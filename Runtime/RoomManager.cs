@@ -17,6 +17,8 @@ namespace GameRuntime
         private Room currentRoom;
         private List<Engine.Core.GameObject> gameObjects = new List<Engine.Core.GameObject>();
         private ScriptManager scriptManager;
+        private int viewportWidth = 800;
+        private int viewportHeight = 600;
 
         // Data classes (matching the editor)
         public class GameOptions
@@ -174,9 +176,10 @@ namespace GameRuntime
                 }
 
                 // Load texture
-                using (var fileStream = File.OpenRead(spritePath))
+                byte[] imageBytes = File.ReadAllBytes(spritePath);
+                using (var ms = new MemoryStream(imageBytes))
                 {
-                    var texture = Texture2D.FromStream(graphicsDevice, fileStream);
+                    var texture = Texture2D.FromStream(graphicsDevice, ms);
                     
                     var gameObj = new Engine.Core.GameObject
                     {
@@ -208,45 +211,100 @@ namespace GameRuntime
 
         public void Update(GameTime gameTime)
         {
-            foreach (var gameObj in gameObjects)
+            // Check for mouse clicks on objects
+            if (Engine.Core.Input.IsMousePressed(Engine.Core.Input.Button.Left))
             {
-                foreach (var script in gameObj.scriptInstances)
+                var mousePos = Engine.Core.Input.MousePosition;
+                // Get viewport dimensions from the graphics device (we'll need to pass this)
+                var worldPos = Engine.Core.Camera.Main.ScreenToWorld(mousePos, viewportWidth, viewportHeight);
+                
+                // Check each object for click
+                foreach (var gameObj in gameObjects)
                 {
-                    if (script is Engine.Core.GameScript gs)
+                    if (gameObj.sprite != null && !gameObj.IsDestroyed)
                     {
-                        try
+                        // Calculate object bounds (assuming sprite is centered on position)
+                        var spriteWidth = gameObj.sprite.Width;
+                        var spriteHeight = gameObj.sprite.Height;
+                        var left = gameObj.position.X;
+                        var right = gameObj.position.X + spriteWidth;
+                        var top = gameObj.position.Y;
+                        var bottom = gameObj.position.Y + spriteHeight;
+                        
+                        // Check if mouse is within object bounds
+                        if (worldPos.X >= left && worldPos.X <= right && 
+                            worldPos.Y >= top && worldPos.Y <= bottom)
                         {
-                            gs.Update(gameTime);
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"Error updating script for {gameObj.name}: {ex.Message}");
+                            // Call OnClick on all scripts attached to this object
+                            foreach (var script in gameObj.scriptInstances)
+                            {
+                                if (script is Engine.Core.GameScript gs)
+                                {
+                                    try
+                                    {
+                                        gs.OnClick();
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Console.WriteLine($"Error calling OnClick on script for {gameObj.name}: {ex.Message}");
+                                    }
+                                }
+                            }
+                            break; // Only click the first object found
                         }
                     }
                 }
             }
+            
+            // Update all scripts
+            foreach (var gameObj in gameObjects)
+            {
+                if (!gameObj.IsDestroyed)
+                {
+                    foreach (var script in gameObj.scriptInstances)
+                    {
+                        if (script is Engine.Core.GameScript gs)
+                        {
+                            try
+                            {
+                                gs.Update(gameTime);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Error updating script for {gameObj.name}: {ex.Message}");
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Remove destroyed objects
+            gameObjects.RemoveAll(obj => obj.IsDestroyed);
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
             foreach (var gameObj in gameObjects)
             {
-                if (gameObj.sprite != null)
+                if (gameObj.sprite != null && !gameObj.IsDestroyed)
                 {
                     spriteBatch.Draw(gameObj.sprite, gameObj.position, Color.White);
                 }
 
-                foreach (var script in gameObj.scriptInstances)
+                if (!gameObj.IsDestroyed)
                 {
-                    if (script is Engine.Core.GameScript gs)
+                    foreach (var script in gameObj.scriptInstances)
                     {
-                        try
+                        if (script is Engine.Core.GameScript gs)
                         {
-                            gs.Draw(spriteBatch);
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"Error drawing script for {gameObj.name}: {ex.Message}");
+                            try
+                            {
+                                gs.Draw(spriteBatch);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Error drawing script for {gameObj.name}: {ex.Message}");
+                            }
                         }
                     }
                 }
@@ -261,6 +319,79 @@ namespace GameRuntime
         public string GetCurrentRoomName()
         {
             return currentRoom?.name ?? "";
+        }
+
+        public void SetViewportDimensions(int width, int height)
+        {
+            viewportWidth = width;
+            viewportHeight = height;
+        }
+
+        public Engine.Core.GameObject SpawnObject(string objectName, Vector2 position)
+        {
+            // Find the object file by name
+            var objectsDir = Path.Combine(assetsRoot, "Objects");
+            var objectPath = Path.Combine(objectsDir, $"{objectName}.eo");
+            
+            if (!File.Exists(objectPath))
+            {
+                Console.WriteLine($"Object file not found: {objectPath}");
+                return null;
+            }
+
+            try
+            {
+                var json = File.ReadAllText(objectPath);
+                var earthObj = JsonSerializer.Deserialize<EarthObject>(json);
+                
+                if (earthObj == null || string.IsNullOrEmpty(earthObj.sprite))
+                {
+                    Console.WriteLine("Object has no sprite assigned");
+                    return null;
+                }
+
+                var spritePath = Path.Combine(assetsRoot, "Sprites", earthObj.sprite);
+                if (!File.Exists(spritePath))
+                {
+                    Console.WriteLine($"Sprite file not found: {spritePath}");
+                    return null;
+                }
+
+                // Load texture using the GraphicsDevice from GameScript
+                byte[] imageBytes = File.ReadAllBytes(spritePath);
+                using (var ms = new MemoryStream(imageBytes))
+                {
+                    var texture = Texture2D.FromStream(Engine.Core.GameScript.GraphicsDevice, ms);
+                    
+                    var gameObj = new Engine.Core.GameObject
+                    {
+                        name = earthObj.name,
+                        sprite = texture,
+                        position = position
+                    };
+
+                    // Create script instances and call Create
+                    foreach (var scriptName in earthObj.scripts)
+                    {
+                        var scriptInstance = scriptManager.CreateScriptInstanceByName(scriptName);
+                        if (scriptInstance is Engine.Core.GameScript gs)
+                        {
+                            Console.WriteLine($"Attaching script to spawned object: {gameObj.name}");
+                            gs.Attach(gameObj);
+                            gameObj.scriptInstances.Add(gs);
+                        }
+                    }
+
+                    gameObjects.Add(gameObj);
+                    Console.WriteLine($"Spawned object '{objectName}' at position {position}");
+                    return gameObj;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to spawn object: {ex.Message}");
+                return null;
+            }
         }
     }
 } 

@@ -43,6 +43,10 @@ namespace GameRuntime
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             
+            // Set GraphicsDevice and RoomManager for scripts to use
+            Engine.Core.GameScript.GraphicsDevice = GraphicsDevice;
+            Engine.Core.GameScript.RoomManager = _roomManager;
+            
             // Load the default room
             _roomManager.LoadDefaultRoom(GraphicsDevice);
         }
@@ -54,6 +58,9 @@ namespace GameRuntime
 
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+
+            // Update viewport dimensions for coordinate conversion
+            _roomManager.SetViewportDimensions(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
 
             // Update room manager (which handles all game objects and their scripts)
             _roomManager.Update(gameTime);

@@ -81,3 +81,4 @@ C:\Users\calle\Desktop\Earth Engine\Runtime\obj\Debug\net8.0-windows\refint\Game
 C:\Users\calle\Desktop\Earth Engine\Runtime\obj\Debug\net8.0-windows\GameRuntime.pdb
 C:\Users\calle\Desktop\Earth Engine\Runtime\obj\Debug\net8.0-windows\GameRuntime.genruntimeconfig.cache
 C:\Users\calle\Desktop\Earth Engine\Runtime\obj\Debug\net8.0-windows\ref\GameRuntime.dll
+C:\Users\calle\Desktop\Earth Engine\Runtime\obj\Debug\net8.0-windows\GameRuntime.sourcelink.json

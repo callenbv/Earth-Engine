@@ -97,3 +97,4 @@ C:\Users\calle\Desktop\Earth Engine\Editor\bin\Debug\net8.0-windows\runtimes\win
 C:\Users\calle\Desktop\Earth Engine\Editor\bin\Debug\net8.0-windows\runtimes\win-x86\native\soft_oal.dll
 C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\GameOptionsEditor.baml
 C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\GameOptionsEditor.g.cs
+C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\Editor.sourcelink.json

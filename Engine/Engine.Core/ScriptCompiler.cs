@@ -82,10 +82,10 @@ namespace Engine.Core
                     result.Success = true;
                     result.AssemblyBytes = ms.ToArray();
 
-                    // Write DLL to Scripts directory
-                    var outputDir = scriptsDirectory;
-                    Directory.CreateDirectory(outputDir);
-                    var dllPath = Path.Combine(outputDir, "GameScripts.dll");
+                    // Write DLL to Editor/bin/Scripts
+                    var editorBin = Path.GetFullPath(Path.Combine(scriptsDirectory, "..", "..", "bin", "Scripts"));
+                    Directory.CreateDirectory(editorBin);
+                    var dllPath = Path.Combine(editorBin, "GameScripts.dll");
                     File.WriteAllBytes(dllPath, result.AssemblyBytes);
                 }
             }

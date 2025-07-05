@@ -44,6 +44,9 @@ namespace Editor
             public List<RoomObject> objects { get; set; } = new List<RoomObject>();
         }
         
+        // 1. Add a field for tiled background toggle
+        private bool showTiledBackground = true;
+        
         public RoomEditor()
         {
             InitializeComponent();
@@ -63,6 +66,27 @@ namespace Editor
             // Add Ctrl+S hotkey for saving
             this.PreviewKeyDown += RoomEditor_PreviewKeyDown;
             this.Focusable = true;
+            
+            // 2. Add a checkbox to toggle the tiled background in the RoomEditor constructor (after InitializeComponent):
+            var tileCheckbox = new CheckBox { Content = "Show Tiled Background", IsChecked = showTiledBackground, Margin = new Thickness(5) };
+            tileCheckbox.Checked += (s, e) => { showTiledBackground = true; RoomCanvas.InvalidateVisual(); };
+            tileCheckbox.Unchecked += (s, e) => { showTiledBackground = false; RoomCanvas.InvalidateVisual(); };
+            var parentPanel = this.Content as Panel;
+            if (parentPanel != null) parentPanel.Children.Insert(0, tileCheckbox);
+
+            // 1. Draw a simple grid overlay (lines every 16px) on RoomCanvas
+            RoomCanvas.Loaded += (s, e) => RoomCanvas.InvalidateVisual();
+            RoomCanvas.SizeChanged += (s, e) => RoomCanvas.InvalidateVisual();
+            RoomCanvas.PreviewMouseWheel += (s, e) => RoomCanvas.InvalidateVisual();
+            RoomCanvas.PreviewMouseMove += (s, e) => RoomCanvas.InvalidateVisual();
+            RoomCanvas.PreviewDragOver += (s, e) => RoomCanvas.InvalidateVisual();
+            RoomCanvas.PreviewDrop += (s, e) => RoomCanvas.InvalidateVisual();
+            RoomCanvas.PreviewMouseLeftButtonUp += (s, e) => RoomCanvas.InvalidateVisual();
+            RoomCanvas.PreviewMouseLeftButtonDown += (s, e) => RoomCanvas.InvalidateVisual();
+            RoomCanvas.PreviewKeyDown += (s, e) => RoomCanvas.InvalidateVisual();
+            RoomCanvas.PreviewKeyUp += (s, e) => RoomCanvas.InvalidateVisual();
+            RoomCanvas.PreviewMouseRightButtonDown += (s, e) => RoomCanvas.InvalidateVisual();
+            RoomCanvas.PreviewMouseRightButtonUp += (s, e) => RoomCanvas.InvalidateVisual();
         }
         
         private void LoadObjectList()
@@ -142,8 +166,8 @@ namespace Editor
                     room.objects.Add(new RoomObject
                     {
                         objectPath = objectPath,
-                        x = Canvas.GetLeft(img),
-                        y = Canvas.GetTop(img)
+                        x = Canvas.GetLeft(img) + img.Width / 2,
+                        y = Canvas.GetTop(img) + img.Height / 2
                     });
                 }
             }
@@ -200,6 +224,8 @@ namespace Editor
                     if (File.Exists(spritePath))
                     {
                         var bmp = new BitmapImage(new Uri(spritePath));
+                        var snappedX = Math.Round(x / 16.0) * 16;
+                        var snappedY = Math.Round(y / 16.0) * 16;
                         var img = new Image
                         {
                             Source = bmp,
@@ -211,9 +237,16 @@ namespace Editor
                             Tag = eoPath
                         };
                         RenderOptions.SetBitmapScalingMode(img, BitmapScalingMode.NearestNeighbor);
-                        Canvas.SetLeft(img, x - bmp.PixelWidth / 2);
-                        Canvas.SetTop(img, y - bmp.PixelHeight / 2);
+                        Canvas.SetLeft(img, snappedX - bmp.PixelWidth / 2);
+                        Canvas.SetTop(img, snappedY - bmp.PixelHeight / 2);
                         RoomCanvas.Children.Add(img);
+                        img.MouseRightButtonUp += (s, e) => {
+                            if (MessageBox.Show($"Delete this object?", "Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                            {
+                                RoomCanvas.Children.Remove(img);
+                            }
+                            e.Handled = true;
+                        };
                     }
                     else
                     {
@@ -247,13 +280,13 @@ namespace Editor
         
         private void RoomCanvas_MouseMove(object sender, MouseEventArgs e)
         {
-            if (isDragging && draggedElement != null)
+            if (isDragging && draggedElement is Image img)
             {
-                var currentPos = e.GetPosition(RoomCanvas);
-                var delta = currentPos - dragStart;
-                
-                Canvas.SetLeft(draggedElement, originalPosition.X + delta.X);
-                Canvas.SetTop(draggedElement, originalPosition.Y + delta.Y);
+                var mousePos = Mouse.GetPosition(RoomCanvas);
+                var snappedX = Math.Round(mousePos.X / 16.0) * 16;
+                var snappedY = Math.Round(mousePos.Y / 16.0) * 16;
+                Canvas.SetLeft(img, snappedX - img.Width / 2);
+                Canvas.SetTop(img, snappedY - img.Height / 2);
             }
         }
         

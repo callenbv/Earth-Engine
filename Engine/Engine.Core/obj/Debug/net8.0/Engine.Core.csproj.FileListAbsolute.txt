@@ -10,3 +10,4 @@ C:\Users\calle\Desktop\Earth Engine\Engine\Engine.Core\obj\Debug\net8.0\Engine.C
 C:\Users\calle\Desktop\Earth Engine\Engine\Engine.Core\obj\Debug\net8.0\refint\Engine.Core.dll
 C:\Users\calle\Desktop\Earth Engine\Engine\Engine.Core\obj\Debug\net8.0\Engine.Core.pdb
 C:\Users\calle\Desktop\Earth Engine\Engine\Engine.Core\obj\Debug\net8.0\ref\Engine.Core.dll
+C:\Users\calle\Desktop\Earth Engine\Engine\Engine.Core\obj\Debug\net8.0\Engine.Core.sourcelink.json

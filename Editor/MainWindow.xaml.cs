@@ -11,6 +11,7 @@ using Microsoft.Win32;
 using System.Windows.Media;
 using System.Windows.Threading;
 using System.Management;
+using System.Windows.Media.Imaging;
 
 namespace Editor
 {
@@ -61,7 +62,9 @@ namespace Editor
                 var compiler = new Engine.Core.ScriptCompiler();
                 var scriptsDir = Path.Combine(assetsRoot, "Scripts");
                 var result = compiler.CompileScripts(scriptsDir);
-                var dllPath = Path.Combine(scriptsDir, "GameScripts.dll");
+                // Get DLL from Editor/bin/Scripts
+                var editorBinScripts = Path.GetFullPath(Path.Combine(scriptsDir, "..", "..", "bin", "Scripts"));
+                var dllPath = Path.Combine(editorBinScripts, "GameScripts.dll");
                 if (!result.Success)
                 {
                     MessageBox.Show($"Script compilation failed:\n{string.Join("\n", result.Errors)}", "Script Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -191,7 +194,16 @@ namespace Editor
                     var spritePath = Path.Combine(assetsRoot, "Sprites", _inspectorObjectData.sprite);
                     if (File.Exists(spritePath))
                     {
-                        var bmp = new System.Windows.Media.Imaging.BitmapImage(new Uri(spritePath));
+                        byte[] imageBytes = File.ReadAllBytes(spritePath);
+                        BitmapImage bmp = new BitmapImage();
+                        using (var ms = new MemoryStream(imageBytes))
+                        {
+                            bmp.BeginInit();
+                            bmp.CacheOption = BitmapCacheOption.OnLoad;
+                            bmp.StreamSource = ms;
+                            bmp.EndInit();
+                            bmp.Freeze(); // Ensures the image is fully loaded and not tied to the stream
+                        }
                         var spriteImg = new Image
                         {
                             Source = bmp,
@@ -213,8 +225,13 @@ namespace Editor
                 // Sprite
                 InspectorPanel.Children.Add(new TextBlock { Text = "Sprite:", FontWeight = FontWeights.Bold });
                 var spriteList = GetAllSprites();
-                var spriteCombo = new ComboBox { ItemsSource = spriteList, SelectedItem = _inspectorObjectData.sprite, Margin = new Thickness(0, 0, 0, 10) };
-                spriteCombo.SelectionChanged += (s, e) => { _inspectorObjectData.sprite = spriteCombo.SelectedItem?.ToString() ?? ""; SaveInspectorObject(); ShowInspector(assetPath); };
+                var spriteCombo = new ComboBox { ItemsSource = spriteList, SelectedItem = _inspectorObjectData.sprite, Margin = new Thickness(0, 0, 0, 10), Width = 180 };
+                spriteCombo.SelectionChanged += (s, e) => {
+                    var selected = spriteCombo.SelectedItem?.ToString() ?? "";
+                    _inspectorObjectData.sprite = !string.IsNullOrEmpty(selected) ? selected : "";
+                    SaveInspectorObject();
+                    ShowInspector(assetPath);
+                };
                 InspectorPanel.Children.Add(spriteCombo);
                 // Scripts
                 InspectorPanel.Children.Add(new TextBlock { Text = "Scripts:", FontWeight = FontWeights.Bold });
@@ -243,7 +260,16 @@ namespace Editor
             else if (ext == ".png" || ext == ".jpg" || ext == ".jpeg")
             {
                 // Sprite preview with nearest neighbor scaling, not warped, and show dimensions
-                var bmp = new System.Windows.Media.Imaging.BitmapImage(new Uri(assetPath));
+                byte[] imageBytes = File.ReadAllBytes(assetPath);
+                BitmapImage bmp = new BitmapImage();
+                using (var ms = new MemoryStream(imageBytes))
+                {
+                    bmp.BeginInit();
+                    bmp.CacheOption = BitmapCacheOption.OnLoad;
+                    bmp.StreamSource = ms;
+                    bmp.EndInit();
+                    bmp.Freeze(); // Ensures the image is fully loaded and not tied to the stream
+                }
                 var img = new Image
                 {
                     Source = bmp,
@@ -257,6 +283,41 @@ namespace Editor
                 InspectorPanel.Children.Add(img);
                 InspectorPanel.Children.Add(new TextBlock { Text = Path.GetFileName(assetPath), FontWeight = FontWeights.Bold });
                 InspectorPanel.Children.Add(new TextBlock { Text = $"Dimensions: {bmp.PixelWidth} x {bmp.PixelHeight}", Foreground = Brushes.Gray });
+                var loadSpriteBtn = new Button { Content = "Load New Sprite...", Margin = new Thickness(0, 0, 0, 10) };
+                loadSpriteBtn.Click += (s, e) => {
+                    // Remove the old image and force GC to release file lock
+                    InspectorPanel.Children.Clear();
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                    var dlg = new Microsoft.Win32.OpenFileDialog { Filter = "Image Files (*.png;*.jpg;*.jpeg)|*.png;*.jpg;*.jpeg" };
+                    if (dlg.ShowDialog() == true)
+                    {
+                        var spritesDir = Path.Combine(assetsRoot, "Sprites");
+                        var destPath = Path.Combine(spritesDir, Path.GetFileName(dlg.FileName));
+                        File.Copy(dlg.FileName, destPath, overwrite: true);
+                        // Optionally, refresh the inspector to show the new sprite
+                        ShowInspector(destPath);
+                    }
+                };
+                InspectorPanel.Children.Add(loadSpriteBtn);
+                var deleteSpriteBtn = new Button { Content = "Delete Sprite", Margin = new Thickness(0, 0, 0, 10), Style = (Style)Application.Current.Resources["DangerButton"] };
+                deleteSpriteBtn.Click += (s, e) => {
+                    if (MessageBox.Show($"Delete this sprite? This cannot be undone.", "Delete Sprite", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                    {
+                        try
+                        {
+                            File.Delete(assetPath);
+                            // Optionally, refresh the asset tree or inspector
+                            InspectorPanel.Children.Clear();
+                            MessageBox.Show("Sprite deleted.");
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"Failed to delete sprite: {ex.Message}");
+                        }
+                    }
+                };
+                InspectorPanel.Children.Add(deleteSpriteBtn);
             }
             else
             {

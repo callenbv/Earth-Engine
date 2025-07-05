@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:Editor"
              mc:Ignorable="d"
              d:DesignHeight="600" d:DesignWidth="900">
     <UserControl.Resources>
@@ -58,6 +59,7 @@
         <!-- Right Panel: Room Canvas -->
         <Border Grid.Column="1" Margin="10" Background="{StaticResource PanelBackground}" CornerRadius="6">
             <Grid>
+                <local:GridOverlay x:Name="GridOverlay" />
                 <Canvas x:Name="RoomCanvas" AllowDrop="True" Background="Transparent" 
                         MouseLeftButtonDown="RoomCanvas_MouseLeftButtonDown"
                         MouseMove="RoomCanvas_MouseMove"

@@ -29,6 +29,18 @@ namespace Engine.Core
                    Matrix.CreateTranslation(new Vector3(viewportWidth * 0.5f, viewportHeight * 0.5f, 0f));
         }
 
+        public Vector2 ScreenToWorld(Point screenPos, int viewportWidth, int viewportHeight)
+        {
+            var viewMatrix = GetViewMatrix(viewportWidth, viewportHeight);
+            var inverseViewMatrix = Matrix.Invert(viewMatrix);
+            
+            // Convert screen position to world position
+            var screenVector = new Vector3(screenPos.X, screenPos.Y, 0f);
+            var worldVector = Vector3.Transform(screenVector, inverseViewMatrix);
+            
+            return new Vector2(worldVector.X, worldVector.Y);
+        }
+
         // Singleton for easy access
         private static Camera _main;
         public static Camera Main => _main ??= new Camera();
