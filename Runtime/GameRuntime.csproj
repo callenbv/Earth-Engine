@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <StartupObject>GameRuntime.Game1</StartupObject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.303" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Engine\Engine.Core\Engine.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Editor\bin\Assets\Scripts\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Player\**" />
+    <EmbeddedResource Remove="Player\**" />
+    <None Remove="Player\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="..\Editor\bin\Assets\Scripts\PlayerMovement.cs" Link="PlayerMovement.cs" />
+  </ItemGroup>
+
+</Project> 

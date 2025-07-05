@@ -1,0 +1,30 @@
+{
+  "name": "rm_start",
+  "objects": [
+    {
+      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Player.eo",
+      "x": 81.80000000000004,
+      "y": 74.64000000000007
+    },
+    {
+      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Tree.eo",
+      "x": 158.60000000000002,
+      "y": 4.240000000000009
+    },
+    {
+      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Tree.eo",
+      "x": 49.80000000000001,
+      "y": 61.04000000000002
+    },
+    {
+      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Tree.eo",
+      "x": 8.199999999999989,
+      "y": -53.359999999999985
+    },
+    {
+      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Chest.eo",
+      "x": 125,
+      "y": 152.64000000000001
+    }
+  ]
+}

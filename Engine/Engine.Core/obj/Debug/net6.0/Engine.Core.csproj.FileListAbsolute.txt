@@ -1,0 +1,12 @@
+C:\Users\calle\Desktop\Earth Engine\Engine\Engine.Core\obj\Debug\net6.0\Engine.Core.csproj.AssemblyReference.cache
+C:\Users\calle\Desktop\Earth Engine\Engine\Engine.Core\obj\Debug\net6.0\Engine.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\calle\Desktop\Earth Engine\Engine\Engine.Core\obj\Debug\net6.0\Engine.Core.AssemblyInfoInputs.cache
+C:\Users\calle\Desktop\Earth Engine\Engine\Engine.Core\obj\Debug\net6.0\Engine.Core.AssemblyInfo.cs
+C:\Users\calle\Desktop\Earth Engine\Engine\Engine.Core\obj\Debug\net6.0\Engine.Core.csproj.CoreCompileInputs.cache
+C:\Users\calle\Desktop\Earth Engine\Engine\Engine.Core\bin\Debug\net6.0\Engine.Core.deps.json
+C:\Users\calle\Desktop\Earth Engine\Engine\Engine.Core\bin\Debug\net6.0\Engine.Core.dll
+C:\Users\calle\Desktop\Earth Engine\Engine\Engine.Core\bin\Debug\net6.0\Engine.Core.pdb
+C:\Users\calle\Desktop\Earth Engine\Engine\Engine.Core\obj\Debug\net6.0\Engine.Core.dll
+C:\Users\calle\Desktop\Earth Engine\Engine\Engine.Core\obj\Debug\net6.0\refint\Engine.Core.dll
+C:\Users\calle\Desktop\Earth Engine\Engine\Engine.Core\obj\Debug\net6.0\Engine.Core.pdb
+C:\Users\calle\Desktop\Earth Engine\Engine\Engine.Core\obj\Debug\net6.0\ref\Engine.Core.dll

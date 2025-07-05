@@ -1,0 +1,8 @@
+{
+  "name": "Player",
+  "sprite": "Player.png",
+  "scripts": [
+    "PlayerMovement.cs",
+    "CameraFollow.cs"
+  ]
+}

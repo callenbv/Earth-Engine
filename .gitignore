@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+*.v2
+*.bin
+*.cache
+*.pdb
+*.vsidx
+.vs/GameEngine/v17/.suo
