@@ -4,7 +4,6 @@ using System;
 
 public class LightEmitter : GameScript
 {
-    private float pulseTimer = 0f;
     private bool isPulsing = false;
     
     public override void Create()

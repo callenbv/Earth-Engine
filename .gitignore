@@ -38,3 +38,4 @@
 .vs/GameEngine/v17/.suo
 *.props
 *.xnb
+/Editor/obj

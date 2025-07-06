@@ -1,0 +1,7 @@
+{
+  "name": "Campfire",
+  "sprite": "Campfire.png",
+  "scripts": [
+    "LightEmitter.cs"
+  ]
+}

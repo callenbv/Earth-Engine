@@ -97,6 +97,16 @@
       "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Furnace.eo",
       "x": 400,
       "y": 352
+    },
+    {
+      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Rock.eo",
+      "x": 464.5,
+      "y": 272
+    },
+    {
+      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Campfire.eo",
+      "x": 464,
+      "y": 336
     }
   ]
 }

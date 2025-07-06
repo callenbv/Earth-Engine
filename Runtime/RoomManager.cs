@@ -459,6 +459,7 @@ namespace GameRuntime
                 // 3) Build your source rectangle
                 //    - full texture by default
                 Rectangle? sourceRect = new Rectangle(0, 0, tex.Width, tex.Height);
+                Vector2 origin = new Vector2(gameObj.sprite.Width / 2, gameObj.sprite.Height / 2);
 
                 if (gameObj is AnimatedGameObject anim
                     && anim.spriteData?.animated == true
@@ -479,9 +480,9 @@ namespace GameRuntime
                     fh = Math.Min(fh, tex.Height);
 
                     sourceRect = new Rectangle(x, 0, fw, fh);
+                    origin = new Vector2(anim.spriteData.frameWidth/2,anim.spriteData.frameHeight/2);
                 }
 
-                Vector2 origin = new Vector2(gameObj.sprite.Width/2,gameObj.sprite.Height/2);
 
                 // 4) Single Draw call
                 spriteBatch.Draw(

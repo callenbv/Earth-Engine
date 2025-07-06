@@ -165,7 +165,7 @@ namespace GameRuntime
                     spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive);
                     spriteBatch.Draw(
                         softCircleTexture,
-                        light.Position+new Vector2(-24,0),
+                        light.Position,
                         null,
                         light.Color * light.Intensity,
                         0f,
