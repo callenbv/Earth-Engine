@@ -1,10 +1,10 @@
-﻿using Engine.Core;
+using Engine.Core;
 using Microsoft.Xna.Framework;
 using System;
 
 public class CameraFollow : GameScript
 {
-    int targetZoom = 4;
+    float targetZoom = 4f;
 
     public override void Create()
     {

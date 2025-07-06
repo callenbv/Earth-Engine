@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Content;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -39,6 +40,8 @@ namespace GameRuntime
             public string name { get; set; }
             public string background { get; set; } = "";
             public bool backgroundTiled { get; set; } = false;
+            public int width { get; set; } = 800;
+            public int height { get; set; } = 600;
             public List<RoomObject> objects { get; set; } = new List<RoomObject>();
         }
 
@@ -400,6 +403,8 @@ namespace GameRuntime
 
         public void Draw(SpriteBatch spriteBatch)
         {
+            _currentSpriteBatch = spriteBatch;
+            
             // Draw background first
             if (backgroundTexture != null)
             {
@@ -793,5 +798,7 @@ namespace GameRuntime
             
             return lights;
         }
+        
+        private SpriteBatch _currentSpriteBatch;
     }
 } 

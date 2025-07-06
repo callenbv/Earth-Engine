@@ -136,6 +136,10 @@
             "MonoGame.Framework.DesktopGL": {
               "target": "Package",
               "version": "[3.8.1.303, )"
+            },
+            "SharpFont": {
+              "target": "Package",
+              "version": "[4.0.1, )"
             }
           },
           "imports": [

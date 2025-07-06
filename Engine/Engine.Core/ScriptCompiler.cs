@@ -29,7 +29,7 @@ namespace Engine.Core
                     return result;
                 }
 
-                var scriptFiles = Directory.GetFiles(scriptsDirectory, "*.cs");
+                var scriptFiles = Directory.GetFiles(scriptsDirectory, "*.cs", SearchOption.AllDirectories);
                 if (scriptFiles.Length == 0)
                 {
                     result.Success = true; // No scripts to compile

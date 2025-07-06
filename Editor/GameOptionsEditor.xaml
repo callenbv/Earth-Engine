@@ -24,13 +24,12 @@
             <TextBlock Text="Game Options" FontWeight="Bold" FontSize="18" Margin="0,0,0,10" Foreground="{DynamicResource PrimaryTextBrush}"/>
             <TextBlock Text="Default Room:" FontWeight="Bold" Margin="0,0,0,5" Foreground="{DynamicResource PrimaryTextBrush}"/>
             <ComboBox x:Name="DefaultRoomComboBox" Margin="0,0,0,10" SelectionChanged="DefaultRoomComboBox_SelectionChanged"/>
-            <TextBlock Text="Game Title:" FontWeight="Bold" Margin="0,0,0,5" Foreground="{DynamicResource PrimaryTextBrush}"/>
+            <TextBlock Text="Game Name:" FontWeight="Bold" Margin="0,0,0,5" Foreground="{DynamicResource PrimaryTextBrush}"/>
             <TextBox x:Name="GameTitleTextBox" Margin="0,0,0,10"/>
             <TextBlock Text="Window Width:" FontWeight="Bold" Margin="0,0,0,5" Foreground="{DynamicResource PrimaryTextBrush}"/>
             <TextBox x:Name="WindowWidthTextBox" Text="800" Margin="0,0,0,5"/>
             <TextBlock Text="Window Height:" FontWeight="Bold" Margin="0,0,0,5" Foreground="{DynamicResource PrimaryTextBrush}"/>
             <TextBox x:Name="WindowHeightTextBox" Text="600" Margin="0,0,0,10"/>
-            <Button Content="Save Game Options" Click="SaveGameOptions_Click" Padding="8,2"/>
-        </StackPanel>
+    </StackPanel>
     </Border>
 </UserControl>

@@ -2,111 +2,93 @@
   "name": "rm_start",
   "background": "spr_forest_bg.png",
   "backgroundTiled": true,
+  "width": 400,
+  "height": 320,
   "objects": [
     {
       "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Chest.eo",
-      "x": 432,
-      "y": 368
-    },
-    {
-      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Player.eo",
-      "x": 432,
-      "y": 320
-    },
-    {
-      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Tree.eo",
-      "x": 368,
-      "y": 272
-    },
-    {
-      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Tree.eo",
       "x": 320,
-      "y": 208
-    },
-    {
-      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Tree.eo",
-      "x": 512,
-      "y": 304
-    },
-    {
-      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Tree.eo",
-      "x": 288,
-      "y": 352
+      "y": 240
     },
     {
       "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Torch.eo",
-      "x": 192,
-      "y": 176
+      "x": 176,
+      "y": 64
     },
     {
       "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Torch.eo",
-      "x": 480,
-      "y": 368
-    },
-    {
-      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Tree.eo",
-      "x": 528,
-      "y": 176
-    },
-    {
-      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Slime.eo",
-      "x": 224,
-      "y": 300
-    },
-    {
-      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Rock.eo",
-      "x": 368.5,
-      "y": 384
-    },
-    {
-      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Rock.eo",
-      "x": 400.5,
+      "x": 176,
       "y": 224
     },
     {
-      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Rock.eo",
-      "x": 560.5,
-      "y": 272
-    },
-    {
-      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Rock.eo",
-      "x": 480.5,
-      "y": 400
+      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Slime.eo",
+      "x": 144,
+      "y": 236
     },
     {
       "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\House.eo",
-      "x": 224,
-      "y": 192
+      "x": 112,
+      "y": 80
     },
     {
       "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Witch.eo",
-      "x": 320,
-      "y": 304
+      "x": 256,
+      "y": 192
     },
     {
       "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Torch.eo",
-      "x": 224,
-      "y": 352
+      "x": 304,
+      "y": 128
     },
     {
       "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Torch.eo",
-      "x": 448,
-      "y": 208
+      "x": 96,
+      "y": 192
     },
     {
       "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Furnace.eo",
-      "x": 400,
-      "y": 352
-    },
-    {
-      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Rock.eo",
-      "x": 464.5,
-      "y": 272
+      "x": 320,
+      "y": 192
     },
     {
       "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Campfire.eo",
-      "x": 464,
-      "y": 336
+      "x": 240,
+      "y": 240
+    },
+    {
+      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Resources\\Tree.eo",
+      "x": 240,
+      "y": 80
+    },
+    {
+      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Resources\\Tree.eo",
+      "x": 64,
+      "y": 192
+    },
+    {
+      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Resources\\Tree.eo",
+      "x": 32,
+      "y": 48
+    },
+    {
+      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Resources\\Tree.eo",
+      "x": 352,
+      "y": 128
+    },
+    {
+      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Resources\\Tree.eo",
+      "x": 192,
+      "y": 240
+    },
+    {
+      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Player.eo",
+      "x": 192,
+      "y": 160
+    },
+    {
+      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\UI\\WorldText.eo",
+      "x": 64,
+      "y": 16
     }
   ]
 }

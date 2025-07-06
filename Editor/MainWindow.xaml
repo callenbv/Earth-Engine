@@ -32,7 +32,9 @@
                                       Margin="10,0,10,10"
                                       SelectedItemChanged="AssetTreeView_SelectedItemChanged"
                                       MouseDoubleClick="AssetTreeView_MouseDoubleClick"
+                                      MouseLeftButtonUp="AssetTreeView_MouseLeftButtonUp"
                                       PreviewMouseRightButtonDown="AssetTreeView_PreviewMouseRightButtonDown"
+                                      PreviewMouseDown="AssetTreeView_PreviewMouseDown"
                                       AllowDrop="True"
                                       PreviewMouseMove="AssetTreeView_PreviewMouseMove"
                                       Drop="AssetTreeView_Drop"/>

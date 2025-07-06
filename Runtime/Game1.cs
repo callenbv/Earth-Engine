@@ -81,6 +81,12 @@ namespace GameRuntime
             // Update viewport dimensions for coordinate conversion
             _roomManager.SetViewportDimensions(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
 
+            // Check for hot reload every few frames
+            if (gameTime.TotalGameTime.TotalMilliseconds % 500 < 16) // Check every ~500ms
+            {
+                _scriptManager.CheckForHotReload();
+            }
+
             // Update room manager (which handles all game objects and their scripts)
             _roomManager.Update(gameTime);
 

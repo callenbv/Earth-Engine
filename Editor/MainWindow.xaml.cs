@@ -12,7 +12,10 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using System.Management;
 using System.Windows.Media.Imaging;
+using System.Windows.Documents;
 using System.Text.Json;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Editor
 {
@@ -33,6 +36,8 @@ namespace Editor
         private string _lastInspectedObjectPath;
         private dynamic _lastInspectedObjectData;
         private bool isDraggingScript = false;
+        private bool isDraggingAsset = false;
+        private bool isHandlingRoomSelection = false;
 
         public MainWindow()
         {
@@ -127,6 +132,13 @@ namespace Editor
 
         private void LoadAssetTree()
         {
+            // Preserve selected tab index
+            var tabControl = (TabControl)((DockPanel)Content).Children[0];
+            int selectedTabIndex = tabControl.SelectedIndex;
+
+            // Store expanded state before clearing
+            var expandedPaths = GetExpandedPaths();
+            
             AssetTreeView.Items.Clear();
             foreach (var type in assetTypeFolders.Keys)
             {
@@ -135,6 +147,12 @@ namespace Editor
                 LoadAssetFolder(typeNode, absPath);
                 AssetTreeView.Items.Add(typeNode);
             }
+            
+            // Restore expanded state
+            RestoreExpandedPaths(expandedPaths);
+
+            // Restore selected tab index
+            tabControl.SelectedIndex = selectedTabIndex;
         }
 
         private void LoadAssetFolder(TreeViewItem parent, string folderPath)
@@ -142,56 +160,94 @@ namespace Editor
             if (!Directory.Exists(folderPath))
                 Directory.CreateDirectory(folderPath);
 
-            // Add folders
+            // Always add all subfolders
             foreach (var dir in Directory.GetDirectories(folderPath))
             {
                 var dirName = Path.GetFileName(dir);
-                var dirNode = new TreeViewItem { Header = dirName, Tag = dir };
+                // Add folder icon
+                var folderPanel = new StackPanel { Orientation = Orientation.Horizontal };
+                var folderIcon = new TextBlock { Text = "📁", FontSize = 14, Margin = new Thickness(0, 0, 5, 0) };
+                var folderText = new TextBlock { Text = dirName };
+                folderPanel.Children.Add(folderIcon);
+                folderPanel.Children.Add(folderText);
+                var dirNode = new TreeViewItem { Header = folderPanel, Tag = dir };
                 LoadAssetFolder(dirNode, dir);
                 parent.Items.Add(dirNode);
             }
             // Add files (show all except .dll)
+            var scriptsRoot = Path.Combine(assetsRoot, "Scripts");
             foreach (var file in Directory.GetFiles(folderPath))
             {
                 if (file.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
                     continue;
                 var fileName = Path.GetFileName(file);
-                var fileNode = new TreeViewItem { Header = fileName, Tag = file };
+                var ext = Path.GetExtension(fileName).ToLower();
+                // Only show .room files in the Rooms folder
+                if (ext == ".room" && !folderPath.EndsWith("Rooms"))
+                    continue;
+                // Only show .cs files if they are under the Scripts root
+                if (ext == ".cs" && !file.StartsWith(scriptsRoot))
+                    continue;
+                // Add icons for file types
+                StackPanel filePanel = new StackPanel { Orientation = Orientation.Horizontal };
+                TextBlock icon = new TextBlock { FontSize = 14, Margin = new Thickness(0, 0, 5, 0) };
+                if (ext == ".room")
+                    icon.Text = "🎮";
+                else if (ext == ".cs")
+                    icon.Text = "📄";
+                else
+                    icon.Text = "📦";
+                var fileText = new TextBlock { Text = fileName };
+                filePanel.Children.Add(icon);
+                filePanel.Children.Add(fileText);
+                var fileNode = new TreeViewItem { Header = filePanel, Tag = file };
                 parent.Items.Add(fileNode);
             }
         }
 
         private void AssetTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (isDraggingScript) return;
             var selected = AssetTreeView.SelectedItem as TreeViewItem;
-            if (selected != null && File.Exists(selected.Tag.ToString()))
+            if (selected != null && selected.Tag != null && File.Exists(selected.Tag.ToString()))
             {
                 var ext = Path.GetExtension(selected.Tag.ToString()).ToLower();
                 if (ext == ".room")
                 {
+                    // Set flag to prevent MouseLeftButtonUp from interfering
+                    isHandlingRoomSelection = true;
+                    // Switch to Rooms tab and load the room
                     var tabControl = (TabControl)((DockPanel)Content).Children[0];
+                    TabItem roomsTab = null;
+                    RoomEditor roomEditor = null;
+                    // Find the Rooms tab and RoomEditor
                     foreach (TabItem tab in tabControl.Items)
                     {
-                        if (tab.Content is RoomEditor re)
+                        if (tab.Header.ToString() == "Rooms")
                         {
-                            re.LoadRoom(selected.Tag.ToString());
-                            tabControl.SelectedItem = tab;
+                            roomsTab = tab;
+                            roomEditor = tab.Content as RoomEditor;
                             break;
                         }
                     }
-                    return; // Prevent ShowInspector for .room files
+                    if (roomsTab != null && roomEditor != null)
+                    {
+                        // Extract just the room name from the file path
+                        var roomName = Path.GetFileNameWithoutExtension(selected.Tag.ToString());
+                        roomEditor.LoadRoom(roomName);
+                        // Use SelectedIndex instead of SelectedItem for more reliable tab switching
+                        tabControl.SelectedIndex = 1; // Rooms tab is at index 1
+                        // Workaround: set again after a short delay to fight WPF focus issues
+                        Dispatcher.InvokeAsync(() => { tabControl.SelectedIndex = 1; }, System.Windows.Threading.DispatcherPriority.Background);
+                        // Force focus to the room editor to prevent tab switching back
+                        roomEditor.Focus();
+                    }
+                    // Reset flag after a short delay to allow MouseLeftButtonUp to complete
+                    Task.Delay(100).ContinueWith(_ => {
+                        Dispatcher.Invoke(() => {
+                            isHandlingRoomSelection = false;
+                        });
+                    });
                 }
-                else if (ext == ".cs")
-                {
-                    // Do not update inspector for script selection
-                    return;
-                }
-                ShowInspector(selected.Tag.ToString());
-            }
-            else
-            {
-                InspectorPanel.Children.Clear();
             }
         }
 
@@ -199,7 +255,43 @@ namespace Editor
         {
             InspectorPanel.Children.Clear();
             var ext = Path.GetExtension(assetPath).ToLower();
-            if (ext == ".eo")
+            if (ext == ".cs")
+            {
+                // Script editing
+                InspectorPanel.Children.Add(new TextBlock { Text = Path.GetFileName(assetPath), FontWeight = FontWeights.Bold, Margin = new Thickness(0, 0, 0, 10) });
+                
+                // Script content text box with syntax highlighting
+                var scriptContent = File.ReadAllText(assetPath);
+                var scriptTextBox = CreateSyntaxHighlightingEditor(scriptContent);
+                
+                // Save button
+                var saveButton = new Button { Content = "Save Script", Margin = new Thickness(0, 0, 0, 5) };
+                saveButton.Click += (s, e) => {
+                    try
+                    {
+                        var textRange = new TextRange(scriptTextBox.Document.ContentStart, scriptTextBox.Document.ContentEnd);
+                        File.WriteAllText(assetPath, textRange.Text);
+                        
+                        // Hot reload the script
+                        HotReloadScript(assetPath);
+                        
+                        MessageBox.Show("Script saved and hot-reloaded!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Failed to save script: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                };
+                
+                InspectorPanel.Children.Add(saveButton);
+                InspectorPanel.Children.Add(scriptTextBox);
+                
+                // Open in Visual Studio button
+                var openInVSButton = new Button { Content = "Open in Visual Studio", Margin = new Thickness(0, 0, 0, 5) };
+                openInVSButton.Click += (s, e) => OpenInVisualStudio();
+                InspectorPanel.Children.Add(openInVSButton);
+            }
+            else if (ext == ".eo")
             {
                 _inspectorObjectPath = assetPath;
                 var json = File.ReadAllText(assetPath);
@@ -483,16 +575,44 @@ namespace Editor
                 var scriptPath = e.Data.GetData(DataFormats.StringFormat) as string;
                 if (Path.GetExtension(scriptPath).ToLower() == ".cs")
                 {
-                    var scriptName = Path.GetFileName(scriptPath);
-                    // Use last-inspected object data
-                    var json = File.ReadAllText(objectPath);
-                    var obj = System.Text.Json.JsonSerializer.Deserialize<EarthObject>(json);
-                    if (!obj.scripts.Contains(scriptName))
+                    // Ensure objectPath is the correct path to the object file
+                    if (!File.Exists(objectPath))
                     {
-                        obj.scripts.Add(scriptName);
-                        var newJson = System.Text.Json.JsonSerializer.Serialize(obj, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
-                        File.WriteAllText(objectPath, newJson);
-                        ShowInspector(objectPath);
+                        MessageBox.Show($"Object file not found: {objectPath}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+                    
+                    // Get the relative path from the Scripts folder
+                    var scriptsRoot = Path.Combine(assetsRoot, "Scripts");
+                    string scriptName;
+                    
+                    if (scriptPath.StartsWith(scriptsRoot))
+                    {
+                        // Get just the class name (filename without extension), not the folder path
+                        scriptName = Path.GetFileNameWithoutExtension(scriptPath);
+                    }
+                    else
+                    {
+                        // Fallback to just filename if not in Scripts folder
+                        scriptName = Path.GetFileNameWithoutExtension(scriptPath);
+                    }
+                    
+                    try
+                    {
+                        // Use last-inspected object data
+                        var json = File.ReadAllText(objectPath);
+                        var obj = System.Text.Json.JsonSerializer.Deserialize<EarthObject>(json);
+                        if (!obj.scripts.Contains(scriptName))
+                        {
+                            obj.scripts.Add(scriptName);
+                            var newJson = System.Text.Json.JsonSerializer.Serialize(obj, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+                            File.WriteAllText(objectPath, newJson);
+                            ShowInspector(objectPath);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Failed to attach script: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
             }
@@ -571,23 +691,110 @@ namespace Editor
             }
             return sprites;
         }
+        private Point? dragStartPoint = null;
+        
+        private void AssetTreeView_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                dragStartPoint = e.GetPosition(null);
+            }
+        }
+        
         private void AssetTreeView_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)
             {
-                var treeView = sender as TreeView;
-                var item = treeView?.SelectedItem as TreeViewItem;
-                if (item != null && File.Exists(item.Tag?.ToString()) && Path.GetExtension(item.Tag.ToString()).ToLower() == ".cs")
+                // Only start dragging if we've moved a minimum distance (to distinguish from clicks)
+                if (dragStartPoint.HasValue)
                 {
-                    isDraggingScript = true;
-                    DragDrop.DoDragDrop(treeView, item.Tag.ToString(), DragDropEffects.Copy);
-                    isDraggingScript = false;
+                    var distance = Math.Sqrt(Math.Pow(e.GetPosition(null).X - dragStartPoint.Value.X, 2) + 
+                                           Math.Pow(e.GetPosition(null).Y - dragStartPoint.Value.Y, 2));
+                    
+                    if (distance > 5) // Minimum drag distance of 5 pixels
+                    {
+                        var treeView = sender as TreeView;
+                        var item = treeView?.SelectedItem as TreeViewItem;
+                        if (item != null && File.Exists(item.Tag?.ToString()))
+                        {
+                            // Make all assets draggable, not just scripts
+                            isDraggingScript = true;
+                            isDraggingAsset = true;
+                            DragDrop.DoDragDrop(treeView, item.Tag.ToString(), DragDropEffects.Copy);
+                            isDraggingScript = false;
+                            isDraggingAsset = false;
+                            dragStartPoint = null; // Reset drag start point
+                        }
+                    }
                 }
+            }
+            else
+            {
+                dragStartPoint = null; // Reset when mouse button is released
             }
         }
         private void AssetTreeView_Drop(object sender, DragEventArgs e)
         {
-            // Optionally handle drop to move files/folders in the tree
+            // Only process drops if we're actually dragging an asset
+            if (!isDraggingAsset) return;
+            
+            if (e.Data.GetDataPresent(DataFormats.StringFormat))
+            {
+                var sourcePath = e.Data.GetData(DataFormats.StringFormat) as string;
+                if (string.IsNullOrEmpty(sourcePath)) return;
+                
+                var targetItem = GetTreeViewItemAtPosition(e.GetPosition(AssetTreeView));
+                if (targetItem == null) return;
+                
+                var targetPath = targetItem.Tag?.ToString();
+                if (string.IsNullOrEmpty(targetPath)) return;
+                
+                try
+                {
+                    // If target is a directory, move the file into it
+                    if (Directory.Exists(targetPath))
+                    {
+                        var fileName = Path.GetFileName(sourcePath);
+                        var destPath = Path.Combine(targetPath, fileName);
+                        
+                        if (File.Exists(sourcePath))
+                        {
+                            File.Move(sourcePath, destPath);
+                        }
+                        else if (Directory.Exists(sourcePath))
+                        {
+                            // Move directory
+                            var destDir = Path.Combine(targetPath, Path.GetFileName(sourcePath));
+                            if (!Directory.Exists(destDir))
+                            {
+                                Directory.Move(sourcePath, destDir);
+                                
+                                // Update stored paths if the moved directory contains the currently inspected object
+                                if (!string.IsNullOrEmpty(_lastInspectedObjectPath) && _lastInspectedObjectPath.StartsWith(sourcePath))
+                                {
+                                    var relativePath = _lastInspectedObjectPath.Substring(sourcePath.Length);
+                                    _lastInspectedObjectPath = Path.Combine(destDir, relativePath.TrimStart('\\', '/'));
+                                    _inspectorObjectPath = _lastInspectedObjectPath;
+                                }
+                            }
+                        }
+                        
+                        // Update stored paths if the moved asset was the currently inspected object
+                        if (_lastInspectedObjectPath == sourcePath)
+                        {
+                            _lastInspectedObjectPath = destPath;
+                            _inspectorObjectPath = destPath;
+                        }
+                        
+                        LoadAssetTree(); // Refresh the tree
+                        e.Handled = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Failed to move asset: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
         }
 
         private void AssetTreeView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -601,6 +808,46 @@ namespace Editor
                     OpenInVisualStudio();
                 }
                 // Optionally handle other asset types
+            }
+        }
+        
+        private void AssetTreeView_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            // If we're handling a room selection, don't interfere
+            if (isHandlingRoomSelection)
+            {
+                return;
+            }
+            // Handle asset selection on mouse release (not drag)
+            if (isDraggingScript) 
+            {
+                return;
+            }
+            var selected = AssetTreeView.SelectedItem as TreeViewItem;
+            if (selected != null && selected.Tag != null && File.Exists(selected.Tag.ToString()))
+            {
+                var ext = Path.GetExtension(selected.Tag.ToString()).ToLower();
+                if (ext == ".room")
+                {
+                    // Rooms are handled in SelectedItemChanged, so we don't need to do anything here
+                    return;
+                }
+                else if (ext == ".cs")
+                {
+                    // Show script in inspector for editing
+                    ShowInspector(selected.Tag.ToString());
+                }
+                else if (ext == ".eo" || ext == ".png" || ext == ".jpg" || ext == ".jpeg")
+                {
+                    // Show other assets in inspector
+                    ShowInspector(selected.Tag.ToString());
+                }
+            }
+            // Check if we're currently on the Rooms tab and if so, don't do anything that might switch back
+            var tabControl = (TabControl)((DockPanel)Content).Children[0];
+            if (tabControl.SelectedIndex == 1) // Rooms tab
+            {
+                return;
             }
         }
 
@@ -787,7 +1034,26 @@ namespace Editor
                 {
                     if (tab.Content is UserControl uc && uc is RoomEditor re)
                     {
+                        // Preserve scroll position before reloading
+                        var treeView = re.GetType().GetField("ObjectTreeView", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.GetValue(re) as TreeView;
+                        double scrollPosition = 0;
+                        if (treeView != null)
+                        {
+                            var scrollViewer = GetScrollViewer(treeView);
+                            if (scrollViewer != null)
+                                scrollPosition = scrollViewer.VerticalOffset;
+                        }
+                        
+                        // Reload the object list
                         re.GetType().GetMethod("LoadObjectList", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.Invoke(re, null);
+                        
+                        // Restore scroll position
+                        if (treeView != null && scrollPosition > 0)
+                        {
+                            var scrollViewer = GetScrollViewer(treeView);
+                            if (scrollViewer != null)
+                                scrollViewer.ScrollToVerticalOffset(scrollPosition);
+                        }
                     }
                 }
             }
@@ -951,6 +1217,245 @@ namespace Editor
             public int frameCount { get; set; } = 1;
             public double frameSpeed { get; set; } = 1.0; // frames per second
             public bool animated { get; set; } = false;
+        }
+        
+        // Hot reload functionality
+        private void HotReloadScript(string scriptPath)
+        {
+            try
+            {
+                // Compile the single script
+                var compiler = new Engine.Core.ScriptCompiler();
+                var scriptsDir = Path.Combine(assetsRoot, "Scripts");
+                var result = compiler.CompileScripts(scriptsDir);
+                
+                if (!result.Success)
+                {
+                    MessageBox.Show($"Script compilation failed:\n{string.Join("\n", result.Errors)}", "Hot Reload Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                
+                // Copy DLL to runtime if game is running
+                var solutionRoot = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", ".."));
+                var editorBinScripts = Path.GetFullPath(Path.Combine(scriptsDir, "..", "..", "bin", "Scripts"));
+                var dllPath = Path.Combine(editorBinScripts, "GameScripts.dll");
+                var runtimeScriptsDir = Path.Combine(solutionRoot, "Runtime", "bin", "Debug", "net8.0-windows", "Scripts");
+                
+                if (Directory.Exists(runtimeScriptsDir))
+                {
+                    var destDllPath = Path.Combine(runtimeScriptsDir, "GameScripts.dll");
+                    File.Copy(dllPath, destDllPath, true);
+                    Console.WriteLine($"[Hot Reload] Script {Path.GetFileName(scriptPath)} compiled and copied to runtime");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Hot Reload] Error: {ex.Message}");
+            }
+        }
+        
+        // Asset tree state management
+        private HashSet<string> GetExpandedPaths()
+        {
+            var expandedPaths = new HashSet<string>();
+            CollectExpandedPaths(AssetTreeView.Items, expandedPaths);
+            return expandedPaths;
+        }
+        
+        private void CollectExpandedPaths(ItemCollection items, HashSet<string> expandedPaths)
+        {
+            foreach (TreeViewItem item in items)
+            {
+                if (item.IsExpanded && item.Tag != null)
+                {
+                    expandedPaths.Add(item.Tag.ToString());
+                }
+                CollectExpandedPaths(item.Items, expandedPaths);
+            }
+        }
+        
+        private void RestoreExpandedPaths(HashSet<string> expandedPaths)
+        {
+            RestoreExpandedPathsRecursive(AssetTreeView.Items, expandedPaths);
+        }
+        
+        private void RestoreExpandedPathsRecursive(ItemCollection items, HashSet<string> expandedPaths)
+        {
+            foreach (TreeViewItem item in items)
+            {
+                if (item.Tag != null && expandedPaths.Contains(item.Tag.ToString()))
+                {
+                    item.IsExpanded = true;
+                }
+                RestoreExpandedPathsRecursive(item.Items, expandedPaths);
+            }
+        }
+        
+
+        
+        private TreeViewItem GetTreeViewItemAtPosition(Point position)
+        {
+            var element = AssetTreeView.InputHitTest(position) as DependencyObject;
+            while (element != null && !(element is TreeViewItem))
+            {
+                element = VisualTreeHelper.GetParent(element);
+            }
+            return element as TreeViewItem;
+        }
+
+        private static ScrollViewer GetScrollViewer(DependencyObject depObj)
+        {
+            if (depObj is ScrollViewer scrollViewer)
+                return scrollViewer;
+
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
+            {
+                var child = VisualTreeHelper.GetChild(depObj, i);
+                var result = GetScrollViewer(child);
+                if (result != null) return result;
+            }
+            return null;
+        }
+
+        private RichTextBox CreateSyntaxHighlightingEditor(string content)
+        {
+            var richTextBox = new RichTextBox
+            {
+                AcceptsReturn = true,
+                AcceptsTab = true,
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
+                Height = 400,
+                FontFamily = new FontFamily("Consolas"),
+                FontSize = 12,
+                Background = new SolidColorBrush(Color.FromRgb(30, 30, 30)),
+                Foreground = new SolidColorBrush(Colors.White),
+                BorderBrush = new SolidColorBrush(Colors.Gray),
+                BorderThickness = new Thickness(1)
+            };
+            
+            // Set compact line height
+            richTextBox.Document.LineHeight = 8;
+
+            // Set the content with basic syntax highlighting
+            SetBasicSyntaxHighlighting(richTextBox, content);
+
+            return richTextBox;
+        }
+
+        private void SetBasicSyntaxHighlighting(RichTextBox richTextBox, string content)
+        {
+            var paragraph = new Paragraph();
+            
+            // C# syntax highlighting patterns
+            var patterns = new Dictionary<string, Brush>
+            {
+                // Keywords
+                { @"\b(using|namespace|class|public|private|protected|internal|static|void|int|float|double|string|bool|var|if|else|for|while|foreach|return|new|this|base|null|true|false|override|virtual|abstract|interface|enum|struct|try|catch|finally|throw|using|namespace|partial|sealed|readonly|const|out|ref|in|params|where|select|from|let|group|into|orderby|join|on|equals|by|ascending|descending)\b", new SolidColorBrush(Colors.LightBlue) },
+                
+                // Types
+                { @"\b(GameScript|GameObject|Vector2|Vector3|Color|Rectangle|Texture2D|SpriteBatch|GameTime|Keys|Mouse|Input|Camera|RoomManager|ScriptManager|Engine\.Core)\b", new SolidColorBrush(Colors.LightGreen) },
+                
+                // Strings
+                { @"""[^""]*""", new SolidColorBrush(Colors.LightCoral) },
+                
+                // Comments
+                { @"//.*$", new SolidColorBrush(Colors.Gray) },
+                { @"/\*.*?\*/", new SolidColorBrush(Colors.Gray) },
+                
+                // Numbers
+                { @"\b\d+\.?\d*\b", new SolidColorBrush(Colors.LightYellow) },
+                
+                // Method calls
+                { @"\b\w+(?=\()", new SolidColorBrush(Colors.LightCyan) }
+            };
+
+            // Apply syntax highlighting to the entire content
+            var highlightedRuns = ApplySyntaxHighlighting(content, patterns);
+            
+            // Add all highlighted runs to the paragraph
+            foreach (var run in highlightedRuns)
+            {
+                paragraph.Inlines.Add(run);
+            }
+            
+            richTextBox.Document.Blocks.Clear();
+            richTextBox.Document.Blocks.Add(paragraph);
+        }
+
+        private List<Inline> ApplySyntaxHighlighting(string content, Dictionary<string, Brush> patterns)
+        {
+            var result = new List<Inline>();
+            var lines = content.Split('\n');
+            
+            foreach (var line in lines)
+            {
+                var lineRuns = new List<Inline>();
+                var currentPosition = 0;
+                var lineText = line;
+                
+                // Find all matches for this line
+                var allMatches = new List<(int index, int length, Brush brush, string text)>();
+                
+                foreach (var pattern in patterns)
+                {
+                    var regex = new Regex(pattern.Key, RegexOptions.Compiled);
+                    var matches = regex.Matches(lineText);
+                    
+                    foreach (Match match in matches)
+                    {
+                        allMatches.Add((match.Index, match.Length, pattern.Value, match.Value));
+                    }
+                }
+                
+                // Sort matches by position
+                allMatches.Sort((a, b) => a.index.CompareTo(b.index));
+                
+                // Process matches in order
+                foreach (var match in allMatches)
+                {
+                    // Add text before this match
+                    if (match.index > currentPosition)
+                    {
+                        var beforeText = lineText.Substring(currentPosition, match.index - currentPosition);
+                        if (!string.IsNullOrEmpty(beforeText))
+                        {
+                            lineRuns.Add(new Run(beforeText) { Foreground = new SolidColorBrush(Colors.White) });
+                        }
+                    }
+                    
+                    // Add the highlighted match
+                    lineRuns.Add(new Run(match.text) { Foreground = match.brush });
+                    currentPosition = match.index + match.length;
+                }
+                
+                // Add remaining text after last match
+                if (currentPosition < lineText.Length)
+                {
+                    var remainingText = lineText.Substring(currentPosition);
+                    if (!string.IsNullOrEmpty(remainingText))
+                    {
+                        lineRuns.Add(new Run(remainingText) { Foreground = new SolidColorBrush(Colors.White) });
+                    }
+                }
+                
+                // If no highlighting was applied, add the original line
+                if (lineRuns.Count == 0)
+                {
+                    lineRuns.Add(new Run(lineText) { Foreground = new SolidColorBrush(Colors.White) });
+                }
+                
+                // Add all runs for this line
+                result.AddRange(lineRuns);
+                
+                // Add line break (except for the last line)
+                if (line != lines[lines.Length - 1])
+                {
+                    result.Add(new LineBreak());
+                }
+            }
+            
+            return result;
         }
     }
 } 

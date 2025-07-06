@@ -1,3 +1,10 @@
+C:\Users\calle\Desktop\Earth Engine\Runtime\obj\Debug\net8.0-windows\GameRuntime.csproj.AssemblyReference.cache
+C:\Users\calle\Desktop\Earth Engine\Runtime\obj\Debug\net8.0-windows\GameRuntime.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\calle\Desktop\Earth Engine\Runtime\obj\Debug\net8.0-windows\GameRuntime.AssemblyInfoInputs.cache
+C:\Users\calle\Desktop\Earth Engine\Runtime\obj\Debug\net8.0-windows\GameRuntime.AssemblyInfo.cs
+C:\Users\calle\Desktop\Earth Engine\Runtime\obj\Debug\net8.0-windows\GameRuntime.csproj.CoreCompileInputs.cache
+C:\Users\calle\Desktop\Earth Engine\Runtime\obj\Debug\net8.0-windows\GameRuntime.sourcelink.json
+C:\Users\calle\Desktop\Earth Engine\Runtime\bin\Debug\net8.0-windows\SharpFont.dll.config
 C:\Users\calle\Desktop\Earth Engine\Runtime\bin\Debug\net8.0-windows\GameRuntime.exe
 C:\Users\calle\Desktop\Earth Engine\Runtime\bin\Debug\net8.0-windows\GameRuntime.deps.json
 C:\Users\calle\Desktop\Earth Engine\Runtime\bin\Debug\net8.0-windows\GameRuntime.runtimeconfig.json
@@ -70,15 +77,9 @@ C:\Users\calle\Desktop\Earth Engine\Runtime\bin\Debug\net8.0-windows\runtimes\wi
 C:\Users\calle\Desktop\Earth Engine\Runtime\bin\Debug\net8.0-windows\runtimes\win-x86\native\soft_oal.dll
 C:\Users\calle\Desktop\Earth Engine\Runtime\bin\Debug\net8.0-windows\Engine.Core.dll
 C:\Users\calle\Desktop\Earth Engine\Runtime\bin\Debug\net8.0-windows\Engine.Core.pdb
-C:\Users\calle\Desktop\Earth Engine\Runtime\obj\Debug\net8.0-windows\GameRuntime.csproj.AssemblyReference.cache
-C:\Users\calle\Desktop\Earth Engine\Runtime\obj\Debug\net8.0-windows\GameRuntime.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\calle\Desktop\Earth Engine\Runtime\obj\Debug\net8.0-windows\GameRuntime.AssemblyInfoInputs.cache
-C:\Users\calle\Desktop\Earth Engine\Runtime\obj\Debug\net8.0-windows\GameRuntime.AssemblyInfo.cs
-C:\Users\calle\Desktop\Earth Engine\Runtime\obj\Debug\net8.0-windows\GameRuntime.csproj.CoreCompileInputs.cache
 C:\Users\calle\Desktop\Earth Engine\Runtime\obj\Debug\net8.0-windows\GameRunt.5FBD03FF.Up2Date
 C:\Users\calle\Desktop\Earth Engine\Runtime\obj\Debug\net8.0-windows\GameRuntime.dll
 C:\Users\calle\Desktop\Earth Engine\Runtime\obj\Debug\net8.0-windows\refint\GameRuntime.dll
 C:\Users\calle\Desktop\Earth Engine\Runtime\obj\Debug\net8.0-windows\GameRuntime.pdb
 C:\Users\calle\Desktop\Earth Engine\Runtime\obj\Debug\net8.0-windows\GameRuntime.genruntimeconfig.cache
 C:\Users\calle\Desktop\Earth Engine\Runtime\obj\Debug\net8.0-windows\ref\GameRuntime.dll
-C:\Users\calle\Desktop\Earth Engine\Runtime\obj\Debug\net8.0-windows\GameRuntime.sourcelink.json

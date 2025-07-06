@@ -1,0 +1,7 @@
+{
+  "name": "WorldText",
+  "sprite": "Log.png",
+  "scripts": [
+    "FontTest"
+  ]
+}

@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.303" />
+    <PackageReference Include="SharpFont" Version="4.0.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,16 +18,6 @@
 
   <ItemGroup>
     <Compile Include="..\Editor\bin\Assets\Scripts\**\*.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="Player\**" />
-    <EmbeddedResource Remove="Player\**" />
-    <None Remove="Player\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="..\Editor\bin\Assets\Scripts\PlayerMovement.cs" Link="PlayerMovement.cs" />
   </ItemGroup>
 
 </Project> 

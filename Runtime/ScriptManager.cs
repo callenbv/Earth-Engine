@@ -13,6 +13,7 @@ namespace GameRuntime
         private List<object> _scriptInstances = new List<object>();
         private string _scriptsDirectory;
         private Assembly _scriptAssembly;
+        private DateTime _lastAssemblyWriteTime;
 
         public ScriptManager()
         {
@@ -28,8 +29,17 @@ namespace GameRuntime
                 try
                 {
                     var lastWrite = File.GetLastWriteTime(dllPath);
+                    
+                    // Check if assembly has changed (for hot reloading)
+                    if (_scriptAssembly != null && lastWrite <= _lastAssemblyWriteTime)
+                    {
+                        return; // No change, keep existing assembly
+                    }
+                    
                     Console.WriteLine($"[ScriptManager] Loading DLL: {dllPath} (LastWrite: {lastWrite})");
                     _scriptAssembly = Assembly.LoadFrom(dllPath);
+                    _lastAssemblyWriteTime = lastWrite;
+                    
                     var types = _scriptAssembly.GetTypes();
                     Console.WriteLine($"[ScriptManager] Types in DLL:");
                     foreach (var t in types)
@@ -49,7 +59,12 @@ namespace GameRuntime
         public void LoadScripts()
         {
             _scriptInstances.Clear();
-            LoadScriptAssembly(); // Always reload the assembly in case it changed
+            LoadScriptAssembly(); // Check for changes and reload if needed
+        }
+        
+        public void CheckForHotReload()
+        {
+            LoadScriptAssembly(); // This will only reload if the DLL has changed
         }
 
         public object CreateScriptInstance(string scriptPath)
