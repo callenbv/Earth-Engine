@@ -16,8 +16,7 @@ namespace Engine.Core
 
             if (Target != null)
             {
-                Vector2 offset = new Vector2(Target.sprite.Width/2, Target.sprite.Height/2);
-                Position = Vector2.Lerp(Position, Target.position+offset, SmoothSpeed * dt);
+                Position = Vector2.Lerp(Position, Target.position, SmoothSpeed * dt);
             }
         }
 

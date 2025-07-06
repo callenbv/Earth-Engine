@@ -9,6 +9,9 @@ namespace Engine.Core
         public string name;
         public Texture2D sprite;
         public Vector2 position;
+        public Vector2 scale = Vector2.One;
+        public float rotation;
+        public SpriteEffects spriteEffect = SpriteEffects.None;
         public List<object> scriptInstances = new List<object>();
         public bool IsDestroyed { get; private set; } = false;
         

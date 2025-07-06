@@ -41,6 +41,8 @@ namespace Editor
         public class Room
         {
             public string name { get; set; }
+            public string background { get; set; } = "";
+            public bool backgroundTiled { get; set; } = false;
             public List<RoomObject> objects { get; set; } = new List<RoomObject>();
         }
         
@@ -67,26 +69,15 @@ namespace Editor
             this.PreviewKeyDown += RoomEditor_PreviewKeyDown;
             this.Focusable = true;
             
-            // 2. Add a checkbox to toggle the tiled background in the RoomEditor constructor (after InitializeComponent):
+            // Add a checkbox to toggle the tiled background
             var tileCheckbox = new CheckBox { Content = "Show Tiled Background", IsChecked = showTiledBackground, Margin = new Thickness(5) };
             tileCheckbox.Checked += (s, e) => { showTiledBackground = true; RoomCanvas.InvalidateVisual(); };
             tileCheckbox.Unchecked += (s, e) => { showTiledBackground = false; RoomCanvas.InvalidateVisual(); };
             var parentPanel = this.Content as Panel;
             if (parentPanel != null) parentPanel.Children.Insert(0, tileCheckbox);
 
-            // 1. Draw a simple grid overlay (lines every 16px) on RoomCanvas
-            RoomCanvas.Loaded += (s, e) => RoomCanvas.InvalidateVisual();
-            RoomCanvas.SizeChanged += (s, e) => RoomCanvas.InvalidateVisual();
-            RoomCanvas.PreviewMouseWheel += (s, e) => RoomCanvas.InvalidateVisual();
-            RoomCanvas.PreviewMouseMove += (s, e) => RoomCanvas.InvalidateVisual();
-            RoomCanvas.PreviewDragOver += (s, e) => RoomCanvas.InvalidateVisual();
-            RoomCanvas.PreviewDrop += (s, e) => RoomCanvas.InvalidateVisual();
-            RoomCanvas.PreviewMouseLeftButtonUp += (s, e) => RoomCanvas.InvalidateVisual();
-            RoomCanvas.PreviewMouseLeftButtonDown += (s, e) => RoomCanvas.InvalidateVisual();
-            RoomCanvas.PreviewKeyDown += (s, e) => RoomCanvas.InvalidateVisual();
-            RoomCanvas.PreviewKeyUp += (s, e) => RoomCanvas.InvalidateVisual();
-            RoomCanvas.PreviewMouseRightButtonDown += (s, e) => RoomCanvas.InvalidateVisual();
-            RoomCanvas.PreviewMouseRightButtonUp += (s, e) => RoomCanvas.InvalidateVisual();
+            // Populate background ComboBox with sprites after component is loaded
+            this.Loaded += (s, e) => RefreshBackgroundComboBox();
         }
         
         private void LoadObjectList()
@@ -124,7 +115,7 @@ namespace Editor
             }
         }
         
-        private void LoadRoom(string roomName)
+        public void LoadRoom(string roomName)
         {
             RoomCanvas.Children.Clear();
             CanvasInfoText.Visibility = Visibility.Visible;
@@ -138,6 +129,12 @@ namespace Editor
                     var room = JsonSerializer.Deserialize<Room>(json);
                     if (room != null)
                     {
+                        // Load background settings
+                        if (BackgroundComboBox != null)
+                            BackgroundComboBox.SelectedItem = room.background;
+                        if (BackgroundTiledCheckBox != null)
+                            BackgroundTiledCheckBox.IsChecked = room.backgroundTiled;
+                        
                         foreach (var roomObj in room.objects)
                         {
                             AddObjectToCanvas(roomObj.objectPath, roomObj.x, roomObj.y);
@@ -150,6 +147,19 @@ namespace Editor
                     MessageBox.Show($"Failed to load room: {ex.Message}");
                 }
             }
+            else
+            {
+                // New room - clear background settings
+                if (BackgroundComboBox != null)
+                    BackgroundComboBox.SelectedItem = null;
+                if (BackgroundTiledCheckBox != null)
+                    BackgroundTiledCheckBox.IsChecked = false;
+            }
+        }
+        
+        public string GetCurrentRoomName()
+        {
+            return currentRoomName;
         }
         
         public void SaveRoom()
@@ -159,15 +169,19 @@ namespace Editor
                 
             var room = new Room { name = currentRoomName };
             
+            // Save background settings
+            room.background = BackgroundComboBox?.SelectedItem as string ?? "";
+            room.backgroundTiled = BackgroundTiledCheckBox?.IsChecked ?? false;
+            
             foreach (UIElement element in RoomCanvas.Children)
             {
-                if (element is Image img && img.Tag is string objectPath)
+                if (element is AnimatedSpriteDisplay animatedSprite && animatedSprite.Tag is string objectPath)
                 {
                     room.objects.Add(new RoomObject
                     {
                         objectPath = objectPath,
-                        x = Canvas.GetLeft(img) + img.Width / 2,
-                        y = Canvas.GetTop(img) + img.Height / 2
+                        x = Canvas.GetLeft(animatedSprite) + animatedSprite.Width / 2,
+                        y = Canvas.GetTop(animatedSprite) + animatedSprite.Height / 2
                     });
                 }
             }
@@ -223,28 +237,60 @@ namespace Editor
                     var spritePath = Path.Combine(assetsRoot, "Sprites", obj.sprite);
                     if (File.Exists(spritePath))
                     {
+                        // Load sprite data if it exists
+                        var spriteDataPath = Path.ChangeExtension(spritePath, ".sprite");
+                        MainWindow.SpriteData spriteData = null;
+                        
+                        if (File.Exists(spriteDataPath))
+                        {
+                            try
+                            {
+                                var spriteJson = File.ReadAllText(spriteDataPath);
+                                spriteData = JsonSerializer.Deserialize<MainWindow.SpriteData>(spriteJson);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Failed to load sprite data: {ex.Message}");
+                            }
+                        }
+                        
+                        // Load the image
                         var bmp = new BitmapImage(new Uri(spritePath));
+                        
+                        // Use frame dimensions if available
+                        int displayWidth = spriteData?.frameWidth > 0 ? spriteData.frameWidth : bmp.PixelWidth;
+                        int displayHeight = spriteData?.frameHeight > 0 ? spriteData.frameHeight : bmp.PixelHeight;
+                        
                         var snappedX = Math.Round(x / 16.0) * 16;
                         var snappedY = Math.Round(y / 16.0) * 16;
-                        var img = new Image
-                        {
-                            Source = bmp,
-                            Width = bmp.PixelWidth,
-                            Height = bmp.PixelHeight,
-                            Stretch = Stretch.None,
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Tag = eoPath
-                        };
-                        RenderOptions.SetBitmapScalingMode(img, BitmapScalingMode.NearestNeighbor);
-                        Canvas.SetLeft(img, snappedX - bmp.PixelWidth / 2);
-                        Canvas.SetTop(img, snappedY - bmp.PixelHeight / 2);
-                        RoomCanvas.Children.Add(img);
-                        img.MouseRightButtonUp += (s, e) => {
+                        
+                        // Create animated sprite display
+                        var animatedSprite = new AnimatedSpriteDisplay();
+                        animatedSprite.LoadSprite(spritePath, spriteData);
+                        animatedSprite.Width = displayWidth;
+                        animatedSprite.Height = displayHeight;
+                        animatedSprite.Tag = eoPath;
+                        
+                        Canvas.SetLeft(animatedSprite, snappedX - displayWidth / 2);
+                        Canvas.SetTop(animatedSprite, snappedY - displayHeight / 2);
+                        RoomCanvas.Children.Add(animatedSprite);
+                        
+                        // Add right-click delete functionality
+                        animatedSprite.MouseRightButtonUp += (s, e) => {
                             if (MessageBox.Show($"Delete this object?", "Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
                             {
-                                RoomCanvas.Children.Remove(img);
+                                RoomCanvas.Children.Remove(animatedSprite);
                             }
+                            e.Handled = true;
+                        };
+                        
+                        // Add mouse events for dragging
+                        animatedSprite.MouseLeftButtonDown += (s, e) => {
+                            isDragging = true;
+                            draggedElement = animatedSprite;
+                            dragStart = e.GetPosition(RoomCanvas);
+                            originalPosition = new Point(Canvas.GetLeft(animatedSprite), Canvas.GetTop(animatedSprite));
+                            animatedSprite.CaptureMouse();
                             e.Handled = true;
                         };
                     }
@@ -267,26 +313,26 @@ namespace Editor
         // Mouse events for object movement
         private void RoomCanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (e.Source is Image img)
+            if (e.Source is AnimatedSpriteDisplay animatedSprite)
             {
                 isDragging = true;
-                draggedElement = img;
+                draggedElement = animatedSprite;
                 dragStart = e.GetPosition(RoomCanvas);
-                originalPosition = new Point(Canvas.GetLeft(img), Canvas.GetTop(img));
-                img.CaptureMouse();
+                originalPosition = new Point(Canvas.GetLeft(animatedSprite), Canvas.GetTop(animatedSprite));
+                animatedSprite.CaptureMouse();
                 e.Handled = true;
             }
         }
         
         private void RoomCanvas_MouseMove(object sender, MouseEventArgs e)
         {
-            if (isDragging && draggedElement is Image img)
+            if (isDragging && draggedElement is AnimatedSpriteDisplay animatedSprite)
             {
                 var mousePos = Mouse.GetPosition(RoomCanvas);
                 var snappedX = Math.Round(mousePos.X / 16.0) * 16;
                 var snappedY = Math.Round(mousePos.Y / 16.0) * 16;
-                Canvas.SetLeft(img, snappedX - img.Width / 2);
-                Canvas.SetTop(img, snappedY - img.Height / 2);
+                Canvas.SetLeft(animatedSprite, snappedX - animatedSprite.Width / 2);
+                Canvas.SetTop(animatedSprite, snappedY - animatedSprite.Height / 2);
             }
         }
         
@@ -375,6 +421,82 @@ namespace Editor
             {
                 SaveRoom();
                 e.Handled = true;
+            }
+        }
+        
+        private void BrowseBackground_Click(object sender, RoutedEventArgs e)
+        {
+            var dlg = new Microsoft.Win32.OpenFileDialog 
+            { 
+                Filter = "Image Files (*.png;*.jpg;*.jpeg)|*.png;*.jpg;*.jpeg",
+                Title = "Select Background Image"
+            };
+            
+            if (dlg.ShowDialog() == true)
+            {
+                var spritesDir = Path.Combine(assetsRoot, "Sprites");
+                var fileName = Path.GetFileName(dlg.FileName);
+                var destPath = Path.Combine(spritesDir, fileName);
+                
+                try
+                {
+                    File.Copy(dlg.FileName, destPath, overwrite: true);
+                    if (BackgroundComboBox != null)
+                        BackgroundComboBox.Items.Add(fileName);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Failed to copy background image: {ex.Message}");
+                }
+            }
+        }
+        
+        private void ClearBackground_Click(object sender, RoutedEventArgs e)
+        {
+            if (BackgroundComboBox != null)
+                BackgroundComboBox.SelectedItem = null;
+            if (BackgroundTiledCheckBox != null)
+                BackgroundTiledCheckBox.IsChecked = false;
+        }
+        
+        private void RefreshBackground_Click(object sender, RoutedEventArgs e)
+        {
+            Console.WriteLine("Manual refresh button clicked");
+            RefreshBackgroundComboBox();
+        }
+        
+        private void RefreshBackgroundComboBox()
+        {
+            try
+            {
+                var spritesDir = Path.Combine(assetsRoot, "Sprites");
+                var currentSelection = BackgroundComboBox?.SelectedItem as string;
+                
+                if (BackgroundComboBox == null) return;
+                
+                BackgroundComboBox.Items.Clear();
+                if (Directory.Exists(spritesDir))
+                {
+                    foreach (var file in Directory.GetFiles(spritesDir))
+                    {
+                        var ext = Path.GetExtension(file).ToLowerInvariant();
+                        if (ext == ".png" || ext == ".jpg" || ext == ".jpeg")
+                        {
+                            var name = Path.GetFileName(file);
+                            BackgroundComboBox.Items.Add(name);
+                        }
+                    }
+                }
+                
+                // Restore the previous selection if it still exists
+                if (!string.IsNullOrEmpty(currentSelection) && BackgroundComboBox.Items.Contains(currentSelection))
+                {
+                    BackgroundComboBox.SelectedItem = currentSelection;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error refreshing background combo box: {ex.Message}");
             }
         }
     }

@@ -1,0 +1,8 @@
+{
+  "name": "spr_houses_strip4",
+  "frameWidth": 640,
+  "frameHeight": 160,
+  "frameCount": 4,
+  "frameSpeed": 1,
+  "animated": true
+}

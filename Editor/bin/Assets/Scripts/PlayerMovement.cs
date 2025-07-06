@@ -1,5 +1,6 @@
 using Engine.Core;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 
@@ -21,6 +22,7 @@ public class PlayerMovement : GameScript
         if (Input.IsKeyDown(Keys.A))
         {
             Owner.position.X -= Speed;
+            Owner.spriteEffect = SpriteEffects.FlipHorizontally;
         }
         if (Input.IsKeyDown(Keys.S))
         {
@@ -29,6 +31,7 @@ public class PlayerMovement : GameScript
         if (Input.IsKeyDown(Keys.D))
         {
             Owner.position.X += Speed;
+            Owner.spriteEffect = SpriteEffects.None;
         }
     }
 }

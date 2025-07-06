@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using System.Management;
 using System.Windows.Media.Imaging;
+using System.Text.Json;
 
 namespace Editor
 {
@@ -20,9 +21,10 @@ namespace Editor
         private readonly string assetsRoot;
         private readonly Dictionary<string, string> assetTypeFolders = new()
         {
-            { "Scripts", "Assets/Scripts" },
-            { "Objects", "Assets/Objects" },
-            { "Sprites", "Assets/Sprites" }
+            { "Scripts", "Scripts" },
+            { "Objects", "Objects" },
+            { "Sprites", "Sprites" },
+            { "Rooms", "Rooms" }
         };
         private TreeViewItem _rightClickItem;
         private string _inspectorObjectPath;
@@ -148,9 +150,11 @@ namespace Editor
                 LoadAssetFolder(dirNode, dir);
                 parent.Items.Add(dirNode);
             }
-            // Add files
+            // Add files (show all except .dll)
             foreach (var file in Directory.GetFiles(folderPath))
             {
+                if (file.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
+                    continue;
                 var fileName = Path.GetFileName(file);
                 var fileNode = new TreeViewItem { Header = fileName, Tag = file };
                 parent.Items.Add(fileNode);
@@ -164,7 +168,21 @@ namespace Editor
             if (selected != null && File.Exists(selected.Tag.ToString()))
             {
                 var ext = Path.GetExtension(selected.Tag.ToString()).ToLower();
-                if (ext == ".cs")
+                if (ext == ".room")
+                {
+                    var tabControl = (TabControl)((DockPanel)Content).Children[0];
+                    foreach (TabItem tab in tabControl.Items)
+                    {
+                        if (tab.Content is RoomEditor re)
+                        {
+                            re.LoadRoom(selected.Tag.ToString());
+                            tabControl.SelectedItem = tab;
+                            break;
+                        }
+                    }
+                    return; // Prevent ShowInspector for .room files
+                }
+                else if (ext == ".cs")
                 {
                     // Do not update inspector for script selection
                     return;
@@ -189,32 +207,31 @@ namespace Editor
                 _lastInspectedObjectPath = _inspectorObjectPath;
                 _lastInspectedObjectData = _inspectorObjectData;
                 // Assigned sprite preview (if any)
+                AnimatedSpriteDisplay animatedSprite = null;
                 if (!string.IsNullOrWhiteSpace(_inspectorObjectData.sprite))
                 {
                     var spritePath = Path.Combine(assetsRoot, "Sprites", _inspectorObjectData.sprite);
                     if (File.Exists(spritePath))
                     {
-                        byte[] imageBytes = File.ReadAllBytes(spritePath);
-                        BitmapImage bmp = new BitmapImage();
-                        using (var ms = new MemoryStream(imageBytes))
+                        // Load sprite data if it exists
+                        var spriteDataPath = Path.ChangeExtension(spritePath, ".sprite");
+                        SpriteData spriteData = null;
+                        if (File.Exists(spriteDataPath))
                         {
-                            bmp.BeginInit();
-                            bmp.CacheOption = BitmapCacheOption.OnLoad;
-                            bmp.StreamSource = ms;
-                            bmp.EndInit();
-                            bmp.Freeze(); // Ensures the image is fully loaded and not tied to the stream
+                            try
+                            {
+                                var spriteJson = File.ReadAllText(spriteDataPath);
+                                spriteData = JsonSerializer.Deserialize<SpriteData>(spriteJson);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Failed to load sprite data: {ex.Message}");
+                            }
                         }
-                        var spriteImg = new Image
-                        {
-                            Source = bmp,
-                            Width = bmp.PixelWidth,
-                            Height = bmp.PixelHeight,
-                            Stretch = System.Windows.Media.Stretch.None,
-                            HorizontalAlignment = HorizontalAlignment.Center,
-                            Margin = new Thickness(0, 0, 0, 10)
-                        };
-                        System.Windows.Media.RenderOptions.SetBitmapScalingMode(spriteImg, System.Windows.Media.BitmapScalingMode.NearestNeighbor);
-                        InspectorPanel.Children.Add(spriteImg);
+                        animatedSprite = new AnimatedSpriteDisplay();
+                        animatedSprite.LoadSprite(spritePath, spriteData);
+                        animatedSprite.Margin = new Thickness(0, 0, 0, 10);
+                        InspectorPanel.Children.Add(animatedSprite);
                     }
                 }
                 // Name
@@ -230,7 +247,30 @@ namespace Editor
                     var selected = spriteCombo.SelectedItem?.ToString() ?? "";
                     _inspectorObjectData.sprite = !string.IsNullOrEmpty(selected) ? selected : "";
                     SaveInspectorObject();
-                    ShowInspector(assetPath);
+                    // Update the image in-place if possible
+                    if (animatedSprite != null && !string.IsNullOrEmpty(selected))
+                    {
+                        var newSpritePath = Path.Combine(assetsRoot, "Sprites", selected);
+                        if (File.Exists(newSpritePath))
+                        {
+                            var newSpriteDataPath = Path.ChangeExtension(newSpritePath, ".sprite");
+                            SpriteData newSpriteData = null;
+                            if (File.Exists(newSpriteDataPath))
+                            {
+                                try
+                                {
+                                    var spriteJson = File.ReadAllText(newSpriteDataPath);
+                                    newSpriteData = JsonSerializer.Deserialize<SpriteData>(spriteJson);
+                                }
+                                catch { }
+                            }
+                            animatedSprite.LoadSprite(newSpritePath, newSpriteData);
+                        }
+                    }
+                    else
+                    {
+                        ShowInspector(assetPath);
+                    }
                 };
                 InspectorPanel.Children.Add(spriteCombo);
                 // Scripts
@@ -259,44 +299,141 @@ namespace Editor
             }
             else if (ext == ".png" || ext == ".jpg" || ext == ".jpeg")
             {
-                // Sprite preview with nearest neighbor scaling, not warped, and show dimensions
-                byte[] imageBytes = File.ReadAllBytes(assetPath);
-                BitmapImage bmp = new BitmapImage();
-                using (var ms = new MemoryStream(imageBytes))
+                // Load or create sprite data
+                var spriteDataPath = Path.ChangeExtension(assetPath, ".sprite");
+                SpriteData spriteData = null;
+                
+                if (File.Exists(spriteDataPath))
                 {
-                    bmp.BeginInit();
-                    bmp.CacheOption = BitmapCacheOption.OnLoad;
-                    bmp.StreamSource = ms;
-                    bmp.EndInit();
-                    bmp.Freeze(); // Ensures the image is fully loaded and not tied to the stream
+                    try
+                    {
+                        var spriteJson = File.ReadAllText(spriteDataPath);
+                        spriteData = JsonSerializer.Deserialize<SpriteData>(spriteJson);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Failed to load sprite data: {ex.Message}");
+                    }
                 }
-                var img = new Image
+                
+                if (spriteData == null)
                 {
-                    Source = bmp,
-                    Width = bmp.PixelWidth,
-                    Height = bmp.PixelHeight,
-                    Stretch = System.Windows.Media.Stretch.None,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    Margin = new Thickness(0, 0, 0, 10)
-                };
-                System.Windows.Media.RenderOptions.SetBitmapScalingMode(img, System.Windows.Media.BitmapScalingMode.NearestNeighbor);
-                InspectorPanel.Children.Add(img);
+                    // Create default sprite data
+                    byte[] imageBytes = File.ReadAllBytes(assetPath);
+                    BitmapImage bmp = new BitmapImage();
+                    using (var ms = new MemoryStream(imageBytes))
+                    {
+                        bmp.BeginInit();
+                        bmp.CacheOption = BitmapCacheOption.OnLoad;
+                        bmp.StreamSource = ms;
+                        bmp.EndInit();
+                        bmp.Freeze();
+                    }
+                    
+                    spriteData = new SpriteData
+                    {
+                        name = Path.GetFileNameWithoutExtension(assetPath),
+                        frameWidth = bmp.PixelWidth,
+                        frameHeight = bmp.PixelHeight,
+                        frameCount = 1,
+                        frameSpeed = 1.0,
+                        animated = false
+                    };
+                }
+
+                // Animated sprite preview
+                var animatedSprite = new AnimatedSpriteDisplay();
+                animatedSprite.LoadSprite(assetPath, spriteData);
+                animatedSprite.Margin = new Thickness(0, 0, 0, 10);
+                InspectorPanel.Children.Add(animatedSprite);
+                
                 InspectorPanel.Children.Add(new TextBlock { Text = Path.GetFileName(assetPath), FontWeight = FontWeights.Bold });
-                InspectorPanel.Children.Add(new TextBlock { Text = $"Dimensions: {bmp.PixelWidth} x {bmp.PixelHeight}", Foreground = Brushes.Gray });
-                var loadSpriteBtn = new Button { Content = "Load New Sprite...", Margin = new Thickness(0, 0, 0, 10) };
+                InspectorPanel.Children.Add(new TextBlock { Text = $"Dimensions: {spriteData.frameWidth} x {spriteData.frameHeight}", Foreground = Brushes.Gray });
+                
+                // Animation controls
+                InspectorPanel.Children.Add(new TextBlock { Text = "Animation Settings:", FontWeight = FontWeights.Bold, Margin = new Thickness(0, 10, 0, 5) });
+                
+                // Animated checkbox
+                var animatedCheck = new CheckBox { Content = "Animated", IsChecked = spriteData.animated, Margin = new Thickness(0, 0, 0, 5) };
+                animatedCheck.Checked += (s, e) => { spriteData.animated = true; SaveSpriteData(spriteDataPath, spriteData); animatedSprite.SetAnimationProperties(spriteData); };
+                animatedCheck.Unchecked += (s, e) => { spriteData.animated = false; SaveSpriteData(spriteDataPath, spriteData); animatedSprite.SetAnimationProperties(spriteData); };
+                InspectorPanel.Children.Add(animatedCheck);
+                
+                // Frame count
+                InspectorPanel.Children.Add(new TextBlock { Text = "Frame Count:" });
+                var frameCountBox = new TextBox { Text = spriteData.frameCount.ToString(), Margin = new Thickness(0, 0, 0, 5) };
+                frameCountBox.LostFocus += (s, e) => { 
+                    if (int.TryParse(frameCountBox.Text, out int count) && count > 0) 
+                    { 
+                        spriteData.frameCount = count; 
+                        SaveSpriteData(spriteDataPath, spriteData); 
+                        animatedSprite.SetAnimationProperties(spriteData); 
+                    } 
+                };
+                InspectorPanel.Children.Add(frameCountBox);
+                
+                // Frame speed
+                InspectorPanel.Children.Add(new TextBlock { Text = "Frame Speed (FPS):" });
+                var frameSpeedBox = new TextBox { Text = spriteData.frameSpeed.ToString(), Margin = new Thickness(0, 0, 0, 5) };
+                frameSpeedBox.LostFocus += (s, e) => { 
+                    if (double.TryParse(frameSpeedBox.Text, out double speed) && speed > 0) 
+                    { 
+                        spriteData.frameSpeed = speed; 
+                        SaveSpriteData(spriteDataPath, spriteData); 
+                        animatedSprite.SetAnimationProperties(spriteData); 
+                    } 
+                };
+                InspectorPanel.Children.Add(frameSpeedBox);
+                
+                // Frame width
+                InspectorPanel.Children.Add(new TextBlock { Text = "Frame Width (0 = full width):" });
+                var frameWidthBox = new TextBox { Text = spriteData.frameWidth.ToString(), Margin = new Thickness(0, 0, 0, 5) };
+                frameWidthBox.LostFocus += (s, e) => { 
+                    if (int.TryParse(frameWidthBox.Text, out int width) && width >= 0) 
+                    { 
+                        spriteData.frameWidth = width; 
+                        SaveSpriteData(spriteDataPath, spriteData); 
+                        animatedSprite.SetAnimationProperties(spriteData); 
+                    } 
+                };
+                InspectorPanel.Children.Add(frameWidthBox);
+                
+                // Frame height
+                InspectorPanel.Children.Add(new TextBlock { Text = "Frame Height (0 = full height):" });
+                var frameHeightBox = new TextBox { Text = spriteData.frameHeight.ToString(), Margin = new Thickness(0, 0, 0, 5) };
+                frameHeightBox.LostFocus += (s, e) => { 
+                    if (int.TryParse(frameHeightBox.Text, out int height) && height >= 0) 
+                    { 
+                        spriteData.frameHeight = height; 
+                        SaveSpriteData(spriteDataPath, spriteData); 
+                        animatedSprite.SetAnimationProperties(spriteData); 
+                    } 
+                };
+                InspectorPanel.Children.Add(frameHeightBox);
+                
+                var loadSpriteBtn = new Button { Content = "Load New Sprite...", Margin = new Thickness(0, 10, 0, 10) };
                 loadSpriteBtn.Click += (s, e) => {
-                    // Remove the old image and force GC to release file lock
-                    InspectorPanel.Children.Clear();
-                    GC.Collect();
-                    GC.WaitForPendingFinalizers();
                     var dlg = new Microsoft.Win32.OpenFileDialog { Filter = "Image Files (*.png;*.jpg;*.jpeg)|*.png;*.jpg;*.jpeg" };
                     if (dlg.ShowDialog() == true)
                     {
-                        var spritesDir = Path.Combine(assetsRoot, "Sprites");
-                        var destPath = Path.Combine(spritesDir, Path.GetFileName(dlg.FileName));
-                        File.Copy(dlg.FileName, destPath, overwrite: true);
-                        // Optionally, refresh the inspector to show the new sprite
-                        ShowInspector(destPath);
+                        try
+                        {
+                            var spritesDir = Path.Combine(assetsRoot, "Sprites");
+                            var destPath = Path.Combine(spritesDir, Path.GetFileName(dlg.FileName));
+                            File.Copy(dlg.FileName, destPath, overwrite: true);
+                            
+                            // Refresh the asset tree to show the new sprite
+                            LoadAssetTree();
+                            
+                            // Refresh the inspector to show the updated sprite
+                            ShowInspector(destPath);
+                            
+                            MessageBox.Show($"Sprite '{Path.GetFileName(dlg.FileName)}' loaded successfully!", "Sprite Loaded", MessageBoxButton.OK, MessageBoxImage.Information);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"Failed to load sprite: {ex.Message}", "Load Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
                     }
                 };
                 InspectorPanel.Children.Add(loadSpriteBtn);
@@ -307,6 +444,8 @@ namespace Editor
                         try
                         {
                             File.Delete(assetPath);
+                            if (File.Exists(spriteDataPath))
+                                File.Delete(spriteDataPath);
                             // Optionally, refresh the asset tree or inspector
                             InspectorPanel.Children.Clear();
                             MessageBox.Show("Sprite deleted.");
@@ -363,6 +502,19 @@ namespace Editor
             var json = System.Text.Json.JsonSerializer.Serialize(_inspectorObjectData, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(_inspectorObjectPath, json);
         }
+        
+        private void SaveSpriteData(string spriteDataPath, SpriteData spriteData)
+        {
+            try
+            {
+                var json = JsonSerializer.Serialize(spriteData, new JsonSerializerOptions { WriteIndented = true });
+                File.WriteAllText(spriteDataPath, json);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to save sprite data: {ex.Message}");
+            }
+        }
 
         private void SaveAll()
         {
@@ -404,9 +556,20 @@ namespace Editor
         }
         private List<string> GetAllSprites()
         {
+            var sprites = new List<string>();
             var spritesDir = Path.Combine(assetsRoot, "Sprites");
-            if (!Directory.Exists(spritesDir)) return new List<string>();
-            return Directory.GetFiles(spritesDir).Select(Path.GetFileName).ToList();
+            if (Directory.Exists(spritesDir))
+            {
+                foreach (var file in Directory.GetFiles(spritesDir))
+                {
+                    var ext = Path.GetExtension(file).ToLowerInvariant();
+                    if (ext == ".png" || ext == ".jpg" || ext == ".jpeg")
+                    {
+                        sprites.Add(Path.GetFileName(file));
+                    }
+                }
+            }
+            return sprites;
         }
         private void AssetTreeView_PreviewMouseMove(object sender, MouseEventArgs e)
         {
@@ -529,11 +692,11 @@ namespace Editor
 
         private void ShowContextMenuForItem(TreeViewItem item, MouseButtonEventArgs e)
         {
-            var menu = new ContextMenu();
+            var contextMenu = new ContextMenu();
             // Always allow new folder
             var newFolder = new MenuItem { Header = "New Folder" };
             newFolder.Click += NewFolder_Click;
-            menu.Items.Add(newFolder);
+            contextMenu.Items.Add(newFolder);
 
             // Contextual asset creation
             string tag = item.Tag?.ToString() ?? "";
@@ -541,31 +704,55 @@ namespace Editor
             {
                 var newScript = new MenuItem { Header = "New Script" };
                 newScript.Click += NewScript_Click;
-                menu.Items.Add(newScript);
+                contextMenu.Items.Add(newScript);
             }
             else if (tag.Contains("Objects"))
             {
                 var newObject = new MenuItem { Header = "New Object" };
                 newObject.Click += NewObject_Click;
-                menu.Items.Add(newObject);
+                contextMenu.Items.Add(newObject);
             }
             else if (tag.Contains("Sprites"))
             {
                 var newSprite = new MenuItem { Header = "Import Sprite..." };
                 newSprite.Click += ImportSprite_Click;
-                menu.Items.Add(newSprite);
+                contextMenu.Items.Add(newSprite);
             }
 
-            menu.Items.Add(new Separator());
+            contextMenu.Items.Add(new Separator());
             var rename = new MenuItem { Header = "Rename" };
             rename.Click += RenameAsset_Click;
-            menu.Items.Add(rename);
+            contextMenu.Items.Add(rename);
             var del = new MenuItem { Header = "Delete" };
             del.Click += DeleteAsset_Click;
-            menu.Items.Add(del);
+            contextMenu.Items.Add(del);
 
-            item.ContextMenu = menu;
-            menu.IsOpen = true;
+            // Add 'New Room' to asset tree context menu
+            var newRoomMenuItem = new MenuItem { Header = "New Room" };
+            newRoomMenuItem.Click += (s, args) => {
+                string roomName = PromptDialog("Enter room name:", "New Room");
+                if (!string.IsNullOrWhiteSpace(roomName))
+                {
+                    var roomsDir = Path.Combine(assetsRoot, "Rooms");
+                    Directory.CreateDirectory(roomsDir);
+                    var roomPath = Path.Combine(roomsDir, roomName + ".room");
+                    if (!File.Exists(roomPath))
+                    {
+                        var defaultRoomJson = "{\n  \"name\": \"" + roomName + "\",\n  \"objects\": []\n}";
+                        File.WriteAllText(roomPath, defaultRoomJson);
+                        LoadAssetTree();
+                    }
+                    else
+                    {
+                        MessageBox.Show("A room with that name already exists.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            };
+            contextMenu.Items.Add(newRoomMenuItem);
+
+            item.ContextMenu = contextMenu;
+            contextMenu.IsOpen = true;
+            e.Handled = true;
         }
 
         private void NewScript_Click(object sender, RoutedEventArgs e)
@@ -754,6 +941,16 @@ namespace Editor
             public string name { get; set; }
             public string sprite { get; set; }
             public List<string> scripts { get; set; } = new List<string>();
+        }
+        
+        public class SpriteData
+        {
+            public string name { get; set; }
+            public int frameWidth { get; set; } = 0; // 0 means use full image
+            public int frameHeight { get; set; } = 0; // 0 means use full image
+            public int frameCount { get; set; } = 1;
+            public double frameSpeed { get; set; } = 1.0; // frames per second
+            public bool animated { get; set; } = false;
         }
     }
 } 

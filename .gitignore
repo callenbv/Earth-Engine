@@ -36,3 +36,5 @@
 *.pdb
 *.vsidx
 .vs/GameEngine/v17/.suo
+*.props
+*.xnb

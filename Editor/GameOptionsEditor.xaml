@@ -6,33 +6,31 @@
              mc:Ignorable="d"
              d:DesignHeight="400" d:DesignWidth="400">
     <UserControl.Resources>
-        <SolidColorBrush x:Key="PanelBackground" Color="#2C313A"/>
-        <SolidColorBrush x:Key="TextBrush" Color="#F8F8F2"/>
         <Style x:Key="DangerButton" TargetType="Button">
-            <Setter Property="Background" Value="#E53935"/>
-            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="{DynamicResource DangerButtonBackgroundBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource DangerButtonForegroundBrush}"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Margin" Value="2"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#B71C1C"/>
+                    <Setter Property="Background" Value="{DynamicResource DangerButtonHoverBrush}"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
-    <Border Background="{StaticResource PanelBackground}" CornerRadius="6" Padding="20">
+    <Border Background="{DynamicResource ControlBackgroundBrush}" CornerRadius="6" Padding="20">
         <StackPanel>
-            <TextBlock Text="Game Options" FontWeight="Bold" FontSize="18" Margin="0,0,0,10" Foreground="{StaticResource TextBrush}"/>
-            <TextBlock Text="Default Room:" FontWeight="Bold" Margin="0,0,0,5"/>
+            <TextBlock Text="Game Options" FontWeight="Bold" FontSize="18" Margin="0,0,0,10" Foreground="{DynamicResource PrimaryTextBrush}"/>
+            <TextBlock Text="Default Room:" FontWeight="Bold" Margin="0,0,0,5" Foreground="{DynamicResource PrimaryTextBrush}"/>
             <ComboBox x:Name="DefaultRoomComboBox" Margin="0,0,0,10" SelectionChanged="DefaultRoomComboBox_SelectionChanged"/>
-            <TextBlock Text="Game Title:" FontWeight="Bold" Margin="0,0,0,5"/>
+            <TextBlock Text="Game Title:" FontWeight="Bold" Margin="0,0,0,5" Foreground="{DynamicResource PrimaryTextBrush}"/>
             <TextBox x:Name="GameTitleTextBox" Margin="0,0,0,10"/>
-            <TextBlock Text="Window Width:" FontWeight="Bold" Margin="0,0,0,5"/>
+            <TextBlock Text="Window Width:" FontWeight="Bold" Margin="0,0,0,5" Foreground="{DynamicResource PrimaryTextBrush}"/>
             <TextBox x:Name="WindowWidthTextBox" Text="800" Margin="0,0,0,5"/>
-            <TextBlock Text="Window Height:" FontWeight="Bold" Margin="0,0,0,5"/>
+            <TextBlock Text="Window Height:" FontWeight="Bold" Margin="0,0,0,5" Foreground="{DynamicResource PrimaryTextBrush}"/>
             <TextBox x:Name="WindowHeightTextBox" Text="600" Margin="0,0,0,10"/>
             <Button Content="Save Game Options" Click="SaveGameOptions_Click" Padding="8,2"/>
         </StackPanel>
     </Border>
-</UserControl> 
+</UserControl>

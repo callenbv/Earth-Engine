@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PipelineBuildEvent xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <SourceFile>C:/Users/calle/Desktop/Earth Engine/Content/ShadowCast.fx </SourceFile>
+  <SourceTime>2025-07-05T19:06:43.5207517-07:00</SourceTime>
+  <DestFile>C:/Users/calle/Desktop/Earth Engine/Content/bin/Windows/ShadowCast.xnb</DestFile>
+  <DestTime>2025-07-05T19:19:00.3966995-07:00</DestTime>
+  <Importer>EffectImporter</Importer>
+  <ImporterTime>2025-06-02T03:31:02-07:00</ImporterTime>
+  <Processor>EffectProcessor</Processor>
+  <ProcessorTime>2025-06-02T03:31:02-07:00</ProcessorTime>
+  <Parameters>
+    <Key>DebugMode</Key>
+    <Value>Auto</Value>
+  </Parameters>
+  <Dependencies />
+  <BuildAsset />
+  <BuildOutput />
+</PipelineBuildEvent>

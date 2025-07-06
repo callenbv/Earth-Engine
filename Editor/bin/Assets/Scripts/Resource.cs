@@ -10,7 +10,7 @@ public class Resource : GameScript
 
     public override void Destroy()
     {
-        var spawnedItem = SpawnObject("Item", Owner.position+new Vector2(8,64));
+        var spawnedItem = SpawnObject("Item", Owner.position);
 
         if (spawnedItem != null)
         {

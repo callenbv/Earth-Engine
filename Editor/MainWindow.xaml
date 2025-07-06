@@ -4,130 +4,7 @@
         xmlns:local="clr-namespace:Editor"
         Title="Game Engine Editor" Height="800" Width="1200"
         WindowStartupLocation="CenterScreen"
-        Background="#23272E">
-    <Window.Resources>
-        <SolidColorBrush x:Key="DarkBackground" Color="#23272E"/>
-        <SolidColorBrush x:Key="PanelBackground" Color="#2C313A"/>
-        <SolidColorBrush x:Key="Accent" Color="#4CAF50"/>
-        <SolidColorBrush x:Key="TextBrush" Color="#F8F8F2"/>
-        <SolidColorBrush x:Key="SubtleText" Color="#B0B0B0"/>
-        <Style TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
-        </Style>
-        <Style TargetType="Button">
-            <Setter Property="Background" Value="{StaticResource Accent}"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Margin" Value="2"/>
-        </Style>
-        <Style TargetType="ComboBox">
-            <Setter Property="Background" Value="{StaticResource PanelBackground}"/>
-            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
-            <Setter Property="BorderBrush" Value="#444"/>
-            <Setter Property="Padding" Value="2"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ComboBox">
-                        <Grid>
-                            <ToggleButton Name="ToggleButton"
-                                          Grid.Column="2"
-                                          Focusable="false"
-                                          IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
-                                          ClickMode="Press"
-                                          Background="{TemplateBinding Background}"/>
-                            <ContentPresenter Name="ContentSite"
-                                              IsHitTestVisible="False"
-                                              Content="{TemplateBinding SelectionBoxItem}"
-                                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
-                                              ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
-                                              Margin="3,3,23,3"
-                                              VerticalAlignment="Center"
-                                              HorizontalAlignment="Left"
-                                              RecognizesAccessKey="True"
-                                              />
-                            <TextBox x:Name="PART_EditableTextBox"
-                                     Style="{x:Null}"
-                                     Template="{DynamicResource ComboBoxTextBox}"
-                                     HorizontalAlignment="Left"
-                                     VerticalAlignment="Center"
-                                     Background="{StaticResource PanelBackground}"
-                                     Foreground="{StaticResource TextBrush}"
-                                     Visibility="Hidden"
-                                     IsReadOnly="False"/>
-                            <Popup Name="Popup"
-                                   Placement="Bottom"
-                                   IsOpen="{TemplateBinding IsDropDownOpen}"
-                                   AllowsTransparency="True"
-                                   Focusable="False"
-                                   PopupAnimation="Slide">
-                                <Grid Name="DropDown"
-                                      SnapsToDevicePixels="True"
-                                      MinWidth="{TemplateBinding ActualWidth}"
-                                      MaxHeight="200"
-                                      Background="{StaticResource PanelBackground}">
-                                    <Border x:Name="DropDownBorder"
-                                            BorderThickness="1"
-                                            BorderBrush="#444"
-                                            Background="{StaticResource PanelBackground}"/>
-                                    <ScrollViewer Margin="4,6,4,6" SnapsToDevicePixels="True">
-                                        <StackPanel IsItemsHost="True"
-                                                    KeyboardNavigation.DirectionalNavigation="Contained"/>
-                                    </ScrollViewer>
-                                </Grid>
-                            </Popup>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style TargetType="ComboBoxItem">
-            <Setter Property="Background" Value="#23272E"/>
-            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
-            <Setter Property="Padding" Value="4,2"/>
-        </Style>
-        <Style TargetType="TextBox">
-            <Setter Property="Background" Value="#23272E"/>
-            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
-            <Setter Property="BorderBrush" Value="#444"/>
-        </Style>
-        <Style TargetType="TreeView">
-            <Setter Property="Background" Value="{StaticResource PanelBackground}"/>
-            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
-        </Style>
-        <Style TargetType="TreeViewItem">
-            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
-        </Style>
-        <Style TargetType="ToolBar">
-            <Setter Property="Background" Value="#23272E"/>
-        </Style>
-        <Style TargetType="DockPanel">
-            <Setter Property="Background" Value="{StaticResource PanelBackground}"/>
-        </Style>
-        <Style TargetType="StackPanel">
-            <Setter Property="Background" Value="{StaticResource PanelBackground}"/>
-        </Style>
-        <Style TargetType="MenuItem">
-            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
-            <Setter Property="Background" Value="#23272E"/>
-        </Style>
-        <Style TargetType="ContextMenu">
-            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
-            <Setter Property="Background" Value="#23272E"/>
-        </Style>
-        <Style x:Key="DangerButton" TargetType="Button">
-            <Setter Property="Background" Value="#E53935"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Margin" Value="2"/>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#B71C1C"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-    </Window.Resources>
+        Background="{DynamicResource WindowBackgroundBrush}">
     <DockPanel>
         <TabControl>
             <TabItem Header="Assets">
@@ -138,22 +15,7 @@
                                 Content="▶ Play (F5)"
                                 FontSize="14"
                                 Padding="10,5"
-                                Click="PlayButton_Click">
-                            <Button.Style>
-                                <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-                                    <Setter Property="Background" Value="#4CAF50"/>
-                                    <Setter Property="Foreground" Value="White"/>
-                                    <Setter Property="FontWeight" Value="Bold"/>
-                                    <Setter Property="BorderThickness" Value="0"/>
-                                    <Setter Property="Margin" Value="2"/>
-                                    <Style.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="#43A047"/>
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
+                                Click="PlayButton_Click"/>
                     </ToolBar>
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -194,4 +56,4 @@
             </TabItem>
         </TabControl>
     </DockPanel>
-</Window> 
+</Window>

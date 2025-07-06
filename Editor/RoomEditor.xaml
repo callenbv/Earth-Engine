@@ -7,10 +7,6 @@
              mc:Ignorable="d"
              d:DesignHeight="600" d:DesignWidth="900">
     <UserControl.Resources>
-        <SolidColorBrush x:Key="DarkBackground" Color="#23272E"/>
-        <SolidColorBrush x:Key="PanelBackground" Color="#2C313A"/>
-        <SolidColorBrush x:Key="TextBrush" Color="#F8F8F2"/>
-        <SolidColorBrush x:Key="Accent" Color="#4CAF50"/>
         <Style x:Key="DangerButton" TargetType="Button">
             <Setter Property="Background" Value="#E53935"/>
             <Setter Property="Foreground" Value="White"/>
@@ -24,16 +20,16 @@
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
-    <Grid Background="{StaticResource DarkBackground}">
+    <Grid Background="{DynamicResource WindowBackgroundBrush}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="250"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         
         <!-- Left Panel: Room Management & Objects -->
-        <StackPanel Grid.Column="0" Background="{StaticResource PanelBackground}">
+        <StackPanel Grid.Column="0" Background="{DynamicResource ControlBackgroundBrush}">
             <!-- Room Management -->
-            <GroupBox Header="Room Management" Margin="10" Foreground="{StaticResource TextBrush}">
+            <GroupBox Header="Room Management" Margin="10" Foreground="{DynamicResource PrimaryTextBrush}">
                 <StackPanel Margin="5">
                     <TextBlock Text="Current Room:" FontWeight="Bold" Margin="0,0,0,5"/>
                     <ComboBox x:Name="RoomComboBox" Margin="0,0,0,10" SelectionChanged="RoomComboBox_SelectionChanged"/>
@@ -45,29 +41,38 @@
                         <Button Content="Save" Click="SaveRoom_Click" Padding="8,2" Margin="0,0,5,0"/>
                         <Button Content="Delete" Click="DeleteRoom_Click" Padding="8,2" Style="{StaticResource DangerButton}"/>
                     </StackPanel>
+                    
+                    <!-- Background Settings -->
+                    <Separator Margin="0,10,0,10"/>
+                    <TextBlock Text="Background:" FontWeight="Bold" Margin="0,0,0,5"/>
+                    <ComboBox x:Name="BackgroundComboBox" Width="120" Margin="0,0,0,5" VerticalAlignment="Center"/>
+                    <CheckBox x:Name="BackgroundTiledCheckBox" Content="Tiled Background" Margin="0,0,0,5" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                    <Button Content="Clear Background" Click="ClearBackground_Click" Padding="8,2" Margin="0,0,0,10"/>
                 </StackPanel>
             </GroupBox>
             <!-- Objects List -->
-            <GroupBox Header="Objects" Margin="10" Foreground="{StaticResource TextBrush}">
+            <GroupBox Header="Objects" Margin="10" Foreground="{DynamicResource PrimaryTextBrush}">
                 <StackPanel Margin="5">
                     <TextBlock Text="Drag objects to place in room:" FontWeight="Bold" Margin="0,0,0,5"/>
-                    <ListBox x:Name="ObjectListBox" Height="200" Background="{StaticResource PanelBackground}" Foreground="{StaticResource TextBrush}"/>
+                    <ListBox x:Name="ObjectListBox" Height="200" Background="{DynamicResource ControlBackgroundBrush}" Foreground="{DynamicResource PrimaryTextBrush}"/>
                 </StackPanel>
             </GroupBox>
         </StackPanel>
         
         <!-- Right Panel: Room Canvas -->
-        <Border Grid.Column="1" Margin="10" Background="{StaticResource PanelBackground}" CornerRadius="6">
+        <Border Grid.Column="1" Margin="10" Background="{DynamicResource ControlBackgroundBrush}" CornerRadius="6">
             <Grid>
                 <local:GridOverlay x:Name="GridOverlay" />
-                <Canvas x:Name="RoomCanvas" AllowDrop="True" Background="Transparent" 
+                <local:BackgroundCanvas x:Name="RoomCanvas" AllowDrop="True" Background="Transparent"
+                        BackgroundSprite="{Binding ElementName=BackgroundComboBox, Path=SelectedItem, Mode=OneWay}"
+                        Tiled="{Binding ElementName=BackgroundTiledCheckBox, Path=IsChecked, Mode=OneWay}"
                         MouseLeftButtonDown="RoomCanvas_MouseLeftButtonDown"
                         MouseMove="RoomCanvas_MouseMove"
                         MouseLeftButtonUp="RoomCanvas_MouseLeftButtonUp"/>
                 <TextBlock x:Name="CanvasInfoText" Text="Drag objects from the left panel to place them in the room" 
                            HorizontalAlignment="Center" VerticalAlignment="Center" 
-                           Foreground="{StaticResource TextBrush}" Opacity="0.5"/>
+                           Foreground="{DynamicResource PrimaryTextBrush}" Opacity="0.5"/>
             </Grid>
         </Border>
     </Grid>
-</UserControl> 
+</UserControl>
