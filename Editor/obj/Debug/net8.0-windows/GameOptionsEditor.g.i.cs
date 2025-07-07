@@ -84,7 +84,7 @@ namespace Editor {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/Editor;V1.0.0.0;component/gameoptionseditor.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/Editor;component/gameoptionseditor.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\GameOptionsEditor.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

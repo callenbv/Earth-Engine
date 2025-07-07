@@ -18,7 +18,7 @@
     {
       "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Slime.eo",
       "x": 304,
-      "y": 272
+      "y": 268
     },
     {
       "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Torch.eo",
@@ -42,18 +42,8 @@
     },
     {
       "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Resources\\Tree.eo",
-      "x": 240,
-      "y": 80
-    },
-    {
-      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Resources\\Tree.eo",
       "x": 32,
       "y": 48
-    },
-    {
-      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Resources\\Tree.eo",
-      "x": 352,
-      "y": 128
     },
     {
       "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Resources\\Tree.eo",
@@ -64,6 +54,46 @@
       "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Player.eo",
       "x": 192,
       "y": 160
+    },
+    {
+      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Resources\\Rock.eo",
+      "x": 112.5,
+      "y": 112
+    },
+    {
+      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Resources\\Rock.eo",
+      "x": 256.5,
+      "y": 80
+    },
+    {
+      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Resources\\Rock.eo",
+      "x": 272.5,
+      "y": 176
+    },
+    {
+      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Resources\\Rock.eo",
+      "x": 64.5,
+      "y": 208
+    },
+    {
+      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Resources\\Rock.eo",
+      "x": 320.5,
+      "y": 208
+    },
+    {
+      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Resources\\Rock.eo",
+      "x": 352.5,
+      "y": 64
+    },
+    {
+      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Resources\\Rock.eo",
+      "x": 80.5,
+      "y": 48
+    },
+    {
+      "objectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\bin\\Debug\\net8.0-windows\\..\\..\\Assets\\Objects\\Resources\\Rock.eo",
+      "x": 224.5,
+      "y": 32
     }
   ]
 }

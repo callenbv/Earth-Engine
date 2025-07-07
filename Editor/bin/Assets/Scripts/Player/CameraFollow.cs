@@ -14,7 +14,7 @@ public class CameraFollow : GameScript
     {
         float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-        Camera.Zoom = targetZoom;
+        Camera.Zoom = targetZoom+MathF.Sin((float)gameTime.TotalGameTime.TotalSeconds)/55f;
         Camera.Target = Owner;
     }
 }
