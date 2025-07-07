@@ -22,7 +22,7 @@ public class PlayerMovement : GameScript
         if (Input.IsKeyDown(Keys.A))
         {
             Owner.position.X -= Speed;
-            Owner.spriteEffect = SpriteEffects.FlipHorizontally;
+            Owner.sprite.spriteEffect = SpriteEffects.FlipHorizontally;
         }
         if (Input.IsKeyDown(Keys.S))
         {
@@ -31,7 +31,7 @@ public class PlayerMovement : GameScript
         if (Input.IsKeyDown(Keys.D))
         {
             Owner.position.X += Speed;
-            Owner.spriteEffect = SpriteEffects.None;
+            Owner.sprite.spriteEffect = SpriteEffects.None;
         }
     }
 }

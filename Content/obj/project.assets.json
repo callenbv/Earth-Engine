@@ -1,0 +1,266 @@
+{
+  "version": 3,
+  "targets": {
+    "net8.0-windows7.0": {
+      "Autofac/5.2.0": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.1/Autofac.dll": {
+            "related": ".pdb;.xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.1/Autofac.dll": {
+            "related": ".pdb;.xml"
+          }
+        }
+      },
+      "MonoGame.Extended/4.1.0": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/MonoGame.Extended.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/MonoGame.Extended.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "MonoGame.Extended.Content.Pipeline/4.1.0": {
+        "type": "package",
+        "dependencies": {
+          "Autofac": "5.2.0",
+          "MonoGame.Extended": "4.1.0"
+        },
+        "compile": {
+          "lib/net8.0/MonoGame.Extended.Content.Pipeline.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/MonoGame.Extended.Content.Pipeline.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "build/MonoGame.Extended.Content.Pipeline.targets": {}
+        }
+      },
+      "MonoGame.Framework.DesktopGL/3.8.1.303": {
+        "type": "package",
+        "compile": {
+          "lib/net6.0/MonoGame.Framework.dll": {}
+        },
+        "runtime": {
+          "lib/net6.0/MonoGame.Framework.dll": {}
+        },
+        "build": {
+          "build/MonoGame.Framework.DesktopGL.targets": {}
+        },
+        "runtimeTargets": {
+          "runtimes/linux-x64/native/libSDL2-2.0.so.0": {
+            "assetType": "native",
+            "rid": "linux-x64"
+          },
+          "runtimes/linux-x64/native/libopenal.so.1": {
+            "assetType": "native",
+            "rid": "linux-x64"
+          },
+          "runtimes/osx/native/libSDL2.dylib": {
+            "assetType": "native",
+            "rid": "osx"
+          },
+          "runtimes/osx/native/libopenal.1.dylib": {
+            "assetType": "native",
+            "rid": "osx"
+          },
+          "runtimes/win-x64/native/SDL2.dll": {
+            "assetType": "native",
+            "rid": "win-x64"
+          },
+          "runtimes/win-x64/native/soft_oal.dll": {
+            "assetType": "native",
+            "rid": "win-x64"
+          },
+          "runtimes/win-x86/native/SDL2.dll": {
+            "assetType": "native",
+            "rid": "win-x86"
+          },
+          "runtimes/win-x86/native/soft_oal.dll": {
+            "assetType": "native",
+            "rid": "win-x86"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Autofac/5.2.0": {
+      "sha512": "V8dBH0dsv75uDzl7Sw+HkhKDPUw2eXnlMjcSVMH+tLo2s67MpTKGyDj1pDcpR+IF2u4YRs0s3/x7R88YJzIWvg==",
+      "type": "package",
+      "path": "autofac/5.2.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "autofac.5.2.0.nupkg.sha512",
+        "autofac.nuspec",
+        "icon.png",
+        "lib/net461/Autofac.dll",
+        "lib/net461/Autofac.pdb",
+        "lib/net461/Autofac.xml",
+        "lib/netstandard2.0/Autofac.dll",
+        "lib/netstandard2.0/Autofac.pdb",
+        "lib/netstandard2.0/Autofac.xml",
+        "lib/netstandard2.1/Autofac.dll",
+        "lib/netstandard2.1/Autofac.pdb",
+        "lib/netstandard2.1/Autofac.xml"
+      ]
+    },
+    "MonoGame.Extended/4.1.0": {
+      "sha512": "ES6VVjdoFAkCYzrkfAJ1Mfc0neMSqBhbgzyf3fM/sl9AvPTa8MMx1/YuqIEhEb5MeDTauQRkFNWWfA4XgMUCaw==",
+      "type": "package",
+      "path": "monogame.extended/4.1.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "lib/net8.0/MonoGame.Extended.dll",
+        "lib/net8.0/MonoGame.Extended.xml",
+        "logo-nuget-128.png",
+        "monogame.extended.4.1.0.nupkg.sha512",
+        "monogame.extended.nuspec"
+      ]
+    },
+    "MonoGame.Extended.Content.Pipeline/4.1.0": {
+      "sha512": "dQiItd/MDhj0oNVsfzIfmyO/yN0Ww5bLdC+4lBTrguESWQhsvmAnu+Vx8R+yFkmmgD2ePevifac6IC6ZiTdgxg==",
+      "type": "package",
+      "path": "monogame.extended.content.pipeline/4.1.0",
+      "hasTools": true,
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "build/MonoGame.Extended.Content.Pipeline.targets",
+        "lib/net8.0/MonoGame.Extended.Content.Pipeline.dll",
+        "lib/net8.0/MonoGame.Extended.Content.Pipeline.xml",
+        "logo-nuget-128.png",
+        "monogame.extended.content.pipeline.4.1.0.nupkg.sha512",
+        "monogame.extended.content.pipeline.nuspec",
+        "tools/MonoGame.Extended.Content.Pipeline.dll",
+        "tools/MonoGame.Extended.dll"
+      ]
+    },
+    "MonoGame.Framework.DesktopGL/3.8.1.303": {
+      "sha512": "eGYhqn0n1olk8MNYeE9EuBmoNNECN1T18rPMaQpkzsEQ0H3nVyFPXC+uCo78v5pi5juQpJ3PSFnSkjzZJ1U58A==",
+      "type": "package",
+      "path": "monogame.framework.desktopgl/3.8.1.303",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "build/MonoGame.Framework.DesktopGL.targets",
+        "lib/net6.0/MonoGame.Framework.dll",
+        "monogame.framework.desktopgl.3.8.1.303.nupkg.sha512",
+        "monogame.framework.desktopgl.nuspec",
+        "runtimes/linux-x64/native/libSDL2-2.0.so.0",
+        "runtimes/linux-x64/native/libopenal.so.1",
+        "runtimes/osx/native/libSDL2.dylib",
+        "runtimes/osx/native/libopenal.1.dylib",
+        "runtimes/win-x64/native/SDL2.dll",
+        "runtimes/win-x64/native/soft_oal.dll",
+        "runtimes/win-x86/native/SDL2.dll",
+        "runtimes/win-x86/native/soft_oal.dll"
+      ]
+    }
+  },
+  "projectFileDependencyGroups": {
+    "net8.0-windows7.0": [
+      "MonoGame.Extended.Content.Pipeline >= 4.1.0",
+      "MonoGame.Framework.DesktopGL >= 3.8.1.303"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\calle\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "C:\\Users\\calle\\Desktop\\Earth Engine\\Content\\Content.csproj",
+      "projectName": "Content",
+      "projectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Content\\Content.csproj",
+      "packagesPath": "C:\\Users\\calle\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Content\\obj\\",
+      "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
+      "configFilePaths": [
+        "C:\\Users\\calle\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net8.0-windows"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net8.0-windows7.0": {
+          "targetAlias": "net8.0-windows",
+          "projectReferences": {}
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "9.0.100"
+    },
+    "frameworks": {
+      "net8.0-windows7.0": {
+        "targetAlias": "net8.0-windows",
+        "dependencies": {
+          "MonoGame.Extended.Content.Pipeline": {
+            "target": "Package",
+            "version": "[4.1.0, )"
+          },
+          "MonoGame.Framework.DesktopGL": {
+            "target": "Package",
+            "version": "[3.8.1.303, )"
+          }
+        },
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          },
+          "Microsoft.WindowsDesktop.App": {
+            "privateAssets": "none"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.101/PortableRuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}

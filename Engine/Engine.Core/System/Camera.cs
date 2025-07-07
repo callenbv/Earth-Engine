@@ -1,3 +1,5 @@
+using Engine.Core.Game;
+using Engine.Core.Game.Rooms;
 using Microsoft.Xna.Framework;
 
 namespace Engine.Core
@@ -22,7 +24,27 @@ namespace Engine.Core
 
         public Matrix GetViewMatrix(int viewportWidth, int viewportHeight)
         {
-            return Matrix.CreateTranslation(new Vector3(-Position, 0f)) *
+            float snap = 1f / Zoom;
+            Vector3 Translation = new Vector3(
+            (float)MathF.Floor(-Position.X / snap) * snap,
+            (float)MathF.Floor(-Position.Y / snap) * snap,
+            0f);
+
+            return Matrix.CreateTranslation(Translation) *
+                   Matrix.CreateRotationZ(Rotation) *
+                   Matrix.CreateScale(Zoom, Zoom, 1f) *
+                   Matrix.CreateTranslation(new Vector3(viewportWidth * 0.5f, viewportHeight * 0.5f, 0f));
+        }
+
+        public Matrix GetViewMatrixPixel(int viewportWidth, int viewportHeight)
+        {
+            float snap = 1f / Zoom;
+            Vector3 Translation = new Vector3(
+            (float)MathF.Floor(-Position.X / snap) * snap,
+            (float)MathF.Floor(-Position.Y / snap) * snap,
+            0f);
+
+            return Matrix.CreateTranslation(Translation) *
                    Matrix.CreateRotationZ(Rotation) *
                    Matrix.CreateScale(Zoom, Zoom, 1f) *
                    Matrix.CreateTranslation(new Vector3(viewportWidth * 0.5f, viewportHeight * 0.5f, 0f));
@@ -40,8 +62,13 @@ namespace Engine.Core
             return new Vector2(worldVector.X, worldVector.Y);
         }
 
+        public void SetViewportSize(int  viewportWidth, int viewportHeight)
+        {
+
+        }
+
         // Singleton for easy access
-        private static Camera _main;
+        private static Camera? _main;
         public static Camera Main => _main ??= new Camera();
     }
 } 

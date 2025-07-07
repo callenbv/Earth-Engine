@@ -8,8 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.303" />
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.3" />
     <PackageReference Include="SharpFont" Version="4.0.1" />
+    <PackageReference Include="MonoGame.Extended" Version="4.1.0" />
+    <PackageReference Include="MonoGame.Extended.Content.Pipeline" Version="4.1.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -18,6 +20,10 @@
 
   <ItemGroup>
     <Compile Include="..\Editor\bin\Assets\Scripts\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="..\Editor\bin\Assets\Scripts\TextureReloader.cs" />
   </ItemGroup>
 
 </Project> 

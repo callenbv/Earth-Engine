@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
+using System.Reflection;
 
 namespace Engine.Core
 {
@@ -9,6 +10,12 @@ namespace Engine.Core
         private static KeyboardState _previousKeyboard;
         private static MouseState _currentMouse;
         private static MouseState _previousMouse;
+        
+        // Reference to the Game instance for calling Exit()
+        public static Microsoft.Xna.Framework.Game? gameInstance;
+        
+        // Reference to the GraphicsDeviceManager for fullscreen toggle
+        public static Microsoft.Xna.Framework.GraphicsDeviceManager? graphicsManager;
 
         public static void Update()
         {
@@ -16,6 +23,42 @@ namespace Engine.Core
             _previousMouse = _currentMouse;
             _currentKeyboard = Keyboard.GetState();
             _currentMouse = Mouse.GetState();
+
+            HandleHotkeys();
+        }
+
+        /// <summary>
+        /// Handle hotkey pressing
+        /// </summary>
+        private static void HandleHotkeys()
+        {
+            // Gamepad quit
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            {
+                gameInstance.Exit();
+            }
+
+            // Fullscreen toggle (F11 or Alt+Enter)
+            if (IsKeyPressed(Keys.F11) || (IsKeyPressed(Keys.Enter) && (IsKeyDown(Keys.LeftAlt) || IsKeyDown(Keys.RightAlt))))
+            {
+                ToggleFullscreen();
+            }
+
+            // Restart room
+            if (Keyboard.GetState().IsKeyDown(Keys.R) && (Keyboard.GetState().IsKeyDown(Keys.LeftControl) || Keyboard.GetState().IsKeyDown(Keys.RightControl)))
+            {
+            }
+        }
+
+        /// <summary>
+        /// Toggle between fullscreen and windowed mode
+        /// </summary>
+        private static void ToggleFullscreen()
+        {
+            if (graphicsManager != null)
+            {
+                graphicsManager.ToggleFullScreen();
+            }
         }
 
         // Keyboard

@@ -6,7 +6,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Engine.Core;
-using GameRuntime; // For Lighting2D
+using GameRuntime;
+using System.Runtime.Serialization;
+using Engine.Core.Game;
+using Engine.Core.Game.Tiles;
+using Engine.Core.Graphics;
 
 namespace GameRuntime
 {
@@ -15,15 +19,19 @@ namespace GameRuntime
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         private ScriptManager _scriptManager;
-        private RoomManager _roomManager;
+        private RuntimeManager _roomManager;
+        private GameObjectManager objectManager;
         private Lighting2D _lighting;
         private int _lastWidth, _lastHeight;
         private RenderTarget2D _sceneRenderTarget;
+        private TilemapRenderer _mapRenderer;
 
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
-            Content.RootDirectory = "Content";
+            // Point ContentManager to the Editor's Assets directory where sprites are located
+            var assetsPath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "Editor", "bin", "Assets"));
+            Content.RootDirectory = assetsPath;
             IsMouseVisible = true;
         }
 
@@ -31,16 +39,22 @@ namespace GameRuntime
         {
             _scriptManager = new ScriptManager();
             _scriptManager.LoadScripts();
-            
-            _roomManager = new RoomManager(_scriptManager);
-            
+            objectManager = new GameObjectManager();
+            _roomManager = new RuntimeManager(_scriptManager);
+            Input.gameInstance = this;
+            Input.graphicsManager = _graphics;
+            TextureLibrary.Main.LoadTextures(_graphics.GraphicsDevice);
+
+            _mapRenderer = new TilemapRenderer();
+
             // Load game options and set window properties
             var gameOptions = _roomManager.GetGameOptions();
             Window.Title = gameOptions.title;
             _graphics.PreferredBackBufferWidth = gameOptions.windowWidth;
             _graphics.PreferredBackBufferHeight = gameOptions.windowHeight;
             _graphics.ApplyChanges();
-            
+            _mapRenderer.Initialize();
+
             base.Initialize();
         }
 
@@ -52,8 +66,8 @@ namespace GameRuntime
             Engine.Core.GameScript.GraphicsDevice = GraphicsDevice;
             Engine.Core.GameScript.RoomManager = _roomManager;
             
-            // Load the default room
-            _roomManager.LoadDefaultRoom(GraphicsDevice);
+            // Load the default room with ContentManager
+            _roomManager.LoadDefaultRoom(GraphicsDevice, Content);
 
             // Initialize lighting system
             _lighting = new Lighting2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
@@ -69,17 +83,8 @@ namespace GameRuntime
             Input.Update();
             Camera.Main.Update(gameTime);
 
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
-
-            // Check for Ctrl+R to reset room
-            if (Keyboard.GetState().IsKeyDown(Keys.R) && (Keyboard.GetState().IsKeyDown(Keys.LeftControl) || Keyboard.GetState().IsKeyDown(Keys.RightControl)))
-            {
-                ResetRoom();
-            }
-
             // Update viewport dimensions for coordinate conversion
-            _roomManager.SetViewportDimensions(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+            Camera.Main.SetViewportSize(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
 
             // Check for hot reload every few frames
             if (gameTime.TotalGameTime.TotalMilliseconds % 500 < 16) // Check every ~500ms
@@ -100,40 +105,7 @@ namespace GameRuntime
                 _lastHeight = GraphicsDevice.Viewport.Height;
             }
 
-            // Update lighting occluders and lights from room
-            _lighting.Occluders = _roomManager.GetOccluders();
-            
-            // Get lights from room and add demo lights
-            var roomLights = _roomManager.GetLights();
-            _lighting.Lights.Clear();
-            _lighting.Lights.AddRange(roomLights);
-
             base.Update(gameTime);
-        }
-
-        private void ResetRoom()
-        {
-            try
-            {
-                // Get the current room name
-                var currentRoomName = _roomManager.GetCurrentRoomName();
-                if (!string.IsNullOrEmpty(currentRoomName))
-                {
-                    // Reload the current room
-                    _roomManager.LoadRoom(currentRoomName, GraphicsDevice);
-                    Console.WriteLine($"Room '{currentRoomName}' reset!");
-                }
-                else
-                {
-                    // Load default room if no current room
-                    _roomManager.LoadDefaultRoom(GraphicsDevice);
-                    Console.WriteLine("Default room loaded!");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Failed to reset room: {ex.Message}");
-            }
         }
 
         protected override void Draw(GameTime gameTime)
@@ -142,9 +114,18 @@ namespace GameRuntime
             GraphicsDevice.SetRenderTarget(_sceneRenderTarget);
             GraphicsDevice.Clear(Color.CornflowerBlue);
             var viewport = GraphicsDevice.Viewport;
-            _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Engine.Core.Camera.Main.GetViewMatrix(viewport.Width, viewport.Height));
+
+            _spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Engine.Core.Camera.Main.GetViewMatrixPixel(viewport.Width, viewport.Height));
+            _mapRenderer.Draw(_spriteBatch);
+            _spriteBatch.End();
+
+            _spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Engine.Core.Camera.Main.GetViewMatrix(viewport.Width, viewport.Height));
             _roomManager.Draw(_spriteBatch);
             _spriteBatch.End();
+
+
+            // Get lights from room and populate lighting system
+            _roomManager.GetLights(_lighting);
 
             // Update the lightmap (draw lights to lightmap render target)
             _lighting.Draw(_spriteBatch);

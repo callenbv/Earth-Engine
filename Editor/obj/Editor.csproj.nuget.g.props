@@ -17,6 +17,7 @@
     <Import Project="$(NuGetPackageRoot)microsoft.codeanalysis.analyzers\3.3.4\buildTransitive\Microsoft.CodeAnalysis.Analyzers.props" Condition="Exists('$(NuGetPackageRoot)microsoft.codeanalysis.analyzers\3.3.4\buildTransitive\Microsoft.CodeAnalysis.Analyzers.props')" />
   </ImportGroup>
   <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
+    <PkgMonoGame_Extended_Content_Pipeline Condition=" '$(PkgMonoGame_Extended_Content_Pipeline)' == '' ">C:\Users\calle\.nuget\packages\monogame.extended.content.pipeline\4.1.0</PkgMonoGame_Extended_Content_Pipeline>
     <PkgMicrosoft_CodeAnalysis_Analyzers Condition=" '$(PkgMicrosoft_CodeAnalysis_Analyzers)' == '' ">C:\Users\calle\.nuget\packages\microsoft.codeanalysis.analyzers\3.3.4</PkgMicrosoft_CodeAnalysis_Analyzers>
   </PropertyGroup>
 </Project>

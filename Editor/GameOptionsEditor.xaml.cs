@@ -1,3 +1,4 @@
+using Engine.Core.Game;
 using System;
 using System.IO;
 using System.Text.Json;
@@ -11,14 +12,6 @@ namespace Editor
         private readonly string assetsRoot;
         private readonly string roomsDir;
         private readonly string gameOptionsPath;
-
-        public class GameOptions
-        {
-            public string title { get; set; } = "My Game";
-            public int windowWidth { get; set; } = 800;
-            public int windowHeight { get; set; } = 600;
-            public string defaultRoom { get; set; } = "";
-        }
 
         public GameOptionsEditor()
         {

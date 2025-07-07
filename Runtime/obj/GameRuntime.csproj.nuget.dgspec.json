@@ -61,6 +61,10 @@
             "MonoGame.Framework.DesktopGL": {
               "target": "Package",
               "version": "[3.8.1.303, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.3, )"
             }
           },
           "imports": [
@@ -133,9 +137,17 @@
         "net8.0-windows7.0": {
           "targetAlias": "net8.0-windows",
           "dependencies": {
+            "MonoGame.Extended": {
+              "target": "Package",
+              "version": "[4.1.0, )"
+            },
+            "MonoGame.Extended.Content.Pipeline": {
+              "target": "Package",
+              "version": "[4.1.0, )"
+            },
             "MonoGame.Framework.DesktopGL": {
               "target": "Package",
-              "version": "[3.8.1.303, )"
+              "version": "[3.8.3, )"
             },
             "SharpFont": {
               "target": "Package",

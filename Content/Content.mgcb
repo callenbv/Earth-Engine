@@ -9,6 +9,10 @@
 
 #-------------------------------- References --------------------------------#
 
+#begin MonoGame.Extended.Content.Pipeline.dll
+/processor:PassThroughProcessor
+/build:MonoGame.Extended.Content.Pipeline.dll
+
 #---------------------------------- Content ---------------------------------#
 
 #begin ShadowCast.fx
@@ -16,3 +20,8 @@
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:ShadowCast.fx 
+
+#begin Rooms/Home.tmx
+/importer:TiledMapImporter
+/processor:TiledMapProcessor
+/build:Rooms/Home.tmx

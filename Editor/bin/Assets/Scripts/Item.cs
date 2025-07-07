@@ -9,7 +9,6 @@ public class Item : GameScript
 
     public override void Update(GameTime gameTime)
     {
-        Owner.scale.X += MathF.Sin((float)gameTime.TotalGameTime.TotalSeconds*7)/100f;
-        Owner.scale.Y += MathF.Sin((float)gameTime.TotalGameTime.TotalSeconds*7)/100f;
+        Owner.scale += MathF.Sin((float)gameTime.TotalGameTime.TotalSeconds*7)/100f;
     }
 }

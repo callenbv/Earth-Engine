@@ -1,4 +1,5 @@
 using Engine.Core;
+using Engine.Core.Game;
 using Microsoft.Xna.Framework;
 
 public class Resource : GameScript
@@ -10,7 +11,7 @@ public class Resource : GameScript
 
     public override void Destroy()
     {
-        var spawnedItem = SpawnObject("Item", Owner.position);
+        var spawnedItem = GameObject.Instantiate("Item", Owner.position);
 
         if (spawnedItem != null)
         {

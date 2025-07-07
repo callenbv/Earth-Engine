@@ -39,3 +39,4 @@
 *.props
 *.xnb
 /Editor/obj
+*.lref

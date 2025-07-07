@@ -100,3 +100,7 @@ C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\AnimatedSpri
 C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\AnimatedSpriteDisplay.g.cs
 C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\Themes\DarkTheme.baml
 C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\App.baml
+C:\Users\calle\Desktop\Earth Engine\Editor\bin\Debug\net8.0-windows\Newtonsoft.Json.dll
+C:\Users\calle\Desktop\Earth Engine\Editor\bin\Debug\net8.0-windows\Autofac.dll
+C:\Users\calle\Desktop\Earth Engine\Editor\bin\Debug\net8.0-windows\MonoGame.Extended.dll
+C:\Users\calle\Desktop\Earth Engine\Editor\bin\Debug\net8.0-windows\MonoGame.Extended.Content.Pipeline.dll

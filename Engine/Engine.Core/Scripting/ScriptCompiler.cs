@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -101,7 +102,7 @@ namespace Engine.Core
         private static IEnumerable<MetadataReference> GetReferences()
         {
             var references = new List<MetadataReference>();
-            
+
             // Add basic .NET references
             var assemblies = new[]
             {
