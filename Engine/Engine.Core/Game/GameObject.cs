@@ -127,7 +127,7 @@ namespace Engine.Core.Game
                 var go = new GameObject(objDef.Name);
 
                 go.position = position;
-                GameObjectManager.Instance.gameObjects.Add(go);
+                GameObjectManager.Main.gameObjects.Add(go);
 
                 return go;
             }

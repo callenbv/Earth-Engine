@@ -19,12 +19,13 @@ namespace GameRuntime
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         private ScriptManager _scriptManager;
-        private RuntimeManager _roomManager;
+        private RuntimeManager runtimeManager;
         private GameObjectManager objectManager;
         private Lighting2D _lighting;
         private int _lastWidth, _lastHeight;
         private RenderTarget2D _sceneRenderTarget;
         private TilemapRenderer _mapRenderer;
+        private GameOptions _gameOptions;
 
         public Game1()
         {
@@ -40,18 +41,21 @@ namespace GameRuntime
             _scriptManager = new ScriptManager();
             _scriptManager.LoadScripts();
             objectManager = new GameObjectManager();
-            _roomManager = new RuntimeManager(_scriptManager);
+            runtimeManager = new RuntimeManager(_scriptManager);
+
+            // Get the loaded game options from RuntimeManager
+            _gameOptions = GameOptions.Main;
+            
             Input.gameInstance = this;
             Input.graphicsManager = _graphics;
             TextureLibrary.Main.LoadTextures(_graphics.GraphicsDevice);
 
             _mapRenderer = new TilemapRenderer();
 
-            // Load game options and set window properties
-            var gameOptions = _roomManager.GetGameOptions();
-            Window.Title = gameOptions.title;
-            _graphics.PreferredBackBufferWidth = gameOptions.windowWidth;
-            _graphics.PreferredBackBufferHeight = gameOptions.windowHeight;
+            // Use the loaded game options for window configuration
+            Window.Title = _gameOptions.title;
+            _graphics.PreferredBackBufferWidth = _gameOptions.windowWidth;
+            _graphics.PreferredBackBufferHeight = _gameOptions.windowHeight;
             _graphics.ApplyChanges();
             _mapRenderer.Initialize();
 
@@ -64,10 +68,10 @@ namespace GameRuntime
             
             // Set GraphicsDevice and RoomManager for scripts to use
             Engine.Core.GameScript.GraphicsDevice = GraphicsDevice;
-            Engine.Core.GameScript.RoomManager = _roomManager;
+            Engine.Core.GameScript.RoomManager = runtimeManager;
             
             // Load the default room with ContentManager
-            _roomManager.LoadDefaultRoom(GraphicsDevice, Content);
+            runtimeManager.Initialize(GraphicsDevice, Content);
 
             // Initialize lighting system
             _lighting = new Lighting2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
@@ -93,7 +97,7 @@ namespace GameRuntime
             }
 
             // Update room manager (which handles all game objects and their scripts)
-            _roomManager.Update(gameTime);
+            runtimeManager.Update(gameTime);
 
             // Resize lighting and scene render target if needed
             if (GraphicsDevice.Viewport.Width != _lastWidth || GraphicsDevice.Viewport.Height != _lastHeight)
@@ -120,12 +124,8 @@ namespace GameRuntime
             _spriteBatch.End();
 
             _spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Engine.Core.Camera.Main.GetViewMatrix(viewport.Width, viewport.Height));
-            _roomManager.Draw(_spriteBatch);
+            runtimeManager.Draw(_spriteBatch);
             _spriteBatch.End();
-
-
-            // Get lights from room and populate lighting system
-            _roomManager.GetLights(_lighting);
 
             // Update the lightmap (draw lights to lightmap render target)
             _lighting.Draw(_spriteBatch);

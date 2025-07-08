@@ -1,7 +1,0 @@
-{
-  "name": "Item",
-  "sprite": "Log.png",
-  "scripts": [
-    "Item.cs"
-  ]
-}

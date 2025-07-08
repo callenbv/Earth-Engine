@@ -1,8 +1,0 @@
-{
-  "name": "Player",
-  "sprite": "Player.png",
-  "scripts": [
-    "CameraFollow",
-    "PlayerMovement"
-  ]
-}

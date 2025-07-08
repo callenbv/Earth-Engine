@@ -1,8 +1,0 @@
-{
-  "name": "Slime",
-  "frameWidth": 24,
-  "frameHeight": 24,
-  "frameCount": 10,
-  "frameSpeed": 12,
-  "animated": true
-}

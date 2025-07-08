@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework.Content;
 using Engine.Core.Game;
+using System.Runtime.Serialization;
 
 namespace GameRuntime
 {
@@ -64,77 +65,7 @@ namespace GameRuntime
             whitePixel = new Texture2D(gd, 1, 1);
             whitePixel.SetData(new[] { Color.White });
         }
-        //public void DrawShadowsFor(Light light, SpriteBatch spriteBatch)
-        //{
-        //    float maxDist = light.Radius * 2f;
-        //    Color shadowColor = new Color(0, 0, 0, 200);
-
-        //    // BasicEffect setup omitted for brevity…
-
-        //    foreach (var oc in occluders)
-        //    {
-        //        // oc is AnimatedGameObject or something with silhouetteEdges
-        //        foreach (var (localA, localB) in oc.silhouetteEdges)
-        //        {
-        //            // transform to world:
-        //            var A = Vector2.Transform(localA, oc.WorldTransform);
-        //            var B = Vector2.Transform(localB, oc.WorldTransform);
-
-        //            // only cast from edges facing away from the light
-        //            var edge = B - A;
-        //            var normal = new Vector2(-edge.Y, edge.X);
-        //            var mid = (A + B) * 0.5f;
-        //            if (Vector2.Dot(normal, mid - light.Position) <= 0)
-        //                continue;
-
-        //            // extrude to "infinity"
-        //            var dirA = Vector2.Normalize(A - light.Position);
-        //            var dirB = Vector2.Normalize(B - light.Position);
-        //            var farA = A + dirA * maxDist;
-        //            var farB = B + dirB * maxDist;
-
-        //            // build two triangles for the quad
-        //            var verts = new[] {
-        //                new VertexPositionColor(new Vector3(A,0),  shadowColor),
-        //                new VertexPositionColor(new Vector3(B,0),  shadowColor),
-        //                new VertexPositionColor(new Vector3(farB,0), shadowColor),
-
-        //                new VertexPositionColor(new Vector3(A,0),  shadowColor),
-        //                new VertexPositionColor(new Vector3(farB,0), shadowColor),
-        //                new VertexPositionColor(new Vector3(farA,0), shadowColor),
-        //            };
-
-        //            // set your MultiplyBlend, RasterizerState, etc.
-        //            graphicsDevice.BlendState = Lighting2D.MultiplyBlend;
-        //            graphicsDevice.RasterizerState = RasterizerState.CullNone;
-        //            graphicsDevice.DepthStencilState = DepthStencilState.None;
-
-        //            // draw verts with your BasicEffect
-        //            effect.CurrentTechnique.Passes[0].Apply();
-        //            graphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, verts, 0, 2);
-        //        }
-        //    }
-        //}
-
-        //public List<LightSource> GetLights()
-        //{
-        //    var lights = new List<LightSource>();
-
-        //    foreach (var gameObj in gameObjects)
-        //    {
-        //        if (gameObj is AnimatedGameObject animObj && animObj.emitsLight)
-        //        {
-        //            var light = animObj.CreateLightSource();
-        //            if (light != null)
-        //            {
-        //                lights.Add(light);
-        //            }
-        //        }
-        //    }
-
-        //    return lights;
-        //}
-
+     
         public void Resize(int width, int height)
         {
             this.width = width;
@@ -206,8 +137,75 @@ namespace GameRuntime
             }
         }
 
+        /// <summary>
+        /// Get all lights from game objects and populate the lighting system
+        /// </summary>
+        /// <param name="lighting">The lighting system to populate</param>
+        public void GetLights()
+        {
+            Lights.Clear();
+
+            foreach (var gameObj in GameObjectManager.Main.GetAllObjects())
+            {
+                // Check if the object has any scripts that emit light
+                foreach (var script in gameObj.scriptInstances)
+                {
+                    if (script is Engine.Core.GameScript gameScript)
+                    {
+                        // Check if this script has lighting properties
+                        var lightRadiusProperty = script.GetType().GetField("lightRadius", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                        var lightIntensityProperty = script.GetType().GetField("lightIntensity", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                        var lightColorProperty = script.GetType().GetField("lightColor", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+                        if (lightRadiusProperty != null && lightIntensityProperty != null && lightColorProperty != null)
+                        {
+                            var radius = (float)lightRadiusProperty.GetValue(script);
+                            var intensity = (float)lightIntensityProperty.GetValue(script);
+                            var colorName = (string)lightColorProperty.GetValue(script);
+
+                            if (radius > 0 && intensity > 0)
+                            {
+                                // Parse color string to Color
+                                var color = Color.White;
+                                try
+                                {
+                                    var colorProperty = typeof(Microsoft.Xna.Framework.Color).GetProperty(colorName);
+                                    if (colorProperty != null)
+                                    {
+                                        color = (Color)colorProperty.GetValue(null);
+                                    }
+                                }
+                                catch
+                                {
+                                    // Default to white if color parsing fails
+                                    color = Microsoft.Xna.Framework.Color.White;
+                                }
+
+                                var light = new LightSource
+                                {
+                                    Position = gameObj.position,
+                                    Radius = radius,
+                                    Color = color,
+                                    Intensity = intensity
+                                };
+
+                                Lights.Add(light);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Draw the lighting layer
+        /// </summary>
+        /// <param name="spriteBatch"></param>
         public void Draw(SpriteBatch spriteBatch)
         {
+            // Get the lights in the scene
+            GetLights();
+
             // Safety check
             if (spriteBatch == null || graphicsDevice == null || lightmap == null)
             {
@@ -250,34 +248,6 @@ namespace GameRuntime
             graphicsDevice.SetRenderTarget(null);
         }
 
-        public void DebugSaveLightmap()
-        {
-            // Save the lightmap to a file for inspection
-            try
-            {
-                Color[] data = new Color[width * height];
-                lightmap.GetData(data);
-                
-                // Check if the lightmap has any non-black pixels
-                bool hasNonBlack = false;
-                for (int i = 0; i < data.Length; i++)
-                {
-                    if (data[i].R > 0 || data[i].G > 0 || data[i].B > 0 || data[i].A > 0)
-                    {
-                        hasNonBlack = true;
-                        break;
-                    }
-                }
-                
-                Console.WriteLine($"[DEBUG] Lightmap size: {width}x{height}");
-                Console.WriteLine($"[DEBUG] Lightmap has non-black pixels: {hasNonBlack}");
-                Console.WriteLine($"[DEBUG] First few pixels: {data[0]}, {data[1]}, {data[2]}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[DEBUG] Error reading lightmap: {ex.Message}");
-            }
-        }
         public RenderTarget2D GetLightmap()
         {
             return lightmap;

@@ -15,25 +15,44 @@ namespace Engine.Core.Graphics
         private static TextureLibrary? _main;
         GraphicsDevice? graphicsDevice = null;
         public static TextureLibrary Main => _main ??= new TextureLibrary();
-
+        
+        /// <summary>
+        /// Loads all textures within project
+        /// </summary>
+        /// <param name="graphicsDevice_"></param>
+        /// <param name="searchPattern"></param>
+        /// <exception cref="DirectoryNotFoundException"></exception>
         public void LoadTextures(GraphicsDevice graphicsDevice_, string searchPattern = "*.png")
         {
-            if (graphicsDevice == null)
-                graphicsDevice = graphicsDevice_;          // remember for hot-reload if needed
-
-            var baseDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
-                                                        "..", "..", "..", "..",
-                                                        "Editor", "bin", "Assets"));
-            var spriteDir = Path.Combine(baseDir, "Sprites");
-            if (!Directory.Exists(spriteDir))
-                throw new DirectoryNotFoundException($"Sprite directory not found: {spriteDir}");
-
-            foreach (var file in Directory.GetFiles(spriteDir, searchPattern, SearchOption.TopDirectoryOnly))
+            try
             {
-                using var fs = File.OpenRead(file);
-                var tex = Texture2D.FromStream(graphicsDevice, fs);
-                tex.Name = Path.GetFileNameWithoutExtension(file);
-                textures[tex.Name] = tex;
+                if (graphicsDevice == null)
+                    graphicsDevice = graphicsDevice_;
+
+                // Look for Assets/Sprites relative to the EXE location
+                var baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets");
+                var spriteDir = Path.Combine(baseDir, "Sprites");
+                if (!Directory.Exists(spriteDir))
+                    throw new DirectoryNotFoundException($"Sprite directory not found: {spriteDir}");
+
+                foreach (var file in Directory.GetFiles(spriteDir, searchPattern, SearchOption.TopDirectoryOnly))
+                {
+                    try
+                    {
+                        using var fs = File.OpenRead(file);
+                        var tex = Texture2D.FromStream(graphicsDevice, fs);
+                        tex.Name = Path.GetFileNameWithoutExtension(file);
+                        textures[tex.Name] = tex;
+                    }
+                    catch (DirectoryNotFoundException)
+                    {
+                        Console.WriteLine($"Texture not found at {spriteDir}");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
             }
         }
 
@@ -45,7 +64,10 @@ namespace Engine.Core.Graphics
             if (textures.TryGetValue(name, out var tex))
                 return tex;
 
-            throw new KeyNotFoundException($"Texture '{name}' not found. Make sure LoadTextures() was called and the file exists.");
+
+            // Return a white square for bad texture
+            Console.WriteLine($"Texture '{name}' not found. Make sure LoadTextures() was called and the file exists.");
+            return new Texture2D(graphicsDevice, 16, 16);
         }
     }
 }

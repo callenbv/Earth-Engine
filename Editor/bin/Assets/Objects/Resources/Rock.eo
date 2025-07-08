@@ -1,7 +1,0 @@
-{
-  "name": "Rock",
-  "sprite": "Rock.png",
-  "scripts": [
-    "Resource.cs"
-  ]
-}

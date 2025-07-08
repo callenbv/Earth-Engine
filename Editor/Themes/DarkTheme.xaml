@@ -21,7 +21,7 @@
         <Setter Property="Background" Value="{DynamicResource WindowBackgroundBrush}"/>
         <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
     </Style>
-
+  
     <!-- Button style -->
     <Style TargetType="Button">
         <Setter Property="Background" Value="{DynamicResource ControlBackgroundBrush}"/>
@@ -225,15 +225,62 @@
     <!-- ToolBar -->
     <Style TargetType="ToolBar">
         <Setter Property="Background" Value="{DynamicResource ControlBackgroundBrush}"/>
+        <Setter Property="Foreground"  Value="CadetBlue"/>
+  </Style>
+
+    <!-- TextBlock style -->
+    <Style TargetType="TextBlock">
         <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
     </Style>
 
-    <!-- TreeView -->
-    <Style TargetType="TreeView">
+    <!-- Menu bar style -->
+    <Style TargetType="Menu">
         <Setter Property="Background" Value="{DynamicResource ControlBackgroundBrush}"/>
         <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
     </Style>
+  
+    <!-- MenuItem style -->
+    <Style TargetType="MenuItem">
+        <Setter Property="Background" Value="{DynamicResource ControlBackgroundBrush}"/>
+        <Setter Property="Foreground"  Value="CadetBlue"/>
+        <Setter Property="Padding" Value="8,4"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+        <Setter Property="Foreground" Value="CadetBlue"/>
+            </Trigger>
+            <Trigger Property="IsSubmenuOpen" Value="True">
+                <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+                <Setter Property="Foreground" Value="CadetBlue"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- TreeView style -->
+    <Style TargetType="TreeView">
+        <Setter Property="Background" Value="{DynamicResource ControlBackgroundBrush}"/>
+        <Setter Property="Foreground" Value="CadetBlue"/>
+    </Style>
+
+    <!-- TreeViewItem style -->
     <Style TargetType="TreeViewItem">
-        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+        <Setter Property="Foreground" Value="CadetBlue"/>
+        <Setter Property="Background" Value="{DynamicResource ControlBackgroundBrush}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="2,0,0,0"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Style.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+                <Setter Property="Foreground" Value="CadetBlue"/>
+            </Trigger>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="#FF353A42"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="#FF666666"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 </ResourceDictionary> 

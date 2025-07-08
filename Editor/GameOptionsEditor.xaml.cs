@@ -13,30 +13,30 @@ namespace Editor
         private readonly string roomsDir;
         private readonly string gameOptionsPath;
 
-        public GameOptionsEditor()
+        public GameOptionsEditor(string assetsRoot)
         {
             InitializeComponent();
-            assetsRoot = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "Assets");
-            roomsDir = System.IO.Path.Combine(assetsRoot, "Rooms");
-            gameOptionsPath = System.IO.Path.Combine(assetsRoot, "game_options.json");
+            this.assetsRoot = assetsRoot;
+            roomsDir = Path.Combine(assetsRoot, "Rooms");
+            gameOptionsPath = Path.Combine(assetsRoot, "game_options.json");
             LoadRooms();
             LoadGameOptions();
         }
 
-        private void LoadRooms()
+        public void LoadRooms()
         {
-            DefaultRoomComboBox.Items.Clear();
+            StartRoomComboBox.Items.Clear();
             if (Directory.Exists(roomsDir))
             {
                 foreach (var file in Directory.GetFiles(roomsDir, "*.room"))
                 {
                     var name = Path.GetFileNameWithoutExtension(file);
-                    DefaultRoomComboBox.Items.Add(name);
+                    StartRoomComboBox.Items.Add(name);
                 }
             }
         }
 
-        private void LoadGameOptions()
+        public void LoadGameOptions()
         {
             if (File.Exists(gameOptionsPath))
             {
@@ -49,7 +49,7 @@ namespace Editor
                         GameTitleTextBox.Text = options.title;
                         WindowWidthTextBox.Text = options.windowWidth.ToString();
                         WindowHeightTextBox.Text = options.windowHeight.ToString();
-                        DefaultRoomComboBox.SelectedItem = options.defaultRoom;
+                        StartRoomComboBox.SelectedItem = options.defaultRoom;
                     }
                 }
                 catch (Exception ex)
@@ -59,7 +59,7 @@ namespace Editor
             }
         }
 
-        private void DefaultRoomComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void StartRoomComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             // This will be saved when SaveGameOptions is clicked
         }
@@ -78,11 +78,12 @@ namespace Editor
                     title = GameTitleTextBox.Text,
                     windowWidth = int.Parse(WindowWidthTextBox.Text),
                     windowHeight = int.Parse(WindowHeightTextBox.Text),
-                    defaultRoom = DefaultRoomComboBox.SelectedItem?.ToString() ?? ""
+                    defaultRoom = StartRoomComboBox.SelectedItem?.ToString() ?? ""
                 };
                 var json = JsonSerializer.Serialize(options, new JsonSerializerOptions { WriteIndented = true });
                 File.WriteAllText(gameOptionsPath, json);
                 // Silent save for Ctrl+S, no popup
+                LoadRooms();
             }
             catch (Exception ex)
             {

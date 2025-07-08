@@ -52,42 +52,30 @@ namespace Editor
         // 1. Add a field for tiled background toggle
         private bool showTiledBackground = true;
         
-        public RoomEditor()
+        public RoomEditor(string assetsRoot)
         {
             InitializeComponent();
-            assetsRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "Assets");
+            this.assetsRoot = assetsRoot;
             roomsDir = Path.Combine(assetsRoot, "Rooms");
             gameOptionsPath = Path.Combine(assetsRoot, "game_options.json");
-            
-            // Create directories if they don't exist
             Directory.CreateDirectory(roomsDir);
-            
             LoadObjectList();
             LoadRooms();
-            
             ObjectTreeView.PreviewMouseMove += ObjectTreeView_PreviewMouseMove;
             RoomCanvas.Drop += RoomCanvas_Drop;
-            
-            // Add Ctrl+S hotkey for saving
             this.PreviewKeyDown += RoomEditor_PreviewKeyDown;
             this.Focusable = true;
-            
-            // Add a checkbox to toggle the tiled background
             var tileCheckbox = new CheckBox { Content = "Show Tiled Background", IsChecked = showTiledBackground, Margin = new Thickness(5) };
             tileCheckbox.Checked += (s, e) => { showTiledBackground = true; RoomCanvas.InvalidateVisual(); };
             tileCheckbox.Unchecked += (s, e) => { showTiledBackground = false; RoomCanvas.InvalidateVisual(); };
             var parentPanel = this.Content as Panel;
             if (parentPanel != null) parentPanel.Children.Insert(0, tileCheckbox);
-
-            // Add event handlers for room size controls
             RoomWidthTextBox.LostFocus += RoomSize_Changed;
             RoomHeightTextBox.LostFocus += RoomSize_Changed;
-
-            // Populate background ComboBox with sprites after component is loaded
             this.Loaded += (s, e) => RefreshBackgroundComboBox();
         }
-        
-        private void LoadObjectList()
+
+        public void LoadObjectList()
         {
             ObjectTreeView.Items.Clear();
             var objectsDir = Path.Combine(assetsRoot, "Objects");

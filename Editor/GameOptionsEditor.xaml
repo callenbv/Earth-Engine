@@ -22,8 +22,8 @@
     <Border Background="{DynamicResource ControlBackgroundBrush}" CornerRadius="6" Padding="20">
         <StackPanel>
             <TextBlock Text="Game Options" FontWeight="Bold" FontSize="18" Margin="0,0,0,10" Foreground="{DynamicResource PrimaryTextBrush}"/>
-            <TextBlock Text="Default Room:" FontWeight="Bold" Margin="0,0,0,5" Foreground="{DynamicResource PrimaryTextBrush}"/>
-            <ComboBox x:Name="DefaultRoomComboBox" Margin="0,0,0,10" SelectionChanged="DefaultRoomComboBox_SelectionChanged"/>
+            <TextBlock Text="Start Room:" FontWeight="Bold" Margin="0,0,0,5" Foreground="{DynamicResource PrimaryTextBrush}"/>
+            <ComboBox x:Name="StartRoomComboBox" Margin="0,0,0,10" SelectionChanged="StartRoomComboBox_SelectionChanged"/>
             <TextBlock Text="Game Name:" FontWeight="Bold" Margin="0,0,0,5" Foreground="{DynamicResource PrimaryTextBrush}"/>
             <TextBox x:Name="GameTitleTextBox" Margin="0,0,0,10"/>
             <TextBlock Text="Window Width:" FontWeight="Bold" Margin="0,0,0,5" Foreground="{DynamicResource PrimaryTextBrush}"/>

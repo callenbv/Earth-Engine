@@ -5,6 +5,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Linq;
+using Engine.Core;
+using Engine.Core.Game;
+using Microsoft.Xna.Framework.Content;
+using Engine.Core.Game.Components;
+using System.Text.Json;
 
 namespace GameRuntime
 {
@@ -14,13 +19,21 @@ namespace GameRuntime
         private string _scriptsDirectory;
         private Assembly _scriptAssembly;
         private DateTime _lastAssemblyWriteTime;
+        public static ScriptManager Instance { get; private set; }
 
+        /// <summary>
+        /// Load the script assemblies 
+        /// </summary>
         public ScriptManager()
         {
+            Instance = this;
             _scriptsDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts");
             LoadScriptAssembly();
         }
 
+        /// <summary>
+        /// Load the script assembly from dll
+        /// </summary>
         private void LoadScriptAssembly()
         {
             var dllPath = Path.Combine(_scriptsDirectory, "GameScripts.dll");
@@ -73,7 +86,12 @@ namespace GameRuntime
             return null;
         }
 
-        public Engine.Core.GameScript CreateScriptInstanceByName(string scriptName)
+        /// <summary>
+        /// Create a script instance given a name
+        /// </summary>
+        /// <param name="scriptName"></param>
+        /// <returns></returns>
+        public GameScript CreateScriptInstanceByName(string scriptName)
         {
             // Create script instance by name (for room objects)
             try
@@ -107,6 +125,10 @@ namespace GameRuntime
             }
         }
 
+        /// <summary>
+        /// Update the script by invoking it
+        /// </summary>
+        /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
         {
             foreach (var script in _scriptInstances)
@@ -123,6 +145,10 @@ namespace GameRuntime
             }
         }
 
+        /// <summary>
+        /// Draw the script if possible
+        /// </summary>
+        /// <param name="spriteBatch"></param>
         public void Draw(SpriteBatch spriteBatch)
         {
             foreach (var script in _scriptInstances)
@@ -137,20 +163,6 @@ namespace GameRuntime
                     Console.WriteLine($"Error drawing script: {ex.Message}");
                 }
             }
-        }
-    }
-
-    // Default script class for demonstration
-    public class DefaultGameScript
-    {
-        public void Update(GameTime gameTime)
-        {
-            // Default update logic
-        }
-
-        public void Draw(SpriteBatch spriteBatch)
-        {
-            // Default drawing logic
         }
     }
 } 

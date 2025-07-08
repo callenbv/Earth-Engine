@@ -1,5 +1,4 @@
-﻿using Engine.Core.Game.World;
-using Engine.Core.Graphics;
+﻿using Engine.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -19,13 +18,13 @@ namespace Engine.Core.Game.Tiles
         /// </summary>
         public void Initialize()
         {
-            TileMap test = new TileMap(100, 100, TextureLibrary.Main.Get("Tileset"));
-            DungeonGenerator dungeon = new DungeonGenerator(test);
-            dungeon.GenerateAllFloor();
-            dungeon.Generate();
-            tileMaps.Add(test);
+
         }
 
+        /// <summary>
+        /// Draw all tilemaps
+        /// </summary>
+        /// <param name="spriteBatch"></param>
         public void Draw(SpriteBatch spriteBatch)
         {
             foreach (var tileMap in tileMaps)

@@ -12,5 +12,14 @@ namespace Editor
                 e.Handled = true;
             };
         }
+
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+            
+            // Start with the welcome window
+            var welcomeWindow = new WelcomeWindow();
+            welcomeWindow.Show();
+        }
     }
 } 

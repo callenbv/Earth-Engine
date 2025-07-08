@@ -104,3 +104,5 @@ C:\Users\calle\Desktop\Earth Engine\Editor\bin\Debug\net8.0-windows\Newtonsoft.J
 C:\Users\calle\Desktop\Earth Engine\Editor\bin\Debug\net8.0-windows\Autofac.dll
 C:\Users\calle\Desktop\Earth Engine\Editor\bin\Debug\net8.0-windows\MonoGame.Extended.dll
 C:\Users\calle\Desktop\Earth Engine\Editor\bin\Debug\net8.0-windows\MonoGame.Extended.Content.Pipeline.dll
+C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\WelcomeWindow.baml
+C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\WelcomeWindow.g.cs

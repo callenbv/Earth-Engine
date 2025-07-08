@@ -17,10 +17,10 @@ namespace Engine.Core.Game
     {
         public List<GameObject> gameObjects = new List<GameObject>();
         public List<TileMap> tileMaps = new List<TileMap>();
-        
-        // Static instance for global access
-        public static GameObjectManager Instance { get; private set; }
-        
+
+        private static GameObjectManager? Instance;
+        public static GameObjectManager Main => Instance ??= new GameObjectManager();
+
         public GameObjectManager()
         {
             Instance = this;

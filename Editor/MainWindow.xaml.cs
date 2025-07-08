@@ -38,13 +38,60 @@ namespace Editor
         private bool isDraggingScript = false;
         private bool isDraggingAsset = false;
         private bool isHandlingRoomSelection = false;
+        private FileSystemWatcher _assetsWatcher;
+        private DateTime _lastReload = DateTime.MinValue;
 
-        public MainWindow()
+        public MainWindow(string? projectPath = null)
         {
             InitializeComponent();
-            assetsRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "Assets");
+            
+            if (!string.IsNullOrEmpty(projectPath) && Directory.Exists(projectPath))
+            {
+                // Use the provided project path
+                assetsRoot = Path.Combine(projectPath, "Assets");
+                Title = $"Earth Engine Editor - {Path.GetFileName(projectPath)}";
+            }
+            else
+            {
+                // Fallback to default assets path
+                assetsRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "Assets");
+            }
+            
+            // Find the TabControl and set RoomEditor and GameOptionsEditor
+            var dockPanel = (DockPanel)Content;
+            TabControl tabControl = null;
+            foreach (var child in dockPanel.Children)
+            {
+                if (child is TabControl tc)
+                {
+                    tabControl = tc;
+                    break;
+                }
+            }
+            if (tabControl != null)
+            {
+                foreach (TabItem tab in tabControl.Items)
+                {
+                    if (tab.Header.ToString() == "Rooms")
+                        tab.Content = new RoomEditor(assetsRoot);
+                    else if (tab.Header.ToString() == "Game Options")
+                        tab.Content = new GameOptionsEditor(assetsRoot);
+                }
+            }
+            
             LoadAssetTree();
             this.KeyDown += MainWindow_KeyDown;
+
+            // Set up FileSystemWatcher for assets
+            _assetsWatcher = new FileSystemWatcher(assetsRoot)
+            {
+                IncludeSubdirectories = true,
+                EnableRaisingEvents = true
+            };
+            _assetsWatcher.Changed += OnAssetsChanged;
+            _assetsWatcher.Created += OnAssetsChanged;
+            _assetsWatcher.Deleted += OnAssetsChanged;
+            _assetsWatcher.Renamed += OnAssetsChanged;
         }
 
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
@@ -62,78 +109,107 @@ namespace Editor
 
         private void PlayButton_Click(object sender, RoutedEventArgs e)
         {
-            var solutionRoot = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", ".."));
             try
             {
-                // Recompile scripts before running the game
+                // 1. Compile scripts as before
                 var compiler = new Engine.Core.ScriptCompiler();
                 var scriptsDir = Path.Combine(assetsRoot, "Scripts");
-                var result = compiler.CompileScripts(scriptsDir);
-                // Get DLL from Editor/bin/Scripts
-                var editorBinScripts = Path.GetFullPath(Path.Combine(scriptsDir, "..", "..", "bin", "Scripts"));
-                var dllPath = Path.Combine(editorBinScripts, "GameScripts.dll");
+                var projectBinDir = Path.Combine(Path.GetDirectoryName(assetsRoot), "bin");
+                Directory.CreateDirectory(projectBinDir);
+
+                // 3. Copy runtime EXE and dependencies to project bin
+                var solutionRoot = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", ".."));
+                var runtimeBuildDir = Path.Combine(solutionRoot, "Runtime", "bin", "Debug", "net8.0-windows");
+                var runtimeExe = Path.Combine(runtimeBuildDir, "GameRuntime.exe");
+                if (!File.Exists(runtimeExe))
+                {
+                    System.Windows.MessageBox.Show($"Game runtime not found at: {runtimeExe}\nPlease build the runtime project first.", "Runtime Not Found", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                // Copy all files and subdirectories from runtimeBuildDir to projectBinDir
+                foreach (var file in Directory.GetFiles(runtimeBuildDir, "*", SearchOption.AllDirectories))
+                {
+                    var relativePath = Path.GetRelativePath(runtimeBuildDir, file);
+                    var dest = Path.Combine(projectBinDir, relativePath);
+                    Directory.CreateDirectory(Path.GetDirectoryName(dest));
+                    File.Copy(file, dest, true);
+                }
+
+                // 4. Copy scripts DLL to project bin/Scripts
+                var projectBinScripts = Path.Combine(projectBinDir, "Scripts");
+                Directory.CreateDirectory(projectBinScripts);
+                var dllPath = Path.Combine(projectBinScripts, "GameScripts.dll");
+                var result = compiler.CompileScripts(scriptsDir, dllPath);
                 if (!result.Success)
                 {
-                    MessageBox.Show($"Script compilation failed:\n{string.Join("\n", result.Errors)}", "Script Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
-                else
-                {
-                    //MessageBox.Show("Scripts compiled successfully!", "Script Compilation", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-
-                // Copy DLL to Runtime's Scripts directory
-                try
-                {
-                    var runtimeScriptsDir = Path.Combine(solutionRoot, "Runtime", "bin", "Debug", "net8.0-windows", "Scripts");
-                    Directory.CreateDirectory(runtimeScriptsDir);
-                    var destDllPath = Path.Combine(runtimeScriptsDir, "GameScripts.dll");
-                    File.Copy(dllPath, destDllPath, true);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Failed to copy GameScripts.dll to runtime: {ex.Message}", "Copy Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    System.Windows.MessageBox.Show($"Script compilation failed:\n{string.Join("\n", result.Errors)}", "Script Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
-                // Save the current room if RoomEditor is open
-                foreach (TabItem tab in ((TabControl)((DockPanel)Content).Children[0]).Items)
+                // 5. Copy Assets to project bin/Assets (optional: or just reference directly)
+                var projectBinAssets = Path.Combine(projectBinDir, "Assets");
+                CopyDirectory(assetsRoot, projectBinAssets);
+
+                // 6. Save the current room if RoomEditor is open (as before)
+                var dockPanel = (DockPanel)Content;
+                TabControl tabControl = null;
+                foreach (var child in dockPanel.Children)
                 {
-                    if (tab.Content is UserControl uc && uc is RoomEditor re)
+                    if (child is TabControl tc)
                     {
-                        re.SaveRoom();
+                        tabControl = tc;
                         break;
                     }
                 }
-                // Go up from Editor/bin/Debug/net8.0-windows to solution root, then to Runtime/bin/Debug/net8.0-windows
-                var runtimePath = Path.Combine(solutionRoot, "Runtime", "bin", "Debug", "net8.0-windows", "GameRuntime.exe");
-                if (!File.Exists(runtimePath))
+                if (tabControl != null)
                 {
-                    MessageBox.Show($"Game runtime not found at: {runtimePath}\nPlease build the runtime project first.",
-                        "Runtime Not Found", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
+                    foreach (TabItem tab in tabControl.Items)
+                    {
+                        if (tab.Content is UserControl uc && uc is RoomEditor re)
+                        {
+                            re.SaveRoom();
+                            break;
+                        }
+                    }
                 }
+
+                // 7. Launch the runtime from the project bin directory
+                var projectRuntimeExe = Path.Combine(projectBinDir, "GameRuntime.exe");
                 var process = new Process
                 {
                     StartInfo = new ProcessStartInfo
                     {
-                        FileName = runtimePath,
+                        FileName = projectRuntimeExe,
                         UseShellExecute = false,
-                        WorkingDirectory = Path.GetDirectoryName(runtimePath)
+                        WorkingDirectory = projectBinDir
                     }
                 };
                 process.Start();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"An unexpected error occurred:\n{ex}", "Editor Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Windows.MessageBox.Show($"An unexpected error occurred:\n{ex}", "Editor Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private void LoadAssetTree()
         {
             // Preserve selected tab index
-            var tabControl = (TabControl)((DockPanel)Content).Children[0];
+            var dockPanel = (DockPanel)Content;
+            TabControl tabControl = null;
+            foreach (var child in dockPanel.Children)
+            {
+                if (child is TabControl tc)
+                {
+                    tabControl = tc;
+                    break;
+                }
+            }
+            if (tabControl == null)
+            {
+                // Handle error: TabControl not found
+                return;
+            }
             int selectedTabIndex = tabControl.SelectedIndex;
 
             // Store expanded state before clearing
@@ -216,7 +292,21 @@ namespace Editor
                     // Set flag to prevent MouseLeftButtonUp from interfering
                     isHandlingRoomSelection = true;
                     // Switch to Rooms tab and load the room
-                    var tabControl = (TabControl)((DockPanel)Content).Children[0];
+                    var dockPanel = (DockPanel)Content;
+                    TabControl tabControl = null;
+                    foreach (var child in dockPanel.Children)
+                    {
+                        if (child is TabControl tc)
+                        {
+                            tabControl = tc;
+                            break;
+                        }
+                    }
+                    if (tabControl == null)
+                    {
+                        // Handle error: TabControl not found
+                        return;
+                    }
                     TabItem roomsTab = null;
                     RoomEditor roomEditor = null;
                     // Find the Rooms tab and RoomEditor
@@ -287,7 +377,7 @@ namespace Editor
                 InspectorPanel.Children.Add(scriptTextBox);
                 
                 // Open in Visual Studio button
-                var openInVSButton = new Button { Content = "Open in Visual Studio", Margin = new Thickness(0, 0, 0, 5) };
+                var openInVSButton = new Button { Content = "Open Visual Studio", Margin = new Thickness(0, 0, 0, 5) };
                 openInVSButton.Click += (s, e) => OpenInVisualStudio();
                 InspectorPanel.Children.Add(openInVSButton);
             }
@@ -647,7 +737,22 @@ namespace Editor
                 }
 
                 // Save the current room if RoomEditor is open
-                foreach (TabItem tab in ((TabControl)((DockPanel)Content).Children[0]).Items)
+                var dockPanel = (DockPanel)Content;
+                TabControl tabControl = null;
+                foreach (var child in dockPanel.Children)
+                {
+                    if (child is TabControl tc)
+                    {
+                        tabControl = tc;
+                        break;
+                    }
+                }
+                if (tabControl == null)
+                {
+                    // Handle error: TabControl not found
+                    return;
+                }
+                foreach (TabItem tab in tabControl.Items)
                 {
                     if (tab.Content is UserControl uc && uc is RoomEditor re)
                     {
@@ -657,12 +762,15 @@ namespace Editor
                 }
 
                 // Save game options if GameOptionsEditor is open
-                foreach (TabItem tab in ((TabControl)((DockPanel)Content).Children[0]).Items)
+                if (tabControl != null)
                 {
-                    if (tab.Content is UserControl uc && uc is GameOptionsEditor goe)
+                    foreach (TabItem tab in tabControl.Items)
                     {
-                        goe.SaveGameOptions();
-                        break;
+                        if (tab.Content is UserControl uc && uc is GameOptionsEditor goe)
+                        {
+                            goe.SaveGameOptions();
+                            break;
+                        }
                     }
                 }
 
@@ -844,7 +952,21 @@ namespace Editor
                 }
             }
             // Check if we're currently on the Rooms tab and if so, don't do anything that might switch back
-            var tabControl = (TabControl)((DockPanel)Content).Children[0];
+            var dockPanel = (DockPanel)Content;
+            TabControl tabControl = null;
+            foreach (var child in dockPanel.Children)
+            {
+                if (child is TabControl tc)
+                {
+                    tabControl = tc;
+                    break;
+                }
+            }
+            if (tabControl == null)
+            {
+                // Handle error: TabControl not found
+                return;
+            }
             if (tabControl.SelectedIndex == 1) // Rooms tab
             {
                 return;
@@ -1030,7 +1152,22 @@ namespace Editor
                 LoadAssetTreeAndExpandTo(newAssetPath);
 
                 // Refresh RoomEditor object lists
-                foreach (TabItem tab in ((TabControl)((DockPanel)Content).Children[0]).Items)
+                var dockPanel = (DockPanel)Content;
+                TabControl tabControl = null;
+                foreach (var child in dockPanel.Children)
+                {
+                    if (child is TabControl tc)
+                    {
+                        tabControl = tc;
+                        break;
+                    }
+                }
+                if (tabControl == null)
+                {
+                    // Handle error: TabControl not found
+                    return;
+                }
+                foreach (TabItem tab in tabControl.Items)
                 {
                     if (tab.Content is UserControl uc && uc is RoomEditor re)
                     {
@@ -1140,16 +1277,23 @@ namespace Editor
             var isDir = Directory.Exists(path);
             var isFile = File.Exists(path);
             var currentName = Path.GetFileName(path);
-            var newName = PromptDialog($"Enter new name:", "Rename", currentName);
-            if (!string.IsNullOrWhiteSpace(newName) && newName != currentName)
+            var currentExt = Path.GetExtension(currentName);
+            var newName = PromptDialog($"Enter new name:", "Rename", Path.GetFileNameWithoutExtension(currentName));
+            if (!string.IsNullOrWhiteSpace(newName))
             {
-                var parentDir = Path.GetDirectoryName(path);
-                var newPath = Path.Combine(parentDir, newName);
-                if (isDir)
-                    Directory.Move(path, newPath);
-                else if (isFile)
-                    File.Move(path, newPath);
-                LoadAssetTree();
+                // If file, append extension if user omitted it
+                if (isFile && !newName.EndsWith(currentExt, StringComparison.OrdinalIgnoreCase))
+                    newName += currentExt;
+                if (newName != currentName)
+                {
+                    var parentDir = Path.GetDirectoryName(path);
+                    var newPath = Path.Combine(parentDir, newName);
+                    if (isDir)
+                        Directory.Move(path, newPath);
+                    else if (isFile)
+                        File.Move(path, newPath);
+                    LoadAssetTree();
+                }
             }
         }
 
@@ -1227,20 +1371,21 @@ namespace Editor
                 // Compile the single script
                 var compiler = new Engine.Core.ScriptCompiler();
                 var scriptsDir = Path.Combine(assetsRoot, "Scripts");
-                var result = compiler.CompileScripts(scriptsDir);
-                
+                var editorBinScripts = Path.GetFullPath(Path.Combine(scriptsDir, "..", "..", "bin", "Scripts"));
+                Directory.CreateDirectory(editorBinScripts);
+                var dllPath = Path.Combine(editorBinScripts, "GameScripts.dll");
+                var result = compiler.CompileScripts(scriptsDir, dllPath);
                 if (!result.Success)
                 {
                     MessageBox.Show($"Script compilation failed:\n{string.Join("\n", result.Errors)}", "Hot Reload Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
-                
                 // Copy DLL to runtime if game is running
                 var solutionRoot = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", ".."));
-                var editorBinScripts = Path.GetFullPath(Path.Combine(scriptsDir, "..", "..", "bin", "Scripts"));
-                var dllPath = Path.Combine(editorBinScripts, "GameScripts.dll");
+                var tempDllPath = Path.Combine(editorBinScripts, "GameScripts_temp.dll");
+                File.Copy(dllPath, tempDllPath, true); // Always copy to temp before loading
+                // Use tempDllPath for any reflection/hot reload logic here
                 var runtimeScriptsDir = Path.Combine(solutionRoot, "Runtime", "bin", "Debug", "net8.0-windows", "Scripts");
-                
                 if (Directory.Exists(runtimeScriptsDir))
                 {
                     var destDllPath = Path.Combine(runtimeScriptsDir, "GameScripts.dll");
@@ -1456,6 +1601,198 @@ namespace Editor
             }
             
             return result;
+        }
+
+        private void CopyDirectory(string sourceDir, string destinationDir)
+        {
+            var dir = new DirectoryInfo(sourceDir);
+            DirectoryInfo[] dirs = dir.GetDirectories();
+
+            // Always create the destination directory
+            if (!Directory.Exists(destinationDir))
+                Directory.CreateDirectory(destinationDir);
+
+            // Copy all files
+            foreach (FileInfo file in dir.GetFiles())
+            {
+                string targetFilePath = Path.Combine(destinationDir, file.Name);
+                file.CopyTo(targetFilePath, true);
+            }
+
+            // Recursively copy subdirectories (even if empty)
+            foreach (DirectoryInfo subDir in dirs)
+            {
+                string newDestinationDir = Path.Combine(destinationDir, subDir.Name);
+                CopyDirectory(subDir.FullName, newDestinationDir);
+            }
+        }
+
+        private void HomeMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var welcome = new WelcomeWindow();
+            welcome.Show();
+            this.Close();
+        }
+
+        private void ExitMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
+
+        private void KillRunningGameProcesses()
+        {
+            try
+            {
+                var processes = System.Diagnostics.Process.GetProcessesByName("GameRuntime");
+                foreach (var proc in processes)
+                {
+                    proc.Kill();
+                    proc.WaitForExit();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show($"Failed to close running game processes: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        public void GenerateScriptsCsproj(string projectRoot)
+        {
+            var projectName = Path.GetFileName(projectRoot.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+            var csprojPath = Path.Combine(projectRoot, $"{projectName}.csproj");
+            var engineCoreSource = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "Engine", "Engine.Core", "bin", "Debug", "net8.0", "Engine.Core.dll"));
+            var engineCoreDest = Path.Combine(projectRoot, "Engine.Core.dll");
+            if (File.Exists(engineCoreSource))
+                File.Copy(engineCoreSource, engineCoreDest, true);
+            var engineCoreXml = engineCoreSource.Replace(".dll", ".xml");
+            var engineCorePdb = engineCoreSource.Replace(".dll", ".pdb");
+            if (File.Exists(engineCoreXml))
+                File.Copy(engineCoreXml, Path.Combine(projectRoot, "Engine.Core.xml"), true);
+            if (File.Exists(engineCorePdb))
+                File.Copy(engineCorePdb, Path.Combine(projectRoot, "Engine.Core.pdb"), true);
+            var csprojContent = $@"<Project Sdk=""Microsoft.NET.Sdk"">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>GameScripts</RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include=""MonoGame.Framework.DesktopGL"" Version=""3.8.0.1641"" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include=""Assets/Scripts/*.cs"" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include=""Engine.Core"">
+      <HintPath>Engine.Core.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>";
+            File.WriteAllText(csprojPath, csprojContent);
+        }
+
+        private void OpenScriptsInVisualStudio(string projectRoot)
+        {
+            var projectName = Path.GetFileName(projectRoot.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+            var csprojPath = Path.Combine(projectRoot, $"{projectName}.csproj");
+            if (File.Exists(csprojPath))
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = "cmd",
+                    Arguments = $"/c start \"\" \"{csprojPath}\"",
+                    UseShellExecute = false
+                });
+            }
+            else
+            {
+                MessageBox.Show($"{projectName}.csproj not found. Please create a script first.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void OpenVSButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Assume assetsRoot is always set to the current project's Assets folder
+            var projectRoot = Path.GetDirectoryName(assetsRoot);
+            OpenScriptsInVisualStudio(projectRoot);
+        }
+
+        private void OnAssetsChanged(object sender, FileSystemEventArgs e)
+        {
+            // Debounce: only reload if 200ms have passed since last reload
+            if ((DateTime.Now - _lastReload).TotalMilliseconds < 200)
+                return;
+            _lastReload = DateTime.Now;
+
+            Dispatcher.Invoke(() =>
+            {
+                LoadAssetTree();
+                // Reload open editors/inspectors if their file was affected
+                ReloadOpenEditors(e.FullPath);
+            });
+        }
+
+        private void ReloadOpenEditors(string changedPath)
+        {
+            // Find the TabControl
+            var dockPanel = (DockPanel)Content;
+            TabControl tabControl = null;
+            foreach (var child in dockPanel.Children)
+            {
+                if (child is TabControl tc)
+                {
+                    tabControl = tc;
+                    break;
+                }
+            }
+            if (tabControl != null)
+            {
+                foreach (TabItem tab in tabControl.Items)
+                {
+                    if (tab.Content is RoomEditor roomEditor)
+                    {
+                        // If a room file changed, reload the current room
+                        if (changedPath.EndsWith(".room", StringComparison.OrdinalIgnoreCase))
+                        {
+                            var currentRoom = roomEditor.GetCurrentRoomName();
+                            if (!string.IsNullOrEmpty(currentRoom))
+                                roomEditor.LoadRoom(currentRoom);
+                        }
+                        // Always reload the object list in case objects/scripts changed
+                        roomEditor.LoadObjectList();
+                    }
+                    else if (tab.Content is GameOptionsEditor gameOptionsEditor)
+                    {
+                        // Reload rooms and game options if relevant files changed
+                        if (changedPath.EndsWith("game_options.json", StringComparison.OrdinalIgnoreCase) ||
+                            changedPath.EndsWith(".room", StringComparison.OrdinalIgnoreCase))
+                        {
+                            gameOptionsEditor.LoadRooms();
+                            gameOptionsEditor.LoadGameOptions();
+                        }
+                    }
+                }
+            }
+            // Optionally, reload inspector if it references the changed file
+            if (!string.IsNullOrEmpty(_inspectorObjectPath) && changedPath == _inspectorObjectPath)
+            {
+                ShowInspector(_inspectorObjectPath);
+            }
+        }
+
+        // Add this handler for F2 rename
+        private void AssetTreeView_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.F2)
+            {
+                // Only trigger if an item is selected
+                var selected = AssetTreeView.SelectedItem as TreeViewItem;
+                if (selected != null)
+                {
+                    RenameAsset_Click(selected, null);
+                    e.Handled = true;
+                }
+            }
         }
     }
 } 

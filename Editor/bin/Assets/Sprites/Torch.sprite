@@ -1,8 +1,0 @@
-{
-  "name": "Torch",
-  "frameWidth": 16,
-  "frameHeight": 16,
-  "frameCount": 4,
-  "frameSpeed": 12,
-  "animated": true
-}

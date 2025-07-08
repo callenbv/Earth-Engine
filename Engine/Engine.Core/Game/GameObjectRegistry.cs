@@ -26,16 +26,22 @@ namespace Engine.Core.Game
         /// </summary>
         public static void LoadAll(string folderPath = "Content/Objects")
         {
-            _definitions.Clear();
-
-            // find every .eo file under the folder
-            foreach (var path in Directory.GetFiles(folderPath, "*.eo", SearchOption.AllDirectories))
+            try
             {
-                var key = Path.GetFileNameWithoutExtension(path);
-                var json = File.ReadAllText(path);
-                var def = JsonConvert.DeserializeObject<ObjectDefinition>(json);
-                if (def != null)
-                    _definitions[key] = def;
+                _definitions.Clear();
+
+                foreach (var path in Directory.GetFiles(folderPath, "*.eo", SearchOption.AllDirectories))
+                {
+                    var key = Path.GetFileNameWithoutExtension(path);
+                    var json = File.ReadAllText(path);
+                    var def = JsonConvert.DeserializeObject<ObjectDefinition>(json);
+                    if (def != null)
+                        _definitions[key] = def;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
             }
         }
 
