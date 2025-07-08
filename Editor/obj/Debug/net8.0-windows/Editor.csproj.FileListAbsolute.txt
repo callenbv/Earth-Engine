@@ -1,8 +1,3 @@
-C:\Users\calle\Desktop\Earth Engine\Editor\bin\Debug\net8.0-windows\Editor.exe
-C:\Users\calle\Desktop\Earth Engine\Editor\bin\Debug\net8.0-windows\Editor.deps.json
-C:\Users\calle\Desktop\Earth Engine\Editor\bin\Debug\net8.0-windows\Editor.runtimeconfig.json
-C:\Users\calle\Desktop\Earth Engine\Editor\bin\Debug\net8.0-windows\Editor.dll
-C:\Users\calle\Desktop\Earth Engine\Editor\bin\Debug\net8.0-windows\Editor.pdb
 C:\Users\calle\Desktop\Earth Engine\Editor\bin\Debug\net8.0-windows\Microsoft.CodeAnalysis.dll
 C:\Users\calle\Desktop\Earth Engine\Editor\bin\Debug\net8.0-windows\Microsoft.CodeAnalysis.CSharp.dll
 C:\Users\calle\Desktop\Earth Engine\Editor\bin\Debug\net8.0-windows\Microsoft.CodeAnalysis.CSharp.Scripting.dll
@@ -69,20 +64,13 @@ C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\RoomEditor.b
 C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\MainWindow.g.cs
 C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\RoomEditor.g.cs
 C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\App.g.cs
-C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\Editor_MarkupCompile.cache
-C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\Editor_MarkupCompile.lref
 C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\MainWindow.baml
-C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\Editor.g.resources
 C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\Editor.GeneratedMSBuildEditorConfig.editorconfig
 C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\Editor.AssemblyInfoInputs.cache
 C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\Editor.AssemblyInfo.cs
 C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\Editor.csproj.CoreCompileInputs.cache
 C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\Editor.csproj.Up2Date
-C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\Editor.dll
-C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\refint\Editor.dll
-C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\Editor.pdb
 C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\Editor.genruntimeconfig.cache
-C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\ref\Editor.dll
 C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\GeneratedInternalTypeHelper.g.cs
 C:\Users\calle\Desktop\Earth Engine\Editor\bin\Debug\net8.0-windows\MonoGame.Framework.dll
 C:\Users\calle\Desktop\Earth Engine\Editor\bin\Debug\net8.0-windows\runtimes\linux-x64\native\libSDL2-2.0.so.0
@@ -106,3 +94,16 @@ C:\Users\calle\Desktop\Earth Engine\Editor\bin\Debug\net8.0-windows\MonoGame.Ext
 C:\Users\calle\Desktop\Earth Engine\Editor\bin\Debug\net8.0-windows\MonoGame.Extended.Content.Pipeline.dll
 C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\WelcomeWindow.baml
 C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\WelcomeWindow.g.cs
+C:\Users\calle\Desktop\Earth Engine\Editor\bin\Debug\net8.0-windows\Earth Engine.exe
+C:\Users\calle\Desktop\Earth Engine\Editor\bin\Debug\net8.0-windows\Earth Engine.deps.json
+C:\Users\calle\Desktop\Earth Engine\Editor\bin\Debug\net8.0-windows\Earth Engine.runtimeconfig.json
+C:\Users\calle\Desktop\Earth Engine\Editor\bin\Debug\net8.0-windows\Earth Engine.dll
+C:\Users\calle\Desktop\Earth Engine\Editor\bin\Debug\net8.0-windows\Earth Engine.pdb
+C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\Earth Engine_Content.g.cs
+C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\Earth Engine_MarkupCompile.cache
+C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\Earth Engine_MarkupCompile.lref
+C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\Earth Engine.g.resources
+C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\Earth Engine.dll
+C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\refint\Earth Engine.dll
+C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\Earth Engine.pdb
+C:\Users\calle\Desktop\Earth Engine\Editor\obj\Debug\net8.0-windows\ref\Earth Engine.dll

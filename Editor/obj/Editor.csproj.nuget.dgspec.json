@@ -8,7 +8,7 @@
       "version": "1.0.0",
       "restore": {
         "projectUniqueName": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\Editor.csproj",
-        "projectName": "Editor",
+        "projectName": "Earth Engine",
         "projectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\Editor.csproj",
         "packagesPath": "C:\\Users\\calle\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\obj\\",

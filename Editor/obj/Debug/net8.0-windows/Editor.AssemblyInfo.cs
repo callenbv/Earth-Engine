@@ -10,12 +10,12 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("Editor")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("Earth Engine")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9a182cf3b3ad69acdbd6b890043cc199e684cba1")]
-[assembly: System.Reflection.AssemblyProductAttribute("Editor")]
-[assembly: System.Reflection.AssemblyTitleAttribute("Editor")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1a43bb4c2b86707252885ccec05fa079c05045f9")]
+[assembly: System.Reflection.AssemblyProductAttribute("Earth Engine")]
+[assembly: System.Reflection.AssemblyTitleAttribute("Earth Engine")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
 [assembly: System.Runtime.Versioning.TargetPlatformAttribute("Windows7.0")]
 [assembly: System.Runtime.Versioning.SupportedOSPlatformAttribute("Windows7.0")]

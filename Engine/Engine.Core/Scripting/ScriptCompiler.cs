@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -102,40 +102,54 @@ namespace Engine.Core
 
         private static IEnumerable<MetadataReference> GetReferences()
         {
-            var references = new List<MetadataReference>();
+            var refs = new List<MetadataReference>();
 
-            // Add basic .NET references
-            var assemblies = new[]
+            string? tpa = (string?)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES");
+            if (!string.IsNullOrEmpty(tpa))
             {
-                typeof(object).Assembly,
-                typeof(Console).Assembly,
-                typeof(System.Collections.Generic.List<>).Assembly,
-                typeof(System.Linq.Enumerable).Assembly
-            };
+                foreach (var path in tpa.Split(Path.PathSeparator))
+                {
+                    // You can filter here if you want only a subset
+                    refs.Add(MetadataReference.CreateFromFile(path));
+                }
+            }
+            else
+            {
+                // Fallback: manually add a few key assemblies
+                string rtDir = RuntimeEnvironment.GetRuntimeDirectory();
+                string[] essentials =
+                {
+                    "System.Private.CoreLib.dll",
+                    "System.Runtime.dll",
+                    "System.Console.dll",
+                    "System.Collections.dll",
+                    "System.Linq.dll",
+                    "netstandard.dll"
+                };
 
-            foreach (var assembly in assemblies)
-            {
-                references.Add(MetadataReference.CreateFromFile(assembly.Location));
+                foreach (var dll in essentials)
+                {
+                    string full = Path.Combine(rtDir, dll);
+                    if (File.Exists(full))
+                        refs.Add(MetadataReference.CreateFromFile(full));
+                }
             }
 
-            // Add System.Runtime.dll for Roslyn
-            var runtimeDir = System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory();
-            var systemRuntimeDll = Path.Combine(runtimeDir, "System.Runtime.dll");
-            if (File.Exists(systemRuntimeDll))
-                references.Add(MetadataReference.CreateFromFile(systemRuntimeDll));
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
 
-            // Add Engine.Core.dll and MonoGame.Framework.dll
-            var baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            var engineCorePath = Path.Combine(baseDir, "Engine.Core.dll");
-            var monogamePath = Path.Combine(baseDir, "MonoGame.Framework.dll");
-            if (File.Exists(engineCorePath))
-                references.Add(MetadataReference.CreateFromFile(engineCorePath));
-            if (File.Exists(monogamePath))
-                references.Add(MetadataReference.CreateFromFile(monogamePath));
+            foreach (var localDll in new[]
+                     {
+                 "Engine.Core.dll",
+                 "MonoGame.Framework.dll"
+             })
+            {
+                string full = Path.Combine(baseDir, localDll);
+                if (File.Exists(full))
+                    refs.Add(MetadataReference.CreateFromFile(full));
+            }
 
-            return references;
+            return refs;
         }
-
 
         /// <summary>
         /// Load texture and attach scripts to a GameObject
@@ -225,7 +239,7 @@ namespace Engine.Core
                                 var script = createMethod.Invoke(scriptManager, new object[] { scriptName }) as Engine.Core.GameScript;
                                 if (script != null)
                                 {
-                                    script.Attach(gameObject);
+                                    gameObject.AddComponent(script);
                                     gameObject.scriptInstances.Add(script);
                                     Console.WriteLine($"Attached script '{scriptName}' to {objectName}");
                                 }

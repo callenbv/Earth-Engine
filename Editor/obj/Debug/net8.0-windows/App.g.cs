@@ -53,7 +53,7 @@ namespace Editor {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/Editor;component/app.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/Earth Engine;component/app.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\App.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

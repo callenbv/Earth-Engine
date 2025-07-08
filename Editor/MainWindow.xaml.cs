@@ -49,7 +49,7 @@ namespace Editor
             {
                 // Use the provided project path
                 assetsRoot = Path.Combine(projectPath, "Assets");
-                Title = $"Earth Engine Editor - {Path.GetFileName(projectPath)}";
+                Title = $"Earth Engine - {Path.GetFileName(projectPath)}";
             }
             else
             {
@@ -1724,12 +1724,48 @@ namespace Editor
                 return;
             _lastReload = DateTime.Now;
 
+            // Check if a script file was deleted and recompile if needed
+            if (e.ChangeType == WatcherChangeTypes.Deleted && e.FullPath.EndsWith(".cs", StringComparison.OrdinalIgnoreCase))
+            {
+                Console.WriteLine($"[FileWatcher] Script file deleted: {e.FullPath}");
+                RecompileScripts();
+            }
+
             Dispatcher.Invoke(() =>
             {
                 LoadAssetTree();
                 // Reload open editors/inspectors if their file was affected
                 ReloadOpenEditors(e.FullPath);
             });
+        }
+
+        private void RecompileScripts()
+        {
+            try
+            {
+                Console.WriteLine("[FileWatcher] Recompiling scripts after file deletion...");
+                var compiler = new Engine.Core.ScriptCompiler();
+                var scriptsDir = Path.Combine(assetsRoot, "Scripts");
+                var projectBinDir = Path.Combine(Path.GetDirectoryName(assetsRoot), "bin");
+                Directory.CreateDirectory(projectBinDir);
+                var projectBinScripts = Path.Combine(projectBinDir, "Scripts");
+                Directory.CreateDirectory(projectBinScripts);
+                var dllPath = Path.Combine(projectBinScripts, "GameScripts.dll");
+                
+                var result = compiler.CompileScripts(scriptsDir, dllPath);
+                if (result.Success)
+                {
+                    Console.WriteLine("[FileWatcher] Scripts recompiled successfully after file deletion");
+                }
+                else
+                {
+                    Console.WriteLine($"[FileWatcher] Script recompilation failed: {string.Join(", ", result.Errors)}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[FileWatcher] Error recompiling scripts: {ex.Message}");
+            }
         }
 
         private void ReloadOpenEditors(string changedPath)

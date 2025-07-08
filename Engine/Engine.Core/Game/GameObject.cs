@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Engine.Core.Game.Components;
+using System.ComponentModel;
 
 namespace Engine.Core.Game
 {
@@ -17,9 +18,9 @@ namespace Engine.Core.Game
         public float scale = 1f;
         public float rotation;
         public List<object> scriptInstances = new List<object>();
+        public List<ObjectComponent> components = new List<ObjectComponent>();
         public bool IsDestroyed { get; private set; } = false;
                
-
         public GameObject()
         {
 
@@ -27,6 +28,35 @@ namespace Engine.Core.Game
         public GameObject(string name)
         {
             Name = name;
+        }
+
+        /// <summary>
+        /// Creates a new component and attaches it
+        /// </summary>
+        /// <param name="component"></param>
+        public T AddComponent<T>() where T : ObjectComponent, new()
+        { 
+            var component = new T
+            {
+                Owner = this
+            };
+
+            components.Add(component);
+            component.Create();
+            Console.WriteLine($"Added component {component.Name}");
+
+            return component;
+        }
+
+        /// <summary>
+        /// Add an already existing component 
+        /// </summary>
+        /// <param name="comp"></param>
+        public void AddComponent(ObjectComponent component)
+        {
+            component.Owner = this;
+            components.Add(component);
+            component.Create();
         }
 
         /// <summary>
@@ -61,22 +91,18 @@ namespace Engine.Core.Game
         /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
         {
-            foreach (var script in scriptInstances)
+            foreach (var component in components)
             {
-                if (script is GameScript gs)
+                try
                 {
-                    try
-                    {
-                        gs.Update(gameTime);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Error updating script for {Name}: {ex.Message}");
-                    }
+                    component.Update(gameTime);
+                }
+                catch (Exception e) 
+                {
+                    Console.WriteLine($"Error updating component for {Name}: {e.Message}");
                 }
             }
 
-            // Update components: we have one, so for now we hardcode
             if (sprite != null)
             {
                 sprite.Update(gameTime);

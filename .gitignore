@@ -40,3 +40,4 @@
 *.xnb
 /Editor/obj
 *.lref
+*.baml

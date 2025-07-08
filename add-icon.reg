@@ -1,0 +1,10 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CURRENT_USER\Software\Classes\.earthproj]
+@="EarthEngine.Project"
+
+[HKEY_CURRENT_USER\Software\Classes\EarthEngine.Project]
+@="Earth Engine Project File"
+
+[HKEY_CURRENT_USER\Software\Classes\EarthEngine.Project\DefaultIcon]
+@="C:\\Users\\calle\\Desktop\\Earth Engine\\icon.ico,0"
