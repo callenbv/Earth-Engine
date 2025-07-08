@@ -1,13 +1,13 @@
-C:\Users\calle\Desktop\Earth Engine\Content\bin\Debug\net8.0-windows\Content.deps.json
-C:\Users\calle\Desktop\Earth Engine\Content\bin\Debug\net8.0-windows\Content.dll
-C:\Users\calle\Desktop\Earth Engine\Content\bin\Debug\net8.0-windows\Content.pdb
-C:\Users\calle\Desktop\Earth Engine\Content\obj\Debug\net8.0-windows\Content.csproj.AssemblyReference.cache
-C:\Users\calle\Desktop\Earth Engine\Content\obj\Debug\net8.0-windows\Content.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\calle\Desktop\Earth Engine\Content\obj\Debug\net8.0-windows\Content.AssemblyInfoInputs.cache
-C:\Users\calle\Desktop\Earth Engine\Content\obj\Debug\net8.0-windows\Content.AssemblyInfo.cs
-C:\Users\calle\Desktop\Earth Engine\Content\obj\Debug\net8.0-windows\Content.csproj.CoreCompileInputs.cache
-C:\Users\calle\Desktop\Earth Engine\Content\obj\Debug\net8.0-windows\Content.sourcelink.json
-C:\Users\calle\Desktop\Earth Engine\Content\obj\Debug\net8.0-windows\Content.dll
-C:\Users\calle\Desktop\Earth Engine\Content\obj\Debug\net8.0-windows\refint\Content.dll
-C:\Users\calle\Desktop\Earth Engine\Content\obj\Debug\net8.0-windows\Content.pdb
-C:\Users\calle\Desktop\Earth Engine\Content\obj\Debug\net8.0-windows\ref\Content.dll
+C:\Users\urisv\Desktop\Earth-Engine\Content\bin\Debug\net8.0-windows\Content.deps.json
+C:\Users\urisv\Desktop\Earth-Engine\Content\bin\Debug\net8.0-windows\Content.dll
+C:\Users\urisv\Desktop\Earth-Engine\Content\bin\Debug\net8.0-windows\Content.pdb
+C:\Users\urisv\Desktop\Earth-Engine\Content\obj\Debug\net8.0-windows\Content.csproj.AssemblyReference.cache
+C:\Users\urisv\Desktop\Earth-Engine\Content\obj\Debug\net8.0-windows\Content.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\urisv\Desktop\Earth-Engine\Content\obj\Debug\net8.0-windows\Content.AssemblyInfoInputs.cache
+C:\Users\urisv\Desktop\Earth-Engine\Content\obj\Debug\net8.0-windows\Content.AssemblyInfo.cs
+C:\Users\urisv\Desktop\Earth-Engine\Content\obj\Debug\net8.0-windows\Content.csproj.CoreCompileInputs.cache
+C:\Users\urisv\Desktop\Earth-Engine\Content\obj\Debug\net8.0-windows\Content.sourcelink.json
+C:\Users\urisv\Desktop\Earth-Engine\Content\obj\Debug\net8.0-windows\Content.dll
+C:\Users\urisv\Desktop\Earth-Engine\Content\obj\Debug\net8.0-windows\refint\Content.dll
+C:\Users\urisv\Desktop\Earth-Engine\Content\obj\Debug\net8.0-windows\Content.pdb
+C:\Users\urisv\Desktop\Earth-Engine\Content\obj\Debug\net8.0-windows\ref\Content.dll

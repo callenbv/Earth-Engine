@@ -41,3 +41,5 @@
 /Editor/obj
 *.lref
 *.baml
+/Content
+/Editor/obj

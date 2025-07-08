@@ -1655,6 +1655,7 @@
   "projectFileDependencyGroups": {
     "net8.0-windows7.0": [
       "Engine.Core >= 1.0.0",
+      "Microsoft.CodeAnalysis.Analyzers >= 3.3.4",
       "Microsoft.CodeAnalysis.CSharp >= 4.8.0",
       "Microsoft.CodeAnalysis.Scripting >= 4.8.0",
       "MonoGame.Extended >= 4.1.0",
@@ -1663,23 +1664,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\calle\\.nuget\\packages\\": {},
+    "C:\\Users\\urisv\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\Editor.csproj",
+      "projectUniqueName": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Editor\\Editor.csproj",
       "projectName": "Earth Engine",
-      "projectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\Editor.csproj",
-      "packagesPath": "C:\\Users\\calle\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Editor\\obj\\",
+      "projectPath": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Editor\\Editor.csproj",
+      "packagesPath": "C:\\Users\\urisv\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Editor\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\calle\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\urisv\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -1694,8 +1695,8 @@
         "net8.0-windows7.0": {
           "targetAlias": "net8.0-windows",
           "projectReferences": {
-            "C:\\Users\\calle\\Desktop\\Earth Engine\\Engine\\Engine.Core\\Engine.Core.csproj": {
-              "projectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Engine\\Engine.Core\\Engine.Core.csproj"
+            "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Engine\\Engine.Core\\Engine.Core.csproj": {
+              "projectPath": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Engine\\Engine.Core\\Engine.Core.csproj"
             }
           }
         }
@@ -1716,6 +1717,12 @@
       "net8.0-windows7.0": {
         "targetAlias": "net8.0-windows",
         "dependencies": {
+          "Microsoft.CodeAnalysis.Analyzers": {
+            "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+            "suppressParent": "All",
+            "target": "Package",
+            "version": "[3.3.4, )"
+          },
           "Microsoft.CodeAnalysis.CSharp": {
             "target": "Package",
             "version": "[4.8.0, )"

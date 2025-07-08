@@ -9,6 +9,7 @@
       "Earth Engine/1.0.0": {
         "dependencies": {
           "Engine.Core": "1.0.0",
+          "Microsoft.CodeAnalysis.Analyzers": "3.3.4",
           "Microsoft.CodeAnalysis.CSharp": "4.8.0",
           "Microsoft.CodeAnalysis.Scripting": "4.8.0",
           "MonoGame.Extended": "4.1.0",

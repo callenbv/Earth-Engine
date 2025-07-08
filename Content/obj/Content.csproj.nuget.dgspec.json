@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\calle\\Desktop\\Earth Engine\\Content\\Content.csproj": {}
+    "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Content\\Content.csproj": {}
   },
   "projects": {
-    "C:\\Users\\calle\\Desktop\\Earth Engine\\Content\\Content.csproj": {
+    "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Content\\Content.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\calle\\Desktop\\Earth Engine\\Content\\Content.csproj",
+        "projectUniqueName": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Content\\Content.csproj",
         "projectName": "Content",
-        "projectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Content\\Content.csproj",
-        "packagesPath": "C:\\Users\\calle\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Content\\obj\\",
+        "projectPath": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Content\\Content.csproj",
+        "packagesPath": "C:\\Users\\urisv\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Content\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\calle\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\urisv\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],

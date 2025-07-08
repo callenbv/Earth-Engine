@@ -1441,23 +1441,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\calle\\.nuget\\packages\\": {},
+    "C:\\Users\\urisv\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\calle\\Desktop\\Earth Engine\\Engine\\Engine.Core\\Engine.Core.csproj",
+      "projectUniqueName": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Engine\\Engine.Core\\Engine.Core.csproj",
       "projectName": "Engine.Core",
-      "projectPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Engine\\Engine.Core\\Engine.Core.csproj",
-      "packagesPath": "C:\\Users\\calle\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\calle\\Desktop\\Earth Engine\\Engine\\Engine.Core\\obj\\",
+      "projectPath": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Engine\\Engine.Core\\Engine.Core.csproj",
+      "packagesPath": "C:\\Users\\urisv\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Engine\\Engine.Core\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\calle\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\urisv\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
