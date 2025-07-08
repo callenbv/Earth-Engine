@@ -11,7 +11,7 @@ namespace Editor
         public static readonly string ProjectExtension = ".earthproj";
         public static readonly string ProjectsDirectory = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), 
-            "Earth Engine Projects");
+            "EarthEngine");
 
         private static readonly string RecentProjectsFile = Path.Combine(ProjectsDirectory, "RecentProjects.json");
 

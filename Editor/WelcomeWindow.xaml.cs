@@ -123,7 +123,7 @@ namespace Editor
             var openFileDialog = new OpenFileDialog
             {
                 Title = "Open Earth Engine Project",
-                Filter = $"Earth Engine Projects (*{ProjectManager.ProjectExtension})|*{ProjectManager.ProjectExtension}|All Files (*.*)|*.*",
+                Filter = $"EarthEngine (*{ProjectManager.ProjectExtension})|*{ProjectManager.ProjectExtension}|All Files (*.*)|*.*",
                 InitialDirectory = ProjectManager.ProjectsDirectory
             };
 
