@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Earth Engine")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+50c575beda0b6c1a969eb77a04876dd98ba64378")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+05e9a5535fe26c5d9d7a569d384ca096202f1aaf")]
 [assembly: System.Reflection.AssemblyProductAttribute("Earth Engine")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Earth Engine")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

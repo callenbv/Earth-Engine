@@ -1,13 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Xna.Framework.Content;
 using Engine.Core.Game;
-using System.Runtime.Serialization;
 
-namespace GameRuntime
+namespace Engine.Core.Systems.Graphics
 {
     public class LightSource
     {
@@ -17,17 +12,9 @@ namespace GameRuntime
         public float Intensity = 1f;
     }
 
-    public class Occluder
-    {
-        public List<Vector2>? Vertices; // Polygon or line segment (2 points)
-        public Vector2 Position; // Position of the occluder in world space
-        public Texture2D? Sprite; // The sprite texture for pixel-perfect occlusion
-    }
-
     public class Lighting2D
     {
         public List<LightSource> Lights = new();
-        public List<Occluder> Occluders = new();
 
         private GraphicsDevice graphicsDevice;
         private RenderTarget2D lightmap;
@@ -41,17 +28,6 @@ namespace GameRuntime
             ColorDestinationBlend = Blend.Zero,
             ColorBlendFunction = BlendFunction.Add,
             AlphaSourceBlend = Blend.One,
-            AlphaDestinationBlend = Blend.Zero,
-            AlphaBlendFunction = BlendFunction.Add
-        };
-
-        // Alternative multiply blend that should work better
-        public static readonly BlendState MultiplyBlendAlt = new BlendState
-        {
-            ColorSourceBlend = Blend.DestinationColor,
-            ColorDestinationBlend = Blend.Zero,
-            ColorBlendFunction = BlendFunction.Add,
-            AlphaSourceBlend = Blend.DestinationAlpha,
             AlphaDestinationBlend = Blend.Zero,
             AlphaBlendFunction = BlendFunction.Add
         };
@@ -72,16 +48,6 @@ namespace GameRuntime
             this.height = height;
             lightmap?.Dispose();
             lightmap = new RenderTarget2D(graphicsDevice, width, height);
-        }
-
-        public void EnsureWhitePixel()
-        {
-            if (whitePixel == null || whitePixel.IsDisposed)
-            {
-                Console.WriteLine("[Lighting2D] Recreating whitePixel texture!");
-                whitePixel = new Texture2D(graphicsDevice, 1, 1);
-                whitePixel.SetData(new[] { Color.White });
-            }
         }
 
         private void EnsureSoftCircleTexture(int diameter)
@@ -119,24 +85,6 @@ namespace GameRuntime
             softCircleTexture.SetData(data);
         }
 
-        public void LoadContent(GraphicsDevice gd, ContentManager content, int width, int height)
-        {
-            // Load the shadow cast effect
-            try
-            {
-                // shadowCastEffect = content.Load<Effect>("ShadowCast");
-                // if (shadowCastEffect == null)
-                //     Console.WriteLine("[Lighting2D] shadowCastEffect is null!");
-                // else
-                //     Console.WriteLine("[Lighting2D] shadowCastEffect loaded successfully.");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[Lighting2D] Failed to load shadowCastEffect: {ex.Message}");
-                // shadowCastEffect = null;
-            }
-        }
-
         /// <summary>
         /// Get all lights from game objects and populate the lighting system
         /// </summary>
@@ -147,50 +95,21 @@ namespace GameRuntime
 
             foreach (var gameObj in GameObjectManager.Main.GetAllObjects())
             {
-                // Check if the object has any scripts that emit light
                 foreach (var script in gameObj.scriptInstances)
                 {
-                    if (script is Engine.Core.GameScript gameScript)
+                    if (script is PointLight light)
                     {
-                        // Check if this script has lighting properties
-                        var lightRadiusProperty = script.GetType().GetField("lightRadius", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                        var lightIntensityProperty = script.GetType().GetField("lightIntensity", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                        var lightColorProperty = script.GetType().GetField("lightColor", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
-                        if (lightRadiusProperty != null && lightIntensityProperty != null && lightColorProperty != null)
+                        if (light.lightRadius > 0 && light.lightIntensity > 0)
                         {
-                            var radius = (float)lightRadiusProperty.GetValue(script);
-                            var intensity = (float)lightIntensityProperty.GetValue(script);
-                            var colorName = (string)lightColorProperty.GetValue(script);
-
-                            if (radius > 0 && intensity > 0)
+                            var pointLight = new LightSource
                             {
-                                // Parse color string to Color
-                                var color = Color.White;
-                                try
-                                {
-                                    var colorProperty = typeof(Microsoft.Xna.Framework.Color).GetProperty(colorName);
-                                    if (colorProperty != null)
-                                    {
-                                        color = (Color)colorProperty.GetValue(null);
-                                    }
-                                }
-                                catch
-                                {
-                                    // Default to white if color parsing fails
-                                    color = Microsoft.Xna.Framework.Color.White;
-                                }
+                                Position = gameObj.position,
+                                Radius = light.lightRadius,
+                                Color = light.lightColor,
+                                Intensity = light.lightIntensity
+                            };
 
-                                var light = new LightSource
-                                {
-                                    Position = gameObj.position,
-                                    Radius = radius,
-                                    Color = color,
-                                    Intensity = intensity
-                                };
-
-                                Lights.Add(light);
-                            }
+                            Lights.Add(pointLight);
                         }
                     }
                 }
@@ -213,7 +132,7 @@ namespace GameRuntime
                 return;
             }
 
-            // 1. Draw the lightmap (no shadow mask, no shader)
+            // Draw the lightmap (no shadow mask, no shader)
             graphicsDevice.SetRenderTarget(lightmap);
             graphicsDevice.Clear(Color.Black);
 
@@ -237,7 +156,7 @@ namespace GameRuntime
                         null,
                         light.Color * light.Intensity,
                         0f,
-                        new Vector2(diameter / 2f, diameter / 2f), // Origin at center
+                        new Vector2(diameter / 2f, diameter / 2f),
                         1f,
                         SpriteEffects.None,
                         0f);
@@ -248,6 +167,10 @@ namespace GameRuntime
             graphicsDevice.SetRenderTarget(null);
         }
 
+        /// <summary>
+        /// Get lightmap to draw it
+        /// </summary>
+        /// <returns></returns>
         public RenderTarget2D GetLightmap()
         {
             return lightmap;

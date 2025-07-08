@@ -1,15 +1,15 @@
 ﻿using Engine.Core.Game.Components;
-using GameRuntime;
+using Microsoft.Xna.Framework;
 
 namespace Engine.Core.Game
 {
-    public class LightEmitter : GameScript
+    public class PointLight : GameScript
     {
-        protected float lightRadius = 0f;
-        protected float lightIntensity = 0f;
-        protected string lightColor = "Orange";
+        public float lightRadius = 0f;
+        public float lightIntensity = 0f;
+        public Color lightColor = Color.White;
 
-        public void SetLight(float radius, float intensity, string color)
+        public void SetLight(float radius, float intensity, Color color)
         {
             lightRadius = radius;
             lightIntensity = intensity;

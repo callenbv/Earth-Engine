@@ -58,3 +58,6 @@
 /.vs/GameEngine
 /.vs/GameEngine/v17
 /.vs
+/Editor/obj
+/Editor/obj/Debug
+/Editor/obj/Debug/net8.0-windows

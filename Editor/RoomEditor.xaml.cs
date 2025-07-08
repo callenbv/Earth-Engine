@@ -8,6 +8,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
+using Editor.Tiles;
+using System.Threading.Tasks;
 
 namespace Editor
 {
@@ -21,9 +23,18 @@ namespace Editor
         private bool isDragging = false;
         private Point dragStart;
         private UIElement draggedElement;
+        private Room _room;
         private Point originalPosition;
         private double currentZoom = 1.0;
-        
+        private int _activeLayer = -1;
+        private int _selectedTileId = -1;
+        private bool _isPainting;
+        private bool _isUpdatingTilesetPicker = false;
+        private double _tilePaletteZoom = 1.0;
+        private Button _selectedTileButton = null;
+        private Dictionary<int, ImageSource> _tileCache = new Dictionary<int, ImageSource>();
+        private Dictionary<string, UIElement> _visualTiles = new Dictionary<string, UIElement>();
+
         // Data classes
         public class EarthObject
         {
@@ -47,6 +58,26 @@ namespace Editor
             public int width { get; set; } = 800;
             public int height { get; set; } = 600;
             public List<RoomObject> objects { get; set; } = new List<RoomObject>();
+            public int TileSize = 16;
+            public List<TileLayer> Layers = new();
+            public List<Tileset> Tilesets { get; } = new();
+
+            public Tileset? GetTileset(int id) =>
+                Tilesets.FirstOrDefault(t => t.Id == id);
+
+            public void AddLayer(string name)
+            {
+                var layer = new TileLayer(width, height, name);
+                Layers.Add(layer);
+            }
+            public Tile GetTile(int x, int y, int layerIndex)
+            {
+                return Layers[layerIndex].Tiles[x, y];
+            }
+            public void SetTile(int x, int y, int layerIndex, Tile tile)
+            {
+                Layers[layerIndex].Tiles[x, y] = tile;
+            }
         }
         
         // 1. Add a field for tiled background toggle
@@ -72,7 +103,11 @@ namespace Editor
             if (parentPanel != null) parentPanel.Children.Insert(0, tileCheckbox);
             RoomWidthTextBox.LostFocus += RoomSize_Changed;
             RoomHeightTextBox.LostFocus += RoomSize_Changed;
-            this.Loaded += (s, e) => RefreshBackgroundComboBox();
+            this.Loaded += (s, e) => { 
+                RefreshBackgroundComboBox();
+                RefreshTilesetPicker();
+                if (RoomCanvas != null) Panel.SetZIndex(RoomCanvas, 0);
+            };
         }
 
         public void LoadObjectList()
@@ -150,6 +185,7 @@ namespace Editor
                     var room = JsonSerializer.Deserialize<Room>(json);
                     if (room != null)
                     {
+                        _room = room;
                         // Load background settings
                         if (BackgroundComboBox != null)
                             BackgroundComboBox.SelectedItem = room.background;
@@ -164,6 +200,9 @@ namespace Editor
                         
                         // Apply room size to canvas
                         ApplyRoomSize(room.width, room.height);
+                        
+                        // Initialize tile editor
+                        InitTileEditor(room);
                         
                         foreach (var roomObj in room.objects)
                         {
@@ -486,7 +525,32 @@ namespace Editor
         
         private void NewRoom_Click(object sender, RoutedEventArgs e)
         {
-
+            // Create a new empty room
+            _room = new Room();
+            currentRoomName = "";
+            
+            // Clear the canvas
+            RoomCanvas.Children.Clear();
+            CanvasInfoText.Visibility = Visibility.Visible;
+            
+            // Initialize the tile editor
+            InitTileEditor(_room);
+            
+            // Reset UI controls
+            if (BackgroundComboBox != null)
+                BackgroundComboBox.SelectedItem = null;
+            if (BackgroundTiledCheckBox != null)
+                BackgroundTiledCheckBox.IsChecked = false;
+            if (RoomWidthTextBox != null)
+                RoomWidthTextBox.Text = "800";
+            if (RoomHeightTextBox != null)
+                RoomHeightTextBox.Text = "600";
+            
+            // Apply default room size
+            ApplyRoomSize(800, 600);
+            
+            // Refresh tileset picker after room is created
+            RefreshTilesetPicker();
         }
         
         private void SaveRoom_Click(object sender, RoutedEventArgs e)
@@ -519,34 +583,7 @@ namespace Editor
                 e.Handled = true;
             }
         }
-        
-        private void BrowseBackground_Click(object sender, RoutedEventArgs e)
-        {
-            var dlg = new Microsoft.Win32.OpenFileDialog 
-            { 
-                Filter = "Image Files (*.png;*.jpg;*.jpeg)|*.png;*.jpg;*.jpeg",
-                Title = "Select Background Image"
-            };
-            
-            if (dlg.ShowDialog() == true)
-            {
-                var spritesDir = Path.Combine(assetsRoot, "Sprites");
-                var fileName = Path.GetFileName(dlg.FileName);
-                var destPath = Path.Combine(spritesDir, fileName);
-                
-                try
-                {
-                    File.Copy(dlg.FileName, destPath, overwrite: true);
-                    if (BackgroundComboBox != null)
-                        BackgroundComboBox.Items.Add(fileName);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Failed to copy background image: {ex.Message}");
-                }
-            }
-        }
-        
+
         private void ClearBackground_Click(object sender, RoutedEventArgs e)
         {
             if (BackgroundComboBox != null)
@@ -559,6 +596,12 @@ namespace Editor
         {
             Console.WriteLine("Manual refresh button clicked");
             RefreshBackgroundComboBox();
+        }
+        
+        private void RefreshTileset_Click(object sender, RoutedEventArgs e)
+        {
+            Console.WriteLine("Manual tileset refresh button clicked");
+            RefreshTilesetPicker();
         }
         
         private void RefreshBackgroundComboBox()
@@ -593,6 +636,42 @@ namespace Editor
             catch (Exception ex)
             {
                 Console.WriteLine($"Error refreshing background combo box: {ex.Message}");
+            }
+        }
+
+        private void RefreshTilesetPicker()
+        {
+            try
+            {
+                var tilesetsDir = Path.Combine(assetsRoot, "Sprites");
+                var currentSelection = TilesetPicker?.SelectedItem as string;
+                
+                if (TilesetPicker == null) return;
+                
+                TilesetPicker.Items.Clear();
+                
+                if (Directory.Exists(tilesetsDir))
+                {
+                    foreach (var file in Directory.GetFiles(tilesetsDir))
+                    {
+                        var ext = Path.GetExtension(file).ToLowerInvariant();
+                        if (ext == ".png" || ext == ".jpg" || ext == ".jpeg")
+                        {
+                            var name = Path.GetFileName(file);
+                            TilesetPicker.Items.Add(name);
+                        }
+                    }
+                }
+                
+                // Restore the previous selection if it still exists
+                if (!string.IsNullOrEmpty(currentSelection) && TilesetPicker.Items.Contains(currentSelection))
+                {
+                    TilesetPicker.SelectedItem = currentSelection;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error refreshing tileset picker: {ex.Message}");
             }
         }
         
@@ -679,6 +758,464 @@ namespace Editor
             {
                 ZoomText.Text = $"{(currentZoom * 100):F0}%";
             }
+        }
+
+        private void InitTileEditor(Room room)
+        {
+            _room = room;
+            
+            // Pass the room to the canvas for tile rendering
+            if (RoomCanvas != null)
+            {
+                RoomCanvas.Room = room;
+            }
+            
+            RefreshTilesetPicker();
+            RefreshLayerList();
+            RefreshPalette();      // populate TilePalettePanel with buttons/tiles
+        }
+
+        /* ════════════════  LAYER UI ════════════════ */
+
+        private void RefreshLayerList()
+        {
+            LayerListBox.ItemsSource = null;
+            
+            // Create a list of layer display items that include tileset info
+            var layerDisplayItems = _room.Layers.Select(layer => new
+            {
+                Layer = layer,
+                DisplayName = GetLayerDisplayName(layer)
+            }).ToList();
+            
+            LayerListBox.ItemsSource = layerDisplayItems;
+            LayerListBox.DisplayMemberPath = "DisplayName";
+            
+            if (_room.Layers.Count > 0)
+            {
+                _activeLayer = 0;
+                LayerListBox.SelectedIndex = 0;
+            }
+        }
+        
+        private string GetLayerDisplayName(TileLayer layer)
+        {
+            var tileset = _room.GetTileset(layer.TilesetId);
+            if (tileset != null)
+            {
+                var tilesetName = Path.GetFileNameWithoutExtension(tileset.FilePath);
+                return $"{layer.Name} ({tilesetName})";
+            }
+            return $"{layer.Name} (No Tileset)";
+        }
+
+        private static string? AskForText(string title, string label, string defaultValue = "")
+        {
+            var win = new Window
+            {
+                Title = title,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                SizeToContent = SizeToContent.WidthAndHeight,
+                ResizeMode = ResizeMode.NoResize,
+                Owner = Application.Current.MainWindow
+            };
+
+            var txt = new TextBox { Text = defaultValue, MinWidth = 200, Margin = new Thickness(0, 4, 0, 4) };
+            var ok = new Button { Content = "OK", IsDefault = true, Width = 70, Margin = new Thickness(4) };
+            var cancel = new Button { Content = "Cancel", IsCancel = true, Width = 70, Margin = new Thickness(4) };
+
+            ok.Click += (_, __) => win.DialogResult = true;
+
+            var panel = new StackPanel { Margin = new Thickness(10) };
+            panel.Children.Add(new TextBlock { Text = label });
+            panel.Children.Add(txt);
+
+            var btnRow = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
+            btnRow.Children.Add(ok);
+            btnRow.Children.Add(cancel);
+            panel.Children.Add(btnRow);
+
+            win.Content = panel;
+
+            return win.ShowDialog() == true ? txt.Text.Trim() : null;
+        }
+
+        // ───── Add-layer handler ─────────────────────────────────────────────────
+        private void AddLayer_Click(object sender, RoutedEventArgs e)
+        {
+            if (_room == null) return;
+
+            string? name = AskForText("New Tile Layer", "Layer name:", $"Layer {_room.Layers.Count}");
+            if (string.IsNullOrWhiteSpace(name)) return;
+
+            _room.AddLayer(name);
+            _activeLayer = _room.Layers.Count - 1;
+            RefreshLayerList();
+            RoomCanvas.InvalidateVisual();
+        }
+        private void LayerListBox_SelectionChanged(object s, SelectionChangedEventArgs e)
+        {
+            if (_isUpdatingTilesetPicker) return; // Prevent circular updates
+            
+            // Clear visual tiles when switching layers
+            ClearVisualTiles();
+            
+            // Render existing tiles for the selected layer (asynchronously to prevent freezing)
+            if (_activeLayer >= 0 && _room != null)
+            {
+                Task.Run(() => RenderExistingTiles());
+            }
+            
+            _activeLayer = LayerListBox.SelectedIndex;
+            if (_activeLayer >= 0)
+            {
+                var layer = _room.Layers[_activeLayer];
+                var tileset = _room.GetTileset(layer.TilesetId);
+                if (tileset != null)
+                {
+                    var tilesetName = Path.GetFileName(tileset.FilePath);
+                    _isUpdatingTilesetPicker = true;
+                    TilesetPicker.SelectedItem = tilesetName;
+                    _isUpdatingTilesetPicker = false;
+                }
+                else
+                {
+                    // No tileset assigned to this layer yet
+                    _isUpdatingTilesetPicker = true;
+                    TilesetPicker.SelectedItem = null;
+                    _isUpdatingTilesetPicker = false;
+                }
+            }
+            else
+            {
+                // No layer selected
+                _isUpdatingTilesetPicker = true;
+                TilesetPicker.SelectedItem = null;
+                _isUpdatingTilesetPicker = false;
+            }
+            RefreshPalette();                         // show tiles from that tileset
+        }
+        private void TilesetPicker_SelectionChanged(object? s, SelectionChangedEventArgs e)
+        {
+            if (_isUpdatingTilesetPicker) return;
+            if (_activeLayer < 0 || TilesetPicker.SelectedItem is not string tilesetName) return;
+
+            var tilesetPath = Path.Combine(assetsRoot, "Sprites", tilesetName);
+            if (!File.Exists(tilesetPath)) return;
+
+            var existingTileset = _room.Tilesets.FirstOrDefault(t => t.FilePath == tilesetPath);
+            if (existingTileset == null)
+            {
+                var tilesetId = _room.Tilesets.Count > 0 ? _room.Tilesets.Max(t => t.Id) + 1 : 0;
+                var newTileset = new Tileset(tilesetId, tilesetPath, 16, 16);
+                _room.Tilesets.Add(newTileset);
+                _room.Layers[_activeLayer].TilesetId = newTileset.Id;
+            }
+            else
+            {
+                _room.Layers[_activeLayer].TilesetId = existingTileset.Id;
+            }
+
+            _tileCache.Clear();
+
+            _isUpdatingTilesetPicker = true;
+            RefreshLayerList();
+            LayerListBox.SelectedIndex = _activeLayer;
+            _isUpdatingTilesetPicker = false;
+
+            RefreshPalette();
+        }
+
+        private void RemoveLayer_Click(object sender, RoutedEventArgs e)
+        {
+            if (_activeLayer < 0) return;
+            _room.Layers.RemoveAt(_activeLayer);
+            RefreshLayerList();
+            RoomCanvas.InvalidateVisual();
+        }
+
+        private void MoveLayerUp_Click(object sender, RoutedEventArgs e)
+        {
+            if (_activeLayer <= 0) return;
+            var layer = _room.Layers[_activeLayer];
+            _room.Layers.RemoveAt(_activeLayer);
+            _room.Layers.Insert(--_activeLayer, layer);
+            RefreshLayerList();
+            LayerListBox.SelectedIndex = _activeLayer;
+            RoomCanvas.InvalidateVisual();
+        }
+
+        private void MoveLayerDown_Click(object sender, RoutedEventArgs e)
+        {
+            if (_activeLayer < 0 || _activeLayer >= _room.Layers.Count - 1) return;
+            var layer = _room.Layers[_activeLayer];
+            _room.Layers.RemoveAt(_activeLayer);
+            _room.Layers.Insert(++_activeLayer, layer);
+            RefreshLayerList();
+            LayerListBox.SelectedIndex = _activeLayer;
+            RoomCanvas.InvalidateVisual();
+        }
+
+        /* ════════════════  TILE PALETTE UI ════════════════ */
+
+        private void RefreshPalette()
+        {
+            TilePalettePanel.Children.Clear();
+            _selectedTileButton = null;
+
+            if (_activeLayer < 0) return;
+            var layer = _room.Layers[_activeLayer];
+            var tileset = _room.GetTileset(layer.TilesetId);
+            if (tileset == null) return;
+
+            // Limit the number of tiles to prevent freezing
+            int maxTiles = 50; // Reasonable limit for performance
+            int tileCount = 0;
+
+            for (int ty = 0; ty < tileset.Rows && tileCount < maxTiles; ty++)
+            {
+                for (int tx = 0; tx < tileset.Columns && tileCount < maxTiles; tx++)
+                {
+                    int tileId = ty * tileset.Columns + tx;
+
+                    try
+                    {
+                        // Create the actual tileset image
+                        var img = new Image
+                        {
+                            Width = 32 * _tilePaletteZoom,
+                            Height = 32 * _tilePaletteZoom,
+                            Source = new CroppedBitmap(tileset.Atlas,
+                                       new Int32Rect(tx * tileset.TileWidth, ty * tileset.TileHeight, 
+                                                   tileset.TileWidth, tileset.TileHeight))
+                        };
+
+                        var btn = new Button
+                        {
+                            Tag = tileId,
+                            Content = img,
+                            Margin = new Thickness(1),
+                            Padding = new Thickness(0),
+                            Width = (34 * _tilePaletteZoom),
+                            Height = (34 * _tilePaletteZoom),
+                            BorderThickness = new Thickness(2),
+                            BorderBrush = System.Windows.Media.Brushes.Transparent
+                        };
+                        btn.Click += TilePaletteButton_Click;
+                        TilePalettePanel.Children.Add(btn);
+                        tileCount++;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error creating tile {tileId}: {ex.Message}");
+                        // Fallback to colored rectangle if image fails
+                        var rect = new System.Windows.Shapes.Rectangle
+                        {
+                            Fill = System.Windows.Media.Brushes.Gray,
+                            Stroke = System.Windows.Media.Brushes.Black,
+                            StrokeThickness = 1,
+                            Width = 32 * _tilePaletteZoom,
+                            Height = 32 * _tilePaletteZoom
+                        };
+                        
+                        var fallbackBtn = new Button
+                        {
+                            Tag = tileId,
+                            Content = rect,
+                            Margin = new Thickness(1),
+                            Padding = new Thickness(0),
+                            Width = (34 * _tilePaletteZoom),
+                            Height = (34 * _tilePaletteZoom),
+                            BorderThickness = new Thickness(2),
+                            BorderBrush = System.Windows.Media.Brushes.Transparent
+                        };
+                        fallbackBtn.Click += TilePaletteButton_Click;
+                        TilePalettePanel.Children.Add(fallbackBtn);
+                        tileCount++;
+                    }
+                }
+            }
+        }
+
+        private void TilePaletteButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Clear previous selection
+            if (_selectedTileButton != null)
+            {
+                _selectedTileButton.BorderBrush = System.Windows.Media.Brushes.Transparent;
+            }
+            
+            // Set new selection
+            _selectedTileButton = (Button)sender;
+            _selectedTileButton.BorderBrush = System.Windows.Media.Brushes.Yellow;
+            _selectedTileId = (int)((FrameworkElement)sender).Tag;
+        }
+        
+        private void TilePalette_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+            {
+                // Zoom the palette
+                double zoomDelta = e.Delta > 0 ? 0.1 : -0.1;
+                _tilePaletteZoom = Math.Max(0.5, Math.Min(3.0, _tilePaletteZoom + zoomDelta));
+                RefreshPalette();
+                e.Handled = true;
+            }
+            else
+            {
+                // Scroll the palette
+                var scrollViewer = sender as ScrollViewer;
+                if (scrollViewer != null)
+                {
+                    double scrollDelta = e.Delta > 0 ? -20 : 20;
+                    scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset + scrollDelta);
+                    e.Handled = true;
+                }
+            }
+        }
+        
+        private void TilePaletteZoomIn_Click(object sender, RoutedEventArgs e)
+        {
+            _tilePaletteZoom = Math.Min(3.0, _tilePaletteZoom + 0.2);
+            RefreshPalette();
+        }
+        
+        private void TilePaletteZoomOut_Click(object sender, RoutedEventArgs e)
+        {
+            _tilePaletteZoom = Math.Max(0.5, _tilePaletteZoom - 0.2);
+            RefreshPalette();
+        }
+
+        /* ════════════════  PAINTING HANDLERS ════════════════ */
+
+        private void TilePaintCanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (_activeLayer < 0 || _selectedTileId < 0) return;
+
+            _isPainting = true;
+            PaintAt(e.GetPosition(TilePaintCanvas));
+        }
+
+        private void TilePaintCanvas_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (_isPainting && e.LeftButton == MouseButtonState.Pressed)
+                PaintAt(e.GetPosition(TilePaintCanvas));
+        }
+
+        private void TilePaintCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            _isPainting = false;
+            ReleaseMouseCapture();
+        }
+        private void PaintAt(Point pos)
+        {
+            if (_room == null || _activeLayer < 0 || _selectedTileId < 0)
+                return;
+
+            int t = _room.TileSize;
+            
+            // Snap to grid
+            int x = (int)Math.Floor(pos.X / (16 * currentZoom));
+            int y = (int)Math.Floor(pos.Y / (16 * currentZoom));
+
+            if (x < 0 || y < 0 || x >= _room.width / t || y >= _room.height / t)
+                return;
+
+            var layer = _room.Layers[_activeLayer];
+
+            // Check if we're already painting the same tile at this position
+            var existingTile = layer.Tiles[x, y];
+            if (existingTile != null && existingTile.Index == _selectedTileId)
+                return; // Skip if same tile already exists
+
+            // Use default values to avoid UI element access
+            int z = 0;
+            bool collide = false;
+
+            layer.Tiles[x, y] = new Tile(_selectedTileId, 0, z, collide);
+
+            // Add visual tile directly without Dispatcher to test
+            AddVisualTile(x, y, _selectedTileId);
+        }
+        
+        private void AddVisualTile(int gridX, int gridY, int tileId)
+        {
+            if (_room == null || _activeLayer < 0) return;
+            
+            var layer = _room.Layers[_activeLayer];
+            var tileset = _room.GetTileset(layer.TilesetId);
+            if (tileset == null) return;
+            
+            // Create a unique key for this tile position
+            string tileKey = $"{gridX},{gridY}";
+            
+            // Remove existing visual tile at this position if it exists
+            if (_visualTiles.TryGetValue(tileKey, out var existingTile))
+            {
+                TilePaintCanvas.Children.Remove(existingTile);
+                _visualTiles.Remove(tileKey);
+            }
+            
+            try
+            {
+                // Get or create cached tile image
+                ImageSource tileImage;
+                if (!_tileCache.TryGetValue(tileId, out tileImage))
+                {
+                    // Calculate tile position in tileset
+                    int tilesPerRow = tileset.Columns;
+                    int tileX = (tileId % tilesPerRow) * tileset.TileWidth;
+                    int tileY = (tileId / tilesPerRow) * tileset.TileHeight;
+                    
+                    // Create cropped bitmap for this tile (only once)
+                    tileImage = new CroppedBitmap(tileset.Atlas, 
+                        new Int32Rect(tileX, tileY, tileset.TileWidth, tileset.TileHeight));
+                    
+                    // Cache it for future use
+                    _tileCache[tileId] = tileImage;
+                }
+                
+                // Create image using cached source
+                var img = new Image
+                {
+                    Source = tileImage,
+                    Width = _room.TileSize * currentZoom,
+                    Height = _room.TileSize * currentZoom
+                };
+                
+                // Position the image
+                Canvas.SetLeft(img, gridX * _room.TileSize * currentZoom);
+                Canvas.SetTop(img, gridY * _room.TileSize * currentZoom);
+                
+                // Add to canvas and track it
+                TilePaintCanvas.Children.Add(img);
+                _visualTiles[tileKey] = img;
+            }
+            catch (Exception ex)
+            {
+                // Fallback: just add a colored rectangle if image creation fails
+                var rect = new System.Windows.Shapes.Rectangle
+                {
+                    Fill = System.Windows.Media.Brushes.Green,
+                    Width = _room.TileSize * currentZoom,
+                    Height = _room.TileSize * currentZoom
+                };
+                Canvas.SetLeft(rect, gridX * _room.TileSize * currentZoom);
+                Canvas.SetTop(rect, gridY * _room.TileSize * currentZoom);
+                TilePaintCanvas.Children.Add(rect);
+                _visualTiles[tileKey] = rect;
+            }
+        }
+        
+        private void ClearVisualTiles()
+        {
+            TilePaintCanvas.Children.Clear();
+            _visualTiles.Clear();
+        }
+        
+        private void RenderExistingTiles()
+        {
+
         }
     }
 } 

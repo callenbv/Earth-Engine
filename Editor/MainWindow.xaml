@@ -6,12 +6,17 @@
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource WindowBackgroundBrush}">
     <DockPanel>
-        <Menu DockPanel.Dock="Top">
+        <Menu DockPanel.Dock="Top"
+              ItemContainerStyle="{StaticResource MenuBarItemStyle}">
             <MenuItem Header="File">
-                <MenuItem Header="Home" Click="HomeMenuItem_Click"/>
-                <Separator/>
-                <MenuItem Header="Exit" Click="ExitMenuItem_Click"/>
+              <MenuItem Header="Home"
+                    Click="HomeMenuItem_Click"
+                    Style="{StaticResource DropdownMenuItemStyle}" />
+              <MenuItem Header="Exit"
+                    Click="ExitMenuItem_Click"
+                    Style="{StaticResource DropdownMenuItemStyle}" />
             </MenuItem>
+
             <MenuItem Header="Edit">
                 <!-- Add edit options here -->
             </MenuItem>
@@ -30,7 +35,7 @@
                                 Padding="10,5"
                                 Click="PlayButton_Click"/>
                         <Button x:Name="OpenVSButton"
-                                Content="Open Scripts in Visual Studio"
+                                Content="Open Visual Studio"
                                 FontSize="14"
                                 Padding="10,5"
                                 Click="OpenVSButton_Click"/>
@@ -47,6 +52,7 @@
                                        FontWeight="Bold"
                                        Margin="10,10,10,5"/>
                             <TreeView x:Name="AssetTreeView"
+                                      Style="{StaticResource DarkTreeView}"
                                       Margin="10,0,10,10"
                                       SelectedItemChanged="AssetTreeView_SelectedItemChanged"
                                       MouseDoubleClick="AssetTreeView_MouseDoubleClick"

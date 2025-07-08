@@ -29,6 +29,31 @@ namespace Editor
             { "Sprites", "Sprites" },
             { "Rooms", "Rooms" }
         };
+        private const string ScriptTemplate =
+@"using System;
+using Engine.Core;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+
+public class $CLASS$ : GameScript
+{
+    public override void Create()
+    {
+    }
+
+    public override void Update(GameTime gameTime)
+    {
+    }
+
+    public override void Draw(SpriteBatch spriteBatch)
+    {
+    }
+
+    public override void Destroy()
+    {
+    }
+}";
+
         private TreeViewItem _rightClickItem;
         private string _inspectorObjectPath;
         private dynamic _inspectorObjectData;
@@ -1088,7 +1113,6 @@ namespace Editor
                 contextMenu.Items.Add(newSprite);
             }
 
-            contextMenu.Items.Add(new Separator());
             var rename = new MenuItem { Header = "Rename" };
             rename.Click += RenameAsset_Click;
             contextMenu.Items.Add(rename);
@@ -1127,12 +1151,18 @@ namespace Editor
         private void NewScript_Click(object sender, RoutedEventArgs e)
         {
             var parentDir = GetTargetDir(_rightClickItem);
-            var assetName = PromptDialog($"Enter new script name (without extension):", "New Script");
+            var assetName = PromptDialog("Enter new script name:", "NewScript");
+
             if (!string.IsNullOrWhiteSpace(assetName))
             {
                 var newAssetPath = Path.Combine(parentDir, assetName + ".cs");
+
                 if (!File.Exists(newAssetPath))
-                    File.WriteAllText(newAssetPath, "// New script\n");
+                {
+                    var classContent = ScriptTemplate.Replace("$CLASS$", assetName);
+                    File.WriteAllText(newAssetPath, classContent);
+                }
+
                 LoadAssetTreeAndExpandTo(newAssetPath);
             }
         }
