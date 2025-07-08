@@ -49,3 +49,5 @@
 /Editor/obj/Debug/net8.0-windows
 /.vs/GameEngine
 /.vs/GameEngine/v17
+/Runtime/obj
+/Runtime/obj/Debug
