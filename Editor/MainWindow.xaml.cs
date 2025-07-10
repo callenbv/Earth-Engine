@@ -17,6 +17,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Engine.Core.Game.Components;
 using Engine.Core.Data;
+using System.Numerics;
 
 namespace Editor
 {
@@ -603,8 +604,59 @@ public class $CLASS$ : GameScript
                                     };
                                     editor = combo;
                                 }
-                                sp.Children.Add(label);
-                                sp.Children.Add(editor);
+                                else if (field.FieldType == typeof(Microsoft.Xna.Framework.Vector2))
+                                {
+                                    // Special handling for Vector2
+                                    Microsoft.Xna.Framework.Vector2 vector;
+                                    if (value is Microsoft.Xna.Framework.Vector2 v)
+                                    {
+                                        vector = v;
+                                    }
+                                    else if (value is JsonElement je && je.TryGetProperty("X", out var xElem) && je.TryGetProperty("Y", out var yElem))
+                                    {
+                                        vector = new Microsoft.Xna.Framework.Vector2(
+                                            xElem.GetSingle(),
+                                            yElem.GetSingle()
+                                        );
+                                    }
+                                    else
+                                    {
+                                        vector = new Microsoft.Xna.Framework.Vector2();
+                                    }
+                                    var vectorPanel = new StackPanel { Orientation = Orientation.Horizontal };
+                                    var xBox = new TextBox { Text = vector.X.ToString(), Width = 50, Margin = new Thickness(0, 0, 5, 0) };
+                                    var yBox = new TextBox { Text = vector.Y.ToString(), Width = 50 };
+                                    xBox.LostFocus += (s, e) =>
+                                    {
+                                        if (float.TryParse(xBox.Text, out float x))
+                                        {
+                                            vector.X = x;
+                                            propDict[field.Name] = vector;
+                                            SaveInspectorObject();
+                                        }
+                                    };
+                                    yBox.LostFocus += (s, e) =>
+                                    {
+                                        if (float.TryParse(yBox.Text, out float y))
+                                        {
+                                            vector.Y = y;
+                                            propDict[field.Name] = vector;
+                                            SaveInspectorObject();
+                                        }
+                                    };
+                                    vectorPanel.Children.Add(new TextBlock { Text = "X:", Margin = new Thickness(0, 0, 5, 0) });
+                                    vectorPanel.Children.Add(xBox);
+                                    vectorPanel.Children.Add(new TextBlock { Text = "Y:", Margin = new Thickness(10, 0, 5, 0) });
+                                    vectorPanel.Children.Add(yBox);
+                                    editor = vectorPanel;
+                                }
+
+                                // Add the editor if possible
+                                if (editor != null)
+                                {
+                                    sp.Children.Add(label);
+                                    sp.Children.Add(editor);
+                                }
                             }
                         }
                     }
