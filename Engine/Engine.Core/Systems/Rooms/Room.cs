@@ -9,8 +9,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Microsoft.Xna.Framework;
+using Engine.Core.Game;
+using Engine.Core.Data;
+using Newtonsoft.Json;
 
-namespace Engine.Core.Game.Rooms
+namespace Engine.Core.Systems.Rooms
 {
     public class Room
     {
@@ -18,7 +21,7 @@ namespace Engine.Core.Game.Rooms
         public bool backgroundTiled { get; set; } = false;
         public int width { get; set; } = 800;
         public int height { get; set; } = 600;
-        public List<RoomObject> objects { get; set; } = new List<RoomObject>();
+        public List<EarthObject> objects { get; set; } = new List<EarthObject>();
 
         /// <summary>
         /// Load the default room
@@ -28,7 +31,7 @@ namespace Engine.Core.Game.Rooms
         {
             // Use provided game options or fall back to singleton
             var options = GameOptions.Main;
-            
+
             if (string.IsNullOrEmpty(options.defaultRoom))
             {
                 // Try to load the first available room
@@ -71,7 +74,10 @@ namespace Engine.Core.Game.Rooms
                 GameObjectManager.Main.Clear();
 
                 var json = File.ReadAllText(roomPath);
-                var roomData = JsonSerializer.Deserialize<Room>(json);
+
+                var roomData = JsonConvert.DeserializeObject<Room>(json);
+
+                Console.WriteLine($"Creating {roomData.objects.Count} objects...");
 
                 if (roomData?.objects != null)
                 {
@@ -80,7 +86,7 @@ namespace Engine.Core.Game.Rooms
                         try
                         {
                             // Extract object name from path if objectName is not set
-                            string? objectName = obj.objectName;
+                            string? objectName = obj.name;
                             if (string.IsNullOrEmpty(objectName) && !string.IsNullOrEmpty(obj.objectPath))
                             {
                                 objectName = Path.GetFileNameWithoutExtension(obj.objectPath);
@@ -88,10 +94,10 @@ namespace Engine.Core.Game.Rooms
 
                             if (!string.IsNullOrEmpty(objectName))
                             {
-                                var position = new Vector2(obj.x, obj.y);
+                                var position = new Vector2((float)obj.x, (float)obj.y);
                                 var gameObject = GameObject.Instantiate(objectName, position);
+                                gameObject.scriptProperties = obj.scriptProperties;
 
-                                // Load texture and attach scripts after creation
                                 ScriptCompiler.LoadTextureAndScripts(gameObject, objectName, assetsRoot, contentManager, scriptManager, graphicsDevice);
 
                                 Console.WriteLine($"Spawned {objectName} at ({obj.x}, {obj.y})");
@@ -113,16 +119,5 @@ namespace Engine.Core.Game.Rooms
                 Console.WriteLine($"Failed to load room {roomName}: {ex.Message}");
             }
         }
-    }
-
-    /// <summary>
-    /// Serialized class for placing objects in the room
-    /// </summary>
-    public class RoomObject
-    {
-        public string? objectName { get; set; }
-        public string? objectPath { get; set; }
-        public float x { get; set; }
-        public float y { get; set; }
     }
 }

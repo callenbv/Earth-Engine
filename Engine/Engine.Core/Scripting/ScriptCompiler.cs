@@ -11,6 +11,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System.Text.Json;
+using System.Reflection;
 
 namespace Engine.Core
 {
@@ -228,6 +229,7 @@ namespace Engine.Core
                 // Attach scripts
                 if (objDef.Scripts != null)
                 {
+
                     foreach (var scriptName in objDef.Scripts.Values<string>())
                     {
                         try
@@ -236,9 +238,39 @@ namespace Engine.Core
                             var createMethod = scriptManager.GetType().GetMethod("CreateScriptInstanceByName");
                             if (createMethod != null)
                             {
-                                var script = createMethod.Invoke(scriptManager, new object[] { scriptName }) as Engine.Core.GameScript;
+                                var script = createMethod.Invoke(scriptManager, new object[] { scriptName }) as GameScript;
                                 if (script != null)
                                 {
+                                    // Sets the default values from the script that we set
+                                    var scriptPropsObj = gameObject.scriptProperties;
+                                    var scriptType = script.GetType();
+
+                                    if (scriptPropsObj.TryGetValue(scriptName, out var props))
+                                    {
+                                        foreach (var prop in props)
+                                        {
+                                            var field = scriptType.GetField(prop.Key, BindingFlags.Public | BindingFlags.Instance);
+                                            if (field != null)
+                                            {
+                                                try
+                                                {
+                                                    var value = Convert.ChangeType(prop.Value, field.FieldType);
+                                                    field.SetValue(script, value);
+                                                    Console.WriteLine($"Set {scriptName}.{prop.Key} = {value}");
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    Console.WriteLine($"Failed to set {scriptName}.{prop.Key}: {ex.Message}");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                Console.WriteLine($"Field '{prop.Key}' not found on script '{scriptName}'");
+                                            }
+                                        }
+                                    }
+
+                                    // Add the script to the game object
                                     gameObject.AddComponent(script);
                                     gameObject.scriptInstances.Add(script);
                                     Console.WriteLine($"Attached script '{scriptName}' to {objectName}");

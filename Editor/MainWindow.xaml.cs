@@ -6,7 +6,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Engine.Core;
 using Microsoft.Win32;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -16,6 +15,8 @@ using System.Windows.Documents;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Engine.Core.Game.Components;
+using Engine.Core.Data;
 
 namespace Editor
 {
@@ -66,7 +67,7 @@ public class $CLASS$ : GameScript
         private FileSystemWatcher _assetsWatcher;
         private DateTime _lastReload = DateTime.MinValue;
 
-        public MainWindow(string? projectPath = null)
+        public MainWindow(string projectPath = null)
         {
             InitializeComponent();
             
@@ -170,7 +171,17 @@ public class $CLASS$ : GameScript
                     System.Windows.MessageBox.Show($"Script compilation failed:\n{string.Join("\n", result.Errors)}", "Script Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
-
+                // Ensure Engine.Core.dll is present in bin directory
+                var engineCoreSource = Path.Combine(solutionRoot, "Engine", "Engine.Core", "bin", "Debug", "net8.0", "Engine.Core.dll");
+                var engineCoreDest = Path.Combine(projectBinDir, "Engine.Core.dll");
+                if (File.Exists(engineCoreSource))
+                {
+                    File.Copy(engineCoreSource, engineCoreDest, true);
+                }
+                else
+                {
+                    MessageBox.Show("Engine.Core.dll not found. Please build the Engine.Core project.", "Missing DLL", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
                 // 5. Copy Assets to project bin/Assets (optional: or just reference directly)
                 var projectBinAssets = Path.Combine(projectBinDir, "Assets");
                 CopyDirectory(assetsRoot, projectBinAssets);
@@ -366,45 +377,91 @@ public class $CLASS$ : GameScript
             }
         }
 
+        /// <summary>
+        /// Show the inspector for the selected asset
+        /// </summary>
+        /// <param name="assetPath"></param>
         private void ShowInspector(string assetPath)
         {
             InspectorPanel.Children.Clear();
+
+            if (!File.Exists(assetPath))
+                return;
+
             var ext = Path.GetExtension(assetPath).ToLower();
             if (ext == ".cs")
             {
-                // Script editing
-                InspectorPanel.Children.Add(new TextBlock { Text = Path.GetFileName(assetPath), FontWeight = FontWeights.Bold, Margin = new Thickness(0, 0, 0, 10) });
-                
-                // Script content text box with syntax highlighting
-                var scriptContent = File.ReadAllText(assetPath);
-                var scriptTextBox = CreateSyntaxHighlightingEditor(scriptContent);
-                
-                // Save button
-                var saveButton = new Button { Content = "Save Script", Margin = new Thickness(0, 0, 0, 5) };
-                saveButton.Click += (s, e) => {
+                // Get class name from file name
+                var className = Path.GetFileNameWithoutExtension(assetPath);
+
+                // Path to the compiled scripts DLL
+                var scriptsDllPath = Path.Combine(Path.GetDirectoryName(assetsRoot), "bin", "Scripts", "GameScripts.dll");
+                if (File.Exists(scriptsDllPath))
+                {
                     try
                     {
-                        var textRange = new TextRange(scriptTextBox.Document.ContentStart, scriptTextBox.Document.ContentEnd);
-                        File.WriteAllText(assetPath, textRange.Text);
-                        
-                        // Hot reload the script
-                        HotReloadScript(assetPath);
-                        
-                        MessageBox.Show("Script saved and hot-reloaded!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                        var dllBytes = File.ReadAllBytes(scriptsDllPath);
+                        var assembly = System.Reflection.Assembly.Load(dllBytes);
+                        // Find the type by name (namespace may be needed if present)
+                        var type = assembly.GetType(className) ?? assembly.GetTypes().FirstOrDefault(t => t.Name == className);
+                        if (type != null)
+                        {
+                            // Create an instance
+                            _inspectorObjectData = Activator.CreateInstance(type);
+                        }
+                        else
+                        {
+                            _inspectorObjectData = null;
+                            InspectorPanel.Children.Add(new TextBlock { Text = $"Class '{className}' not found in GameScripts.dll.", Foreground = Brushes.Red });
+                            return;
+                        }
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show($"Failed to save script: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        _inspectorObjectData = null;
+                        InspectorPanel.Children.Add(new TextBlock { Text = $"Error loading script: {ex.Message}", Foreground = Brushes.Red });
+                        return;
                     }
-                };
-                
-                InspectorPanel.Children.Add(saveButton);
-                InspectorPanel.Children.Add(scriptTextBox);
-                
-                // Open in Visual Studio button
-                var openInVSButton = new Button { Content = "Open Visual Studio", Margin = new Thickness(0, 0, 0, 5) };
-                openInVSButton.Click += (s, e) => OpenInVisualStudio();
-                InspectorPanel.Children.Add(openInVSButton);
+                }
+                else
+                {
+                    _inspectorObjectData = null;
+                    InspectorPanel.Children.Add(new TextBlock { Text = $"GameScripts.dll not found. Please compile your scripts.", Foreground = Brushes.Red });
+                    return;
+                }
+
+                // Now reflect on the instance as before
+                var fields = _inspectorObjectData.GetType().GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+                foreach (var field in fields)
+                {
+                    var label = new TextBlock { Text = field.Name };
+                    FrameworkElement editor = null;
+                    if (field.FieldType == typeof(int) || field.FieldType == typeof(float) || field.FieldType == typeof(string))
+                    {
+                        var tb = new TextBox { Text = field.GetValue(_inspectorObjectData)?.ToString() ?? "" };
+                        tb.LostFocus += (s, e) => {
+                            object value = Convert.ChangeType(tb.Text, field.FieldType);
+                            field.SetValue(_inspectorObjectData, value);
+                        };
+                        editor = tb;
+                    }
+                    else if (field.FieldType == typeof(bool))
+                    {
+                        var cb = new CheckBox { IsChecked = (bool?)field.GetValue(_inspectorObjectData) ?? false };
+                        cb.Checked += (s, e) => field.SetValue(_inspectorObjectData, true);
+                        cb.Unchecked += (s, e) => field.SetValue(_inspectorObjectData, false);
+                        editor = cb;
+                    }
+                    else if (field.FieldType.IsEnum)
+                    {
+                        var combo = new ComboBox { ItemsSource = Enum.GetValues(field.FieldType) };
+                        combo.SelectedItem = field.GetValue(_inspectorObjectData);
+                        combo.SelectionChanged += (s, e) => field.SetValue(_inspectorObjectData, combo.SelectedItem);
+                        editor = combo;
+                    }
+                    InspectorPanel.Children.Add(label);
+                    InspectorPanel.Children.Add(editor);
+                }
             }
             else if (ext == ".eo")
             {
@@ -480,24 +537,104 @@ public class $CLASS$ : GameScript
                     }
                 };
                 InspectorPanel.Children.Add(spriteCombo);
+
                 // Scripts
                 InspectorPanel.Children.Add(new TextBlock { Text = "Scripts:", FontWeight = FontWeights.Bold });
                 var scriptListPanel = new StackPanel { AllowDrop = true };
-                var textBrush = (Brush)Application.Current.Resources["TextBrush"];
+
                 foreach (var script in _inspectorObjectData.scripts)
                 {
-                    var sp = new StackPanel { Orientation = Orientation.Horizontal };
-                    var scriptText = new TextBlock
+                    var sp = new StackPanel { Orientation = Orientation.Vertical, Margin = new Thickness(0, 5, 0, 5) };
+                    var scriptLabel = new TextBlock
                     {
                         Text = script,
-                        Foreground = (Brush)Application.Current.Resources["TextBrush"] ?? Brushes.White,
-                        Margin = new Thickness(0, 0, 5, 0),
-                        VerticalAlignment = VerticalAlignment.Center
+                        FontWeight = FontWeights.Bold,
+                        Foreground = Brushes.LightBlue
                     };
-                    sp.Children.Add(scriptText);
-                    var removeBtn = new Button { Content = "Remove", Tag = script, Margin = new Thickness(5, 0, 0, 0), Style = (Style)Application.Current.Resources["DangerButton"] };
-                    removeBtn.Click += (s, e) => { _inspectorObjectData.scripts.Remove(script); SaveInspectorObject(); ShowInspector(assetPath); };
+                    sp.Children.Add(scriptLabel);
+
+                    // Load script type from DLL
+                    var scriptsDllPath = Path.Combine(Path.GetDirectoryName(assetsRoot), "bin", "Scripts", "GameScripts.dll");
+                    if (File.Exists(scriptsDllPath))
+                    {
+                        var dllBytes = File.ReadAllBytes(scriptsDllPath);
+                        var assembly = System.Reflection.Assembly.Load(dllBytes);
+                        var type = assembly.GetType(script) ?? assembly.GetTypes().FirstOrDefault(t => t.Name == script);
+                        if (type != null)
+                        {
+                            // Get or create property dictionary
+                            if (_inspectorObjectData.scriptProperties == null)
+                                _inspectorObjectData.scriptProperties = new Dictionary<string, Dictionary<string, object>>();
+                            if (!_inspectorObjectData.scriptProperties.ContainsKey(script))
+                                _inspectorObjectData.scriptProperties[script] = new Dictionary<string, object>();
+                            var propDict = _inspectorObjectData.scriptProperties[script];
+
+                            foreach (var field in type.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+                            {
+                                var label = new TextBlock { Text = field.Name };
+                                FrameworkElement editor = null;
+                                object value = propDict.ContainsKey(field.Name) ? propDict[field.Name] : field.GetValue(Activator.CreateInstance(type));
+                                if (field.FieldType == typeof(int) || field.FieldType == typeof(float) || field.FieldType == typeof(string))
+                                {
+                                    var tb = new TextBox { Text = value?.ToString() ?? "" };
+                                    tb.LostFocus += (s, e) =>
+                                    {
+                                        object newValue = Convert.ChangeType(tb.Text, field.FieldType);
+                                        propDict[field.Name] = newValue;
+                                        SaveInspectorObject();
+                                    };
+                                    editor = tb;
+                                }
+                                else if (field.FieldType == typeof(bool))
+                                {
+                                    var cb = new CheckBox { IsChecked = value != null && (bool)value };
+                                    cb.Checked += (s, e) => { propDict[field.Name] = true; SaveInspectorObject(); };
+                                    cb.Unchecked += (s, e) => { propDict[field.Name] = false; SaveInspectorObject(); };
+                                    editor = cb;
+                                }
+                                else if (field.FieldType.IsEnum)
+                                {
+                                    var combo = new ComboBox { ItemsSource = Enum.GetValues(field.FieldType) };
+                                    combo.SelectedItem = value;
+                                    combo.SelectionChanged += (s, e) =>
+                                    {
+                                        propDict[field.Name] = combo.SelectedItem;
+                                        SaveInspectorObject();
+                                    };
+                                    editor = combo;
+                                }
+                                sp.Children.Add(label);
+                                sp.Children.Add(editor);
+                            }
+                        }
+                    }
+
+                    // Remove button
+                    var removeBtn = new Button
+                    {
+                        Content = "\uE74D", // Trash icon
+                        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                        Tag = script,
+                        Margin = new Thickness(5, 5, 0, 0),
+                        Style = (Style)Application.Current.Resources["DangerButton"],
+                        FontSize = 16,
+                        Width = 32,
+                        Height = 32,
+                        Padding = new Thickness(0),
+                        HorizontalContentAlignment = HorizontalAlignment.Center,
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        VerticalContentAlignment = VerticalAlignment.Center
+                    };
+
+                    removeBtn.Click += (s, e) =>
+                    {
+                        _inspectorObjectData.scripts.Remove(script);
+                        _inspectorObjectData.scriptProperties.Remove(script);
+                        SaveInspectorObject();
+                        ShowInspector(_inspectorObjectPath);
+                    };
                     sp.Children.Add(removeBtn);
+
                     scriptListPanel.Children.Add(sp);
                 }
                 scriptListPanel.Drop += (s, e) => InspectorPanel_Drop(s, e, assetPath);
@@ -539,11 +676,11 @@ public class $CLASS$ : GameScript
                     
                     spriteData = new SpriteData
                     {
-                        name = Path.GetFileNameWithoutExtension(assetPath),
+                        Name = Path.GetFileNameWithoutExtension(assetPath),
                         frameWidth = bmp.PixelWidth,
                         frameHeight = bmp.PixelHeight,
                         frameCount = 1,
-                        frameSpeed = 1.0,
+                        frameSpeed = 1,
                         animated = false
                     };
                 }
@@ -585,7 +722,7 @@ public class $CLASS$ : GameScript
                 frameSpeedBox.LostFocus += (s, e) => { 
                     if (double.TryParse(frameSpeedBox.Text, out double speed) && speed > 0) 
                     { 
-                        spriteData.frameSpeed = speed; 
+                        spriteData.frameSpeed = (int)speed; 
                         SaveSpriteData(spriteDataPath, spriteData); 
                         animatedSprite.SetAnimationProperties(spriteData); 
                     } 
@@ -1375,24 +1512,6 @@ public class $CLASS$ : GameScript
             return result;
         }
 
-        // EO object model
-        public class EarthObject
-        {
-            public string name { get; set; }
-            public string sprite { get; set; }
-            public List<string> scripts { get; set; } = new List<string>();
-        }
-        
-        public class SpriteData
-        {
-            public string name { get; set; }
-            public int frameWidth { get; set; } = 0; // 0 means use full image
-            public int frameHeight { get; set; } = 0; // 0 means use full image
-            public int frameCount { get; set; } = 1;
-            public double frameSpeed { get; set; } = 1.0; // frames per second
-            public bool animated { get; set; } = false;
-        }
-        
         // Hot reload functionality
         private void HotReloadScript(string scriptPath)
         {

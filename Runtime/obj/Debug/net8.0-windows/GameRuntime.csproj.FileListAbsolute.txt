@@ -1,4 +1,3 @@
-C:\Users\urisv\Desktop\Earth-Engine\Runtime\bin\Debug\net8.0-windows\SharpFont.dll.config
 C:\Users\urisv\Desktop\Earth-Engine\Runtime\bin\Debug\net8.0-windows\GameRuntime.exe
 C:\Users\urisv\Desktop\Earth-Engine\Runtime\bin\Debug\net8.0-windows\GameRuntime.deps.json
 C:\Users\urisv\Desktop\Earth-Engine\Runtime\bin\Debug\net8.0-windows\GameRuntime.runtimeconfig.json

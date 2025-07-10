@@ -10,7 +10,7 @@ namespace Engine.Core.Game.Components
 {
     public class ObjectComponent
     {
-        public string? Name;
+        public string? Name { get; set; }
         public GameObject? Owner { get; set; }
         public static Engine.Core.Camera Camera => Engine.Core.Camera.Main;
         public static GraphicsDevice? GraphicsDevice { get; set; }

@@ -19,6 +19,8 @@ namespace Engine.Core.Game
         public float rotation;
         public List<object> scriptInstances = new List<object>();
         public List<ObjectComponent> components = new List<ObjectComponent>();
+        public Dictionary<string, Dictionary<string, object>> scriptProperties { get; set; } = new();
+
         public bool IsDestroyed { get; private set; } = false;
                
         public GameObject()

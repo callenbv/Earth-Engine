@@ -61,7 +61,7 @@ namespace Editor {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/Earth Engine;V1.0.0.0;component/animatedspritedisplay.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/Earth Engine;component/animatedspritedisplay.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\AnimatedSpriteDisplay.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

@@ -5,13 +5,14 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using System.IO;
+using Engine.Core.Game.Components;
 
 namespace Editor
 {
     public partial class AnimatedSpriteDisplay : UserControl
     {
         private BitmapImage originalImage;
-        private MainWindow.SpriteData spriteData;
+        private SpriteData spriteData;
         private int currentFrame = 0;
         private DispatcherTimer animationTimer;
 
@@ -22,7 +23,7 @@ namespace Editor
             animationTimer.Tick += AnimationTimer_Tick;
         }
 
-        public void LoadSprite(string spritePath, MainWindow.SpriteData data = null)
+        public void LoadSprite(string spritePath, SpriteData data = null)
         {
             try
             {
@@ -44,12 +45,12 @@ namespace Editor
                     originalImage.Freeze();
                 }
 
-                spriteData = data ?? new MainWindow.SpriteData 
+                spriteData = data ?? new SpriteData 
                 { 
                     frameWidth = originalImage.PixelWidth,
                     frameHeight = originalImage.PixelHeight,
                     frameCount = 1,
-                    frameSpeed = 1.0,
+                    frameSpeed = 1,
                     animated = false
                 };
 
@@ -140,7 +141,7 @@ namespace Editor
             }
         }
 
-        public void SetAnimationProperties(MainWindow.SpriteData data)
+        public void SetAnimationProperties(SpriteData data)
         {
             spriteData = data;
             currentFrame = 0;

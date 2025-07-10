@@ -110,8 +110,6 @@
                 Background="Transparent"
                 IsHitTestVisible="false"
                 Panel.ZIndex="50"
-                MouseLeftButtonDown="TilePaintCanvas_MouseLeftButtonDown"
-                MouseMove="TilePaintCanvas_MouseMove"
                 MouseLeftButtonUp="TilePaintCanvas_MouseLeftButtonUp"
                 MouseWheel="RoomCanvas_MouseWheel"/>
             <TextBlock x:Name="CanvasInfoText"
@@ -126,53 +124,9 @@
         <StackPanel Grid.Column="1"
                 Background="{DynamicResource ControlBackgroundBrush}"
                 Margin="6"
-                VerticalAlignment="Stretch">
+                VerticalAlignment="Stretch" d:IsHidden="True">
 
-          <GroupBox Header="Tile Layers" Margin="0,0,0,8">
-            <StackPanel>
-              <ListBox x:Name="LayerListBox"
-                   Height="140"
-                   SelectionChanged="LayerListBox_SelectionChanged"/>
-              <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="Add"  Click="AddLayer_Click"       Margin="1"/>
-                <Button Content="Del"  Click="RemoveLayer_Click"    Margin="1"/>
-                <Button Content="↑"    Click="MoveLayerUp_Click"    Margin="1"/>
-                <Button Content="↓"    Click="MoveLayerDown_Click"  Margin="1"/>
-              </StackPanel>
-            </StackPanel>
-          </GroupBox>
-
-          <GroupBox Header="Tile Palette" Margin="0,0,0,8">
-            <StackPanel>
-              <ScrollViewer Height="140" 
-                           HorizontalScrollBarVisibility="Auto" 
-                           VerticalScrollBarVisibility="Auto"
-                           MouseWheel="TilePalette_MouseWheel"
-                           Name="TilePaletteScrollViewer">
-                <WrapPanel x:Name="TilePalettePanel" Orientation="Horizontal" Width="200" />
-              </ScrollViewer>
-              <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0">
-                <Button Content="Zoom In" Click="TilePaletteZoomIn_Click" Width="60" Margin="2"/>
-                <Button Content="Zoom Out" Click="TilePaletteZoomOut_Click" Width="60" Margin="2"/>
-              </StackPanel>
-            </StackPanel>
-          </GroupBox>
-
-          <GroupBox Header="Tile Properties">
-              <StackPanel Margin="16">
-                <TextBlock Text="Tile Z:" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}"/>
-              <TextBox x:Name="TileHeightBox" Text="800"/>
-              <CheckBox x:Name="TileCollisionBox" Content="Collidable"/>
-            </StackPanel>
-          </GroupBox>
           
-          <StackPanel Orientation="Horizontal" Margin="0,4">
-            <TextBlock Text="Tileset:" VerticalAlignment="Center"/>
-            <ComboBox x:Name="TilesetPicker"
-              Width="140"
-              SelectionChanged="TilesetPicker_SelectionChanged"/>
-            <Button Content="↻" Click="RefreshTileset_Click" Width="25" Margin="2,0,0,0" ToolTip="Refresh Tilesets"/>
-          </StackPanel>
 
         </StackPanel>
       </Grid>

@@ -11,6 +11,7 @@ using System.Runtime.Serialization;
 using Engine.Core.Game;
 using Engine.Core.Game.Tiles;
 using Engine.Core.Graphics;
+using Engine.Core.Systems.Graphics;
 
 namespace GameRuntime
 {

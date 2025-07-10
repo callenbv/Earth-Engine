@@ -11,8 +11,7 @@
           "Engine.Core": "1.0.0",
           "MonoGame.Extended": "4.1.0",
           "MonoGame.Extended.Content.Pipeline": "4.1.0",
-          "MonoGame.Framework.DesktopGL": "3.8.3",
-          "SharpFont": "4.0.1"
+          "MonoGame.Framework.DesktopGL": "3.8.3"
         },
         "runtime": {
           "GameRuntime.dll": {}
@@ -373,12 +372,6 @@
           }
         }
       },
-      "SharpFont/4.0.1": {
-        "dependencies": {
-          "SharpFont.Dependencies": "2.5.5"
-        }
-      },
-      "SharpFont.Dependencies/2.5.5": {},
       "System.Collections.Immutable/7.0.0": {},
       "System.Memory/4.5.3": {},
       "System.Reflection.Metadata/7.0.0": {
@@ -514,20 +507,6 @@
       "sha512": "sha512-WYnil3DhQHzjCY0dM9I2B3r1vWip90AOuQd25KE4NrjPQBg0tBJFluRLm5YPnO5ZLDmwrfosY8jCQGQRmWI/Pg==",
       "path": "nvorbis/0.10.4",
       "hashPath": "nvorbis.0.10.4.nupkg.sha512"
-    },
-    "SharpFont/4.0.1": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-yoFLcuWMYdBGB4YLq3bvzrctItJIb+EuK7C7PGgBzqsKxx5UXUwTce64kbvuDQWlMf6p4uQwDm5t2rQdZ9EkyA==",
-      "path": "sharpfont/4.0.1",
-      "hashPath": "sharpfont.4.0.1.nupkg.sha512"
-    },
-    "SharpFont.Dependencies/2.5.5": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-QlGhaq7pL90m2PNkP+YRaFR+wQsDULxOo3kFUUm/jaf6Ym++jCR2R78oMtKqzVjjCjm1Skwy3k1jYC0mx7/lXw==",
-      "path": "sharpfont.dependencies/2.5.5",
-      "hashPath": "sharpfont.dependencies.2.5.5.nupkg.sha512"
     },
     "System.Collections.Immutable/7.0.0": {
       "type": "package",
