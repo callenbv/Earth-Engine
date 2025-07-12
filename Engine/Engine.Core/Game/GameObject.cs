@@ -123,19 +123,16 @@ namespace Engine.Core.Game
                 sprite.Draw(spriteBatch,position,rotation,scale);
             }
 
-            // Draw scripts
-            foreach (var script in scriptInstances)
+            // Draw components
+            foreach (var component in components)
             {
-                if (script is GameScript gs)
+                try
                 {
-                    try
-                    {
-                        gs.Draw(spriteBatch);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Error drawing script for {Name}: {ex.Message}");
-                    }
+                    component.Draw(spriteBatch);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error drawing script for {Name}: {ex.Message}");
                 }
             }
         }

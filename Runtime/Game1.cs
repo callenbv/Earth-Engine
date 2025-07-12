@@ -50,6 +50,10 @@ namespace GameRuntime
             Input.gameInstance = this;
             Input.graphicsManager = _graphics;
             TextureLibrary.Main.LoadTextures(_graphics.GraphicsDevice);
+            
+            // Initialize font system
+            FontLibrary.Main.Initialize(_graphics.GraphicsDevice, Content);
+            FontLibrary.Main.LoadFonts();
 
             _mapRenderer = new TilemapRenderer();
 

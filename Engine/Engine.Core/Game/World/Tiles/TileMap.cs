@@ -26,7 +26,7 @@ namespace Engine.Core
                 Tiles[x, y] = new Tile(index);
         }
 
-        public Tile GetTile(int x, int y)
+        public Tile? GetTile(int x, int y)
         {
             if (x >= 0 && x < Width && y >= 0 && y < Height)
                 return Tiles[x, y];

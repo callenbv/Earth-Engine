@@ -25,4 +25,16 @@
     <Compile Remove="..\Editor\bin\Assets\Scripts\TextureReloader.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="Content\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <MonoGameContentReference Include="Content\Fonts\*.spritefont">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </MonoGameContentReference>
+  </ItemGroup>
+
 </Project> 

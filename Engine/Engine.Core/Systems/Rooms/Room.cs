@@ -77,10 +77,10 @@ namespace Engine.Core.Systems.Rooms
 
                 var roomData = JsonConvert.DeserializeObject<Room>(json);
 
-                Console.WriteLine($"Creating {roomData.objects.Count} objects...");
-
                 if (roomData?.objects != null)
                 {
+                    Console.WriteLine($"Creating {roomData.objects.Count} objects...");
+
                     foreach (var obj in roomData.objects)
                     {
                         try
