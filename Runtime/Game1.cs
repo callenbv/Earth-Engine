@@ -12,6 +12,9 @@ using Engine.Core.Game;
 using Engine.Core.Game.Tiles;
 using Engine.Core.Graphics;
 using Engine.Core.Systems.Graphics;
+using System.Drawing;
+using System.Windows.Forms;
+using System.Runtime.InteropServices;
 
 namespace GameRuntime
 {
@@ -90,6 +93,19 @@ namespace GameRuntime
             _graphics.PreferredBackBufferHeight = _gameOptions.windowHeight;
             _graphics.ApplyChanges();
 
+            // Set window icon if specified (SDL2)
+            if (!string.IsNullOrEmpty(_gameOptions.icon) && File.Exists(_gameOptions.icon))
+            {
+                try
+                {
+                    SDL2IconHelper.SetWindowIcon(_gameOptions.icon);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to set SDL2 window icon: {ex.Message}");
+                }
+            }
+
             // Set up camera target viewport sizes (this defines the "base" resolution for game logic)
             Camera.Main.SetTargetViewportSize(384, 216);
 
@@ -152,7 +168,7 @@ namespace GameRuntime
 
             // Draw scene to render target (high internal resolution for smooth subpixel movement)
             GraphicsDevice.SetRenderTarget(_sceneRenderTarget);
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.CornflowerBlue);
 
             // Draw world with camera transform at internal resolution
             _spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, 
@@ -179,12 +195,12 @@ namespace GameRuntime
             float offsetY = (viewport.Height - scaledHeight) * 0.5f;
             
             // Draw the render target with linear filtering for smooth scaling
-            _spriteBatch.Draw(_sceneRenderTarget, new Vector2(offsetX, offsetY), null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+            _spriteBatch.Draw(_sceneRenderTarget, new Vector2(offsetX, offsetY), null, Microsoft.Xna.Framework.Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
             _spriteBatch.End();
 
             // Draw lighting overlay (multiply blend) with same scaling
             _spriteBatch.Begin(SpriteSortMode.Immediate, Lighting2D.MultiplyBlend);
-            _spriteBatch.Draw(_lighting.GetLightmap(), new Vector2(offsetX, offsetY), null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+            _spriteBatch.Draw(_lighting.GetLightmap(), new Vector2(offsetX, offsetY), null, Microsoft.Xna.Framework.Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
             _spriteBatch.End();
 
             // Draw UI elements directly to screen (no separate render target for now)
@@ -200,6 +216,56 @@ namespace GameRuntime
         {
             using (var game = new Game1())
                 game.Run();
+        }
+    }
+} 
+
+public static class SDL2IconHelper
+{
+    [DllImport("SDL2.dll", CallingConvention = CallingConvention.Cdecl)]
+    private static extern IntPtr SDL_GL_GetCurrentWindow();
+
+    [DllImport("SDL2.dll", CallingConvention = CallingConvention.Cdecl)]
+    private static extern void SDL_SetWindowIcon(IntPtr window, IntPtr surface);
+
+    [DllImport("SDL2.dll", CallingConvention = CallingConvention.Cdecl)]
+    private static extern IntPtr SDL_CreateRGBSurfaceFrom(
+        IntPtr pixels, int width, int height, int depth, int pitch,
+        uint Rmask, uint Gmask, uint Bmask, uint Amask);
+
+    [DllImport("SDL2.dll", CallingConvention = CallingConvention.Cdecl)]
+    private static extern void SDL_FreeSurface(IntPtr surface);
+
+    public static void SetWindowIcon(string iconPath)
+    {
+        if (!File.Exists(iconPath)) return;
+
+        using (var icon = new Icon(iconPath))
+        using (var bmp = icon.ToBitmap())
+        {
+            var data = bmp.LockBits(
+                new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height),
+                System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            try
+            {
+                IntPtr sdlWindow = SDL_GL_GetCurrentWindow();
+                if (sdlWindow == IntPtr.Zero) return;
+
+                IntPtr surface = SDL_CreateRGBSurfaceFrom(
+                    data.Scan0, bmp.Width, bmp.Height, 32, data.Stride,
+                    0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+
+                if (surface != IntPtr.Zero)
+                {
+                    SDL_SetWindowIcon(sdlWindow, surface);
+                    SDL_FreeSurface(surface);
+                }
+            }
+            finally
+            {
+                bmp.UnlockBits(data);
+            }
         }
     }
 } 

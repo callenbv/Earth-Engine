@@ -4,6 +4,7 @@ using System.IO;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft.Win32;
 
 namespace Editor
 {
@@ -50,6 +51,7 @@ namespace Editor
                         WindowWidthTextBox.Text = options.windowWidth.ToString();
                         WindowHeightTextBox.Text = options.windowHeight.ToString();
                         StartRoomComboBox.SelectedItem = options.defaultRoom;
+                        IconPathTextBox.Text = options.icon ?? string.Empty;
                     }
                 }
                 catch (Exception ex)
@@ -78,7 +80,8 @@ namespace Editor
                     title = GameTitleTextBox.Text,
                     windowWidth = int.Parse(WindowWidthTextBox.Text),
                     windowHeight = int.Parse(WindowHeightTextBox.Text),
-                    defaultRoom = StartRoomComboBox.SelectedItem?.ToString() ?? ""
+                    defaultRoom = StartRoomComboBox.SelectedItem?.ToString() ?? "",
+                    icon = IconPathTextBox.Text
                 };
                 var json = JsonSerializer.Serialize(options, new JsonSerializerOptions { WriteIndented = true });
                 File.WriteAllText(gameOptionsPath, json);
@@ -88,6 +91,16 @@ namespace Editor
             catch (Exception ex)
             {
                 MessageBox.Show($"Failed to save game options: {ex.Message}");
+            }
+        }
+
+        private void BrowseIcon_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new OpenFileDialog();
+            dialog.Filter = "Icon files (*.ico)|*.ico|All files (*.*)|*.*";
+            if (dialog.ShowDialog() == true)
+            {
+                IconPathTextBox.Text = dialog.FileName;
             }
         }
     }

@@ -138,6 +138,46 @@ public class $CLASS$ : GameScript
         {
             try
             {
+                // 0. Read icon path from game_options.json
+                var projectRoot = Path.GetDirectoryName(assetsRoot);
+                var gameOptionsPath = Path.Combine(assetsRoot, "game_options.json");
+                string iconPath = null;
+                if (File.Exists(gameOptionsPath))
+                {
+                    try
+                    {
+                        var json = File.ReadAllText(gameOptionsPath);
+                        using var doc = JsonDocument.Parse(json);
+                        if (doc.RootElement.TryGetProperty("icon", out var iconProp))
+                        {
+                            iconPath = iconProp.GetString();
+                        }
+                    }
+                    catch { /* ignore */ }
+                }
+                var solutionRoot = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", ".."));
+                var runtimeDir = Path.Combine(solutionRoot, "Runtime");
+                var runtimeIconPath = Path.Combine(runtimeDir, "icon.ico");
+                var runtimeCsprojPath = Path.Combine(runtimeDir, "GameRuntime.csproj");
+                string csprojText = File.ReadAllText(runtimeCsprojPath);
+                if (!string.IsNullOrEmpty(iconPath) && File.Exists(iconPath))
+                {
+                    File.Copy(iconPath, runtimeIconPath, true);
+                    // Add or update ApplicationIcon
+                    if (csprojText.Contains("<ApplicationIcon>"))
+                        csprojText = Regex.Replace(csprojText, "<ApplicationIcon>.*?</ApplicationIcon>", "<ApplicationIcon>icon.ico</ApplicationIcon>");
+                    else
+                        csprojText = csprojText.Replace("<PropertyGroup>", "<PropertyGroup>\n    <ApplicationIcon>icon.ico</ApplicationIcon>");
+                }
+                else
+                {
+                    // Remove ApplicationIcon if present
+                    csprojText = Regex.Replace(csprojText, @"<ApplicationIcon>.*?</ApplicationIcon>\s*", "");
+                    if (File.Exists(runtimeIconPath))
+                        File.Delete(runtimeIconPath);
+                }
+                File.WriteAllText(runtimeCsprojPath, csprojText);
+
                 // 1. Compile scripts as before, but show progress bar
                 var compiler = new Engine.Core.ScriptCompiler();
                 var scriptsDir = Path.Combine(assetsRoot, "Scripts");
@@ -174,7 +214,6 @@ public class $CLASS$ : GameScript
 
                 // 2. Build content with MGCB (pre-launch step)
                 ScriptCompileStatus.Text = "Building content...";
-                var projectRoot = Path.GetDirectoryName(assetsRoot);
                 var mgcbPath = Path.Combine(projectRoot, "Content.mgcb");
                 var contentOutput = Path.Combine(projectBinDir, "Content");
                 Directory.CreateDirectory(contentOutput);
@@ -195,7 +234,6 @@ public class $CLASS$ : GameScript
                 ScriptCompileStatus.Text = "";
 
                 // 3. Copy runtime EXE and dependencies to project bin
-                var solutionRoot = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", ".."));
                 var runtimeBuildDir = Path.Combine(solutionRoot, "Runtime", "bin", "Debug", "net8.0-windows");
                 var runtimeExe = Path.Combine(runtimeBuildDir, "GameRuntime.exe");
                 if (!File.Exists(runtimeExe))
@@ -1921,7 +1959,14 @@ public class $CLASS$ : GameScript
                 File.Copy(engineCoreXml, Path.Combine(projectRoot, "Engine.Core.xml"), true);
             if (File.Exists(engineCorePdb))
                 File.Copy(engineCorePdb, Path.Combine(projectRoot, "Engine.Core.pdb"), true);
-            var csprojContent = $"<Project Sdk=\"Microsoft.NET.Sdk\">\n  <PropertyGroup>\n    <TargetFramework>net8.0</TargetFramework>\n    <RootNamespace>GameScripts</RootNamespace>\n    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>\n  </PropertyGroup>\n  <ItemGroup>\n    <PackageReference Include=\"MonoGame.Framework.DesktopGL\" Version=\"3.8.0.1641\" />\n  </ItemGroup>\n  <ItemGroup>\n    <Compile Include=\"Assets/Scripts/*.cs\" />\n  </ItemGroup>\n  <ItemGroup>\n    <Reference Include=\"Engine.Core\">\n      <HintPath>bin/Engine.Core.dll</HintPath>\n    </Reference>\n  </ItemGroup>\n</Project>";
+
+            // Load csproj template from file
+            var templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "ProjectTemplates", "ScriptsProject.csproj.template");
+            var csprojTemplate = File.ReadAllText(templatePath);
+            var iconPath = "Assets/icon.ico";
+            var csprojContent = csprojTemplate
+                .Replace("${PROJECT_NAME}", projectName)
+                .Replace("${ICON_PATH}", iconPath);
             File.WriteAllText(csprojPath, csprojContent);
         }
 

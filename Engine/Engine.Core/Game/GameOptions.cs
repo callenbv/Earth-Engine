@@ -20,5 +20,6 @@ namespace Engine.Core.Game
         public int windowWidth { get; set; } = 800;
         public int windowHeight { get; set; } = 600;
         public string defaultRoom { get; set; } = "";
+        public string icon { get; set; } = "";
     }
 }
