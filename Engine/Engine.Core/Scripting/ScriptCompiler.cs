@@ -101,6 +101,25 @@ namespace Engine.Core
             return result;
         }
 
+        public (bool Success, List<string> Errors) CompileScriptsWithProgress(string scriptsDir, string outputDll, Action<int, int, string> progressCallback)
+        {
+            var errors = new List<string>();
+            var scriptFiles = Directory.GetFiles(scriptsDir, "*.cs", SearchOption.AllDirectories);
+            int total = scriptFiles.Length;
+            int current = 0;
+            foreach (var file in scriptFiles)
+            {
+                current++;
+                progressCallback?.Invoke(current, total, file);
+                // Optionally, you could compile each script individually here, or just simulate progress
+                // For now, just wait a tiny bit to simulate work
+                System.Threading.Thread.Sleep(30);
+            }
+            // Call the real compile method at the end
+            var result = CompileScripts(scriptsDir, outputDll);
+            return (result.Success, result.Errors);
+        }
+
         private static IEnumerable<MetadataReference> GetReferences()
         {
             var refs = new List<MetadataReference>();

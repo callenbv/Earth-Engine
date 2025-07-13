@@ -138,6 +138,26 @@ namespace Engine.Core.Game
         }
 
         /// <summary>
+        /// Draw the object and its attached scripts
+        /// </summary>
+        /// <param name="spriteBatch"></param>
+        public void DrawUI(SpriteBatch spriteBatch)
+        {
+            // Draw components
+            foreach (var component in components)
+            {
+                try
+                {
+                    component.DrawUI(spriteBatch);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error drawing UI script for {Name}: {ex.Message}");
+                }
+            }
+        }
+
+        /// <summary>
         /// Instantiate game object from definition
         /// </summary>
         /// <param name="defName">Name of the object definition to instantiate</param>

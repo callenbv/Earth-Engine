@@ -67,11 +67,31 @@ namespace Engine.Core.Game
                 gameObj.Draw(spriteBatch);
             }
 
+            // Draw tilemaps separately
             foreach (var tilemap in tileMaps)
             {
                 tilemap.Draw(spriteBatch, Vector2.Zero);
             }
         }
+
+        /// <summary>
+        /// Render all UI Draw calls
+        /// </summary>
+        /// <param name="spriteBatch"></param>
+        public void DrawUI(SpriteBatch spriteBatch)
+        {
+            // Get all non-destroyed objects and sort them by depth
+            var objectsToDraw = gameObjects
+                .Where(obj => !obj.IsDestroyed)
+                .ToList();
+
+            // Draw UI elements
+            foreach (var gameObj in objectsToDraw)
+            {
+                gameObj.DrawUI(spriteBatch);
+            }
+        }
+
 
         /// <summary>
         /// Calculate the depth value based on the object's feet position (bottom of sprite)

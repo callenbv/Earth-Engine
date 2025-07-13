@@ -134,15 +134,65 @@ public class $CLASS$ : GameScript
             }
         }
 
-        private void PlayButton_Click(object sender, RoutedEventArgs e)
+        private async void PlayButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                // 1. Compile scripts as before
+                // 1. Compile scripts as before, but show progress bar
                 var compiler = new Engine.Core.ScriptCompiler();
                 var scriptsDir = Path.Combine(assetsRoot, "Scripts");
                 var projectBinDir = Path.Combine(Path.GetDirectoryName(assetsRoot), "bin");
                 Directory.CreateDirectory(projectBinDir);
+
+                // Get all script files
+                var scriptFiles = Directory.GetFiles(scriptsDir, "*.cs", SearchOption.AllDirectories);
+                ScriptCompileProgressBar.Visibility = Visibility.Visible;
+                ScriptCompileProgressBar.Minimum = 0;
+                ScriptCompileProgressBar.Maximum = scriptFiles.Length;
+                ScriptCompileProgressBar.Value = 0;
+                ScriptCompileStatus.Text = "Compiling scripts...";
+
+                // Compile scripts one by one for progress
+                int compiled = 0;
+                var compileResult = await Task.Run(() => compiler.CompileScriptsWithProgress(scriptsDir, Path.Combine(projectBinDir, "Scripts", "GameScripts.dll"), (current, total, file) =>
+                {
+                    Dispatcher.Invoke(() => {
+                        ScriptCompileProgressBar.Value = current;
+                        ScriptCompileStatus.Text = $"Compiling {Path.GetFileName(file)} ({current}/{total})";
+                    });
+                }));
+                ScriptCompileProgressBar.Value = scriptFiles.Length;
+                ScriptCompileStatus.Text = "Script compilation complete.";
+                await Task.Delay(500);
+                ScriptCompileProgressBar.Visibility = Visibility.Collapsed;
+                ScriptCompileStatus.Text = "";
+                if (!compileResult.Success)
+                {
+                    System.Windows.MessageBox.Show($"Script compilation failed:\n{string.Join("\n", compileResult.Errors)}", "Script Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                // 2. Build content with MGCB (pre-launch step)
+                ScriptCompileStatus.Text = "Building content...";
+                var projectRoot = Path.GetDirectoryName(assetsRoot);
+                var mgcbPath = Path.Combine(projectRoot, "Content.mgcb");
+                var contentOutput = Path.Combine(projectBinDir, "Content");
+                Directory.CreateDirectory(contentOutput);
+                if (File.Exists(mgcbPath))
+                {
+                    var mgcbCmd = $"dotnet tool run mgcb -- /@:{mgcbPath} /outputDir:{contentOutput}";
+                    var psi = new System.Diagnostics.ProcessStartInfo("cmd.exe", $"/c {mgcbCmd}")
+                    {
+                        WorkingDirectory = projectRoot,
+                        CreateNoWindow = true,
+                        UseShellExecute = false
+                    };
+                    var proc = System.Diagnostics.Process.Start(psi);
+                    proc.WaitForExit();
+                }
+                ScriptCompileStatus.Text = "Content build complete.";
+                await Task.Delay(500);
+                ScriptCompileStatus.Text = "";
 
                 // 3. Copy runtime EXE and dependencies to project bin
                 var solutionRoot = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", ".."));
@@ -1871,24 +1921,7 @@ public class $CLASS$ : GameScript
                 File.Copy(engineCoreXml, Path.Combine(projectRoot, "Engine.Core.xml"), true);
             if (File.Exists(engineCorePdb))
                 File.Copy(engineCorePdb, Path.Combine(projectRoot, "Engine.Core.pdb"), true);
-            var csprojContent = $@"<Project Sdk=""Microsoft.NET.Sdk"">
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <RootNamespace>GameScripts</RootNamespace>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include=""MonoGame.Framework.DesktopGL"" Version=""3.8.0.1641"" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include=""Assets/Scripts/*.cs"" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include=""Engine.Core"">
-      <HintPath>Engine.Core.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-</Project>";
+            var csprojContent = $"<Project Sdk=\"Microsoft.NET.Sdk\">\n  <PropertyGroup>\n    <TargetFramework>net8.0</TargetFramework>\n    <RootNamespace>GameScripts</RootNamespace>\n    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>\n  </PropertyGroup>\n  <ItemGroup>\n    <PackageReference Include=\"MonoGame.Framework.DesktopGL\" Version=\"3.8.0.1641\" />\n  </ItemGroup>\n  <ItemGroup>\n    <Compile Include=\"Assets/Scripts/*.cs\" />\n  </ItemGroup>\n  <ItemGroup>\n    <Reference Include=\"Engine.Core\">\n      <HintPath>bin/Engine.Core.dll</HintPath>\n    </Reference>\n  </ItemGroup>\n</Project>";
             File.WriteAllText(csprojPath, csprojContent);
         }
 
@@ -1898,11 +1931,42 @@ public class $CLASS$ : GameScript
             var csprojPath = Path.Combine(projectRoot, $"{projectName}.csproj");
             if (File.Exists(csprojPath))
             {
+                // Try to find Visual Studio installation
+                var vsPath = @"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\devenv.exe";
+                if (!File.Exists(vsPath))
+                {
+                    // Try Professional edition
+                    vsPath = @"C:\Program Files\Microsoft Visual Studio\2022\Professional\Common7\IDE\devenv.exe";
+                }
+                if (!File.Exists(vsPath))
+                {
+                    // Try Enterprise edition
+                    vsPath = @"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\devenv.exe";
+                }
+                if (!File.Exists(vsPath))
+                {
+                    // Try 2019 Community
+                    vsPath = @"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\devenv.exe";
+                }
+                if (!File.Exists(vsPath))
+                {
+                    // Fallback to default application (cmd start)
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = "cmd",
+                        Arguments = $"/c start \"\" \"{csprojPath}\"",
+                        UseShellExecute = false
+                    });
+                    return;
+                }
+
+                // Open the project file directly with Visual Studio
                 Process.Start(new ProcessStartInfo
                 {
-                    FileName = "cmd",
-                    Arguments = $"/c start \"\" \"{csprojPath}\"",
-                    UseShellExecute = false
+                    FileName = vsPath,
+                    Arguments = $"\"{csprojPath}\"",
+                    UseShellExecute = true,
+                    WorkingDirectory = projectRoot
                 });
             }
             else

@@ -19,8 +19,8 @@ namespace Engine.Core.Game.Components
         public bool Centered { get; set; } = false;
         public Vector2 Offset { get; set; } = Vector2.Zero;
 
-        private SpriteFont? currentFont;
-        private Vector2 textSize;
+        protected SpriteFont? currentFont;
+        protected Vector2 textSize;
 
         public override void Create()
         {
@@ -50,7 +50,6 @@ namespace Engine.Core.Game.Components
                 position -= textSize * Scale * 0.5f;
             }
 
-            Console.WriteLine($"[TextRenderer] Drawing text '{Text}' at position {position} with scale {Scale}");
             spriteBatch.DrawString(
                 currentFont,
                 Text,

@@ -39,6 +39,8 @@
                                 FontSize="14"
                                 Padding="10,5"
                                 Click="OpenVSButton_Click"/>
+                        <ProgressBar x:Name="ScriptCompileProgressBar" Width="200" Height="18" Minimum="0" Maximum="100" Value="0" Visibility="Collapsed" Margin="10,0,0,0"/>
+                        <TextBlock x:Name="ScriptCompileStatus" Margin="10,0,0,0" VerticalAlignment="Center"/>
                     </ToolBar>
                     <Grid>
                         <Grid.ColumnDefinitions>

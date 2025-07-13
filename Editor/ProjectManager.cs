@@ -97,6 +97,8 @@ namespace Editor
 
                 // Do NOT copy any template files or assets
 
+                // Do NOT copy any template files or assets
+
                 AddToRecentProjects(projectInfo);
 
                 return true;

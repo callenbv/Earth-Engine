@@ -15,13 +15,17 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin ../Runtime/Content/Fonts/Default.spritefont
+#begin Assets/Fonts/Default.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
-/build:../Runtime/Content/Fonts/Default.spritefont
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Assets/Fonts/Default.spritefont
 
-#begin ../Runtime/Content/Fonts/UI.spritefont
+#begin Assets/Fonts/UI.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
-/build:../Runtime/Content/Fonts/UI.spritefont
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Assets/Fonts/UI.spritefont
 

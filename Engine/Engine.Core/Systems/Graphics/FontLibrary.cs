@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Engine.Core.Data;
 
 namespace Engine.Core.Systems.Graphics
 {
@@ -25,11 +26,8 @@ namespace Engine.Core.Systems.Graphics
         {
             graphicsDevice = graphicsDevice_;
             
-            // Create a ContentManager that points to the Runtime's Content directory
-            var contentPath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content"));
-            Console.WriteLine($"[FontLibrary] Creating ContentManager pointing to: {contentPath}");
-            
-            contentManager = new ContentManager(contentManager_.ServiceProvider, contentPath);
+            Console.WriteLine($"[FontLibrary] Creating ContentManager pointing to: {EnginePaths.SHARED_CONTENT_PATH}");
+            contentManager = new ContentManager(contentManager_.ServiceProvider, EnginePaths.SHARED_CONTENT_PATH);
         }
         
         /// <summary>
@@ -47,33 +45,22 @@ namespace Engine.Core.Systems.Graphics
                     return;
                 }
 
-                // Look for fonts in the Runtime's Content/Fonts directory
-                var baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content");
-                var fontDir = Path.Combine(baseDir, "Fonts");
+                // Load fonts from the centralized Content directory
+                var fontNames = new[] { "Default", "UI" };
                 
-                Console.WriteLine($"[FontLibrary] Looking for fonts in: {fontDir}");
-                
-                if (!Directory.Exists(fontDir))
-                {
-                    Console.WriteLine($"[FontLibrary] Font directory not found: {fontDir}");
-                    return;
-                }
-
-                // Load all .spritefont files from the directory
-                foreach (var file in Directory.GetFiles(fontDir, searchPattern, SearchOption.TopDirectoryOnly))
+                foreach (var fontName in fontNames)
                 {
                     try
                     {
-                        string fontName = Path.GetFileNameWithoutExtension(file);
                         Console.WriteLine($"[FontLibrary] Attempting to load font: {fontName}");
                         
-                        var font = contentManager.Load<SpriteFont>(Path.Combine("Fonts", fontName));
+                        var font = contentManager.Load<SpriteFont>(Path.Combine("Assets", "Fonts", fontName));
                         fonts[fontName] = font;
                         Console.WriteLine($"[FontLibrary] Successfully loaded font: {fontName}");
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"[FontLibrary] Failed to load font {Path.GetFileName(file)}: {ex.Message}");
+                        Console.WriteLine($"[FontLibrary] Failed to load font {fontName}: {ex.Message}");
                     }
                 }
             }
@@ -98,7 +85,7 @@ namespace Engine.Core.Systems.Graphics
                     return false;
                 }
 
-                var font = contentManager.Load<SpriteFont>(Path.Combine("Fonts", fontName));
+                var font = contentManager.Load<SpriteFont>(Path.Combine("Assets", "Fonts", fontName));
                 fonts[fontName] = font;
                 Console.WriteLine($"[FontLibrary] Loaded font: {fontName}");
                 return true;

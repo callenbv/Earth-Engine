@@ -19,6 +19,7 @@ namespace Engine.Core.Game.Components
         public virtual void Create() { }
         public virtual void Update(GameTime gameTime) { }
         public virtual void Draw(SpriteBatch spriteBatch) { }
+        public virtual void DrawUI(SpriteBatch spriteBatch) { }
         public virtual void OnClick() { }
         public virtual void Destroy() { }
     }

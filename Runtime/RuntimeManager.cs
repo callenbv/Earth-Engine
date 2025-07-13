@@ -107,5 +107,14 @@ namespace GameRuntime
         {
             objectManager.Draw(spriteBatch);
         }
+
+        /// <summary>
+        /// Draw UI everything
+        /// </summary>
+        /// <param name="spriteBatch"></param>
+        public void DrawUI(SpriteBatch spriteBatch)
+        {
+            objectManager.DrawUI(spriteBatch);
+        }
     }
 } 
