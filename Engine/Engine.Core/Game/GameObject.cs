@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using Engine.Core.Game.Components;
 using System.ComponentModel;
+using System.Security.AccessControl;
 
 namespace Engine.Core.Game
 {
@@ -170,8 +171,27 @@ namespace Engine.Core.Game
             {
                 var objDef = GameObjectRegistry.Get(defName);
                 var go = new GameObject(objDef.Name);
-
                 go.position = position;
+
+                // Load default script properties
+                if (objDef?.Scripts != null)
+                {
+                    foreach (var script in objDef.Scripts)
+                    {
+                        if (objDef.scriptProperties != null)
+                        {
+                            foreach (var kvp in objDef.scriptProperties)
+                                go.scriptProperties[kvp.Key] = new Dictionary<string, object>(kvp.Value);
+                        }
+                    }
+                }
+
+                var assetsRoot = EngineContext.Current.AssetsRoot;
+                var contentManager = EngineContext.Current.ContentManager;
+                var scriptManager = EngineContext.Current.ScriptManager;
+                var graphicsDevice = EngineContext.Current.GraphicsDevice;
+                ScriptCompiler.LoadTextureAndScripts(go, defName, assetsRoot, contentManager, scriptManager, graphicsDevice);
+
                 GameObjectManager.Main.gameObjects.Add(go);
 
                 return go;

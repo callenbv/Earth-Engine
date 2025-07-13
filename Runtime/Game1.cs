@@ -9,7 +9,6 @@ using Engine.Core;
 using GameRuntime;
 using System.Runtime.Serialization;
 using Engine.Core.Game;
-using Engine.Core.Game.Tiles;
 using Engine.Core.Graphics;
 using Engine.Core.Systems.Graphics;
 using System.Drawing;
@@ -78,11 +77,21 @@ namespace GameRuntime
 
             // Get the loaded game options from RuntimeManager
             _gameOptions = GameOptions.Main;
-            
+
+            // Set up EngineContext
+            EngineContext.Current.ContentManager = Content;
+            EngineContext.Current.GraphicsDevice = GraphicsDevice;
+            EngineContext.Current.ScriptManager = _scriptManager;
+            EngineContext.Current.GameObjectManager = objectManager;
+            EngineContext.Current.GameOptions = _gameOptions;
+            // Set assetsRoot and roomsDir from runtimeManager (private fields, so set here if available)
+            EngineContext.Current.AssetsRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets");
+            EngineContext.Current.RoomsDir = Path.Combine(EngineContext.Current.AssetsRoot, "Rooms");
+
             Input.gameInstance = this;
             Input.graphicsManager = _graphics;
             TextureLibrary.Main.LoadTextures(_graphics.GraphicsDevice);
-            
+
             // Initialize font system
             FontLibrary.Main.Initialize(_graphics.GraphicsDevice, Content);
             FontLibrary.Main.LoadFonts();

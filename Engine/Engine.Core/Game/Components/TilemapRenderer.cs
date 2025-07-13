@@ -1,10 +1,11 @@
+using Engine.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 
-namespace Engine.Core
+namespace Engine.Core.Game.Components
 {
-    public class TileMap
+    public class TilemapRenderer : ObjectComponent
     {
         public int Width { get; private set; }
         public int Height { get; private set; }
@@ -12,11 +13,11 @@ namespace Engine.Core
         public Tile[,] Tiles { get; private set; }
         public Texture2D? Texture { get; set; }
 
-        public TileMap(int width, int height, Texture2D texture)
+        public TilemapRenderer(int width, int height, string texture)
         {
             Width = width;
             Height = height;
-            Texture = texture;
+            Texture = TextureLibrary.Main.Get(texture);
             Tiles = new Tile[width, height];
         }
 
@@ -34,7 +35,7 @@ namespace Engine.Core
             return null;
         }
 
-        public void Draw(SpriteBatch spriteBatch, Vector2 position)
+        public override void Draw(SpriteBatch spriteBatch)
         {
             for (int y = 0; y < Height; y++)
             {
@@ -58,7 +59,7 @@ namespace Engine.Core
 
                         spriteBatch.Draw(
                             Texture,
-                            position + new Vector2(x * TileSize, y * TileSize),
+                            Owner.position + new Vector2(x * TileSize, y * TileSize),
                             source,
                             Color.White);
 
@@ -67,4 +68,4 @@ namespace Engine.Core
             }
         }
     }
-} 
+}

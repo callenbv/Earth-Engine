@@ -3,20 +3,44 @@
   "WorkspaceRootPath": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|c:\\users\\urisv\\desktop\\earth-engine\\engine\\engine.core\\game\\components\\spritedata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|solutionrelative:engine\\engine.core\\game\\components\\spritedata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|c:\\users\\urisv\\desktop\\earth-engine\\engine\\engine.core\\game\\gameobject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|solutionrelative:engine\\engine.core\\game\\gameobject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|c:\\users\\urisv\\desktop\\earth-engine\\engine\\engine.core\\systems\\graphics\\texturelibrary.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|solutionrelative:engine\\engine.core\\systems\\graphics\\texturelibrary.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|c:\\users\\urisv\\desktop\\earth-engine\\engine\\engine.core\\systems\\rooms\\room.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|solutionrelative:engine\\engine.core\\systems\\rooms\\room.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|c:\\users\\urisv\\desktop\\earth-engine\\engine\\engine.core\\game\\gameobjectregistry.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|solutionrelative:engine\\engine.core\\game\\gameobjectregistry.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|c:\\users\\urisv\\desktop\\earth-engine\\engine\\engine.core\\game\\components\\spritedata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|solutionrelative:engine\\engine.core\\game\\components\\spritedata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|c:\\users\\urisv\\desktop\\earth-engine\\engine\\engine.core\\scripting\\scriptcompiler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|solutionrelative:engine\\engine.core\\scripting\\scriptcompiler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|c:\\users\\urisv\\desktop\\earth-engine\\engine\\engine.core\\systems\\rooms\\room.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|solutionrelative:engine\\engine.core\\systems\\rooms\\room.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|c:\\users\\urisv\\desktop\\earth-engine\\engine\\engine.core\\game\\components\\tilemaprenderer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|solutionrelative:engine\\engine.core\\game\\components\\tilemaprenderer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B2C3D4E5-F6A7-8901-BCDE-F23456789012}|Runtime\\GameRuntime.csproj|c:\\users\\urisv\\desktop\\earth-engine\\runtime\\game1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B2C3D4E5-F6A7-8901-BCDE-F23456789012}|Runtime\\GameRuntime.csproj|solutionrelative:runtime\\game1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|c:\\users\\urisv\\desktop\\earth-engine\\engine\\engine.core\\game\\gameobjectmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|solutionrelative:engine\\engine.core\\game\\gameobjectmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|c:\\users\\urisv\\desktop\\earth-engine\\engine\\engine.core\\game\\components\\objectcomponent.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|solutionrelative:engine\\engine.core\\game\\components\\objectcomponent.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|c:\\users\\urisv\\desktop\\earth-engine\\engine\\engine.core\\systems\\graphics\\texturelibrary.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|solutionrelative:engine\\engine.core\\systems\\graphics\\texturelibrary.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|c:\\users\\urisv\\desktop\\earth-engine\\engine\\engine.core\\game\\components\\uitextrenderer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -27,32 +51,16 @@
       "RelativeMoniker": "D:0:0:{C3D4E5F6-A7B8-9012-CDEF-345678901234}|Editor\\Editor.csproj|solutionrelative:editor\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{B2C3D4E5-F6A7-8901-BCDE-F23456789012}|Runtime\\GameRuntime.csproj|c:\\users\\urisv\\desktop\\earth-engine\\runtime\\game1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B2C3D4E5-F6A7-8901-BCDE-F23456789012}|Runtime\\GameRuntime.csproj|solutionrelative:runtime\\game1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|c:\\users\\urisv\\desktop\\earth-engine\\engine\\engine.core\\systems\\camera.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|solutionrelative:engine\\engine.core\\systems\\camera.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|c:\\users\\urisv\\desktop\\earth-engine\\engine\\engine.core\\game\\gameobject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|solutionrelative:engine\\engine.core\\game\\gameobject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|c:\\users\\urisv\\desktop\\earth-engine\\engine\\engine.core\\game\\components\\textrenderer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|solutionrelative:engine\\engine.core\\game\\components\\textrenderer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|c:\\users\\urisv\\desktop\\earth-engine\\engine\\engine.core\\game\\gameobjectmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|solutionrelative:engine\\engine.core\\game\\gameobjectmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{B2C3D4E5-F6A7-8901-BCDE-F23456789012}|Runtime\\GameRuntime.csproj|c:\\users\\urisv\\desktop\\earth-engine\\runtime\\runtimemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{B2C3D4E5-F6A7-8901-BCDE-F23456789012}|Runtime\\GameRuntime.csproj|solutionrelative:runtime\\runtimemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|c:\\users\\urisv\\desktop\\earth-engine\\engine\\engine.core\\game\\components\\objectcomponent.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|Engine\\Engine.Core\\Engine.Core.csproj|solutionrelative:engine\\engine.core\\game\\components\\objectcomponent.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -62,37 +70,76 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Document",
               "DocumentIndex": 2,
+              "Title": "GameObjectRegistry.cs",
+              "DocumentMoniker": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Engine\\Engine.Core\\Game\\GameObjectRegistry.cs",
+              "RelativeDocumentMoniker": "Engine\\Engine.Core\\Game\\GameObjectRegistry.cs",
+              "ToolTip": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Engine\\Engine.Core\\Game\\GameObjectRegistry.cs",
+              "RelativeToolTip": "Engine\\Engine.Core\\Game\\GameObjectRegistry.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAABAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-13T04:09:27.554Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "TilemapRenderer.cs",
+              "DocumentMoniker": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Engine\\Engine.Core\\Game\\Components\\TilemapRenderer.cs",
+              "RelativeDocumentMoniker": "Engine\\Engine.Core\\Game\\Components\\TilemapRenderer.cs",
+              "ToolTip": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Engine\\Engine.Core\\Game\\Components\\TilemapRenderer.cs",
+              "RelativeToolTip": "Engine\\Engine.Core\\Game\\Components\\TilemapRenderer.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAA0AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-13T03:38:23.599Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
               "Title": "ScriptCompiler.cs",
               "DocumentMoniker": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Engine\\Engine.Core\\Scripting\\ScriptCompiler.cs",
               "RelativeDocumentMoniker": "Engine\\Engine.Core\\Scripting\\ScriptCompiler.cs",
               "ToolTip": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Engine\\Engine.Core\\Scripting\\ScriptCompiler.cs",
               "RelativeToolTip": "Engine\\Engine.Core\\Scripting\\ScriptCompiler.cs",
-              "ViewState": "AgIAAMMAAAAAAAAAAAAEwMcAAAA+AAAAAAAAAA==",
+              "ViewState": "AgIAAA0BAAAAAAAAAAAEwCYBAAA7AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-07-13T02:44:37.107Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 1,
               "Title": "Room.cs",
               "DocumentMoniker": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Engine\\Engine.Core\\Systems\\Rooms\\Room.cs",
               "RelativeDocumentMoniker": "Engine\\Engine.Core\\Systems\\Rooms\\Room.cs",
               "ToolTip": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Engine\\Engine.Core\\Systems\\Rooms\\Room.cs",
               "RelativeToolTip": "Engine\\Engine.Core\\Systems\\Rooms\\Room.cs",
-              "ViewState": "AgIAAEMAAAAAAAAAAAAQwGQAAABEAAAAAAAAAA==",
+              "ViewState": "AgIAAEEAAAAAAAAAAIAwwGEAAABHAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-07-13T02:44:31.916Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
+              "Title": "GameObject.cs",
+              "DocumentMoniker": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Engine\\Engine.Core\\Game\\GameObject.cs",
+              "RelativeDocumentMoniker": "Engine\\Engine.Core\\Game\\GameObject.cs",
+              "ToolTip": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Engine\\Engine.Core\\Game\\GameObject.cs",
+              "RelativeToolTip": "Engine\\Engine.Core\\Game\\GameObject.cs",
+              "ViewState": "AgIAAJgAAAAAAAAAAAAIwK4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-13T00:41:21.353Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
               "Title": "TextureLibrary.cs",
               "DocumentMoniker": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Engine\\Engine.Core\\Systems\\Graphics\\TextureLibrary.cs",
               "RelativeDocumentMoniker": "Engine\\Engine.Core\\Systems\\Graphics\\TextureLibrary.cs",
@@ -105,20 +152,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 3,
               "Title": "SpriteData.cs",
               "DocumentMoniker": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Engine\\Engine.Core\\Game\\Components\\SpriteData.cs",
               "RelativeDocumentMoniker": "Engine\\Engine.Core\\Game\\Components\\SpriteData.cs",
               "ToolTip": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Engine\\Engine.Core\\Game\\Components\\SpriteData.cs",
               "RelativeToolTip": "Engine\\Engine.Core\\Game\\Components\\SpriteData.cs",
-              "ViewState": "AgIAAEEAAAAAAAAAAADwv0QAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAD4AAAAAAAAAAAAiwFoAAAARAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-07-13T02:41:01.747Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 11,
               "Title": "MainWindow.xaml.cs",
               "DocumentMoniker": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Editor\\MainWindow.xaml.cs",
               "RelativeDocumentMoniker": "Editor\\MainWindow.xaml.cs",
@@ -131,7 +178,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 10,
               "Title": "UITextRenderer.cs",
               "DocumentMoniker": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Engine\\Engine.Core\\Game\\Components\\UITextRenderer.cs",
               "RelativeDocumentMoniker": "Engine\\Engine.Core\\Game\\Components\\UITextRenderer.cs",
@@ -144,7 +191,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 13,
               "Title": "TextRenderer.cs",
               "DocumentMoniker": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Engine\\Engine.Core\\Game\\Components\\TextRenderer.cs",
               "RelativeDocumentMoniker": "Engine\\Engine.Core\\Game\\Components\\TextRenderer.cs",
@@ -157,7 +204,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 14,
               "Title": "RuntimeManager.cs",
               "DocumentMoniker": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Runtime\\RuntimeManager.cs",
               "RelativeDocumentMoniker": "Runtime\\RuntimeManager.cs",
@@ -170,7 +217,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 12,
               "Title": "Camera.cs",
               "DocumentMoniker": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Engine\\Engine.Core\\Systems\\Camera.cs",
               "RelativeDocumentMoniker": "Engine\\Engine.Core\\Systems\\Camera.cs",
@@ -189,46 +236,33 @@
               "RelativeDocumentMoniker": "Runtime\\Game1.cs",
               "ToolTip": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Runtime\\Game1.cs",
               "RelativeToolTip": "Runtime\\Game1.cs",
-              "ViewState": "AgIAAOEAAAAAAAAAAAAjwP4AAAAWAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAASAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-07-13T00:40:31.532Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "GameObject.cs",
-              "DocumentMoniker": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Engine\\Engine.Core\\Game\\GameObject.cs",
-              "RelativeDocumentMoniker": "Engine\\Engine.Core\\Game\\GameObject.cs",
-              "ToolTip": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Engine\\Engine.Core\\Game\\GameObject.cs",
-              "RelativeToolTip": "Engine\\Engine.Core\\Game\\GameObject.cs",
-              "ViewState": "AgIAAH0AAAAAAAAAAAAIwI4AAAAoAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-13T00:41:21.353Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 7,
               "Title": "GameObjectManager.cs",
               "DocumentMoniker": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Engine\\Engine.Core\\Game\\GameObjectManager.cs",
               "RelativeDocumentMoniker": "Engine\\Engine.Core\\Game\\GameObjectManager.cs",
               "ToolTip": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Engine\\Engine.Core\\Game\\GameObjectManager.cs",
               "RelativeToolTip": "Engine\\Engine.Core\\Game\\GameObjectManager.cs",
-              "ViewState": "AgIAAD4AAAAAAAAAAAAIwFMAAAArAAAAAAAAAA==",
+              "ViewState": "AgIAACYAAAAAAAAAAAAgwEMAAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-07-13T00:41:01.546Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 8,
               "Title": "ObjectComponent.cs",
               "DocumentMoniker": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Engine\\Engine.Core\\Game\\Components\\ObjectComponent.cs",
               "RelativeDocumentMoniker": "Engine\\Engine.Core\\Game\\Components\\ObjectComponent.cs",
               "ToolTip": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Engine\\Engine.Core\\Game\\Components\\ObjectComponent.cs",
               "RelativeToolTip": "Engine\\Engine.Core\\Game\\Components\\ObjectComponent.cs",
-              "ViewState": "AgIAAAUAAAAAAAAAAAAgwBcAAAApAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAuwAoAAAARAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-07-13T00:38:36.147Z",
               "EditorCaption": ""

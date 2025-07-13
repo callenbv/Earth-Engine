@@ -16,7 +16,6 @@ namespace Engine.Core.Game
     public class GameObjectManager
     {
         public List<GameObject> gameObjects = new List<GameObject>();
-        public List<TileMap> tileMaps = new List<TileMap>();
 
         private static GameObjectManager? Instance;
         public static GameObjectManager Main => Instance ??= new GameObjectManager();
@@ -65,12 +64,6 @@ namespace Engine.Core.Game
                 }
                 
                 gameObj.Draw(spriteBatch);
-            }
-
-            // Draw tilemaps separately
-            foreach (var tilemap in tileMaps)
-            {
-                tilemap.Draw(spriteBatch, Vector2.Zero);
             }
         }
 

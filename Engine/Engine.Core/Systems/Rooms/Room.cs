@@ -96,9 +96,6 @@ namespace Engine.Core.Systems.Rooms
                             {
                                 var position = new Vector2((float)obj.x, (float)obj.y);
                                 var gameObject = GameObject.Instantiate(objectName, position);
-                                gameObject.scriptProperties = obj.scriptProperties;
-
-                                ScriptCompiler.LoadTextureAndScripts(gameObject, objectName, assetsRoot, contentManager, scriptManager, graphicsDevice);
 
                                 Console.WriteLine($"Spawned {objectName} at ({obj.x}, {obj.y})");
                             }

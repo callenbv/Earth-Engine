@@ -299,6 +299,8 @@ public class $CLASS$ : GameScript
                 }
 
                 // 7. Launch the runtime from the project bin directory
+                // Kill any running game processes before launching
+                KillRunningGameProcesses();
                 var projectRuntimeExe = Path.Combine(projectBinDir, "GameRuntime.exe");
                 var process = new Process
                 {
