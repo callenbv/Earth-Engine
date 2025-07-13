@@ -19,6 +19,15 @@ namespace Engine.Core.Game.Components
             Name = "UI Text Renderer";
         }
 
+        /// <summary>
+        /// Does not inherit draw from text renderer in world
+        /// </summary>
+        /// <param name="spriteBatch"></param>
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+
+        }
+
         public override void DrawUI(SpriteBatch spriteBatch)
         {
             if (!Visible || string.IsNullOrEmpty(Text) || currentFont == null || Owner == null)
