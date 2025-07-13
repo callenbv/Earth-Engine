@@ -91,38 +91,27 @@ namespace GameRuntime
         /// </summary>
         /// <param name="scriptName"></param>
         /// <returns></returns>
-        public GameScript CreateScriptInstanceByName(string scriptName)
+        public ObjectComponent CreateComponentInstanceByName(string componentName)
         {
-            // Create script instance by name (for room objects)
-            try
+            // Try GameScripts.dll for user scripts/components
+            if (_scriptAssembly != null)
             {
-                if (_scriptAssembly == null)
-                {
-                    Console.WriteLine("Script assembly not loaded.");
-                    return null;
-                }
-                // Remove .cs extension if present
-                var typeName = scriptName.EndsWith(".cs") ? scriptName.Substring(0, scriptName.Length - 3) : scriptName;
-                Console.WriteLine($"[ScriptManager] Attempting to instantiate script: {typeName}");
-                // Search the loaded script assembly for the type
                 var scriptType = _scriptAssembly.GetTypes()
-                    .FirstOrDefault(t => t.Name == typeName && typeof(Engine.Core.GameScript).IsAssignableFrom(t));
+                    .FirstOrDefault(t => t.Name == componentName && typeof(Engine.Core.Game.Components.ObjectComponent).IsAssignableFrom(t));
                 if (scriptType != null)
-                {
-                    Console.WriteLine($"[ScriptManager] Instantiating: {scriptType.FullName}");
-                    return Activator.CreateInstance(scriptType) as Engine.Core.GameScript;
-                }
-                else
-                {
-                    Console.WriteLine($"[ScriptManager] Script type not found in DLL: {typeName}");
-                    return null;
-                }
+                    return Activator.CreateInstance(scriptType) as Engine.Core.Game.Components.ObjectComponent;
             }
-            catch (Exception ex)
+            // Try Engine.Core.dll for built-in components
+            var engineCorePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Engine.Core.dll");
+            if (File.Exists(engineCorePath))
             {
-                Console.WriteLine($"Error creating script instance: {ex.Message}");
-                return null;
+                var engineAssembly = Assembly.LoadFrom(engineCorePath);
+                var componentType = engineAssembly.GetTypes()
+                    .FirstOrDefault(t => t.Name == componentName && typeof(Engine.Core.Game.Components.ObjectComponent).IsAssignableFrom(t));
+                if (componentType != null)
+                    return Activator.CreateInstance(componentType) as Engine.Core.Game.Components.ObjectComponent;
             }
+            return null;
         }
 
         /// <summary>

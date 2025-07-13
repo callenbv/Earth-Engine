@@ -13,8 +13,7 @@ namespace Engine.Core.Game
         public string? Name { get; set; }
         public string? Sprite { get; set; }
         public JArray? Components { get; set; }
-        public JArray? Scripts { get; set; }
-        public Dictionary<string, Dictionary<string, object>>? scriptProperties { get; set; }
+        public Dictionary<string, Dictionary<string, object>>? componentProperties { get; set; }
     }
 
     public static class GameObjectRegistry

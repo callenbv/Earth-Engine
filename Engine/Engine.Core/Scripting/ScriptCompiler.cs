@@ -13,6 +13,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Text.Json;
 using System.Reflection;
 using Engine.Core.Graphics;
+using Newtonsoft.Json.Linq;
 
 namespace Engine.Core
 {
@@ -248,35 +249,73 @@ namespace Engine.Core
                 }
 
                 // Attach scripts
-                if (objDef.Scripts != null)
+                if (objDef.Components != null)
                 {
 
-                    foreach (var scriptName in objDef.Scripts.Values<string>())
+                    foreach (var scriptName in objDef.Components.Values<string>())
                     {
                         try
                         {
-                            // Use reflection to call CreateScriptInstanceByName on the scriptManager
-                            var createMethod = scriptManager.GetType().GetMethod("CreateScriptInstanceByName");
+                            // Use reflection to call CreateComponentInstanceByName on the scriptManager
+                            var createMethod = scriptManager.GetType().GetMethod("CreateComponentInstanceByName");
                             if (createMethod != null)
                             {
-                                var script = createMethod.Invoke(scriptManager, new object[] { scriptName }) as GameScript;
-                                if (script != null)
+                                var component = createMethod.Invoke(scriptManager, new object[] { scriptName }) as ObjectComponent;
+                                if (component != null)
                                 {
-                                    // Sets the default values from the script that we set
-                                    var scriptPropsObj = gameObject.scriptProperties;
-                                    var scriptType = script.GetType();
+                                    // Set properties as before
+                                    var scriptPropsObj = gameObject.componentProperties;
+                                    var componentType = component.GetType();
 
                                     if (scriptPropsObj.TryGetValue(scriptName, out var props))
                                     {
                                         foreach (var prop in props)
                                         {
-                                            var field = scriptType.GetField(prop.Key, BindingFlags.Public | BindingFlags.Instance);
+                                            var field = componentType.GetField(prop.Key, BindingFlags.Public | BindingFlags.Instance);
                                             if (field != null)
                                             {
                                                 try
                                                 {
-                                                    var value = Convert.ChangeType(prop.Value, field.FieldType);
-                                                    field.SetValue(script, value);
+                                                    object value;
+                                                    
+                                                    // Handle special types that are stored as JSON objects
+                                                    if (field.FieldType == typeof(Microsoft.Xna.Framework.Color))
+                                                    {
+                                                        // Color is stored as JSON object with R, G, B, A properties
+                                                        if (prop.Value is JObject colorObj)
+                                                        {
+                                                            byte r = colorObj["R"]?.Value<byte>() ?? 255;
+                                                            byte g = colorObj["G"]?.Value<byte>() ?? 255;
+                                                            byte b = colorObj["B"]?.Value<byte>() ?? 255;
+                                                            byte a = colorObj["A"]?.Value<byte>() ?? 255;
+                                                            value = new Microsoft.Xna.Framework.Color(r, g, b, a);
+                                                        }
+                                                        else
+                                                        {
+                                                            value = Convert.ChangeType(prop.Value, field.FieldType);
+                                                        }
+                                                    }
+                                                    else if (field.FieldType == typeof(Microsoft.Xna.Framework.Vector2))
+                                                    {
+                                                        // Vector2 is stored as JSON object with X, Y properties
+                                                        if (prop.Value is JObject vectorObj)
+                                                        {
+                                                            float x = vectorObj["X"]?.Value<float>() ?? 0f;
+                                                            float y = vectorObj["Y"]?.Value<float>() ?? 0f;
+                                                            value = new Microsoft.Xna.Framework.Vector2(x, y);
+                                                        }
+                                                        else
+                                                        {
+                                                            value = Convert.ChangeType(prop.Value, field.FieldType);
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        // For other types, use the standard conversion
+                                                        value = Convert.ChangeType(prop.Value, field.FieldType);
+                                                    }
+                                                    
+                                                    field.SetValue(component, value);
                                                     Console.WriteLine($"Set {scriptName}.{prop.Key} = {value}");
                                                 }
                                                 catch (Exception ex)
@@ -286,29 +325,32 @@ namespace Engine.Core
                                             }
                                             else
                                             {
-                                                Console.WriteLine($"Field '{prop.Key}' not found on script '{scriptName}'");
+                                                Console.WriteLine($"Field '{prop.Key}' not found on component '{scriptName}'");
                                             }
                                         }
                                     }
 
-                                    // Add the script to the game object
-                                    gameObject.AddComponent(script);
-                                    gameObject.scriptInstances.Add(script);
-                                    Console.WriteLine($"Attached script '{scriptName}' to {objectName}");
+                                    // Add the component to the game object
+                                    gameObject.AddComponent(component);
+                                    // If it's a GameScript, also add to scriptInstances
+                                    if (component is GameScript gs)
+                                        gameObject.scriptInstances.Add(gs);
+
+                                    Console.WriteLine($"Attached component '{scriptName}' to {objectName}");
                                 }
                                 else
                                 {
-                                    Console.WriteLine($"Failed to create script instance '{scriptName}' for {objectName}");
+                                    Console.WriteLine($"Failed to create component instance '{scriptName}' for {objectName}");
                                 }
                             }
                             else
                             {
-                                Console.WriteLine($"ScriptManager does not have CreateScriptInstanceByName method");
+                                Console.WriteLine($"ScriptManager does not have CreateComponentInstanceByName method");
                             }
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine($"Error attaching script '{scriptName}' to {objectName}: {ex.Message}");
+                            Console.WriteLine($"Error attaching component '{scriptName}' to {objectName}: {ex.Message}");
                         }
                     }
                 }

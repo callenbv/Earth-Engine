@@ -20,7 +20,7 @@ namespace Engine.Core.Game
         public float rotation;
         public List<object> scriptInstances = new List<object>();
         public List<ObjectComponent> components = new List<ObjectComponent>();
-        public Dictionary<string, Dictionary<string, object>> scriptProperties { get; set; } = new();
+        public Dictionary<string, Dictionary<string, object>> componentProperties { get; set; } = new();
 
         public bool IsDestroyed { get; private set; } = false;
                
@@ -174,14 +174,14 @@ namespace Engine.Core.Game
                 go.position = position;
 
                 // Load default script properties
-                if (objDef?.Scripts != null)
+                if (objDef?.Components != null)
                 {
-                    foreach (var script in objDef.Scripts)
+                    foreach (var script in objDef.Components)
                     {
-                        if (objDef.scriptProperties != null)
+                        if (objDef.componentProperties != null)
                         {
-                            foreach (var kvp in objDef.scriptProperties)
-                                go.scriptProperties[kvp.Key] = new Dictionary<string, object>(kvp.Value);
+                            foreach (var kvp in objDef.componentProperties)
+                                go.componentProperties[kvp.Key] = new Dictionary<string, object>(kvp.Value);
                         }
                     }
                 }

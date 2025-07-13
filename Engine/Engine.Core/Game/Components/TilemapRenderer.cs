@@ -7,8 +7,8 @@ namespace Engine.Core.Game.Components
 {
     public class TilemapRenderer : ObjectComponent
     {
-        public int Width { get; private set; }
-        public int Height { get; private set; }
+        public int Width = 100;
+        public int Height = 100;
         public int TileSize { get; private set; } = 16;
         public Tile[,] Tiles { get; private set; }
         public Texture2D? Texture { get; set; }

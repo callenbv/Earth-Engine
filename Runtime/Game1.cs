@@ -29,10 +29,8 @@ namespace GameRuntime
         private RenderTarget2D _sceneRenderTarget;
         private GameOptions _gameOptions;
         
-        // Internal rendering resolution for smooth subpixel movement
         private const int INTERNAL_WIDTH = 1920;
         private const int INTERNAL_HEIGHT = 1080;
-
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -185,7 +183,7 @@ namespace GameRuntime
             runtimeManager.Draw(_spriteBatch);
             _spriteBatch.End();
 
-            // Update the lightmap (draw lights to lightmap render target)
+            // Update the lightmap
             _lighting.Draw(_spriteBatch);
 
             // Draw scene to backbuffer (scale from internal resolution to window)

@@ -1,12 +1,6 @@
 ﻿using Engine.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace Engine.Core.Game.Components
 {
@@ -37,6 +31,11 @@ namespace Engine.Core.Game.Components
         {
             texture = TextureLibrary.Main.Get(textureName);
             this.frameCount = texture.Width / frameWidth;
+
+            if (frame >= frameCount)
+            {
+                frame = 0;
+            }
         }
 
         /// <summary>
@@ -49,6 +48,11 @@ namespace Engine.Core.Game.Components
             this.frameWidth = frameWidth;
             this.frameHeight = frameHeight;
             this.frameCount = texture.Width / frameWidth;
+
+            if (frame >= frameCount)
+            {
+                frame = 0;
+            }
         }
 
         /// <summary>
@@ -60,11 +64,6 @@ namespace Engine.Core.Game.Components
         /// <param name="scale"></param>
         public void Draw(SpriteBatch spriteBatch, Vector2 position, float rotation, float scale)
         {
-            if (frame > frameCount)
-            {
-                frame = frameCount;
-            }
-
             if (texture !=  null)
             {
                  origin = new Vector2(frameWidth / 2, frameHeight / 2);

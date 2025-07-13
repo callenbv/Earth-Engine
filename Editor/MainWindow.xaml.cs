@@ -18,6 +18,8 @@ using System.Threading.Tasks;
 using Engine.Core.Game.Components;
 using Engine.Core.Data;
 using System.Numerics;
+using Engine.Core;
+using Engine.Core.Game;
 
 namespace Editor
 {
@@ -67,6 +69,7 @@ public class $CLASS$ : GameScript
         private bool isHandlingRoomSelection = false;
         private FileSystemWatcher _assetsWatcher;
         private DateTime _lastReload = DateTime.MinValue;
+        private HashSet<string> _expandedComponents = new HashSet<string>();
 
         public MainWindow(string projectPath = null)
         {
@@ -97,12 +100,34 @@ public class $CLASS$ : GameScript
             }
             if (tabControl != null)
             {
+                RoomEditor roomEditor = null;
                 foreach (TabItem tab in tabControl.Items)
                 {
                     if (tab.Header.ToString() == "Rooms")
-                        tab.Content = new RoomEditor(assetsRoot);
+                    {
+                        roomEditor = new RoomEditor(assetsRoot);
+                        tab.Content = roomEditor;
+                    }
                     else if (tab.Header.ToString() == "Game Options")
                         tab.Content = new GameOptionsEditor(assetsRoot);
+                }
+                // Open default room on startup
+                if (roomEditor != null)
+                {
+                    var gameOptionsPath = Path.Combine(assetsRoot, "game_options.json");
+                    if (File.Exists(gameOptionsPath))
+                    {
+                        try
+                        {
+                            var json = File.ReadAllText(gameOptionsPath);
+                            var options = JsonSerializer.Deserialize<GameOptions>(json);
+                            if (options != null && !string.IsNullOrEmpty(options.defaultRoom))
+                            {
+                                roomEditor.LoadRoom(options.defaultRoom);
+                            }
+                        }
+                        catch { /* ignore */ }
+                    }
                 }
             }
             
@@ -377,11 +402,13 @@ public class $CLASS$ : GameScript
                 LoadAssetFolder(dirNode, dir);
                 parent.Items.Add(dirNode);
             }
-            // Add files (show all except .dll)
+            // Add files (show all except .dll and .sprite)
             var scriptsRoot = Path.Combine(assetsRoot, "Scripts");
             foreach (var file in Directory.GetFiles(folderPath))
             {
                 if (file.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
+                    continue;
+                if (file.EndsWith(".sprite", StringComparison.OrdinalIgnoreCase))
                     continue;
                 var fileName = Path.GetFileName(file);
                 var ext = Path.GetExtension(fileName).ToLower();
@@ -521,6 +548,20 @@ public class $CLASS$ : GameScript
                     return;
                 }
 
+                // Create collapsible script properties section
+                var scriptExpander = new Expander
+                {
+                    Header = $"Script Properties: {className}",
+                    IsExpanded = true,
+                    Margin = new Thickness(0, 2, 0, 2),
+                    Background = new SolidColorBrush(Color.FromRgb(40, 40, 40)),
+                    BorderBrush = new SolidColorBrush(Colors.Gray),
+                    BorderThickness = new Thickness(1)
+                };
+                
+                var scriptContentPanel = new StackPanel { Margin = new Thickness(10, 5, 10, 5) };
+                scriptExpander.Content = scriptContentPanel;
+
                 // Now reflect on the instance as before
                 var fields = _inspectorObjectData.GetType().GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
                 foreach (var field in fields)
@@ -534,25 +575,221 @@ public class $CLASS$ : GameScript
                             object value = Convert.ChangeType(tb.Text, field.FieldType);
                             field.SetValue(_inspectorObjectData, value);
                         };
+                        // Prevent Ctrl+S from bubbling up when editing
+                        tb.PreviewKeyDown += (s, e) =>
+                        {
+                            if (e.Key == Key.S && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+                            {
+                                e.Handled = true;
+                            }
+                        };
                         editor = tb;
                     }
                     else if (field.FieldType == typeof(bool))
                     {
-                        var cb = new CheckBox { IsChecked = (bool?)field.GetValue(_inspectorObjectData) ?? false };
-                        cb.Checked += (s, e) => field.SetValue(_inspectorObjectData, true);
-                        cb.Unchecked += (s, e) => field.SetValue(_inspectorObjectData, false);
+                        bool boolValue = false;
+                        if (field.GetValue(_inspectorObjectData) != null)
+                        {
+                            if (field.GetValue(_inspectorObjectData) is bool b)
+                            {
+                                boolValue = b;
+                            }
+                            else if (field.GetValue(_inspectorObjectData) is JsonElement je)
+                            {
+                                boolValue = je.GetBoolean();
+                            }
+                            else
+                            {
+                                boolValue = Convert.ToBoolean(field.GetValue(_inspectorObjectData));
+                            }
+                        }
+                        
+                        var cb = new CheckBox { IsChecked = boolValue };
+                        cb.Checked += (s, e) => { field.SetValue(_inspectorObjectData, true); SaveInspectorObject(); };
+                        cb.Unchecked += (s, e) => { field.SetValue(_inspectorObjectData, false); SaveInspectorObject(); };
+                        // Prevent the checkbox from bubbling up its click event to the expander
+                        cb.PreviewMouseLeftButtonDown += (s, e) => e.Handled = true;
+                        cb.PreviewMouseLeftButtonUp += (s, e) => e.Handled = true;
                         editor = cb;
                     }
                     else if (field.FieldType.IsEnum)
                     {
-                        var combo = new ComboBox { ItemsSource = Enum.GetValues(field.FieldType) };
-                        combo.SelectedItem = field.GetValue(_inspectorObjectData);
-                        combo.SelectionChanged += (s, e) => field.SetValue(_inspectorObjectData, combo.SelectedItem);
+                        // Debug: Log enum field discovery
+                        Console.WriteLine($"[Inspector] Found enum field: {field.Name} of type {field.FieldType.Name}");
+                        
+                        object enumValue = field.GetValue(_inspectorObjectData);
+                        // If value is a string (from JSON), parse it to the enum type
+                        if (field.GetValue(_inspectorObjectData) is string strValue)
+                        {
+                            try { enumValue = Enum.Parse(field.FieldType, strValue); }
+                            catch { enumValue = Enum.GetValues(field.FieldType).GetValue(0); }
+                        }
+                        // If value is JsonElement (from JSON), try to get string or int
+                        else if (field.GetValue(_inspectorObjectData) is System.Text.Json.JsonElement je)
+                        {
+                            if (je.ValueKind == System.Text.Json.JsonValueKind.String)
+                            {
+                                try { enumValue = Enum.Parse(field.FieldType, je.GetString()); }
+                                catch { enumValue = Enum.GetValues(field.FieldType).GetValue(0); }
+                            }
+                            else if (je.ValueKind == System.Text.Json.JsonValueKind.Number)
+                            {
+                                try { enumValue = Enum.ToObject(field.FieldType, je.GetInt32()); }
+                                catch { enumValue = Enum.GetValues(field.FieldType).GetValue(0); }
+                            }
+                        }
+                        
+                        // Debug: Log enum values
+                        var enumValues = Enum.GetValues(field.FieldType);
+                        Console.WriteLine($"[Inspector] Enum {field.FieldType.Name} has {enumValues.Length} values: {string.Join(", ", enumValues.Cast<object>())}");
+                        Console.WriteLine($"[Inspector] Selected value: {enumValue}");
+                        
+                        var combo = new ComboBox { ItemsSource = enumValues, SelectedItem = enumValue };
+                        combo.SelectionChanged += (s, e) =>
+                        {
+                            // Store as string for robust serialization
+                            _inspectorObjectData.GetType().GetField(field.Name).SetValue(_inspectorObjectData, combo.SelectedItem.ToString());
+                            SaveInspectorObject();
+                        };
                         editor = combo;
                     }
-                    InspectorPanel.Children.Add(label);
-                    InspectorPanel.Children.Add(editor);
+                    else if (field.FieldType == typeof(Microsoft.Xna.Framework.Vector2))
+                    {
+                        // Special handling for Vector2
+                        Microsoft.Xna.Framework.Vector2 vector;
+                        if (field.GetValue(_inspectorObjectData) is Microsoft.Xna.Framework.Vector2 v)
+                        {
+                            vector = v;
+                        }
+                        else if (field.GetValue(_inspectorObjectData) is JsonElement je && je.TryGetProperty("X", out var xElem) && je.TryGetProperty("Y", out var yElem))
+                        {
+                            vector = new Microsoft.Xna.Framework.Vector2(
+                                xElem.GetSingle(),
+                                yElem.GetSingle()
+                            );
+                        }
+                        else
+                        {
+                            vector = new Microsoft.Xna.Framework.Vector2();
+                        }
+                        var vectorPanel = new StackPanel { Orientation = Orientation.Horizontal };
+                        var xBox = new TextBox { Text = vector.X.ToString(), Width = 50, Margin = new Thickness(0, 0, 5, 0) };
+                        var yBox = new TextBox { Text = vector.Y.ToString(), Width = 50 };
+                        xBox.LostFocus += (s, e) =>
+                        {
+                            if (float.TryParse(xBox.Text, out float x))
+                            {
+                                vector.X = x;
+                                field.SetValue(_inspectorObjectData, vector);
+                                SaveInspectorObject();
+                            }
+                        };
+                        yBox.LostFocus += (s, e) =>
+                        {
+                            if (float.TryParse(yBox.Text, out float y))
+                            {
+                                vector.Y = y;
+                                field.SetValue(_inspectorObjectData, vector);
+                                SaveInspectorObject();
+                            }
+                        };
+                        // Prevent Ctrl+S from bubbling up when editing
+                        xBox.PreviewKeyDown += (s, e) =>
+                        {
+                            if (e.Key == Key.S && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+                            {
+                                e.Handled = true;
+                            }
+                        };
+                        yBox.PreviewKeyDown += (s, e) =>
+                        {
+                            if (e.Key == Key.S && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+                            {
+                                e.Handled = true;
+                            }
+                        };
+                        vectorPanel.Children.Add(new TextBlock { Text = "X:", Margin = new Thickness(0, 0, 5, 0) });
+                        vectorPanel.Children.Add(xBox);
+                        vectorPanel.Children.Add(new TextBlock { Text = "Y:", Margin = new Thickness(10, 0, 5, 0) });
+                        vectorPanel.Children.Add(yBox);
+                        editor = vectorPanel;
+                    }
+                    else if (field.FieldType == typeof(Microsoft.Xna.Framework.Color))
+                    {
+                        // Special handling for Color with color picker
+                        Microsoft.Xna.Framework.Color color;
+                        if (field.GetValue(_inspectorObjectData) is Microsoft.Xna.Framework.Color c)
+                        {
+                            color = c;
+                        }
+                        else if (field.GetValue(_inspectorObjectData) is JsonElement je && je.TryGetProperty("R", out var rElem) && je.TryGetProperty("G", out var gElem) && je.TryGetProperty("B", out var bElem))
+                        {
+                            byte r = rElem.GetByte();
+                            byte g = gElem.GetByte();
+                            byte b = bElem.GetByte();
+                            byte a = je.TryGetProperty("A", out var aElem) ? aElem.GetByte() : (byte)255;
+                            color = new Microsoft.Xna.Framework.Color(r, g, b, a);
+                        }
+                        else
+                        {
+                            color = Microsoft.Xna.Framework.Color.White;
+                        }
+                        
+                        var colorPanel = new StackPanel { Orientation = Orientation.Horizontal };
+                        
+                        // Color preview rectangle
+                        var colorPreview = new System.Windows.Shapes.Rectangle
+                        { 
+                            Width = 30, 
+                            Height = 20, 
+                            Fill = new SolidColorBrush(System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B)),
+                            Stroke = Brushes.Gray,
+                            StrokeThickness = 1,
+                            Margin = new Thickness(0, 0, 10, 0)
+                        };
+                        
+                        // Color picker button
+                        var colorButton = new Button 
+                        { 
+                            Content = "Pick Color", 
+                            Width = 80,
+                            Height = 20,
+                            VerticalAlignment = VerticalAlignment.Center
+                        };
+                        
+                        colorButton.Click += (s, e) =>
+                        {
+                            var colorDialog = new System.Windows.Forms.ColorDialog();
+                            colorDialog.Color = System.Drawing.Color.FromArgb(color.A, color.R, color.G, color.B);
+                            
+                            if (colorDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                            {
+                                var newColor = colorDialog.Color;
+                                color = new Microsoft.Xna.Framework.Color(newColor.R, newColor.G, newColor.B, newColor.A);
+                                
+                                // Update the preview rectangle
+                                colorPreview.Fill = new SolidColorBrush(System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B));
+                                
+                                // Save the new color to the component properties dictionary
+                                _inspectorObjectData.GetType().GetField(field.Name).SetValue(_inspectorObjectData, color);
+                                SaveInspectorObject();
+                            }
+                        };
+                        
+                        colorPanel.Children.Add(colorPreview);
+                        colorPanel.Children.Add(colorButton);
+                        editor = colorPanel;
+                    }
+
+                    // Add the editor if possible
+                    if (editor != null)
+                    {
+                        scriptContentPanel.Children.Add(label);
+                        scriptContentPanel.Children.Add(editor);
+                    }
                 }
+                
+                InspectorPanel.Children.Add(scriptExpander);
             }
             else if (ext == ".eo")
             {
@@ -592,6 +829,14 @@ public class $CLASS$ : GameScript
                 // Name
                 var nameBox = new TextBox { Text = _inspectorObjectData.name, Margin = new Thickness(0, 0, 0, 10) };
                 nameBox.LostFocus += (s, e) => { _inspectorObjectData.name = nameBox.Text; SaveInspectorObject(); };
+                // Prevent Ctrl+S from bubbling up when editing
+                nameBox.PreviewKeyDown += (s, e) =>
+                {
+                    if (e.Key == Key.S && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+                    {
+                        e.Handled = true;
+                    }
+                };
                 InspectorPanel.Children.Add(new TextBlock { Text = "Name:", FontWeight = FontWeights.Bold });
                 InspectorPanel.Children.Add(nameBox);
                 // Sprite
@@ -628,125 +873,311 @@ public class $CLASS$ : GameScript
                     }
                 };
                 InspectorPanel.Children.Add(spriteCombo);
+                
+                // Remove Sprite button
+                var removeSpriteButton = new Button 
+                { 
+                    Content = "\uE74D", // Trash icon
+                    FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                    Margin = new Thickness(0, 0, 0, 10),
+                    Style = (Style)Application.Current.Resources["DangerButton"],
+                    FontSize = 16,
+                    Width = 32,
+                    Height = 32,
+                    Padding = new Thickness(0),
+                    HorizontalContentAlignment = HorizontalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalContentAlignment = VerticalAlignment.Center
+                };
+                removeSpriteButton.Click += (s, e) =>
+                {
+                    _inspectorObjectData.sprite = "";
+                    spriteCombo.SelectedItem = null;
+                    SaveInspectorObject();
+                    ShowInspector(assetPath); // Refresh the inspector to update the sprite preview
+                };
+                InspectorPanel.Children.Add(removeSpriteButton);
 
                 // Scripts
-                InspectorPanel.Children.Add(new TextBlock { Text = "Scripts:", FontWeight = FontWeights.Bold });
+                InspectorPanel.Children.Add(new TextBlock { Text = "Components:", FontWeight = FontWeights.Bold });
                 var scriptListPanel = new StackPanel { AllowDrop = true };
 
-                foreach (var script in _inspectorObjectData.scripts)
+                foreach (var component in _inspectorObjectData.components)
                 {
-                    var sp = new StackPanel { Orientation = Orientation.Vertical, Margin = new Thickness(0, 5, 0, 5) };
-                    var scriptLabel = new TextBlock
+                    // Create collapsible component section
+                    var scriptExpander = new Expander
                     {
-                        Text = script,
-                        FontWeight = FontWeights.Bold,
-                        Foreground = Brushes.LightBlue
+                        Header = component,
+                        IsExpanded = _expandedComponents.Contains(component),
+                        Margin = new Thickness(0, 2, 0, 2),
+                        Background = Brushes.Transparent
                     };
-                    sp.Children.Add(scriptLabel);
-
-                    // Load script type from DLL
+                    
+                    // Prevent collapse when clicking on child controls
+                    scriptExpander.MouseLeftButtonDown += (s, e) => {
+                        if (e.Source is CheckBox || e.Source is TextBox || e.Source is ComboBox)
+                        {
+                            e.Handled = true;
+                        }
+                    };
+                    
+                    var scriptContentPanel = new StackPanel { Margin = new Thickness(10, 5, 10, 5) };
+                    scriptExpander.Content = scriptContentPanel;
+                    
+                    // Load component type from DLLs
+                    Type type = null;
+                    
+                    // First try to load from GameScripts.dll (for scripts)
                     var scriptsDllPath = Path.Combine(Path.GetDirectoryName(assetsRoot), "bin", "Scripts", "GameScripts.dll");
                     if (File.Exists(scriptsDllPath))
                     {
                         var dllBytes = File.ReadAllBytes(scriptsDllPath);
                         var assembly = System.Reflection.Assembly.Load(dllBytes);
-                        var type = assembly.GetType(script) ?? assembly.GetTypes().FirstOrDefault(t => t.Name == script);
-                        if (type != null)
+                        type = assembly.GetType(component) ?? assembly.GetTypes().FirstOrDefault(t => t.Name == component);
+                    }
+                    
+                    // If not found in GameScripts.dll, try Engine.Core.dll (for components)
+                    if (type == null)
+                    {
+                        var engineCorePath = Path.Combine(Path.GetDirectoryName(assetsRoot), "bin", "Engine.Core.dll");
+                        if (File.Exists(engineCorePath))
                         {
-                            // Get or create property dictionary
-                            if (_inspectorObjectData.scriptProperties == null)
-                                _inspectorObjectData.scriptProperties = new Dictionary<string, Dictionary<string, object>>();
-                            if (!_inspectorObjectData.scriptProperties.ContainsKey(script))
-                                _inspectorObjectData.scriptProperties[script] = new Dictionary<string, object>();
-                            var propDict = _inspectorObjectData.scriptProperties[script];
+                            var assembly = System.Reflection.Assembly.LoadFrom(engineCorePath);
+                            type = assembly.GetType(component) ?? assembly.GetTypes().FirstOrDefault(t => t.Name == component);
+                        }
+                    }
+                    
+                    if (type != null)
+                    {
+                        // Get or create property dictionary
+                        if (_inspectorObjectData.componentProperties == null)
+                            _inspectorObjectData.componentProperties = new Dictionary<string, Dictionary<string, object>>();
+                        if (!_inspectorObjectData.componentProperties.ContainsKey(component))
+                            _inspectorObjectData.componentProperties[component] = new Dictionary<string, object>();
+                        var propDict = _inspectorObjectData.componentProperties[component];
 
-                            foreach (var field in type.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+                        foreach (var field in type.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+                        {
+                            var label = new TextBlock { Text = field.Name };
+                            FrameworkElement editor = null;
+                            object value = propDict.ContainsKey(field.Name) ? propDict[field.Name] : field.GetValue(Activator.CreateInstance(type));
+                            if (field.FieldType == typeof(int) || field.FieldType == typeof(float) || field.FieldType == typeof(string))
                             {
-                                var label = new TextBlock { Text = field.Name };
-                                FrameworkElement editor = null;
-                                object value = propDict.ContainsKey(field.Name) ? propDict[field.Name] : field.GetValue(Activator.CreateInstance(type));
-                                if (field.FieldType == typeof(int) || field.FieldType == typeof(float) || field.FieldType == typeof(string))
+                                var tb = new TextBox { Text = value?.ToString() ?? "" };
+                                tb.LostFocus += (s, e) =>
                                 {
-                                    var tb = new TextBox { Text = value?.ToString() ?? "" };
-                                    tb.LostFocus += (s, e) =>
+                                    object newValue = Convert.ChangeType(tb.Text, field.FieldType);
+                                    propDict[field.Name] = newValue;
+                                    SaveInspectorObject();
+                                };
+                                // Prevent Ctrl+S from bubbling up when editing
+                                tb.PreviewKeyDown += (s, e) =>
+                                {
+                                    if (e.Key == Key.S && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
                                     {
-                                        object newValue = Convert.ChangeType(tb.Text, field.FieldType);
-                                        propDict[field.Name] = newValue;
-                                        SaveInspectorObject();
-                                    };
-                                    editor = tb;
-                                }
-                                else if (field.FieldType == typeof(bool))
-                                {
-                                    var cb = new CheckBox { IsChecked = value != null && (bool)value };
-                                    cb.Checked += (s, e) => { propDict[field.Name] = true; SaveInspectorObject(); };
-                                    cb.Unchecked += (s, e) => { propDict[field.Name] = false; SaveInspectorObject(); };
-                                    editor = cb;
-                                }
-                                else if (field.FieldType.IsEnum)
-                                {
-                                    var combo = new ComboBox { ItemsSource = Enum.GetValues(field.FieldType) };
-                                    combo.SelectedItem = value;
-                                    combo.SelectionChanged += (s, e) =>
-                                    {
-                                        propDict[field.Name] = combo.SelectedItem;
-                                        SaveInspectorObject();
-                                    };
-                                    editor = combo;
-                                }
-                                else if (field.FieldType == typeof(Microsoft.Xna.Framework.Vector2))
-                                {
-                                    // Special handling for Vector2
-                                    Microsoft.Xna.Framework.Vector2 vector;
-                                    if (value is Microsoft.Xna.Framework.Vector2 v)
-                                    {
-                                        vector = v;
+                                        e.Handled = true;
                                     }
-                                    else if (value is JsonElement je && je.TryGetProperty("X", out var xElem) && je.TryGetProperty("Y", out var yElem))
+                                };
+                                editor = tb;
+                            }
+                            else if (field.FieldType == typeof(bool))
+                            {
+                                bool boolValue = false;
+                                if (value != null)
+                                {
+                                    if (value is bool b)
                                     {
-                                        vector = new Microsoft.Xna.Framework.Vector2(
-                                            xElem.GetSingle(),
-                                            yElem.GetSingle()
-                                        );
+                                        boolValue = b;
+                                    }
+                                    else if (value is JsonElement je)
+                                    {
+                                        boolValue = je.GetBoolean();
                                     }
                                     else
                                     {
-                                        vector = new Microsoft.Xna.Framework.Vector2();
+                                        boolValue = Convert.ToBoolean(value);
                                     }
-                                    var vectorPanel = new StackPanel { Orientation = Orientation.Horizontal };
-                                    var xBox = new TextBox { Text = vector.X.ToString(), Width = 50, Margin = new Thickness(0, 0, 5, 0) };
-                                    var yBox = new TextBox { Text = vector.Y.ToString(), Width = 50 };
-                                    xBox.LostFocus += (s, e) =>
-                                    {
-                                        if (float.TryParse(xBox.Text, out float x))
-                                        {
-                                            vector.X = x;
-                                            propDict[field.Name] = vector;
-                                            SaveInspectorObject();
-                                        }
-                                    };
-                                    yBox.LostFocus += (s, e) =>
-                                    {
-                                        if (float.TryParse(yBox.Text, out float y))
-                                        {
-                                            vector.Y = y;
-                                            propDict[field.Name] = vector;
-                                            SaveInspectorObject();
-                                        }
-                                    };
-                                    vectorPanel.Children.Add(new TextBlock { Text = "X:", Margin = new Thickness(0, 0, 5, 0) });
-                                    vectorPanel.Children.Add(xBox);
-                                    vectorPanel.Children.Add(new TextBlock { Text = "Y:", Margin = new Thickness(10, 0, 5, 0) });
-                                    vectorPanel.Children.Add(yBox);
-                                    editor = vectorPanel;
                                 }
-
-                                // Add the editor if possible
-                                if (editor != null)
+                                
+                                var cb = new CheckBox { IsChecked = boolValue };
+                                cb.Checked += (s, e) => { propDict[field.Name] = true; SaveInspectorObject(); };
+                                cb.Unchecked += (s, e) => { propDict[field.Name] = false; SaveInspectorObject(); };
+                                editor = cb;
+                            }
+                            else if (field.FieldType.IsEnum)
+                            {
+                                // Debug: Log enum field discovery
+                                Console.WriteLine($"[Inspector] Found enum field: {field.Name} of type {field.FieldType.Name}");
+                                
+                                object enumValue = value;
+                                // If value is a string (from JSON), parse it to the enum type
+                                if (value is string strValue)
                                 {
-                                    sp.Children.Add(label);
-                                    sp.Children.Add(editor);
+                                    try { enumValue = Enum.Parse(field.FieldType, strValue); }
+                                    catch { enumValue = Enum.GetValues(field.FieldType).GetValue(0); }
                                 }
+                                // If value is JsonElement (from JSON), try to get string or int
+                                else if (value is System.Text.Json.JsonElement je)
+                                {
+                                    if (je.ValueKind == System.Text.Json.JsonValueKind.String)
+                                    {
+                                        try { enumValue = Enum.Parse(field.FieldType, je.GetString()); }
+                                        catch { enumValue = Enum.GetValues(field.FieldType).GetValue(0); }
+                                    }
+                                    else if (je.ValueKind == System.Text.Json.JsonValueKind.Number)
+                                    {
+                                        try { enumValue = Enum.ToObject(field.FieldType, je.GetInt32()); }
+                                        catch { enumValue = Enum.GetValues(field.FieldType).GetValue(0); }
+                                    }
+                                }
+                                
+                                // Debug: Log enum values
+                                var enumValues = Enum.GetValues(field.FieldType);
+                                Console.WriteLine($"[Inspector] Enum {field.FieldType.Name} has {enumValues.Length} values: {string.Join(", ", enumValues.Cast<object>())}");
+                                Console.WriteLine($"[Inspector] Selected value: {enumValue}");
+                                
+                                var combo = new ComboBox { ItemsSource = enumValues, SelectedItem = enumValue };
+                                combo.SelectionChanged += (s, e) =>
+                                {
+                                    // Store as string for robust serialization
+                                    propDict[field.Name] = combo.SelectedItem.ToString();
+                                    SaveInspectorObject();
+                                };
+                                editor = combo;
+                            }
+                            else if (field.FieldType == typeof(Microsoft.Xna.Framework.Vector2))
+                            {
+                                // Special handling for Vector2
+                                Microsoft.Xna.Framework.Vector2 vector;
+                                if (value is Microsoft.Xna.Framework.Vector2 v)
+                                {
+                                    vector = v;
+                                }
+                                else if (value is JsonElement je && je.TryGetProperty("X", out var xElem) && je.TryGetProperty("Y", out var yElem))
+                                {
+                                    vector = new Microsoft.Xna.Framework.Vector2(
+                                        xElem.GetSingle(),
+                                        yElem.GetSingle()
+                                    );
+                                }
+                                else
+                                {
+                                    vector = new Microsoft.Xna.Framework.Vector2();
+                                }
+                                var vectorPanel = new StackPanel { Orientation = Orientation.Horizontal };
+                                var xBox = new TextBox { Text = vector.X.ToString(), Width = 50, Margin = new Thickness(0, 0, 5, 0) };
+                                var yBox = new TextBox { Text = vector.Y.ToString(), Width = 50 };
+                                xBox.LostFocus += (s, e) =>
+                                {
+                                    if (float.TryParse(xBox.Text, out float x))
+                                    {
+                                        vector.X = x;
+                                        propDict[field.Name] = vector;
+                                        SaveInspectorObject();
+                                    }
+                                };
+                                yBox.LostFocus += (s, e) =>
+                                {
+                                    if (float.TryParse(yBox.Text, out float y))
+                                    {
+                                        vector.Y = y;
+                                        propDict[field.Name] = vector;
+                                        SaveInspectorObject();
+                                    }
+                                };
+                                // Prevent Ctrl+S from bubbling up when editing
+                                xBox.PreviewKeyDown += (s, e) =>
+                                {
+                                    if (e.Key == Key.S && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+                                    {
+                                        e.Handled = true;
+                                    }
+                                };
+                                yBox.PreviewKeyDown += (s, e) =>
+                                {
+                                    if (e.Key == Key.S && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+                                    {
+                                        e.Handled = true;
+                                    }
+                                };
+                                vectorPanel.Children.Add(new TextBlock { Text = "X:", Margin = new Thickness(0, 0, 5, 0) });
+                                vectorPanel.Children.Add(xBox);
+                                vectorPanel.Children.Add(new TextBlock { Text = "Y:", Margin = new Thickness(10, 0, 5, 0) });
+                                vectorPanel.Children.Add(yBox);
+                                editor = vectorPanel;
+                            }
+                            else if (field.FieldType == typeof(Microsoft.Xna.Framework.Color))
+                            {
+                                // Special handling for Color with color picker
+                                Microsoft.Xna.Framework.Color color;
+                                if (value is Microsoft.Xna.Framework.Color c)
+                                {
+                                    color = c;
+                                }
+                                else if (value is JsonElement je && je.TryGetProperty("R", out var rElem) && je.TryGetProperty("G", out var gElem) && je.TryGetProperty("B", out var bElem))
+                                {
+                                    byte r = rElem.GetByte();
+                                    byte g = gElem.GetByte();
+                                    byte b = bElem.GetByte();
+                                    byte a = je.TryGetProperty("A", out var aElem) ? aElem.GetByte() : (byte)255;
+                                    color = new Microsoft.Xna.Framework.Color(r, g, b, a);
+                                }
+                                else
+                                {
+                                    color = Microsoft.Xna.Framework.Color.White;
+                                }
+                                
+                                var colorPanel = new StackPanel { Orientation = Orientation.Horizontal };
+                                
+                                // Color preview rectangle
+                                var colorPreview = new System.Windows.Shapes.Rectangle
+                                { 
+                                    Width = 30, 
+                                    Height = 20, 
+                                    Fill = new SolidColorBrush(System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B)),
+                                    Stroke = Brushes.Gray,
+                                    StrokeThickness = 1,
+                                    Margin = new Thickness(0, 0, 10, 0)
+                                };
+                                
+                                // Color picker button
+                                var colorButton = new Button 
+                                { 
+                                    Content = "Pick Color", 
+                                    Width = 80,
+                                    Height = 20,
+                                    VerticalAlignment = VerticalAlignment.Center
+                                };
+                                
+                                colorButton.Click += (s, e) =>
+                                {
+                                    var colorDialog = new System.Windows.Forms.ColorDialog();
+                                    colorDialog.Color = System.Drawing.Color.FromArgb(color.A, color.R, color.G, color.B);
+                                    
+                                    if (colorDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                                    {
+                                        var newColor = colorDialog.Color;
+                                        color = new Microsoft.Xna.Framework.Color(newColor.R, newColor.G, newColor.B, newColor.A);
+                                        
+                                        // Update the preview rectangle
+                                        colorPreview.Fill = new SolidColorBrush(System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B));
+                                        
+                                        // Save the new color to the component properties dictionary
+                                        propDict[field.Name] = color;
+                                        SaveInspectorObject();
+                                    }
+                                };
+                                
+                                colorPanel.Children.Add(colorPreview);
+                                colorPanel.Children.Add(colorButton);
+                                editor = colorPanel;
+                            }
+
+                            // Add the editor if possible
+                            if (editor != null)
+                            {
+                                scriptContentPanel.Children.Add(label);
+                                scriptContentPanel.Children.Add(editor);
                             }
                         }
                     }
@@ -756,7 +1187,7 @@ public class $CLASS$ : GameScript
                     {
                         Content = "\uE74D", // Trash icon
                         FontFamily = new FontFamily("Segoe MDL2 Assets"),
-                        Tag = script,
+                        Tag = component,
                         Margin = new Thickness(5, 5, 0, 0),
                         Style = (Style)Application.Current.Resources["DangerButton"],
                         FontSize = 16,
@@ -770,18 +1201,60 @@ public class $CLASS$ : GameScript
 
                     removeBtn.Click += (s, e) =>
                     {
-                        _inspectorObjectData.scripts.Remove(script);
-                        _inspectorObjectData.scriptProperties.Remove(script);
+                        _inspectorObjectData.components.Remove(component);
+                        _inspectorObjectData.componentProperties.Remove(component);
                         SaveInspectorObject();
                         ShowInspector(_inspectorObjectPath);
                     };
-                    sp.Children.Add(removeBtn);
+                    scriptContentPanel.Children.Add(removeBtn);
 
-                    scriptListPanel.Children.Add(sp);
+                    scriptListPanel.Children.Add(scriptExpander);
                 }
                 scriptListPanel.Drop += (s, e) => InspectorPanel_Drop(s, e, assetPath);
                 InspectorPanel.Children.Add(scriptListPanel);
-                InspectorPanel.Children.Add(new TextBlock { Text = "Drag scripts here to add.", FontStyle = FontStyles.Italic, Foreground = Brushes.Gray });
+                InspectorPanel.Children.Add(new TextBlock { Text = "Drag components here to add.", FontStyle = FontStyles.Italic, Foreground = Brushes.Gray });
+                
+                // Add Component section
+                InspectorPanel.Children.Add(new TextBlock { Text = "Add Components:", FontWeight = FontWeights.Bold, Margin = new Thickness(0, 15, 0, 5) });
+                
+                // Add Component button and dropdown
+                var addComponentPanel = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 0, 0, 10) };
+                var addComponentButton = new Button 
+                { 
+                    Content = "Add Component", 
+                    Margin = new Thickness(0, 0, 10, 0),
+                    Padding = new Thickness(10, 5, 10, 5)
+                };
+                
+                var componentCombo = new ComboBox 
+                { 
+                    Width = 200,
+                    IsEditable = false
+                };
+                
+                // Get available components from Engine.Core
+                var availableComponents = GetAvailableComponents();
+                componentCombo.ItemsSource = availableComponents;
+                
+                addComponentButton.Click += (s, e) =>
+                {
+                    var selectedComponent = componentCombo.SelectedItem?.ToString();
+                    if (!string.IsNullOrEmpty(selectedComponent))
+                    {
+                        // Add component to object
+                        if (!_inspectorObjectData.components.Contains(selectedComponent))
+                        {
+                            _inspectorObjectData.components.Add(selectedComponent);
+                            SaveInspectorObject();
+                            ShowInspector(assetPath); // Refresh to show the new component
+                        }
+                        componentCombo.SelectedItem = null; // Reset selection
+                    }
+                };
+                
+                addComponentPanel.Children.Add(addComponentButton);
+                addComponentPanel.Children.Add(componentCombo);
+                InspectorPanel.Children.Add(addComponentPanel);
             }
             else if (ext == ".png" || ext == ".jpg" || ext == ".jpeg")
             {
@@ -856,6 +1329,14 @@ public class $CLASS$ : GameScript
                         animatedSprite.SetAnimationProperties(spriteData); 
                     } 
                 };
+                // Prevent Ctrl+S from bubbling up when editing
+                frameCountBox.PreviewKeyDown += (s, e) =>
+                {
+                    if (e.Key == Key.S && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+                    {
+                        e.Handled = true;
+                    }
+                };
                 InspectorPanel.Children.Add(frameCountBox);
                 
                 // Frame speed
@@ -868,6 +1349,14 @@ public class $CLASS$ : GameScript
                         SaveSpriteData(spriteDataPath, spriteData); 
                         animatedSprite.SetAnimationProperties(spriteData); 
                     } 
+                };
+                // Prevent Ctrl+S from bubbling up when editing
+                frameSpeedBox.PreviewKeyDown += (s, e) =>
+                {
+                    if (e.Key == Key.S && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+                    {
+                        e.Handled = true;
+                    }
                 };
                 InspectorPanel.Children.Add(frameSpeedBox);
                 
@@ -882,6 +1371,14 @@ public class $CLASS$ : GameScript
                         animatedSprite.SetAnimationProperties(spriteData); 
                     } 
                 };
+                // Prevent Ctrl+S from bubbling up when editing
+                frameWidthBox.PreviewKeyDown += (s, e) =>
+                {
+                    if (e.Key == Key.S && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+                    {
+                        e.Handled = true;
+                    }
+                };
                 InspectorPanel.Children.Add(frameWidthBox);
                 
                 // Frame height
@@ -894,6 +1391,14 @@ public class $CLASS$ : GameScript
                         SaveSpriteData(spriteDataPath, spriteData); 
                         animatedSprite.SetAnimationProperties(spriteData); 
                     } 
+                };
+                // Prevent Ctrl+S from bubbling up when editing
+                frameHeightBox.PreviewKeyDown += (s, e) =>
+                {
+                    if (e.Key == Key.S && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+                    {
+                        e.Handled = true;
+                    }
                 };
                 InspectorPanel.Children.Add(frameHeightBox);
                 
@@ -996,9 +1501,9 @@ public class $CLASS$ : GameScript
                         // Use last-inspected object data
                         var json = File.ReadAllText(objectPath);
                         var obj = System.Text.Json.JsonSerializer.Deserialize<EarthObject>(json);
-                        if (!obj.scripts.Contains(scriptName))
+                        if (!obj.components.Contains(scriptName))
                         {
-                            obj.scripts.Add(scriptName);
+                            obj.components.Add(scriptName);
                             var newJson = System.Text.Json.JsonSerializer.Serialize(obj, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
                             File.WriteAllText(objectPath, newJson);
                             ShowInspector(objectPath);
@@ -1015,6 +1520,18 @@ public class $CLASS$ : GameScript
         {
             var json = System.Text.Json.JsonSerializer.Serialize(_inspectorObjectData, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(_inspectorObjectPath, json);
+            _expandedComponents.Clear();
+            foreach (var child in InspectorPanel.Children)
+            {
+                if (child is StackPanel panel)
+                {
+                    foreach (var subChild in panel.Children)
+                    {
+                        if (subChild is Expander exp && exp.IsExpanded && exp.Header is string header)
+                            _expandedComponents.Add(header);
+                    }
+                }
+            }
         }
         
         private void SaveSpriteData(string spriteDataPath, SpriteData spriteData)
@@ -1040,7 +1557,7 @@ public class $CLASS$ : GameScript
                     SaveInspectorObject();
                 }
 
-                // Save the current room if RoomEditor is open
+                // Save all rooms (not just the current one)
                 var dockPanel = (DockPanel)Content;
                 TabControl tabControl = null;
                 foreach (var child in dockPanel.Children)
@@ -1051,35 +1568,29 @@ public class $CLASS$ : GameScript
                         break;
                     }
                 }
-                if (tabControl == null)
-                {
-                    // Handle error: TabControl not found
-                    return;
-                }
-                foreach (TabItem tab in tabControl.Items)
-                {
-                    if (tab.Content is UserControl uc && uc is RoomEditor re)
-                    {
-                        re.SaveRoom();
-                        break;
-                    }
-                }
-
-                // Save game options if GameOptionsEditor is open
                 if (tabControl != null)
                 {
+                    // Save all RoomEditors, not just the selected one
+                    foreach (TabItem tab in tabControl.Items)
+                    {
+                        if (tab.Content is UserControl uc && uc is RoomEditor re)
+                        {
+                            re.SaveRoom();
+                        }
+                    }
+
+                    // Save all GameOptionsEditors
                     foreach (TabItem tab in tabControl.Items)
                     {
                         if (tab.Content is UserControl uc && uc is GameOptionsEditor goe)
                         {
                             goe.SaveGameOptions();
-                            break;
                         }
                     }
                 }
 
-                // Show a brief save confirmation (optional)
-                // MessageBox.Show("All changes saved!", "Save Complete", MessageBoxButton.OK, MessageBoxImage.Information);
+                // Show a brief save confirmation
+                Console.WriteLine("All changes saved successfully!");
             }
             catch (Exception ex)
             {
@@ -1102,6 +1613,36 @@ public class $CLASS$ : GameScript
                 }
             }
             return sprites;
+        }
+        
+        private List<string> GetAvailableComponents()
+        {
+            var components = new List<string>();
+            
+            try
+            {
+                // Try to load Engine.Core.dll to get available components
+                var engineCorePath = Path.Combine(Path.GetDirectoryName(assetsRoot), "bin", "Engine.Core.dll");
+                if (File.Exists(engineCorePath))
+                {
+                    var assembly = System.Reflection.Assembly.LoadFrom(engineCorePath);
+                    
+                    // Get all types that inherit from ObjectComponent
+                    var componentTypes = assembly.GetTypes()
+                        .Where(t => t.IsClass && t != typeof(GameScript) && !t.IsAbstract && t.IsSubclassOf(typeof(Engine.Core.Game.Components.ObjectComponent)))
+                        .Select(t => t.Name)
+                        .OrderBy(name => name)
+                        .ToList();
+                    
+                    components.AddRange(componentTypes);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading components: {ex.Message}");
+            }
+            
+            return components;
         }
         private Point? dragStartPoint = null;
         

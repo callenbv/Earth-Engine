@@ -13,7 +13,8 @@ namespace Engine.Core.Data
         public string? name { get; set; }
         public string? objectPath { get; set; }
         public string? sprite { get; set; }
-        public List<string> scripts { get; set; } = new List<string>();
-        public Dictionary<string, Dictionary<string, object>> scriptProperties { get; set; } = new();
+  
+        public List<string> components { get; set; } = new List<string>();
+        public Dictionary<string, Dictionary<string, object>> componentProperties { get; set; } = new();
     }
 }
