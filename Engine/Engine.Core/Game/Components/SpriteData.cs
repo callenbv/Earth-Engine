@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Engine.Core.Graphics;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -29,6 +30,30 @@ namespace Engine.Core.Game.Components
         private float frameTimer = 0;
 
         /// <summary>
+        /// Swap the texture
+        /// </summary>
+        /// <param name="textureName"></param>
+        public void Set(string textureName)
+        {
+            texture = TextureLibrary.Main.Get(textureName);
+            this.frameCount = texture.Width / frameWidth;
+            this.frame = 0;
+        }
+
+        /// <summary>
+        /// Swap the texture
+        /// </summary>
+        /// <param name="textureName"></param>
+        public void Set(string textureName, int frameWidth, int frameHeight)
+        {
+            texture = TextureLibrary.Main.Get(textureName);
+            this.frameWidth = frameWidth;
+            this.frameHeight = frameHeight;
+            this.frameCount = texture.Width / frameWidth;
+            this.frame = 0;
+        }
+
+        /// <summary>
         /// Draw the sprite if valid
         /// </summary>
         /// <param name="spriteBatch"></param>
@@ -49,34 +74,32 @@ namespace Engine.Core.Game.Components
         /// </summary>
         public void Update(GameTime gameTime)
         {
-            if (texture == null)
+            if (texture == null || frameCount <= 0)
                 return;
 
             float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            if (animated)
+            if (animated && frameCount > 1)
             {
                 frameTimer += frameSpeed * dt;
 
                 // Advance the frame
-                if (frameTimer >= 1)
+                if (frameTimer >= 1f)
                 {
-                    frame++;
-                    spriteBox.Width = frameWidth;
-                    spriteBox.X = frame * frameWidth;
-                    spriteBox.Y = 0;
-
-                    if (frame >= frameCount-1)
-                    {
-                        frame = 0;
-                    }
-
-                    frameTimer = 0;
+                    frame = (frame + 1) % frameCount;
+                    frameTimer = 0f;
                 }
+
+                spriteBox.Width = frameWidth;
+                spriteBox.X = frame * frameWidth;
+                spriteBox.Y = 0;
             }
             else
             {
-                spriteBox.Width = texture.Width;
+                frame = 0;
+                spriteBox.X = 0;
+                spriteBox.Y = 0;
+                spriteBox.Width = frameWidth > 0 ? frameWidth : texture.Width;
             }
 
             // Ensure we stay within sprite bounds

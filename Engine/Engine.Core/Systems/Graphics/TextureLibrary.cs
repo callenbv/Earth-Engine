@@ -15,7 +15,8 @@ namespace Engine.Core.Graphics
         private static TextureLibrary? _main;
         GraphicsDevice? graphicsDevice = null;
         public static TextureLibrary Main => _main ??= new TextureLibrary();
-        
+        private Texture2D defaultTexture;
+
         /// <summary>
         /// Loads all textures within project
         /// </summary>
@@ -54,6 +55,8 @@ namespace Engine.Core.Graphics
             {
                 Console.WriteLine(e.Message);
             }
+
+            defaultTexture = new Texture2D(graphicsDevice, 16, 16);
         }
 
         /// <summary>
@@ -64,10 +67,7 @@ namespace Engine.Core.Graphics
             if (textures.TryGetValue(name, out var tex))
                 return tex;
 
-
-            // Return a white square for bad texture
-            Console.WriteLine($"Texture '{name}' not found. Make sure LoadTextures() was called and the file exists.");
-            return new Texture2D(graphicsDevice, 16, 16);
+            return defaultTexture;
         }
     }
 }

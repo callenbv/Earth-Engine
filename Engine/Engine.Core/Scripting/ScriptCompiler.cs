@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System.Text.Json;
 using System.Reflection;
+using Engine.Core.Graphics;
 
 namespace Engine.Core
 {
@@ -196,7 +197,8 @@ namespace Engine.Core
                         if (File.Exists(spritePath))
                         {
                             // Load texture directly from file using GraphicsDevice
-                            gameObject.sprite = new SpriteData();
+                            SpriteData sprite = new SpriteData();
+                            gameObject.sprite = sprite;
                             gameObject.sprite.texture = Texture2D.FromFile(graphicsDevice, spritePath);
 
                             // Try to load sprite definition from .sprite file
