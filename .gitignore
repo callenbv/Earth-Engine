@@ -39,10 +39,10 @@
 *.xnb
 *.lref
 *.baml
-/Content
 /Editor/obj
 /.vs
 /Editor/obj
 /Runtime/obj
 *.props
 /Engine/Engine.Core/obj
+/Content/obj
