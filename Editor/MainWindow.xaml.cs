@@ -2504,7 +2504,7 @@ public class $CLASS$ : GameScript
                 File.Copy(engineCorePdb, Path.Combine(projectRoot, "Engine.Core.pdb"), true);
 
             // Load csproj template from file
-            var templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "ProjectTemplates", "ScriptsProject.csproj.template");
+            var templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "Assets", "ProjectTemplates", "ScriptsProject.csproj.template");
             var csprojTemplate = File.ReadAllText(templatePath);
             var iconPath = "Assets/icon.ico";
             var csprojContent = csprojTemplate

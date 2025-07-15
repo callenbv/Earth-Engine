@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Engine.Core.Game.Components;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
@@ -58,9 +59,10 @@ namespace Engine.Core.Game
             foreach (var gameObj in objectsToDraw)
             {
                 // Update the sprite's depth based on feet position
-                if (gameObj.sprite != null)
+                Sprite2D? sprite = gameObj.GetComponent<Sprite2D>();
+                if (sprite != null)
                 {
-                    gameObj.sprite.depth = GetObjectDepth(gameObj);
+                    sprite.depth = GetObjectDepth(gameObj);
                 }
                 
                 gameObj.Draw(spriteBatch);

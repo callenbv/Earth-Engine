@@ -52,6 +52,16 @@ namespace Engine.Core.Game
         }
 
         /// <summary>
+        /// Gets a component if possible
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T? GetComponent<T>() where T : ObjectComponent
+        {
+            return components.OfType<T>().FirstOrDefault();
+        }
+
+        /// <summary>
         /// Add an already existing component 
         /// </summary>
         /// <param name="comp"></param>
@@ -105,11 +115,6 @@ namespace Engine.Core.Game
                     Console.WriteLine($"Error updating component for {Name}: {e.Message}");
                 }
             }
-
-            if (sprite != null)
-            {
-                sprite.Update(gameTime);
-            }
         }
 
         /// <summary>
@@ -118,12 +123,6 @@ namespace Engine.Core.Game
         /// <param name="spriteBatch"></param>
         public void Draw(SpriteBatch spriteBatch)
         {
-            // Draw the sprite if available
-            if (sprite != null)
-            {
-                sprite.Draw(spriteBatch,position,rotation,scale);
-            }
-
             // Draw components
             foreach (var component in components)
             {
