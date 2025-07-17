@@ -9,9 +9,7 @@
 
 #-------------------------------- References --------------------------------#
 
-#begin MonoGame.Extended.Content.Pipeline.dll
-/processor:PassThroughProcessor
-/build:MonoGame.Extended.Content.Pipeline.dll
+#reference:MonoGame.Extended.Content.Pipeline.dll
 
 #---------------------------------- Content ---------------------------------#
 

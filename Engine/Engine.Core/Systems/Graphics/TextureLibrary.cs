@@ -6,16 +6,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Engine.Core.Data;
+using System.ComponentModel;
 
 namespace Engine.Core.Graphics
 {
     public class TextureLibrary
     {
         public Dictionary<string, Texture2D> textures = new Dictionary<string, Texture2D>();
-        private static TextureLibrary? _main;
         GraphicsDevice? graphicsDevice = null;
-        public static TextureLibrary Main => _main ??= new TextureLibrary();
+        public static TextureLibrary Instance; 
         private Texture2D defaultTexture;
+
+        public TextureLibrary()
+        {
+            Instance = this;
+        }
 
         /// <summary>
         /// Loads all textures within project
@@ -31,12 +37,9 @@ namespace Engine.Core.Graphics
                     graphicsDevice = graphicsDevice_;
 
                 // Look for Assets/Sprites relative to the EXE location
-                var baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets");
-                var spriteDir = Path.Combine(baseDir, "Sprites");
-                if (!Directory.Exists(spriteDir))
-                    throw new DirectoryNotFoundException($"Sprite directory not found: {spriteDir}");
+                string spriteDir = ProjectSettings.AssetsDirectory;
 
-                foreach (var file in Directory.GetFiles(spriteDir, searchPattern, SearchOption.TopDirectoryOnly))
+                foreach (var file in Directory.GetFiles(spriteDir, searchPattern, SearchOption.AllDirectories))
                 {
                     try
                     {

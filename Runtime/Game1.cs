@@ -71,7 +71,7 @@ namespace GameRuntime
             _scriptManager = new ScriptManager();
             _scriptManager.LoadScripts();
             objectManager = new GameObjectManager();
-            runtimeManager = new RuntimeManager(_scriptManager);
+            runtimeManager = new RuntimeManager(this,_scriptManager);
 
             // Get the loaded game options from RuntimeManager
             _gameOptions = GameOptions.Main;
@@ -88,7 +88,7 @@ namespace GameRuntime
 
             Input.gameInstance = this;
             Input.graphicsManager = _graphics;
-            TextureLibrary.Main.LoadTextures(_graphics.GraphicsDevice);
+            TextureLibrary.Instance.LoadTextures(_graphics.GraphicsDevice);
 
             // Initialize font system
             FontLibrary.Main.Initialize(_graphics.GraphicsDevice, Content);
@@ -128,7 +128,7 @@ namespace GameRuntime
             Engine.Core.GameScript.RoomManager = runtimeManager;
             
             // Load the default room with ContentManager
-            runtimeManager.Initialize(GraphicsDevice, Content);
+            runtimeManager.Initialize();
 
             // Initialize lighting system with internal resolution for smooth rendering
             _lighting = new Lighting2D(GraphicsDevice, INTERNAL_WIDTH, INTERNAL_HEIGHT);
@@ -212,7 +212,7 @@ namespace GameRuntime
 
             // Draw UI elements directly to screen (no separate render target for now)
             _spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.LinearClamp, null, null, null, Camera.Main.GetUIViewMatrix(viewport.Width, viewport.Height));
-            runtimeManager.DrawUI(_spriteBatch);
+            //runtimeManager.DrawUI(_spriteBatch);
             _spriteBatch.End();
 
             base.Draw(gameTime);

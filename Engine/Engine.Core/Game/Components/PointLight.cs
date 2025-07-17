@@ -10,7 +10,7 @@ namespace Engine.Core.Game
         public float lightIntensity = 1f;
         public Color lightColor = Color.White;
         private Texture2D? softCircleTexture;
-
+        public override string Name => "Point Light";
         public void SetLight(float radius, float intensity, Color color)
         {
             lightRadius = radius;

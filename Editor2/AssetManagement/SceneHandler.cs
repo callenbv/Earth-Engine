@@ -1,0 +1,67 @@
+﻿using EarthEngineEditor.Windows;
+using Engine.Core.Game;
+using Engine.Core.Game.Components;
+using Engine.Core.Systems.Rooms;
+using GameRuntime;
+using ImGuiNET;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
+
+namespace Editor.AssetManagement
+{
+    public class SceneHandler : IAssetHandler
+    {
+        private Room? scene;
+
+        public void Load(string path)
+        {
+            scene = new Room();
+
+            // Deserialize our scene
+            string name = Path.GetFileName(path);
+            scene.Name = name;
+
+            try
+            {
+                string json = File.ReadAllText(path);
+
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                    Converters = { new ComponentListJsonConverter() }
+                };
+
+                scene = JsonSerializer.Deserialize<Room>(json, options);
+                if (scene != null)
+                {
+                    Console.WriteLine($"Loaded scene: {scene.Name}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to load scene: {ex.Message}");
+            }
+        }
+
+        public void Open()
+        {
+            SceneViewWindow.Instance.scene = scene;
+            RuntimeManager.Instance.scene = scene;
+        }
+
+        public void Render()
+        {
+          
+        }
+        public void Unload()
+        {
+            scene = null;
+        }
+    }
+}

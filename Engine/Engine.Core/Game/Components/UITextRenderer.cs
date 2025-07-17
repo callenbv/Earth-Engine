@@ -12,11 +12,11 @@ namespace Engine.Core.Game.Components
         /// </summary>
         public bool Tethered = true;
         public Vector2 UIPosition;
+        public override string Name => "UI Text Renderer";
 
         public override void Create()
         {
             base.Create();
-            Name = "UI Text Renderer";
         }
 
         /// <summary>

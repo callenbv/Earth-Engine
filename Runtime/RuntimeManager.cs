@@ -6,6 +6,8 @@ using System.IO;
 using System.Text.Json;
 using Engine.Core.Game;
 using Engine.Core.Systems.Rooms;
+using Engine.Core.Systems.Graphics;
+using Engine.Core;
 
 namespace GameRuntime
 {
@@ -17,40 +19,32 @@ namespace GameRuntime
         private GameOptions gameOptions;
         private ScriptManager scriptManager;
         private GameObjectManager objectManager;
+        private Lighting2D _lighting;
+        private RenderTarget2D _sceneRenderTarget;
+        private GraphicsDevice _graphicsDevice;
+        public Room? scene;
+        private int _lastWidth, _lastHeight;
+        private Game game;
+
+        public static RuntimeManager Instance { get; private set; }
+
+        private const int INTERNAL_WIDTH = 1920;
+        private const int INTERNAL_HEIGHT = 1080;
 
         /// <summary>
         /// Constructor to setup the runtime
         /// </summary>
         /// <param name="scriptManager"></param>
-        public RuntimeManager(ScriptManager scriptManager)
+        public RuntimeManager(Game game_, ScriptManager scriptManager)
         {
-            this.scriptManager = scriptManager;
-            this.objectManager = new GameObjectManager();
-            
             // Always use the Assets folder relative to the EXE location
             assetsRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets");
             roomsDir = Path.Combine(assetsRoot, "Rooms");
             gameOptionsPath = Path.Combine(assetsRoot, "game_options.json");
-            
-            // Debug log to file on desktop for guaranteed visibility
-            var debugLogPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "debug_log.txt");
-            File.AppendAllText(debugLogPath, $"[DEBUG] Looking for game_options.json at: {gameOptionsPath}\n");
-            if (File.Exists(gameOptionsPath))
-            {
-
-                File.AppendAllText(debugLogPath, "[DEBUG] game_options.json found!\n");
-                var json = File.ReadAllText(gameOptionsPath);
-                File.AppendAllText(debugLogPath, "[DEBUG] Contents:\n" + json + "\n");
-            }
-            else
-            {
-                File.AppendAllText(debugLogPath, "[DEBUG] game_options.json NOT FOUND!\n");
-            }
-            
-            LoadGameOptions();
-            
-            // Load object definitions
-            GameObjectRegistry.LoadAll(Path.Combine(assetsRoot, "Objects"));
+            Instance = this;
+            game = game_;
+            _graphicsDevice = game_.GraphicsDevice;
+            LoadGameOptions();         
         }
 
         /// <summary>
@@ -58,9 +52,13 @@ namespace GameRuntime
         /// </summary>
         /// <param name="device"></param>
         /// <param name="contentManager"></param>
-        public void Initialize(GraphicsDevice device, ContentManager contentManager)
+        public void Initialize()
         {
-            Room.LoadDefaultRoom(device, roomsDir, assetsRoot, contentManager, scriptManager, gameOptions);
+            _lighting = new Lighting2D(_graphicsDevice, INTERNAL_WIDTH, INTERNAL_HEIGHT);
+            _lastWidth = INTERNAL_WIDTH;
+            _lastHeight = INTERNAL_HEIGHT;
+
+            _sceneRenderTarget = new RenderTarget2D(_graphicsDevice, INTERNAL_WIDTH, INTERNAL_HEIGHT);
         }
 
         /// <summary>
@@ -96,7 +94,20 @@ namespace GameRuntime
         /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
         {
-            objectManager.Update(gameTime);
+            if (scene != null)
+            {
+                scene.Update(gameTime);
+            }
+
+            // Resize lighting and scene render target if needed (only if internal resolution changes)
+            if (INTERNAL_WIDTH != _lastWidth || INTERNAL_HEIGHT != _lastHeight)
+            {
+                _lighting.Resize(INTERNAL_WIDTH, INTERNAL_HEIGHT);
+                _sceneRenderTarget?.Dispose();
+                _sceneRenderTarget = new RenderTarget2D(_graphicsDevice, INTERNAL_WIDTH, INTERNAL_HEIGHT);
+                _lastWidth = INTERNAL_WIDTH;
+                _lastHeight = INTERNAL_HEIGHT;
+            }
         }
 
         /// <summary>
@@ -105,16 +116,52 @@ namespace GameRuntime
         /// <param name="spriteBatch"></param>
         public void Draw(SpriteBatch spriteBatch)
         {
-            objectManager.Draw(spriteBatch);
-        }
+            var viewport = _graphicsDevice.Viewport;
 
-        /// <summary>
-        /// Draw UI everything
-        /// </summary>
-        /// <param name="spriteBatch"></param>
-        public void DrawUI(SpriteBatch spriteBatch)
-        {
-            objectManager.DrawUI(spriteBatch);
+            // Draw scene to render target (high internal resolution for smooth subpixel movement)
+            _graphicsDevice.SetRenderTarget(_sceneRenderTarget);
+            _graphicsDevice.Clear(Microsoft.Xna.Framework.Color.CornflowerBlue);
+
+            // Draw world with camera transform at internal resolution
+            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null,
+                Camera.Main.GetViewMatrix(INTERNAL_WIDTH, INTERNAL_HEIGHT));
+            if (scene != null)
+            {
+                scene.Render(spriteBatch);
+            }
+            spriteBatch.End();
+
+            // Update the lightmap
+            _lighting.Draw(spriteBatch);
+
+            // Draw scene to backbuffer (scale from internal resolution to window)
+            _graphicsDevice.SetRenderTarget(null);
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.LinearClamp);
+
+            // Calculate scale to fit the internal render target in the window while maintaining aspect ratio
+            float scaleX = (float)viewport.Width / INTERNAL_WIDTH;
+            float scaleY = (float)viewport.Height / INTERNAL_HEIGHT;
+            float scale = Math.Min(scaleX, scaleY);
+
+            // Calculate position to center the render target
+            float scaledWidth = INTERNAL_WIDTH * scale;
+            float scaledHeight = INTERNAL_HEIGHT * scale;
+            float offsetX = (viewport.Width - scaledWidth) * 0.5f;
+            float offsetY = (viewport.Height - scaledHeight) * 0.5f;
+
+            // Draw the render target with linear filtering for smooth scaling
+            spriteBatch.Draw(_sceneRenderTarget, new Vector2(offsetX, offsetY), null, Microsoft.Xna.Framework.Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+            spriteBatch.End();
+
+            // Draw lighting overlay (multiply blend) with same scaling
+            spriteBatch.Begin(SpriteSortMode.Immediate, Lighting2D.MultiplyBlend);
+            spriteBatch.Draw(_lighting.GetLightmap(), new Vector2(offsetX, offsetY), null, Microsoft.Xna.Framework.Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+            spriteBatch.End();
+
+            // Draw UI elements directly to screen (no separate render target for now)
+            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.LinearClamp, null, null, null, Camera.Main.GetUIViewMatrix(viewport.Width, viewport.Height));
+            //runtimeManager.DrawUI(_spriteBatch);
+            spriteBatch.End();
         }
     }
 } 

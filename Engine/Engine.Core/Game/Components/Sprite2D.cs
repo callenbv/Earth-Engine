@@ -8,8 +8,9 @@ namespace Engine.Core.Game.Components
     public class Sprite2D : ObjectComponent
     {
         private Texture2D? texture;
-        public int frameWidth { get; set; } = 0; // 0 means use full image
-        public int frameHeight { get; set; } = 0; // 0 means use full image
+        public override string Name => "Sprite 2D";
+        public int frameWidth { get; set; } = 16;
+        public int frameHeight { get; set; } = 16;
         public int frameCount { get; set; } = 1;
         public int frameSpeed = 1;
         public bool animated = false;
@@ -27,7 +28,6 @@ namespace Engine.Core.Game.Components
         /// </summary>
         public override void Create()
         {
-            Name = "Sprite2D";
         }
 
         /// <summary>
@@ -36,7 +36,16 @@ namespace Engine.Core.Game.Components
         /// <param name="textureName"></param>
         public void Set(string textureName)
         {
-            texture = TextureLibrary.Main.Get(textureName);
+            texture = TextureLibrary.Instance.Get(textureName);
+
+            if (texture == null)
+            {
+                Console.WriteLine($"Failed to load texture {textureName}");
+                return;
+            }
+
+            frameWidth = texture.Width;
+            frameHeight = texture.Height;
             this.frameCount = texture.Width / frameWidth;
 
             if (frame >= frameCount)
@@ -51,7 +60,7 @@ namespace Engine.Core.Game.Components
         /// <param name="textureName"></param>
         public void Set(string textureName, int frameWidth, int frameHeight)
         {
-            texture = TextureLibrary.Main.Get(textureName);
+            texture = TextureLibrary.Instance.Get(textureName);
             this.frameWidth = frameWidth;
             this.frameHeight = frameHeight;
             this.frameCount = texture.Width / frameWidth;
@@ -69,12 +78,12 @@ namespace Engine.Core.Game.Components
         /// <param name="position"></param>
         /// <param name="rotation"></param>
         /// <param name="scale"></param>
-        public void Draw(SpriteBatch spriteBatch, Vector2 position, float rotation, float scale)
+        public override void Draw(SpriteBatch spriteBatch)
         {
             if (texture !=  null)
             {
                  origin = new Vector2(frameWidth / 2, frameHeight / 2);
-                 spriteBatch.Draw(texture, position, spriteBox, Color.White, rotation, origin, scale, spriteEffect, depth);
+                 spriteBatch.Draw(texture, Owner.position, spriteBox, Color.White, Owner.rotation, origin, Owner.scale, spriteEffect, depth);
             }
         }
 

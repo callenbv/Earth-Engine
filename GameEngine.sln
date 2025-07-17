@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine.Core", "Engine\Engin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameRuntime", "Runtime\GameRuntime.csproj", "{B2C3D4E5-F6A7-8901-BCDE-F23456789012}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Editor", "Editor\Editor.csproj", "{C3D4E5F6-A7B8-9012-CDEF-345678901234}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Editor2", "Editor2\Editor.csproj", "{C3D4E5F6-A7B8-9012-CDEF-345678901234}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Content", "Content\Content.csproj", "{52470118-163B-4E8E-ACAC-ADE829B6AAD3}"
 EndProject

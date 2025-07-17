@@ -21,10 +21,10 @@ namespace Engine.Core.Game.Components
 
         protected SpriteFont? currentFont;
         protected Vector2 textSize;
+        public override string Name => "Text Renderer";
 
         public override void Create()
         {
-            Name = "TextRenderer";
             LoadFont();
             UpdateTextSize();
         }

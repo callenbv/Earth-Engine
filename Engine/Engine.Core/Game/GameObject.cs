@@ -1,4 +1,4 @@
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
 using Newtonsoft.Json.Linq;
@@ -6,8 +6,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Engine.Core.Game.Components;
-using System.ComponentModel;
 using System.Security.AccessControl;
+using Editor.AssetManagement;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Engine.Core.Game
 {
@@ -19,7 +21,11 @@ namespace Engine.Core.Game
         public float scale = 1f;
         public float rotation;
         public List<object> scriptInstances = new List<object>();
-        public List<ObjectComponent> components = new List<ObjectComponent>();
+        public List<GameObject> children = new List<GameObject>();
+
+        [JsonConverter(typeof(ComponentListJsonConverter))]
+        public List<IComponent> components { get; set; } = new();
+
         public Dictionary<string, Dictionary<string, object>> componentProperties { get; set; } = new();
 
         public bool IsDestroyed { get; private set; } = false;
@@ -202,6 +208,22 @@ namespace Engine.Core.Game
 
             // If failed, make an empty game object
             return new GameObject();
+        }
+
+        /// <summary>
+        /// Deserialize a game object
+        /// </summary>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        public static GameObject Deserialize(string json)
+        {
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            options.Converters.Add(new ComponentListJsonConverter()); // ✅ Actually adds it
+
+            return JsonSerializer.Deserialize<GameObject>(json, options);
         }
     }
 } 

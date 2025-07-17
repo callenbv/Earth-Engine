@@ -8,9 +8,17 @@ using System.Threading.Tasks;
 
 namespace Engine.Core.Game.Components
 {
-    public class ObjectComponent
+    public interface IComponent 
     {
-        public string? Name { get; set; }
+        string Name { get; }
+        void Update(GameTime gameTime);
+        void Draw(SpriteBatch spriteBatch);
+        void DrawUI(SpriteBatch spriteBatch);
+    }
+
+    public abstract class ObjectComponent : IComponent
+    {
+        public virtual string Name => "Component";
         public GameObject? Owner { get; set; }
         public static Engine.Core.Camera Camera => Engine.Core.Camera.Main;
         public static GraphicsDevice? GraphicsDevice { get; set; }

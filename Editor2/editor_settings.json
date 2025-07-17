@@ -1,0 +1,8 @@
+{
+  "ShowDemoWindow": false,
+  "ShowMetricsWindow": false,
+  "ShowAboutWindow": false,
+  "ShowConsole": true,
+  "WindowWidth": 1280,
+  "WindowHeight": 720
+}

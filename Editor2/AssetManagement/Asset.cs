@@ -1,0 +1,102 @@
+﻿using Engine.Core.Data;
+using Engine.Core.Game;
+using Engine.Core.Game.Components;
+using ImGuiNET;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Editor.AssetManagement
+{
+    public interface IAssetHandler
+    {
+        void Load(string path);
+        void Render();
+        void Unload();
+        void Open();
+    }
+    public enum AssetType { Texture, Scene, Data, Script, Audio, Prefab, Unknown }
+    public class Asset
+    {
+        public AssetType Type = AssetType.Unknown;
+        public string Name = string.Empty;
+        public string Path = string.Empty;
+        public bool Folder = false;
+        private IAssetHandler? _handler;
+        private DateTime _lastModified;
+
+        public void Open()
+        {
+            _handler?.Open();
+        }
+
+        public void EnsureLoaded()
+        {
+            string absPath = System.IO.Path.Combine(ProjectSettings.AssetsDirectory, Path);
+            absPath = System.IO.Path.GetFullPath(absPath);
+
+            if (!File.Exists(absPath)) return;
+
+            var modified = File.GetLastWriteTimeUtc(absPath);
+            if (_handler != null && modified == _lastModified)
+                return;
+
+            _lastModified = modified;
+
+            _handler = Type switch
+            {
+                AssetType.Prefab => new PrefabHandler(),
+                AssetType.Scene => new SceneHandler(),
+                _ => null
+            };
+
+            _handler?.Load(absPath);
+        }
+        public static AssetType GetAssetTypeFromExtension(string path)
+        {
+            string ext = System.IO.Path.GetExtension(path).ToLowerInvariant();
+
+            return ext switch
+            {
+                ".png" or ".jpg" or ".jpeg" => AssetType.Texture,
+                ".room" => AssetType.Scene,
+                ".cs" => AssetType.Script,
+                ".json" => AssetType.Data,
+                ".wav" or ".ogg" or ".mp3" => AssetType.Audio,
+                ".prefab" or ".eo" => AssetType.Prefab,
+                _ => AssetType.Unknown
+            };
+        }
+        public static string GetExtensionFromType(AssetType type)
+        {
+            return type switch
+            {
+                AssetType.Texture => ".png",
+                AssetType.Scene => ".room",
+                AssetType.Script => ".cs",
+                AssetType.Data => ".json",
+                AssetType.Prefab => ".eo",
+                _ => ".asset"
+            };
+        }
+        public static string GenerateTemplateForAssetType(AssetType type)
+        {
+            return type switch
+            {
+                AssetType.Prefab => "{\n  \"name\": \"NewPrefab\",\n  \"components\": []\n}",
+                AssetType.Scene => "{\n  \"entities\": []\n}",
+                AssetType.Data => "{\n  \"key\": \"value\"\n}",
+                AssetType.Script => "// New Script\npublic class ScriptName { }",
+                _ => ""
+            };
+        }
+        public void RenderEditor()
+        {
+            EnsureLoaded();
+            _handler?.Render();
+        }
+    }
+}

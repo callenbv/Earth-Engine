@@ -46,3 +46,4 @@
 *.props
 /Engine/Engine.Core/obj
 /Content/obj
+/Editor2/obj

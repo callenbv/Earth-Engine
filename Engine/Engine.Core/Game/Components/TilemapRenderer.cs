@@ -7,17 +7,23 @@ namespace Engine.Core.Game.Components
 {
     public class TilemapRenderer : ObjectComponent
     {
+        public override string Name => "Tilemap Renderer";
         public int Width = 100;
         public int Height = 100;
         public int TileSize { get; private set; } = 16;
-        public Tile[,] Tiles { get; private set; }
+        public Tile[,]? Tiles { get; private set; }
         public Texture2D? Texture { get; set; }
+
+        public TilemapRenderer()
+        {
+
+        }
 
         public TilemapRenderer(int width, int height, string texture)
         {
             Width = width;
             Height = height;
-            Texture = TextureLibrary.Main.Get(texture);
+            Texture = TextureLibrary.Instance.Get(texture);
             Tiles = new Tile[width, height];
         }
 
