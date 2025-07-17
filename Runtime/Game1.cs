@@ -88,7 +88,6 @@ namespace GameRuntime
 
             Input.gameInstance = this;
             Input.graphicsManager = _graphics;
-            TextureLibrary.Instance.LoadTextures(_graphics.GraphicsDevice);
 
             // Initialize font system
             FontLibrary.Main.Initialize(_graphics.GraphicsDevice, Content);
@@ -123,9 +122,7 @@ namespace GameRuntime
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             
-            // Set GraphicsDevice and RoomManager for scripts to use
-            Engine.Core.GameScript.GraphicsDevice = GraphicsDevice;
-            
+ 
             // Load the default room with ContentManager
             runtimeManager.Initialize();
 
@@ -181,9 +178,6 @@ namespace GameRuntime
                 Camera.Main.GetViewMatrix(INTERNAL_WIDTH, INTERNAL_HEIGHT));
             runtimeManager.Draw(_spriteBatch);
             _spriteBatch.End();
-
-            // Update the lightmap
-            _lighting.Draw(_spriteBatch);
 
             // Draw scene to backbuffer (scale from internal resolution to window)
             GraphicsDevice.SetRenderTarget(null);

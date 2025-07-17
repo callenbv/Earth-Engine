@@ -8,6 +8,9 @@ using Engine.Core.Game;
 using Engine.Core.Systems.Rooms;
 using Engine.Core.Systems.Graphics;
 using Engine.Core;
+using System.Drawing;
+using System.Reflection.Metadata;
+using Engine.Core.Data;
 
 namespace GameRuntime
 {
@@ -19,8 +22,10 @@ namespace GameRuntime
         private GameOptions gameOptions;
         private ScriptManager scriptManager;
         private GameObjectManager objectManager;
+        public GraphicsDeviceManager graphicsManager;
         private Lighting2D _lighting;
         private RenderTarget2D _sceneRenderTarget;
+        public ContentManager contentManager;
         private GraphicsDevice _graphicsDevice;
         public Room? scene;
         private int _lastWidth, _lastHeight;
@@ -54,11 +59,18 @@ namespace GameRuntime
         /// <param name="contentManager"></param>
         public void Initialize()
         {
+            contentManager = new ContentManager(game.Services, EnginePaths.SHARED_CONTENT_PATH);
+
+            Input.gameInstance = game;
+            Input.graphicsManager = graphicsManager;
+            FontLibrary.Main.Initialize(_graphicsDevice,contentManager);
+            FontLibrary.Main.LoadFonts();
             _lighting = new Lighting2D(_graphicsDevice, INTERNAL_WIDTH, INTERNAL_HEIGHT);
             _lastWidth = INTERNAL_WIDTH;
             _lastHeight = INTERNAL_HEIGHT;
 
             _sceneRenderTarget = new RenderTarget2D(_graphicsDevice, INTERNAL_WIDTH, INTERNAL_HEIGHT);
+            Camera.Main.SetTargetViewportSize(384, 216);
         }
 
         /// <summary>
@@ -94,6 +106,10 @@ namespace GameRuntime
         /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
         {
+            Input.Update();
+            Camera.Main.Update(gameTime);
+            Camera.Main.SetViewportSize(_graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height);
+
             if (scene != null)
             {
                 scene.Update(gameTime);
@@ -123,8 +139,7 @@ namespace GameRuntime
             _graphicsDevice.Clear(Microsoft.Xna.Framework.Color.CornflowerBlue);
 
             // Draw world with camera transform at internal resolution
-            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null,
-                Camera.Main.GetViewMatrix(INTERNAL_WIDTH, INTERNAL_HEIGHT));
+            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.Main.GetViewMatrix(INTERNAL_WIDTH, INTERNAL_HEIGHT));
             if (scene != null)
             {
                 scene.Render(spriteBatch);
@@ -132,10 +147,11 @@ namespace GameRuntime
             spriteBatch.End();
 
             // Update the lightmap
-            _lighting.Draw(spriteBatch);
+            _lighting.Draw(scene,spriteBatch);
 
             // Draw scene to backbuffer (scale from internal resolution to window)
             _graphicsDevice.SetRenderTarget(null);
+
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.LinearClamp);
 
             // Calculate scale to fit the internal render target in the window while maintaining aspect ratio

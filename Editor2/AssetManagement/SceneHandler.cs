@@ -43,6 +43,17 @@ namespace Editor.AssetManagement
                 if (scene != null)
                 {
                     Console.WriteLine($"Loaded scene: {scene.Name}");
+                    foreach (var obj in scene.objects)
+                    {
+                        foreach (var component in obj.components)
+                        {
+                            if (component is ObjectComponent comp)
+                            {
+                                comp.Owner = obj;
+                                comp.Create();
+                            }
+                        }
+                    }
                 }
             }
             catch (Exception ex)

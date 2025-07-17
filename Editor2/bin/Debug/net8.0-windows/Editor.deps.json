@@ -11,7 +11,6 @@
           "Engine.Core": "1.0.0",
           "GameRuntime": "1.0.0",
           "ImGui.NET": "1.91.6.1",
-          "MonoGame.Content.Builder.Task": "3.8.3",
           "MonoGame.Framework.DesktopGL": "3.8.3"
         },
         "runtime": {
@@ -287,7 +286,6 @@
         }
       },
       "Microsoft.CSharp/4.7.0": {},
-      "MonoGame.Content.Builder.Task/3.8.3": {},
       "MonoGame.Extended/4.1.0": {
         "runtime": {
           "lib/net8.0/MonoGame.Extended.dll": {
@@ -532,13 +530,6 @@
       "sha512": "sha512-pTj+D3uJWyN3My70i2Hqo+OXixq3Os2D1nJ2x92FFo6sk8fYS1m1WLNTs0Dc1uPaViH0YvEEwvzddQ7y4rhXmA==",
       "path": "microsoft.csharp/4.7.0",
       "hashPath": "microsoft.csharp.4.7.0.nupkg.sha512"
-    },
-    "MonoGame.Content.Builder.Task/3.8.3": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-Q1Pv/MCIcnrV4cjIw9sKdY30Swoj5ju+bCASx4E+vvtfXc3ENnHAVJ6QEFeqlcfA0fJZIX4igMmsf6gQbVHXHw==",
-      "path": "monogame.content.builder.task/3.8.3",
-      "hashPath": "monogame.content.builder.task.3.8.3.nupkg.sha512"
     },
     "MonoGame.Extended/4.1.0": {
       "type": "package",

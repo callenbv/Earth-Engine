@@ -4,6 +4,7 @@ using Engine.Core.Game;
 using ImGuiNET;
 using System.IO;
 using System.Device.Gpio;
+using Editor.Windows.Inspector;
 
 namespace EarthEngineEditor.Windows
 {
@@ -60,13 +61,13 @@ namespace EarthEngineEditor.Windows
             if (item is Asset asset)
             {
                 // Set the title and display name
-                Title = asset.Name;
+                Title = $"{asset.Name}\n{asset.Type}";
 
                 // Open the asset if possible
                 asset.Open();
             }
 
-            if (item is GameObject gameObject)
+            if (item is InspectableGameObject gameObject)
             {
                 Title = gameObject.Name;
             }

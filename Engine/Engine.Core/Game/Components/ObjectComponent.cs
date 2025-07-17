@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Engine.Core.Data;
+using Engine.Core.Graphics;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -12,9 +14,10 @@ namespace Engine.Core.Game.Components
     public interface IComponent 
     {
         string Name { get; }
-        void Update(GameTime gameTime);
-        void Draw(SpriteBatch spriteBatch);
-        void DrawUI(SpriteBatch spriteBatch);
+        virtual void Update(GameTime gameTime) { }
+        virtual void Draw(SpriteBatch spriteBatch) { }
+        virtual void DrawUI(SpriteBatch spriteBatch) { }
+        virtual void Create() { }
     }
 
     public abstract class ObjectComponent : IComponent
@@ -23,10 +26,11 @@ namespace Engine.Core.Game.Components
         public string type => GetType().Name;
 
         [JsonIgnore]
+        [HideInInspector]
         public GameObject? Owner { get; set; }  
 
         [JsonIgnore]
-        public static GraphicsDevice? GraphicsDevice { get; set; }
+        public static GraphicsDevice? GraphicsDevice => TextureLibrary.Instance.graphicsDevice;
 
 
         public virtual void Create() { }

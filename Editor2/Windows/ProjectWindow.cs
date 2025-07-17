@@ -64,7 +64,7 @@ namespace EarthEngineEditor.Windows
         {
             try
             {
-                foreach (var item in items)
+                foreach (var item in allAssets)
                 {
                     item.Save();
                 }
@@ -347,6 +347,9 @@ namespace EarthEngineEditor.Windows
                     });
                 }
 
+                // Get all assets
+                PopulateAllAssetsRecursively(absAssetsPath);
+
                 var folders = Directory.GetDirectories(absCurrentPath);
                 foreach (var folder in folders)
                 {
@@ -361,22 +364,13 @@ namespace EarthEngineEditor.Windows
                     });
                 }
 
-                var files = Directory.GetFiles(absCurrentPath);
-                foreach (var file in files)
+                foreach (var asset in allAssets)
                 {
-                    string fileName = Path.GetFileName(file);
-                    string relPath = ProjectSettings.NormalizePath(Path.GetRelativePath(ProjectSettings.AssetsDirectory, file));
-
-                    items.Add(new Asset
+                    if (GetParentPath(asset.Path) == _currentFolder)
                     {
-                        Name = fileName,
-                        Path = relPath, // store relative path
-                        Folder = false,
-                        Type = Asset.GetAssetTypeFromExtension(fileName)
-                    });
+                        items.Add(asset);
+                    }
                 }
-
-                PopulateAllAssetsRecursively(absAssetsPath);
             }
             catch (Exception ex)
             {
@@ -395,13 +389,16 @@ namespace EarthEngineEditor.Windows
                 string fileName = Path.GetFileName(file);
                 string relPath = ProjectSettings.NormalizePath(Path.GetRelativePath(ProjectSettings.AssetsDirectory, file));
 
-                allAssets.Add(new Asset
+                if (!allAssets.Any(a => a.Path == relPath))
                 {
-                    Name = fileName,
-                    Path = relPath,
-                    Folder = false,
-                    Type = Asset.GetAssetTypeFromExtension(fileName)
-                });
+                    allAssets.Add(new Asset
+                    {
+                        Name = fileName,
+                        Path = relPath,
+                        Folder = false,
+                        Type = Asset.GetAssetTypeFromExtension(fileName)
+                    });
+                }
             }
         }
         private void RenderNewAssetDialog()

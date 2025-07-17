@@ -1,7 +1,9 @@
 ﻿using EarthEngineEditor.Windows;
 using Engine.Core.Data;
+using Engine.Core.Graphics;
 using Engine.Core.Systems.Rooms;
 using GameRuntime;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -49,6 +51,8 @@ namespace Editor.AssetManagement
         /// </summary>
         public void Load()
         {
+            TextureLibrary.Instance.LoadTextures();
+
             if (File.Exists(optionsPath))
             {
                 string json = File.ReadAllText(optionsPath);

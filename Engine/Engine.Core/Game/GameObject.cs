@@ -14,7 +14,7 @@ using Engine.Core.Data;
 
 namespace Engine.Core.Game
 {
-    public class GameObject : IInspectable
+    public class GameObject
     {
         public string Name { get; set; } = string.Empty;
         public SpriteData? sprite;
@@ -33,16 +33,17 @@ namespace Engine.Core.Game
                
         public GameObject()
         {
-
+            OnCreate();
         }
         public GameObject(string name)
         {
             Name = name;
+            OnCreate();
         }
 
-        public void Render()
+        public void OnCreate()
         {
-
+            AddComponent<Transform>();
         }
 
         /// <summary>
@@ -228,7 +229,7 @@ namespace Engine.Core.Game
                 PropertyNameCaseInsensitive = true,
                 ReferenceHandler = ReferenceHandler.Preserve
             };
-            options.Converters.Add(new ComponentListJsonConverter()); // ✅ Actually adds it
+            options.Converters.Add(new ComponentListJsonConverter());
 
             return JsonSerializer.Deserialize<GameObject>(json, options);
         }

@@ -2,6 +2,7 @@ using Engine.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Text.Json.Serialization;
 
 namespace Engine.Core.Game.Components
 {
@@ -11,7 +12,9 @@ namespace Engine.Core.Game.Components
         public int Width = 100;
         public int Height = 100;
         public int TileSize { get; private set; } = 16;
-        public Tile[,]? Tiles { get; private set; }
+        [JsonIgnore]
+        public Tile[,] Tiles { get; private set; } = new Tile[100,100];
+        [JsonIgnore]
         public Texture2D? Texture { get; set; }
 
         public TilemapRenderer()

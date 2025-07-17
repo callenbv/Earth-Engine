@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.3" />
-    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.3" />
     <PackageReference Include="ImGui.NET" Version="1.91.6.1" />
   </ItemGroup>
 
@@ -21,4 +20,17 @@
     <ProjectReference Include="../Runtime/GameRuntime.csproj" />
   </ItemGroup>
 
-</Project> 
+  <!-- Automatically build shared MGCB content before build -->
+  <Target Name="BuildMGCB" BeforeTargets="Build">
+    <Exec Command="mgcb /quiet /@:&quot;$(SolutionDir)Content\Content.mgcb&quot; /platform:DesktopGL /outputDir:&quot;$(SolutionDir)Content\bin\DesktopGL\Content&quot; /intermediateDir:&quot;$(SolutionDir)Content\obj&quot; /workingDir:&quot;$(SolutionDir)Content&quot;" />
+  </Target>
+
+  <!-- Ensure XNBs from shared content get copied to output -->
+  <ItemGroup>
+    <Content Include="$(SolutionDir)Content\bin\**\*.xnb">
+      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

@@ -56,7 +56,14 @@ namespace Editor.AssetManagement
                 _ => null
             };
 
-            _handler?.Load(absPath);
+            try
+            {
+                _handler?.Load(absPath);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] {ex.Message}");
+            }
         }
         public static AssetType GetAssetTypeFromExtension(string path)
         {

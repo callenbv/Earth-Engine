@@ -1,23 +1,44 @@
-﻿using Engine.Core.Graphics;
+﻿using Engine.Core.Data;
+using Engine.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.ComponentModel;
+using System.Text.Json.Serialization;
 
 namespace Engine.Core.Game.Components
 {
     public class Sprite2D : ObjectComponent
     {
-        private Texture2D? texture;
+        [JsonIgnore]
+        public Texture2D? texture
+        {
+            get => _texture;
+            set
+            {
+                _texture = value;
+
+                // Optional safety check
+                if (_texture != null && !string.IsNullOrEmpty(_texture.Name))
+                {
+                    texturePath = _texture.Name; // Store the path from the texture name
+                }
+            }
+        }
+        private Texture2D? _texture;
         public override string Name => "Sprite 2D";
+        [HideInInspector]
+        public string texturePath { get; set; } = string.Empty;
         public int frameWidth { get; set; } = 16;
         public int frameHeight { get; set; } = 16;
         public int frameCount { get; set; } = 1;
-        public int frameSpeed = 1;
+        public int frameSpeed { get; set; } = 1;
         public bool animated = false;
         public float depth = 0;
-
+        [HideInInspector]
         public SpriteEffects spriteEffect = SpriteEffects.None;
         public Vector2 origin;
+        public Color Tint = Color.White;
 
         private Rectangle spriteBox = new Rectangle();
         private int frame = 0;
@@ -28,6 +49,18 @@ namespace Engine.Core.Game.Components
         /// </summary>
         public override void Create()
         {
+            Texture2D tex = TextureLibrary.Instance.Get(texturePath);
+
+            if (tex != null)
+            {
+                texture = tex;
+            }
+            else
+            {
+                // Default red square
+                texture = new Texture2D(TextureLibrary.Instance.graphicsDevice, 1, 1);
+                texture.SetData(new[] { Color.Red });
+            }
         }
 
         /// <summary>
@@ -80,10 +113,10 @@ namespace Engine.Core.Game.Components
         /// <param name="scale"></param>
         public override void Draw(SpriteBatch spriteBatch)
         {
-            if (texture !=  null)
+            if (texture != null)
             {
                  origin = new Vector2(frameWidth / 2, frameHeight / 2);
-                 spriteBatch.Draw(texture, Owner.position, spriteBox, Color.White, Owner.rotation, origin, Owner.scale, spriteEffect, depth);
+                 spriteBatch.Draw(texture, Owner.position, spriteBox, Tint, Owner.rotation, origin, Owner.scale, spriteEffect, depth);
             }
         }
 

@@ -47,6 +47,7 @@ namespace EarthEngineEditor
             _consoleWindow = new ConsoleWindow();
             _windowManager = new WindowManager(_consoleWindow);
             textureLibrary = new TextureLibrary();
+            textureLibrary.graphicsDevice = GraphicsDevice;
 
             // Enable docking
             var io = ImGui.GetIO();
@@ -57,9 +58,8 @@ namespace EarthEngineEditor
             Console.WriteLine($"Graphics Device: {GraphicsDevice.Adapter.Description}");
             Console.WriteLine($"Window Size: {_graphics.PreferredBackBufferWidth}x{_graphics.PreferredBackBufferHeight}");
 
-            textureLibrary.LoadTextures(GraphicsDevice);
-
             runtime = new RuntimeManager(this,null);
+            runtime.graphicsManager = _graphics;
             runtime.Initialize();
 
             // Load default project for test
@@ -70,9 +70,6 @@ namespace EarthEngineEditor
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == XnaButtonState.Pressed || Keyboard.GetState().IsKeyDown(XnaKeys.Escape))
-                Exit();
-
             _windowManager?.Update(gameTime);
             runtime.Update(gameTime);
 

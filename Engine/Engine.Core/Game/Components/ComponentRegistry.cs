@@ -11,6 +11,7 @@ namespace Engine.Core.Game.Components
             public static readonly Dictionary<string, Type> Types = new()
         {
             { "Sprite2D", typeof(Sprite2D) },
+            { "Transform", typeof(Transform) },
             { "TilemapRenderer", typeof(TilemapRenderer) },
             { "PointLight", typeof(PointLight) },
             { "TextRenderer", typeof(TextRenderer) },

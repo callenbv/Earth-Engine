@@ -27,7 +27,7 @@ namespace Engine.Core.Systems.Graphics
             graphicsDevice = graphicsDevice_;
             
             Console.WriteLine($"[FontLibrary] Creating ContentManager pointing to: {EnginePaths.SHARED_CONTENT_PATH}");
-            contentManager = new ContentManager(contentManager_.ServiceProvider, EnginePaths.SHARED_CONTENT_PATH);
+            contentManager = contentManager_;
         }
         
         /// <summary>

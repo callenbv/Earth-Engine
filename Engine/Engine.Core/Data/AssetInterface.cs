@@ -8,7 +8,7 @@ namespace Engine.Core.Data
 {
     public interface IInspectable
     {
-        void Render();
+        virtual void Render() { }
     }
 
     public interface IAssetHandler

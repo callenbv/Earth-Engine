@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Engine.Core.Game;
+using Engine.Core.Systems.Rooms;
 
 namespace Engine.Core.Systems.Graphics
 {
@@ -43,10 +44,10 @@ namespace Engine.Core.Systems.Graphics
         /// Draw the lighting layer
         /// </summary>
         /// <param name="spriteBatch"></param>
-        public void Draw(SpriteBatch spriteBatch)
+        public void Draw(Room scene, SpriteBatch spriteBatch)
         {
             // Safety check
-            if (spriteBatch == null || graphicsDevice == null || lightmap == null)
+            if (spriteBatch == null || scene == null || graphicsDevice == null || lightmap == null)
             {
                 Console.WriteLine("[Lighting2D] Critical components are null, skipping draw");
                 return;
@@ -62,7 +63,7 @@ namespace Engine.Core.Systems.Graphics
             spriteBatch.End();
 
             // Draw all lights as soft circles (additive blending)
-            foreach (var gameObj in GameObjectManager.Main.GetAllObjects())
+            foreach (var gameObj in scene.objects)
             {
                 foreach (var component in gameObj.components)
                 {

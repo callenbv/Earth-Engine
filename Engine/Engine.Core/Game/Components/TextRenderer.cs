@@ -7,15 +7,15 @@ namespace Engine.Core.Game.Components
 {
     public class TextRenderer : ObjectComponent
     {
-        public string Text = "";
-        public string FontName { get; set; } = "Default";
-        public Color Color = Color.White;
-        public float Scale = 1.0f;
-        public float Rotation = 0.0f;
-        public Vector2 Origin { get; set; } = Vector2.Zero;
-        public SpriteEffects Effects { get; set; } = SpriteEffects.None;
+        public string Text { get; set; } = "";
+        public string FontName = "Default";
+        public Color Color { get; set; } = Color.White;
+        public float Scale { get; set; } = 1.0f;
+        public float Rotation { get; set; } = 0.0f;
+        public Vector2 Origin = Vector2.Zero;
+        public SpriteEffects Effects = SpriteEffects.None;
         public float Depth { get; set; } = 1.0f;
-        public bool Visible = true;
+        public bool Visible { get; set; } = true;
         public bool Centered { get; set; } = false;
         public Vector2 Offset = Vector2.Zero;
 

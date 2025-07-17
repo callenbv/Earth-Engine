@@ -14,7 +14,7 @@ namespace Engine.Core.Graphics
     public class TextureLibrary
     {
         public Dictionary<string, Texture2D> textures = new Dictionary<string, Texture2D>();
-        GraphicsDevice? graphicsDevice = null;
+        public GraphicsDevice? graphicsDevice = null;
         public static TextureLibrary Instance; 
         private Texture2D defaultTexture;
 
@@ -29,13 +29,10 @@ namespace Engine.Core.Graphics
         /// <param name="graphicsDevice_"></param>
         /// <param name="searchPattern"></param>
         /// <exception cref="DirectoryNotFoundException"></exception>
-        public void LoadTextures(GraphicsDevice graphicsDevice_, string searchPattern = "*.png")
+        public void LoadTextures(string searchPattern = "*.png")
         {
             try
             {
-                if (graphicsDevice == null)
-                    graphicsDevice = graphicsDevice_;
-
                 // Look for Assets/Sprites relative to the EXE location
                 string spriteDir = ProjectSettings.AssetsDirectory;
 

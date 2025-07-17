@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Input;
 using XnaKeys = Microsoft.Xna.Framework.Input.Keys;
 using XnaButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using XnaColor = Microsoft.Xna.Framework.Color;
+using System.IO;
 
 namespace EarthEngineEditor
 {
@@ -84,13 +85,14 @@ namespace EarthEngineEditor
             var io = ImGui.GetIO();
             var fontAtlas = io.Fonts;
             fontAtlas.Clear();
-            
+
             // Load Roboto font from file
-            string fontPath = System.IO.Path.Combine("Content", "Assets", "Fonts", "Roboto-VariableFont_wdth,wght.ttf");
-            System.Diagnostics.Debug.WriteLine($"Looking for font at: {fontPath}");
-            System.Diagnostics.Debug.WriteLine($"Font file exists: {System.IO.File.Exists(fontPath)}");
-            
-            if (System.IO.File.Exists(fontPath))
+            string fontPath = "Roboto-VariableFont_wdth.ttf";
+            Console.WriteLine($"Looking for font at: {fontPath}");
+            Console.WriteLine($"Font file exists: {File.Exists(fontPath)}");
+            Console.WriteLine($"Current directory: {Environment.CurrentDirectory}");
+
+            if (File.Exists(fontPath))
             {
                 try
                 {

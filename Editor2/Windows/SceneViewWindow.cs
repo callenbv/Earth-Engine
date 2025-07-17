@@ -1,3 +1,5 @@
+using Editor.AssetManagement;
+using Editor.Windows.Inspector;
 using Engine.Core.Game;
 using Engine.Core.Game.Components;
 using Engine.Core.Systems.Rooms;
@@ -43,7 +45,6 @@ namespace EarthEngineEditor.Windows
                 {
                     var newObj = new GameObject("Empty");
                     Sprite2D sprite = new Sprite2D();
-                    sprite.Set("Player");
                     newObj.AddComponent(sprite);
                     scene.objects.Add(newObj);
                 }
@@ -78,7 +79,7 @@ namespace EarthEngineEditor.Windows
             {
                 // Handle selection
                 _selectedObject = obj;
-                InspectorWindow.Instance.Inspect(obj);
+                InspectorWindow.Instance.Inspect(new InspectableGameObject(obj));
             }
 
             if (open && hasChildren)

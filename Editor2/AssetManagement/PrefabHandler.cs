@@ -1,13 +1,23 @@
-﻿using Engine.Core.Data;
+﻿using Engine.Core.CustomMath;
+using Engine.Core.Data;
 using Engine.Core.Game;
 using Engine.Core.Game.Components;
+using Engine.Core.Graphics;
+using Engine.Core.Systems.Rooms;
 using ImGuiNET;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended.Graphics;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Reflection;
+using System.Security.Policy;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Editor.AssetManagement
@@ -15,7 +25,7 @@ namespace Editor.AssetManagement
     public class PrefabHandler : IAssetHandler
     {
         private GameObject? _prefab;
-        private string filter = string.Empty;
+        public static string filter = string.Empty;
 
         public void Load(string path)
         {
@@ -30,8 +40,18 @@ namespace Editor.AssetManagement
 
         public void Save(string path)
         {
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                Converters = { new ComponentListJsonConverter() },
+                WriteIndented = true,
+                ReferenceHandler = ReferenceHandler.Preserve
+            };
 
+            string json = JsonSerializer.Serialize<GameObject>(_prefab, options);
+            File.WriteAllText(path, json);
         }
+
         public void Render()
         {
             if (_prefab == null) return;
@@ -51,7 +71,7 @@ namespace Editor.AssetManagement
                     foreach (var field in fields)
                     {
                         var value = field.GetValue(comp);
-                        DrawField(field.Name, value, newValue => field.SetValue(comp, newValue));
+                        DrawField(field.Name, value, field.FieldType, newValue => field.SetValue(comp, newValue),field);
                     }
 
                     // Draw properties (optional)
@@ -59,13 +79,20 @@ namespace Editor.AssetManagement
                     {
                         if (!prop.CanRead || !prop.CanWrite) continue;
                         var value = prop.GetValue(comp);
-                        DrawField(prop.Name, value, newValue => prop.SetValue(comp, newValue));
+
+                        DrawField(prop.Name, value, prop.PropertyType, newValue => prop.SetValue(comp, newValue),prop);
                     }
 
                     ImGui.TreePop();
                 }
             }
 
+            // Draws the button to add a new component
+            DrawEditableButtons(_prefab);
+        }
+
+        public static void DrawEditableButtons(GameObject prefab)
+        {
             // Allow for adding new component
             if (ImGui.Button("Add Component"))
             {
@@ -91,7 +118,7 @@ namespace Editor.AssetManagement
                     {
                         // Add the component
                         var component = (ObjectComponent)Activator.CreateInstance(kvp.Value);
-                        _prefab.AddComponent(component); // Adjust to your method
+                        prefab.AddComponent(component); // Adjust to your method
                         ImGui.CloseCurrentPopup();
                     }
                 }
@@ -100,9 +127,11 @@ namespace Editor.AssetManagement
             }
         }
 
-        void DrawField(string name, object value, Action<object> setValue)
+        public static void DrawField(string name, object value, Type expectedType, Action<object> setValue, MemberInfo memberInfo)
         {
-            if (value == null) return;
+            // Check for custom attribute tag
+            if (memberInfo.GetCustomAttribute<HideInInspectorAttribute>() != null)
+                return;
 
             // Start two-column layout
             ImGui.Columns(2, null, false);
@@ -113,7 +142,11 @@ namespace Editor.AssetManagement
 
             // Draw label, vertically aligned
             ImGui.AlignTextToFramePadding();
-            ImGui.TextUnformatted(name);
+            if (!string.IsNullOrEmpty(name))
+            {
+                name = char.ToUpper(name[0]) + name.Substring(1);
+            }
+            ImGui.Text(name);
             ImGui.NextColumn();
 
             // Set input field to fill remaining width
@@ -144,9 +177,61 @@ namespace Editor.AssetManagement
                 if (ImGui.InputText($"##{name}", buffer, (uint)buffer.Length))
                     setValue(Encoding.UTF8.GetString(buffer).TrimEnd('\0'));
             }
+            else if (value is Microsoft.Xna.Framework.Vector2 v)
+            {
+                System.Numerics.Vector2 input = v.ToNumerics();
+                if (ImGui.InputFloat2($"##{name}", ref input))
+                {
+                    setValue(input.ToXna());
+                }
+            }
+            else if (value is Microsoft.Xna.Framework.Color color)
+            {
+                System.Numerics.Vector4 colorVec = new(
+                    color.R / 255f,
+                    color.G / 255f,
+                    color.B / 255f,
+                    color.A / 255f
+                );
+
+                if (ImGui.ColorEdit4($"##{name}", ref colorVec))
+                {
+                    var newColor = new Microsoft.Xna.Framework.Color(
+                        (byte)(colorVec.X * 255),
+                        (byte)(colorVec.Y * 255),
+                        (byte)(colorVec.Z * 255),
+                        (byte)(colorVec.W * 255)
+                    );
+
+                    setValue(newColor);
+                }
+            }
+            else if (expectedType == typeof(Texture2D))
+            {
+                string selectedName = value is Texture2D tex && tex.Name != null ? tex.Name : "(None)";
+                if (ImGui.BeginCombo($"##{name}", selectedName))
+                {
+                    if (ImGui.Selectable("(None)", value == null))
+                        setValue(null);
+
+                    foreach (var kv in TextureLibrary.Instance.textures)
+                    {
+                        string texName = kv.Key;
+                        Texture2D texValue = kv.Value;
+
+                        if (ImGui.Selectable(texName, value == texValue))
+                        {
+                            texValue.Name = texName;
+                            setValue(texValue);
+                        }
+                    }
+
+                    ImGui.EndCombo();
+                }
+            }
             else
             {
-                ImGui.Text($"(unsupported type: {value.GetType().Name})");
+                // ImGui.Text($"(unsupported type: {value.GetType().Name})");
             }
 
             ImGui.PopItemWidth();
