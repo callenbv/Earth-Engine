@@ -1,4 +1,5 @@
-﻿using Engine.Core.Game;
+﻿using Engine.Core.Data;
+using Engine.Core.Game;
 using Engine.Core.Game.Components;
 using ImGuiNET;
 using System;
@@ -27,6 +28,10 @@ namespace Editor.AssetManagement
 
         }
 
+        public void Save(string path)
+        {
+
+        }
         public void Render()
         {
             if (_prefab == null) return;

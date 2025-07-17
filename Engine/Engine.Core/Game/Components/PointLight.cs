@@ -30,6 +30,7 @@ namespace Engine.Core.Game
 
             softCircleTexture?.Dispose();
             softCircleTexture = new Texture2D(GraphicsDevice, diameter, diameter);
+
             Color[] data = new Color[diameter * diameter];
             float r = diameter / 2f;
             for (int y = 0; y < diameter; y++)

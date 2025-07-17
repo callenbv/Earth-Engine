@@ -10,12 +10,13 @@ using System.Security.AccessControl;
 using Editor.AssetManagement;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Engine.Core.Data;
 
 namespace Engine.Core.Game
 {
-    public class GameObject
+    public class GameObject : IInspectable
     {
-        public string? Name;
+        public string Name { get; set; } = string.Empty;
         public SpriteData? sprite;
         public Vector2 position;
         public float scale = 1f;
@@ -37,6 +38,11 @@ namespace Engine.Core.Game
         public GameObject(string name)
         {
             Name = name;
+        }
+
+        public void Render()
+        {
+
         }
 
         /// <summary>
@@ -219,7 +225,8 @@ namespace Engine.Core.Game
         {
             var options = new JsonSerializerOptions
             {
-                PropertyNameCaseInsensitive = true
+                PropertyNameCaseInsensitive = true,
+                ReferenceHandler = ReferenceHandler.Preserve
             };
             options.Converters.Add(new ComponentListJsonConverter()); // ✅ Actually adds it
 

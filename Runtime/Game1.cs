@@ -125,7 +125,6 @@ namespace GameRuntime
             
             // Set GraphicsDevice and RoomManager for scripts to use
             Engine.Core.GameScript.GraphicsDevice = GraphicsDevice;
-            Engine.Core.GameScript.RoomManager = runtimeManager;
             
             // Load the default room with ContentManager
             runtimeManager.Initialize();

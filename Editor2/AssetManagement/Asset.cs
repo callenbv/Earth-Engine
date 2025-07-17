@@ -1,4 +1,5 @@
-﻿using Engine.Core.Data;
+﻿using EarthEngineEditor.Windows;
+using Engine.Core.Data;
 using Engine.Core.Game;
 using Engine.Core.Game.Components;
 using ImGuiNET;
@@ -11,15 +12,8 @@ using System.Threading.Tasks;
 
 namespace Editor.AssetManagement
 {
-    public interface IAssetHandler
-    {
-        void Load(string path);
-        void Render();
-        void Unload();
-        void Open();
-    }
     public enum AssetType { Texture, Scene, Data, Script, Audio, Prefab, Unknown }
-    public class Asset
+    public class Asset : IInspectable
     {
         public AssetType Type = AssetType.Unknown;
         public string Name = string.Empty;
@@ -30,7 +24,16 @@ namespace Editor.AssetManagement
 
         public void Open()
         {
+            EnsureLoaded();
             _handler?.Open();
+        }
+
+        public void Save()
+        {
+            string absPath = System.IO.Path.Combine(ProjectSettings.AssetsDirectory, Path);
+            absPath = System.IO.Path.GetFullPath(absPath);
+            _handler?.Save(absPath);
+            Console.WriteLine($"Saved {Name} to {Path}");
         }
 
         public void EnsureLoaded()
@@ -70,6 +73,12 @@ namespace Editor.AssetManagement
                 _ => AssetType.Unknown
             };
         }
+
+        public static Asset Get(string path)
+        {
+            return ProjectWindow.Instance.Get(path);
+        }
+
         public static string GetExtensionFromType(AssetType type)
         {
             return type switch
@@ -93,7 +102,7 @@ namespace Editor.AssetManagement
                 _ => ""
             };
         }
-        public void RenderEditor()
+        public void Render()
         {
             EnsureLoaded();
             _handler?.Render();

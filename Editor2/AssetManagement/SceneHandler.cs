@@ -1,4 +1,5 @@
 ﻿using EarthEngineEditor.Windows;
+using Engine.Core.Data;
 using Engine.Core.Game;
 using Engine.Core.Game.Components;
 using Engine.Core.Systems.Rooms;
@@ -11,6 +12,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Editor.AssetManagement
@@ -18,7 +20,6 @@ namespace Editor.AssetManagement
     public class SceneHandler : IAssetHandler
     {
         private Room? scene;
-
         public void Load(string path)
         {
             scene = new Room();
@@ -34,7 +35,8 @@ namespace Editor.AssetManagement
                 var options = new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true,
-                    Converters = { new ComponentListJsonConverter() }
+                    Converters = { new ComponentListJsonConverter() },
+                    ReferenceHandler = ReferenceHandler.Preserve
                 };
 
                 scene = JsonSerializer.Deserialize<Room>(json, options);
@@ -46,6 +48,30 @@ namespace Editor.AssetManagement
             catch (Exception ex)
             {
                 Console.WriteLine($"Failed to load scene: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Save the room data if it changed
+        /// </summary>
+        public void Save(string path)
+        {
+            try
+            {
+                var options = new JsonSerializerOptions
+                {
+                    WriteIndented = true,
+                    Converters = { new ComponentListJsonConverter() },
+                    ReferenceHandler = ReferenceHandler.Preserve
+                };
+
+                string json = JsonSerializer.Serialize(scene, options);
+                File.WriteAllText(path, json);
+                Console.WriteLine($"Scene saved: {scene.Name}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to save scene: {ex.Message}");
             }
         }
 

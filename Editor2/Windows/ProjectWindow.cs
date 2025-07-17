@@ -14,8 +14,9 @@ namespace EarthEngineEditor.Windows
         private bool _showProject = true;
         private string _currentProjectPath = "";
         private string _currentFolder = "";
-        private List<ProjectItem> items = new();
-        private ProjectItem? _selectedItem = null;
+        private List<Asset> items = new();
+        private List<Asset> allAssets = new();
+        private Asset? _selectedItem = null;
         private string _searchText = "";
 
         // Folder creation dialog
@@ -32,10 +33,47 @@ namespace EarthEngineEditor.Windows
         private bool _showNewAssetDialog = false;
         private string _newAssetName = string.Empty;
         private AssetType _selectedAssetType = AssetType.Prefab;
+        public static ProjectWindow Instance { get; set; }
 
         public ProjectWindow()
         {
+            Instance = this;
+        }
 
+        /// <summary>
+        /// Returns the asset given the name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public Asset? Get(string name)
+        {
+            foreach (var asset in allAssets)
+            {
+                if (asset.Name == name)
+                    return asset;
+            }
+
+            return null;
+        }
+
+
+        /// <summary>
+        /// Try to save any changes made to assets
+        /// </summary>
+        public void Save()
+        {
+            try
+            {
+                foreach (var item in items)
+                {
+                    item.Save();
+                }
+                Console.WriteLine("[DONE] Saved Project");
+            }
+            catch (Exception e) 
+            {
+                Console.WriteLine("[ERROR] "+e.ToString());
+            }
         }
 
         public void SetProjectPath(string projectPath)
@@ -234,7 +272,7 @@ namespace EarthEngineEditor.Windows
                         if (!Directory.Exists(folderPath))
                         {
                             Directory.CreateDirectory(folderPath);
-                            items.Add(new ProjectItem
+                            items.Add(new Asset
                             {
                                 Name = _newFolderName,
                                 Path = folderPath,
@@ -288,6 +326,7 @@ namespace EarthEngineEditor.Windows
         private void RefreshItems()
         {
             items.Clear();
+            allAssets.Clear();
 
             string absAssetsPath = ProjectSettings.AssetsDirectory; // Full path to "Assets"
             string absCurrentPath = Path.Combine(absAssetsPath, _currentFolder ?? "").Replace('\\', '/');
@@ -300,7 +339,7 @@ namespace EarthEngineEditor.Windows
                 if (!string.IsNullOrEmpty(_currentFolder))
                 {
                     var parentRelPath = GetParentPath(_currentFolder);
-                    items.Add(new ProjectItem
+                    items.Add(new Asset
                     {
                         Name = "..",
                         Path = parentRelPath,  // relative path!
@@ -314,7 +353,7 @@ namespace EarthEngineEditor.Windows
                     string folderName = Path.GetFileName(folder);
                     string relPath = ProjectSettings.NormalizePath(Path.GetRelativePath(ProjectSettings.AssetsDirectory, folder));
 
-                    items.Add(new ProjectItem
+                    items.Add(new Asset
                     {
                         Name = folderName,
                         Path = relPath, // store relative path
@@ -328,21 +367,43 @@ namespace EarthEngineEditor.Windows
                     string fileName = Path.GetFileName(file);
                     string relPath = ProjectSettings.NormalizePath(Path.GetRelativePath(ProjectSettings.AssetsDirectory, file));
 
-                    items.Add(new ProjectItem
+                    items.Add(new Asset
                     {
                         Name = fileName,
                         Path = relPath, // store relative path
                         Folder = false,
-                        Type = ProjectItem.GetAssetTypeFromExtension(fileName)
+                        Type = Asset.GetAssetTypeFromExtension(fileName)
                     });
                 }
+
+                PopulateAllAssetsRecursively(absAssetsPath);
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error loading items: {ex.Message}");
             }
         }
+        private void PopulateAllAssetsRecursively(string directory)
+        {
+            var folders = Directory.GetDirectories(directory);
+            foreach (var folder in folders)
+                PopulateAllAssetsRecursively(folder);
 
+            var files = Directory.GetFiles(directory);
+            foreach (var file in files)
+            {
+                string fileName = Path.GetFileName(file);
+                string relPath = ProjectSettings.NormalizePath(Path.GetRelativePath(ProjectSettings.AssetsDirectory, file));
+
+                allAssets.Add(new Asset
+                {
+                    Name = fileName,
+                    Path = relPath,
+                    Folder = false,
+                    Type = Asset.GetAssetTypeFromExtension(fileName)
+                });
+            }
+        }
         private void RenderNewAssetDialog()
         {
             ImGui.OpenPopup("New Asset");

@@ -14,11 +14,11 @@ namespace Editor.AssetManagement
             foreach (var element in doc.RootElement.EnumerateArray())
             {
                 if (!element.TryGetProperty("type", out var typeProp))
-                    throw new JsonException("Component missing 'type' field");
+                    Console.WriteLine("Component missing 'type' field");
 
                 var typeName = typeProp.GetString();
                 if (!ComponentRegistry.Types.TryGetValue(typeName, out var concreteType))
-                    throw new JsonException($"Unknown component type: {typeName}");
+                    Console.WriteLine($"Unknown component type: {typeName}");
 
                 var json = element.GetRawText();
                 var component = (IComponent)JsonSerializer.Deserialize(json, concreteType, options);

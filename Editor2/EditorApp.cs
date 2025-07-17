@@ -10,6 +10,7 @@ using XnaColor = Microsoft.Xna.Framework.Color;
 using Engine.Core.Graphics;
 using Engine.Core.Systems.Rooms;
 using GameRuntime;
+using Engine.Core.Data;
 
 namespace EarthEngineEditor
 {
@@ -56,12 +57,13 @@ namespace EarthEngineEditor
             Console.WriteLine($"Graphics Device: {GraphicsDevice.Adapter.Description}");
             Console.WriteLine($"Window Size: {_graphics.PreferredBackBufferWidth}x{_graphics.PreferredBackBufferHeight}");
 
-            // Load default project for test
-            _windowManager.OpenProject();
             textureLibrary.LoadTextures(GraphicsDevice);
 
             runtime = new RuntimeManager(this,null);
             runtime.Initialize();
+
+            // Load default project for test
+            _windowManager.OpenProject(_windowManager.GetLastProject());
 
             base.Initialize();
         }
@@ -71,6 +73,7 @@ namespace EarthEngineEditor
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == XnaButtonState.Pressed || Keyboard.GetState().IsKeyDown(XnaKeys.Escape))
                 Exit();
 
+            _windowManager?.Update(gameTime);
             runtime.Update(gameTime);
 
             _windowManager?.UpdatePerformance(gameTime.ElapsedGameTime.TotalMilliseconds);

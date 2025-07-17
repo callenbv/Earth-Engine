@@ -1,9 +1,10 @@
 using Editor.AssetManagement;
+using Engine.Core;
 using Engine.Core.Data;
 using ImGuiNET;
-using System;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using System.IO;
-using System.Windows.Forms;
 
 namespace EarthEngineEditor.Windows
 {
@@ -15,6 +16,8 @@ namespace EarthEngineEditor.Windows
         private readonly AboutWindow _about;
         private readonly PerformanceWindow _performance;
         private readonly ConsoleWindow _console;
+        private EarthProject project;
+        public List<string> recentProjects = new List<string>();
 
         public WindowManager(ConsoleWindow console)
         {
@@ -24,6 +27,8 @@ namespace EarthEngineEditor.Windows
             _about = new AboutWindow();
             _performance = new PerformanceWindow();
             _console = console;
+            project = new EarthProject();
+            Load();
         }
 
         public void UpdatePerformance(double frameTime)
@@ -41,6 +46,41 @@ namespace EarthEngineEditor.Windows
             _console.Render();
         }
 
+        /// <summary>
+        /// Load all recent projects
+        /// </summary>
+        public void Load()
+        {
+            var files = File.ReadAllLines(ProjectSettings.RecentProjects).ToList();
+            recentProjects = files;
+        }
+
+        /// <summary>
+        /// Returns the last opened project, useful for a lot of things
+        /// </summary>
+        /// <returns></returns>
+        public string? GetLastProject()
+        {
+            string? recentProject = recentProjects.FirstOrDefault();
+
+            return recentProject;
+        }
+
+        /// <summary>
+        /// Check for hotkeys
+        /// </summary>
+        /// <param name="gameTime"></param>
+        public void Update(GameTime gameTime)
+        {
+            if (Input.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.LeftControl))
+            {
+                if (Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.S))
+                {
+                    SaveProject();
+                }
+            }
+        }
+
         public void RenderMenuBar()
         {
             if (ImGui.BeginMainMenuBar())
@@ -53,7 +93,7 @@ namespace EarthEngineEditor.Windows
                     }
                     if (ImGui.MenuItem("Open Project"))
                     {
-                        OpenProject();
+                        SelectProject();
                     }
                     if (ImGui.MenuItem("Save Project"))
                     {
@@ -124,24 +164,18 @@ namespace EarthEngineEditor.Windows
 
                         // Create project file
                         var projectContent = $@"{{
-  ""name"": ""{projectName}"",
-  ""version"": ""1.0.0"",
-  ""created"": ""{DateTime.Now:yyyy-MM-dd HH:mm:ss}""
-}}";
+                          ""name"": ""{projectName}"",
+                          ""scene"": """",
+                          ""version"": ""1.0.0"",
+                          ""created"": ""{DateTime.Now:yyyy-MM-dd HH:mm:ss}""
+                        }}";
+
                         File.WriteAllText(projectFile, projectContent);
 
-                        // Set project directories
-                        ProjectSettings.ProjectDirectory = ProjectSettings.NormalizePath(projectFolder);
-                        ProjectSettings.AssetsDirectory = ProjectSettings.NormalizePath(assetsFolder);
-                        ProjectSettings.AbsoluteProjectPath = projectFolder;
-                        ProjectSettings.AbsoluteAssetsPath = assetsFolder;
-
-                        // Set project path in project window
-                        _project.SetProjectPath(projectFolder);
+                        OpenProject(projectFolder);
+                        project.settings.GameName = projectName;
 
                         Console.WriteLine($"Created new project: {projectFile}");
-                        Console.WriteLine($"Project Directory: {ProjectSettings.ProjectDirectory}");
-                        Console.WriteLine($"Assets Directory: {ProjectSettings.AssetsDirectory}");
                     }
                     catch (Exception ex)
                     {
@@ -151,7 +185,7 @@ namespace EarthEngineEditor.Windows
             }
         }
 
-        public void OpenProject()
+        public void SelectProject()
         {
             using (var openFileDialog = new OpenFileDialog())
             {
@@ -166,21 +200,7 @@ namespace EarthEngineEditor.Windows
                     {
                         try
                         {
-                            var projectDirectory = Path.GetDirectoryName(projectFile);
-                            var assetsDirectory = Path.Combine(projectDirectory, "Assets");
-
-                            // Set project directories
-                            ProjectSettings.ProjectDirectory = ProjectSettings.NormalizePath(projectDirectory);
-                            ProjectSettings.AssetsDirectory = ProjectSettings.NormalizePath(assetsDirectory);
-                            ProjectSettings.AbsoluteProjectPath = projectDirectory;
-                            ProjectSettings.AbsoluteAssetsPath = assetsDirectory;
-
-                            // Set project path in project window
-                            _project.SetProjectPath(projectDirectory);
-
-                            Console.WriteLine($"Opened project: {projectFile}");
-                            Console.WriteLine($"Project Directory: {ProjectSettings.ProjectDirectory}");
-                            Console.WriteLine($"Assets Directory: {ProjectSettings.AssetsDirectory}");
+                            OpenProject(projectFile);
                         }
                         catch (Exception ex)
                         {
@@ -195,12 +215,59 @@ namespace EarthEngineEditor.Windows
             }
         }
 
-        private void SaveProject()
+        /// <summary>
+        /// Opens the project given the filepath
+        /// </summary>
+        /// <param name="projectFilePath"></param>
+        public void OpenProject(string? projectFilePath)
         {
-            // TODO: Implement project saving logic
-            Console.WriteLine("Save Project - Not implemented yet");
+            if (projectFilePath == null)
+                return;
+
+            var projectDirectory = Path.GetDirectoryName(projectFilePath);
+            var assetsDirectory = Path.Combine(projectDirectory, "Assets");
+
+            // Set project directories
+            ProjectSettings.ProjectDirectory = ProjectSettings.NormalizePath(projectDirectory);
+            ProjectSettings.AssetsDirectory = ProjectSettings.NormalizePath(assetsDirectory);
+            ProjectSettings.AbsoluteProjectPath = projectDirectory;
+            ProjectSettings.AbsoluteAssetsPath = assetsDirectory;
+
+            // Update the project window
+            _project.SetProjectPath(projectDirectory);
+               
+            // Load project settings
+            project = new EarthProject();
+            project.Load();
+
+            // Load existing projects (or create empty list)
+            var data = File.Exists(ProjectSettings.RecentProjects)
+                ? File.ReadAllLines(ProjectSettings.RecentProjects).ToList()
+                : new List<string>();
+
+            // Normalize path and remove duplicates
+            data.RemoveAll(p => string.Equals(p, projectFilePath, StringComparison.OrdinalIgnoreCase));
+
+            // Insert the new project at the top
+            data.Insert(0, projectFilePath);
+
+            // Limit to 10 recent entries
+            if (data.Count > 10)
+                data = data.Take(10).ToList();
+
+            // Write updated list back to file
+            File.WriteAllLines(ProjectSettings.RecentProjects, data);
+
+            Console.WriteLine($"Opened project: {projectFilePath}");
+            Console.WriteLine($"Project Directory: {ProjectSettings.ProjectDirectory}");
+            Console.WriteLine($"Assets Directory: {ProjectSettings.AssetsDirectory}");
         }
 
+        private void SaveProject()
+        {
+            _project.Save();
+            project?.Save();
+        }
 
         public bool GetSceneViewVisible() => _sceneView.IsVisible;
         public void SetSceneViewVisible(bool visible) => _sceneView.SetVisible(visible);

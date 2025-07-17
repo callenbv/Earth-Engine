@@ -78,6 +78,7 @@ namespace EarthEngineEditor.Windows
             {
                 // Handle selection
                 _selectedObject = obj;
+                InspectorWindow.Instance.Inspect(obj);
             }
 
             if (open && hasChildren)

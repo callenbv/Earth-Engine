@@ -1,6 +1,9 @@
 using Editor.AssetManagement;
+using Engine.Core.Data;
+using Engine.Core.Game;
 using ImGuiNET;
 using System.IO;
+using System.Device.Gpio;
 
 namespace EarthEngineEditor.Windows
 {
@@ -10,8 +13,7 @@ namespace EarthEngineEditor.Windows
         public static InspectorWindow Instance { get; private set; }
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public Asset? selectedItem;
-
+        public IInspectable? selectedItem;
 
         public InspectorWindow()
         {
@@ -27,10 +29,9 @@ namespace EarthEngineEditor.Windows
 
             ImGui.Begin("Inspector", ref _showInspector);
             ImGui.Text($"{Title}");
-            ImGui.Text($"{selectedItem.Type}");
             ImGui.Separator();
 
-            selectedItem.RenderEditor();
+            selectedItem.Render();
 
             ImGui.End();
         }
@@ -50,17 +51,25 @@ namespace EarthEngineEditor.Windows
         /// Trigger an inspect
         /// </summary>
         /// <param name="item"></param>
-        public void Inspect(Asset item)
+        public void Inspect(IInspectable item)
         {
             if (item == null) return;
+
             selectedItem = item;
 
-            // Set the title and display name
-            Title = item.Name;
-            Description = item.Path;
+            if (item is Asset asset)
+            {
+                // Set the title and display name
+                Title = asset.Name;
 
-            // Open the asset if possible
-            selectedItem.Open();
+                // Open the asset if possible
+                asset.Open();
+            }
+
+            if (item is GameObject gameObject)
+            {
+                Title = gameObject.Name;
+            }
         }
     }
 } 
