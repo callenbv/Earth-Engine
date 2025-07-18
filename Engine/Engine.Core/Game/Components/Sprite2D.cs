@@ -39,8 +39,8 @@ namespace Engine.Core.Game.Components
         public SpriteEffects spriteEffect = SpriteEffects.None;
         public Vector2 origin;
         public Color Tint = Color.White;
-
-        private Rectangle spriteBox = new Rectangle();
+        [HideInInspector]
+        public Rectangle spriteBox = new Rectangle();
         private int frame = 0;
         private float frameTimer = 0;
 

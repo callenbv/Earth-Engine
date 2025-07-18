@@ -71,6 +71,7 @@ namespace GameRuntime
 
             _sceneRenderTarget = new RenderTarget2D(_graphicsDevice, INTERNAL_WIDTH, INTERNAL_HEIGHT);
             Camera.Main.SetTargetViewportSize(384, 216);
+            
         }
 
         /// <summary>
@@ -109,6 +110,9 @@ namespace GameRuntime
             Input.Update();
             Camera.Main.Update(gameTime);
             Camera.Main.SetViewportSize(_graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height);
+
+            Camera.Main.ViewportHeight = graphicsManager.GraphicsDevice.Viewport.Height;
+            Camera.Main.ViewportWidth = graphicsManager.GraphicsDevice.Viewport.Width;
 
             if (scene != null)
             {

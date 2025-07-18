@@ -10,6 +10,7 @@ namespace Engine.Core
         private static KeyboardState _previousKeyboard;
         private static MouseState _currentMouse;
         private static MouseState _previousMouse;
+        public static Vector2 mouseWorldPosition;
         
         // Reference to the Game instance for calling Exit()
         public static Microsoft.Xna.Framework.Game? gameInstance;
@@ -23,8 +24,25 @@ namespace Engine.Core
             _previousMouse = _currentMouse;
             _currentKeyboard = Keyboard.GetState();
             _currentMouse = Mouse.GetState();
+            mouseWorldPosition = GetMouseWorldPosition();
 
             HandleHotkeys();
+        }
+        private static Vector2 GetMouseWorldPosition()
+        {
+            MouseState mouseState = Mouse.GetState();
+            Point mouseScreenPos = new Point(mouseState.X, mouseState.Y);
+            return Camera.Main.ScreenToWorld(mouseScreenPos);
+        }
+
+        /// <summary>
+        /// Check if hovering over a recangle
+        /// </summary>
+        /// <param name="rectangle"></param>
+        /// <returns></returns>
+        public static bool MouseHover(Rectangle rectangle)
+        {
+            return rectangle.Contains(mouseWorldPosition);
         }
 
         /// <summary>
@@ -68,7 +86,7 @@ namespace Engine.Core
         public static bool IsKeyReleased(Keys key) => _currentKeyboard.IsKeyUp(key) && _previousKeyboard.IsKeyDown(key);
 
         // Mouse
-        public static bool IsMouseDown(Button button)
+        public static bool IsMouseDown(Button button = Button.Left)
         {
             return button switch
             {
@@ -88,7 +106,7 @@ namespace Engine.Core
                 _ => false
             };
         }
-        public static bool IsMousePressed(Button button)
+        public static bool IsMousePressed(Button button = Button.Left)
         {
             return IsMouseDown(button) &&
                 (button switch
@@ -99,7 +117,7 @@ namespace Engine.Core
                     _ => false
                 });
         }
-        public static bool IsMouseReleased(Button button)
+        public static bool IsMouseReleased(Button button = Button.Left)
         {
             return IsMouseUp(button) &&
                 (button switch

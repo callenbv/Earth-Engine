@@ -5,6 +5,7 @@ using Engine.Core.Game.Components;
 using Engine.Core.Systems.Rooms;
 using GameRuntime;
 using ImGuiNET;
+using MonoGame.Extended.Serialization.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -36,8 +37,11 @@ namespace Editor.AssetManagement
                 {
                     PropertyNameCaseInsensitive = true,
                     Converters = { new ComponentListJsonConverter() },
-                    ReferenceHandler = ReferenceHandler.Preserve
+                    ReferenceHandler = ReferenceHandler.Preserve,
                 };
+                options.Converters.Add(new Vector2JsonConverter());
+                options.Converters.Add(new ColorJsonConverter());
+
 
                 scene = JsonSerializer.Deserialize<Room>(json, options);
                 if (scene != null)
@@ -75,6 +79,8 @@ namespace Editor.AssetManagement
                     Converters = { new ComponentListJsonConverter() },
                     ReferenceHandler = ReferenceHandler.Preserve
                 };
+                options.Converters.Add(new Vector2JsonConverter());
+                options.Converters.Add(new ColorJsonConverter());
 
                 string json = JsonSerializer.Serialize(scene, options);
                 File.WriteAllText(path, json);

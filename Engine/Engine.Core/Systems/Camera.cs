@@ -1,4 +1,4 @@
-using Engine.Core.Game;
+﻿using Engine.Core.Game;
 using Microsoft.Xna.Framework;
 
 namespace Engine.Core
@@ -13,8 +13,8 @@ namespace Engine.Core
         public float UIScale { get; set; } = 1f;
         
         // Viewport settings
-        public int ViewportWidth { get; private set; } = 384;
-        public int ViewportHeight { get; private set; } = 216;
+        public int ViewportWidth { get; set; } = 384;
+        public int ViewportHeight { get; set; } = 216;
         public int TargetViewportWidth { get; set; } = 384;
         public int TargetViewportHeight { get; set; } = 216;
 
@@ -44,7 +44,6 @@ namespace Engine.Core
                                  Matrix.CreateScale(Zoom, Zoom, 1f) *
                                  Matrix.CreateTranslation(new Vector3(TargetViewportWidth * 0.5f, TargetViewportHeight * 0.5f, 0f));
             
-            // Scale the transform to the internal resolution
             Matrix scaleTransform = Matrix.CreateScale(scale, scale, 1f);
             
             return baseTransform * scaleTransform;
@@ -55,29 +54,35 @@ namespace Engine.Core
             return Matrix.Identity;
         }
 
-        public Vector2 ScreenToWorld(Point screenPos, int viewportWidth, int viewportHeight)
+        public Vector2 ScreenToWorld(Point screenPos)
         {
-            // Calculate scale factor from base resolution to actual rendering resolution
-            float scaleX = (float)viewportWidth / TargetViewportWidth;
-            float scaleY = (float)viewportHeight / TargetViewportHeight;
+            int screenW = ViewportWidth;
+            int screenH = ViewportHeight;
+
+            const int INTERNAL_WIDTH = 1920;
+            const int INTERNAL_HEIGHT = 1080;
+
+            // 1. Match the Draw() code: get scale and offset
+            float scaleX = (float)screenW / INTERNAL_WIDTH;
+            float scaleY = (float)screenH / INTERNAL_HEIGHT;
             float scale = Math.Min(scaleX, scaleY);
-            
-            // Scale the screen position back to base resolution
-            Point baseScreenPos = new Point(
-                (int)(screenPos.X / scale),
-                (int)(screenPos.Y / scale)
-            );
-            
-            // Use base resolution for coordinate conversion
-            var viewMatrix = GetViewMatrix(TargetViewportWidth, TargetViewportHeight);
-            var inverseViewMatrix = Matrix.Invert(viewMatrix);
-            
-            // Convert screen position to world position
-            var screenVector = new Vector3(baseScreenPos.X, baseScreenPos.Y, 0f);
-            var worldVector = Vector3.Transform(screenVector, inverseViewMatrix);
-            
-            return new Vector2(worldVector.X, worldVector.Y);
+
+            float offsetX = (screenW - INTERNAL_WIDTH * scale) * 0.5f;
+            float offsetY = (screenH - INTERNAL_HEIGHT * scale) * 0.5f;
+
+            // 2. Convert mouse screen pos → internal render target space
+            float internalX = (screenPos.X - offsetX) / scale;
+            float internalY = (screenPos.Y - offsetY) / scale;
+
+            // 3. Convert internal point → world space
+            Vector3 internalVec = new Vector3(internalX, internalY, 0f);
+            Matrix view = GetViewMatrix(INTERNAL_WIDTH, INTERNAL_HEIGHT);
+            Matrix inverse = Matrix.Invert(view);
+            Vector3 worldVec = Vector3.Transform(internalVec, inverse);
+
+            return new Vector2(worldVec.X, worldVec.Y);
         }
+
 
         public void SetViewportSize(int viewportWidth, int viewportHeight)
         {

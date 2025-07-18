@@ -8,6 +8,7 @@ using ImGuiNET;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Graphics;
+using MonoGame.Extended.Serialization.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -47,6 +48,8 @@ namespace Editor.AssetManagement
                 WriteIndented = true,
                 ReferenceHandler = ReferenceHandler.Preserve
             };
+            options.Converters.Add(new Vector2JsonConverter());
+            options.Converters.Add(new ColorJsonConverter());
 
             string json = JsonSerializer.Serialize<GameObject>(_prefab, options);
             File.WriteAllText(path, json);
