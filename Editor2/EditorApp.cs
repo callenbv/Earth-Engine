@@ -8,9 +8,10 @@ using XnaKeys = Microsoft.Xna.Framework.Input.Keys;
 using XnaButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using XnaColor = Microsoft.Xna.Framework.Color;
 using Engine.Core.Graphics;
-using Engine.Core.Systems.Rooms;
 using GameRuntime;
 using Engine.Core.Data;
+using Engine.Core.Rooms;
+using Engine.Core.Game;
 
 namespace EarthEngineEditor
 {
@@ -24,30 +25,26 @@ namespace EarthEngineEditor
         private TextureLibrary? textureLibrary;
         private Room? scene;
         private SpriteBatch spriteBatch;
-        private RuntimeManager runtime;
+        public RuntimeManager runtime;
+        public static EditorApp Instance { get; private set; }
 
         public EditorApp()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+            Window.AllowUserResizing = true;
+            Instance = this;
         }
 
         protected override void Initialize()
         {
             // Load settings
-            _settings = EditorSettings.Load();
             spriteBatch = new SpriteBatch(GraphicsDevice);
-
-            _graphics.PreferredBackBufferWidth = _settings.WindowWidth;
-            _graphics.PreferredBackBufferHeight = _settings.WindowHeight;
-            _graphics.ApplyChanges();
 
             _imGuiRenderer = new ImGuiRenderer(this);
             _consoleWindow = new ConsoleWindow();
-            _windowManager = new WindowManager(_consoleWindow);
-            textureLibrary = new TextureLibrary();
-            textureLibrary.graphicsDevice = GraphicsDevice;
+            _windowManager = new WindowManager(this,_consoleWindow);
 
             // Enable docking
             var io = ImGui.GetIO();
@@ -60,10 +57,17 @@ namespace EarthEngineEditor
 
             runtime = new RuntimeManager(this,null);
             runtime.graphicsManager = _graphics;
-            runtime.Initialize();
+            runtime.gameOptions = new GameOptions();
 
             // Load default project for test
             _windowManager.OpenProject(_windowManager.GetLastProject());
+
+            // Override game options
+            _settings = EditorSettings.Load();
+
+            _graphics.PreferredBackBufferWidth = _settings.WindowWidth;
+            _graphics.PreferredBackBufferHeight = _settings.WindowHeight;
+            _graphics.ApplyChanges();
 
             base.Initialize();
         }

@@ -17,9 +17,10 @@ namespace EarthEngineEditor.Windows
         private readonly PerformanceWindow _performance;
         private readonly ConsoleWindow _console;
         private EarthProject project;
+        private EditorApp game;
         public List<string> recentProjects = new List<string>();
-
-        public WindowManager(ConsoleWindow console)
+        private bool _openSettingsPopup = false;
+        public WindowManager(EditorApp game_, ConsoleWindow console)
         {
             _sceneView = new SceneViewWindow();
             _inspector = new InspectorWindow();
@@ -27,7 +28,7 @@ namespace EarthEngineEditor.Windows
             _about = new AboutWindow();
             _performance = new PerformanceWindow();
             _console = console;
-            project = new EarthProject();
+            game = game_;
             Load();
         }
 
@@ -81,6 +82,9 @@ namespace EarthEngineEditor.Windows
             }
         }
 
+        /// <summary>
+        /// Render the top menu bar (file, etc.)
+        /// </summary>
         public void RenderMenuBar()
         {
             if (ImGui.BeginMainMenuBar())
@@ -99,17 +103,16 @@ namespace EarthEngineEditor.Windows
                     {
                         SaveProject();
                     }
-                    ImGui.Separator();
                     if (ImGui.MenuItem("Exit"))
                     {
-                        // TODO: Implement exit functionality
+                        EditorApp.Instance.Exit();
                     }
                     ImGui.EndMenu();
                 }
                 
+                // Toggle different windows
                 if (ImGui.BeginMenu("View"))
                 {
-                    
                     bool sceneVisible = _sceneView.IsVisible;
                     if (ImGui.MenuItem("Scene View", null, ref sceneVisible))
                         _sceneView.SetVisible(sceneVisible);
@@ -133,15 +136,76 @@ namespace EarthEngineEditor.Windows
                     bool aboutVisible = _about.IsVisible;
                     if (ImGui.MenuItem("About", null, ref aboutVisible))
                         _about.SetVisible(aboutVisible);
-                    
+
+                    if (ImGui.MenuItem("Reset", null, ref aboutVisible))
+                    {
+                        _sceneView.SetVisible(true);
+                        _inspector.SetVisible(true);
+                        _project.SetVisible(true);
+                        _console.SetVisible(true);
+                        _performance.SetVisible(true);
+                        _about.SetVisible(false);
+                    }
+
                     ImGui.EndMenu();
                 }
-                
+
+                if (ImGui.BeginMenu("Project"))
+                {
+                    if (ImGui.MenuItem("Settings"))
+                    {
+                        _openSettingsPopup = true;
+                    }
+                    ImGui.EndMenu();
+                }
+
+                if (_openSettingsPopup)
+                    ImGui.OpenPopup("Game Settings");
+
+                if (ImGui.BeginPopupModal("Game Settings", ImGuiWindowFlags.AlwaysAutoResize))
+                {
+                    var settings = game.runtime.gameOptions;
+
+                    string title = settings.Title ?? "";
+                    if (ImGui.InputText("Game Title", ref title, 100))
+                        settings.Title = title;
+
+                    int width = settings.WindowWidth;
+                    if (ImGui.InputInt("Window Width", ref width))
+                        settings.WindowWidth = Math.Max(100, width);
+
+                    int height = settings.WindowHeight;
+                    if (ImGui.InputInt("Window Height", ref height))
+                        settings.WindowHeight = Math.Max(100, height);
+
+                    if (ImGui.Button("Save"))
+                    {
+                        project.Save();
+                        ImGui.CloseCurrentPopup();
+                        _openSettingsPopup = false;
+                    }
+
+                    ImGui.SameLine();
+                    if (ImGui.Button("Cancel"))
+                    {
+                        ImGui.CloseCurrentPopup();
+                        _openSettingsPopup = false;
+                    }
+
+                    ImGui.EndPopup();
+                }
+
                 ImGui.EndMainMenuBar();
+            }
+
+            // Run game
+            if (Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.F5))
+            {
+                EditorApp.Instance.runtime.Launch();
             }
         }
 
-        private void CreateNewProject()
+        public void CreateNewProject()
         {
             using (var folderBrowserDialog = new FolderBrowserDialog())
             {
@@ -232,6 +296,8 @@ namespace EarthEngineEditor.Windows
             ProjectSettings.AssetsDirectory = ProjectSettings.NormalizePath(assetsDirectory);
             ProjectSettings.AbsoluteProjectPath = projectDirectory;
             ProjectSettings.AbsoluteAssetsPath = assetsDirectory;
+
+            EnginePaths.AssetsBase = ProjectSettings.AssetsDirectory;
 
             // Update the project window
             _project.SetProjectPath(projectDirectory);

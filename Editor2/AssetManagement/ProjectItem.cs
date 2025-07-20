@@ -1,7 +1,8 @@
-﻿using EarthEngineEditor.Windows;
+﻿using EarthEngineEditor;
+using EarthEngineEditor.Windows;
 using Engine.Core.Data;
+using Engine.Core.Game;
 using Engine.Core.Graphics;
-using Engine.Core.Systems.Rooms;
 using GameRuntime;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -15,17 +16,11 @@ using System.Threading.Tasks;
 namespace Editor.AssetManagement
 {
 
-    public class ProjectSettingsData
-    { 
-        public string? LastScene {  get; set; } = string.Empty;
-        public string? GameName {  get; set; } = string.Empty;
-    }
-
     public class EarthProject
     {
         public string optionsPath = string.Empty;
 
-        public ProjectSettingsData settings;
+        public GameOptions settings;
 
         /// <summary>
         /// Give ourselves quick paths
@@ -33,7 +28,7 @@ namespace Editor.AssetManagement
         public EarthProject()
         {
             optionsPath = Path.Combine(ProjectSettings.ProjectDirectory, "game_options.json");
-            settings = new ProjectSettingsData();
+            settings = new GameOptions();
         }
 
         /// <summary>
@@ -41,7 +36,8 @@ namespace Editor.AssetManagement
         /// </summary>
         public void Save()
         {
-            settings.LastScene = SceneViewWindow.Instance.scene?.Name;
+            settings.LastScene = SceneViewWindow.Instance.scene?.FilePath;
+
             string json = JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(optionsPath, json);
         }
@@ -51,20 +47,24 @@ namespace Editor.AssetManagement
         /// </summary>
         public void Load()
         {
-            TextureLibrary.Instance.LoadTextures();
+            // Load per project assets
+            EditorApp.Instance.runtime.Initialize();
 
             if (File.Exists(optionsPath))
             {
                 string json = File.ReadAllText(optionsPath);
-                settings = JsonSerializer.Deserialize<ProjectSettingsData>(json);
+                settings = JsonSerializer.Deserialize<GameOptions>(json);
 
-                Asset scene = Asset.Get(settings.LastScene);
+                Asset scene = Asset.Get(Path.GetFileName(settings.LastScene));
+                InspectorWindow.Instance.Inspect(scene);
+                ProjectSettings.RuntimePath = settings.RuntimePath ?? string.Empty;
 
                 if (scene != null)
                 {
                     scene.Open();
                 }
 
+                EditorApp.Instance.runtime.gameOptions = settings;
                 Console.WriteLine("Last Scene: " + settings.LastScene);
             }
             else

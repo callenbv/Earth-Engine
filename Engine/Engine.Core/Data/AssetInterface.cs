@@ -16,7 +16,7 @@ namespace Engine.Core.Data
         void Load(string path);
         void Render();
         void Unload();
-        void Open();
+        void Open(string path);
         void Save(string path);
     }
 }

@@ -10,6 +10,7 @@
         "dependencies": {
           "Microsoft.CodeAnalysis.CSharp": "4.8.0",
           "Microsoft.CodeAnalysis.Scripting": "4.8.0",
+          "MonoGame.Extended": "4.1.0",
           "MonoGame.Framework.DesktopGL": "3.8.1.303",
           "Newtonsoft.Json": "13.0.3",
           "System.Device.Gpio": "4.0.1"
@@ -239,6 +240,14 @@
         }
       },
       "Microsoft.CSharp/4.7.0": {},
+      "MonoGame.Extended/4.1.0": {
+        "runtime": {
+          "lib/net8.0/MonoGame.Extended.dll": {
+            "assemblyVersion": "4.1.0.0",
+            "fileVersion": "4.1.0.0"
+          }
+        }
+      },
       "MonoGame.Framework.DesktopGL/3.8.1.303": {
         "runtime": {
           "lib/net6.0/MonoGame.Framework.dll": {
@@ -368,6 +377,13 @@
       "sha512": "sha512-pTj+D3uJWyN3My70i2Hqo+OXixq3Os2D1nJ2x92FFo6sk8fYS1m1WLNTs0Dc1uPaViH0YvEEwvzddQ7y4rhXmA==",
       "path": "microsoft.csharp/4.7.0",
       "hashPath": "microsoft.csharp.4.7.0.nupkg.sha512"
+    },
+    "MonoGame.Extended/4.1.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ES6VVjdoFAkCYzrkfAJ1Mfc0neMSqBhbgzyf3fM/sl9AvPTa8MMx1/YuqIEhEb5MeDTauQRkFNWWfA4XgMUCaw==",
+      "path": "monogame.extended/4.1.0",
+      "hashPath": "monogame.extended.4.1.0.nupkg.sha512"
     },
     "MonoGame.Framework.DesktopGL/3.8.1.303": {
       "type": "package",

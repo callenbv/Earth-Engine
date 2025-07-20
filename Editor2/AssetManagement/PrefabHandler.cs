@@ -3,7 +3,7 @@ using Engine.Core.Data;
 using Engine.Core.Game;
 using Engine.Core.Game.Components;
 using Engine.Core.Graphics;
-using Engine.Core.Systems.Rooms;
+using Engine.Core.Rooms;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -34,7 +34,7 @@ namespace Editor.AssetManagement
             _prefab = GameObject.Deserialize(json);
         }
 
-        public void Open()
+        public void Open(string path)
         {
 
         }

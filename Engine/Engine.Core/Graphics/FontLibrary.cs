@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using Engine.Core.Data;
 
-namespace Engine.Core.Systems.Graphics
+namespace Engine.Core.Graphics
 {
     public class FontLibrary
     {
@@ -14,9 +14,9 @@ namespace Engine.Core.Systems.Graphics
         private static FontLibrary? _main;
         private GraphicsDevice? graphicsDevice = null;
         private ContentManager? contentManager = null;
-        
+
         public static FontLibrary Main => _main ??= new FontLibrary();
-        
+
         /// <summary>
         /// Initialize the font library with graphics device and content manager
         /// </summary>
@@ -25,11 +25,11 @@ namespace Engine.Core.Systems.Graphics
         public void Initialize(GraphicsDevice graphicsDevice_, ContentManager contentManager_)
         {
             graphicsDevice = graphicsDevice_;
-            
+
             Console.WriteLine($"[FontLibrary] Creating ContentManager pointing to: {EnginePaths.SHARED_CONTENT_PATH}");
             contentManager = contentManager_;
         }
-        
+
         /// <summary>
         /// Loads all fonts from the Fonts directory
         /// </summary>
@@ -47,13 +47,13 @@ namespace Engine.Core.Systems.Graphics
 
                 // Load fonts from the centralized Content directory
                 var fontNames = new[] { "Default", "UI" };
-                
+
                 foreach (var fontName in fontNames)
                 {
                     try
                     {
                         Console.WriteLine($"[FontLibrary] Attempting to load font: {fontName}");
-                        
+
                         var font = contentManager.Load<SpriteFont>(Path.Combine("Assets", "Fonts", fontName));
                         fonts[fontName] = font;
                         Console.WriteLine($"[FontLibrary] Successfully loaded font: {fontName}");
@@ -143,7 +143,7 @@ namespace Engine.Core.Systems.Graphics
             // Create a simple 1x1 white texture for the default font
             var texture = new Texture2D(graphicsDevice, 1, 1);
             texture.SetData(new[] { Color.White });
-            
+
             // This is a fallback - in practice, you should always have at least one font loaded
             Console.WriteLine("[FontLibrary] Created fallback font");
             return null; // We'll need to implement proper fallback font creation
@@ -168,4 +168,4 @@ namespace Engine.Core.Systems.Graphics
             return new List<string>(fonts.Keys);
         }
     }
-} 
+}

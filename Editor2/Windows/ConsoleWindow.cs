@@ -48,12 +48,15 @@ namespace EarthEngineEditor
             }
         }
 
+        /// <summary>
+        /// Render the console
+        /// </summary>
         public void Render()
         {
             if (!_showConsole) return;
 
             ImGui.Begin("Console", ref _showConsole, ImGuiWindowFlags.MenuBar);
-            
+
             // Menu bar
             if (ImGui.BeginMenuBar())
             {
@@ -64,8 +67,7 @@ namespace EarthEngineEditor
                         _logLines.Clear();
                     }
                 }
-                ImGui.MenuItem("Auto-scroll", null, ref _autoScroll);
-                if (ImGui.MenuItem("Copy to Clipboard"))
+                if (ImGui.MenuItem("Copy"))
                 {
                     lock (_logLines)
                     {

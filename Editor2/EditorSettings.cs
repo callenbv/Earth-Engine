@@ -6,14 +6,14 @@ namespace EarthEngineEditor
 {
     public class EditorSettings
     {
-        private static readonly string SettingsPath = "editor_settings.json";
+        private static readonly string SettingsPath = "Settings\\settings.json";
         
         public bool ShowDemoWindow { get; set; } = false;
         public bool ShowMetricsWindow { get; set; } = false;
         public bool ShowAboutWindow { get; set; } = false;
         public bool ShowConsole { get; set; } = true;
-        public int WindowWidth { get; set; } = 1280;
-        public int WindowHeight { get; set; } = 720;
+        public int WindowWidth { get; set; } = 1920;
+        public int WindowHeight { get; set; } = 1080;
         public List<string> OpenPanels = new();
         public string? LastFocusedPanel = null;
 

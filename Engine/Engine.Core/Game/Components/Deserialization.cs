@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using MonoGame.Extended.Serialization.Json;
 
 namespace Editor.AssetManagement
 {
@@ -37,50 +38,6 @@ namespace Editor.AssetManagement
                 JsonSerializer.Serialize(writer, component, component.GetType(), options);
             }
             writer.WriteEndArray();
-        }
-    }
-
-    public class Vector2JsonConverter : JsonConverter<Vector2>
-    {
-        public override Vector2 Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {
-            float x = 0, y = 0;
-
-            if (reader.TokenType != JsonTokenType.StartObject)
-                throw new JsonException();
-
-            while (reader.Read())
-            {
-                if (reader.TokenType == JsonTokenType.EndObject)
-                    return new Vector2(x, y);
-
-                if (reader.TokenType == JsonTokenType.PropertyName)
-                {
-                    string propertyName = reader.GetString();
-                    reader.Read();
-                    switch (propertyName)
-                    {
-                        case "X":
-                        case "x":
-                            x = reader.GetSingle();
-                            break;
-                        case "Y":
-                        case "y":
-                            y = reader.GetSingle();
-                            break;
-                    }
-                }
-            }
-
-            throw new JsonException("Unexpected end of Vector2");
-        }
-
-        public override void Write(Utf8JsonWriter writer, Vector2 value, JsonSerializerOptions options)
-        {
-            writer.WriteStartObject();
-            writer.WriteNumber("X", value.X);
-            writer.WriteNumber("Y", value.Y);
-            writer.WriteEndObject();
         }
     }
 }

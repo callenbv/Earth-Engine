@@ -393,6 +393,7 @@
         "dependencies": {
           "Microsoft.CodeAnalysis.CSharp": "4.8.0",
           "Microsoft.CodeAnalysis.Scripting": "4.8.0",
+          "MonoGame.Extended": "4.1.0",
           "MonoGame.Framework.DesktopGL": "3.8.3",
           "Newtonsoft.Json": "13.0.3",
           "System.Device.Gpio": "4.0.1"

@@ -3,7 +3,7 @@ using Editor.Windows.Inspector;
 using Engine.Core;
 using Engine.Core.Game;
 using Engine.Core.Game.Components;
-using Engine.Core.Systems.Rooms;
+using Engine.Core.Rooms;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
 

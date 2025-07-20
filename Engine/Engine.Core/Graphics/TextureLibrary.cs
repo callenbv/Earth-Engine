@@ -34,7 +34,7 @@ namespace Engine.Core.Graphics
             try
             {
                 // Look for Assets/Sprites relative to the EXE location
-                string spriteDir = ProjectSettings.AssetsDirectory;
+                string spriteDir = EnginePaths.AssetsBase;
 
                 foreach (var file in Directory.GetFiles(spriteDir, searchPattern, SearchOption.AllDirectories))
                 {

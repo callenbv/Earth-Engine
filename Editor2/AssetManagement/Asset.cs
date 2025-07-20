@@ -25,7 +25,7 @@ namespace Editor.AssetManagement
         public void Open()
         {
             EnsureLoaded();
-            _handler?.Open();
+            _handler?.Open(Path);
         }
 
         public void Save()
@@ -33,7 +33,6 @@ namespace Editor.AssetManagement
             string absPath = System.IO.Path.Combine(ProjectSettings.AssetsDirectory, Path);
             absPath = System.IO.Path.GetFullPath(absPath);
             _handler?.Save(absPath);
-            Console.WriteLine($"Saved {Name} to {Path}");
         }
 
         public void EnsureLoaded()

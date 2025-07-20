@@ -29,6 +29,7 @@ namespace EarthEngineEditor
         private int _textureId = 1;
         private KeyboardState _lastKeyboard;
         private MouseState _lastMouse;
+        private int _lastScrollWheelValue = 0;
 
         // Keep font data pinned for ImGui lifetime
         private byte[]? _robotoFontData;
@@ -165,7 +166,14 @@ namespace EarthEngineEditor
             io.AddMouseButtonEvent(0, mouse.LeftButton == XnaButtonState.Pressed);
             io.AddMouseButtonEvent(1, mouse.RightButton == XnaButtonState.Pressed);
             io.AddMouseButtonEvent(2, mouse.MiddleButton == XnaButtonState.Pressed);
-            io.AddMouseWheelEvent(0, mouse.ScrollWheelValue / 120.0f);
+
+            // Ensure correct mouse scrolling
+            int scrollDelta = mouse.ScrollWheelValue - _lastScrollWheelValue;
+            float scrollDeltaNormalized = scrollDelta / 120.0f;
+
+            io.AddMouseWheelEvent(0, scrollDeltaNormalized);
+            _lastScrollWheelValue = mouse.ScrollWheelValue;
+
             foreach (ImGuiKey key in Enum.GetValues(typeof(ImGuiKey)))
             {
                 XnaKeys? xnaKey = ImGuiKeyToXnaKey(key);

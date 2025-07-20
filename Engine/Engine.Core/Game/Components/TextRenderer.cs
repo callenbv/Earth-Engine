@@ -1,7 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Engine.Core.Systems.Graphics;
 using System;
+using Engine.Core.Graphics;
 
 namespace Engine.Core.Game.Components
 {

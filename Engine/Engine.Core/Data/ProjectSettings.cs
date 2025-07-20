@@ -13,6 +13,7 @@ namespace Engine.Core.Data
         public static string AssetsDirectory = string.Empty;
         public static string AbsoluteProjectPath = string.Empty;
         public static string AbsoluteAssetsPath = string.Empty;
+        public static string RuntimePath = string.Empty;
         public static string RecentProjects = Path.Combine(
             AppDomain.CurrentDomain.BaseDirectory,
             "recent_projects.json"

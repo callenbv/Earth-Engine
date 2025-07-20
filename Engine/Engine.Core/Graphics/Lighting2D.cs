@@ -1,9 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Engine.Core.Game;
-using Engine.Core.Systems.Rooms;
+using Engine.Core.Rooms;
 
-namespace Engine.Core.Systems.Graphics
+namespace Engine.Core.Graphics
 {
     public class Lighting2D
     {
@@ -31,7 +31,7 @@ namespace Engine.Core.Systems.Graphics
             whitePixel = new Texture2D(gd, 1, 1);
             whitePixel.SetData(new[] { Color.White });
         }
-     
+
         public void Resize(int width, int height)
         {
             this.width = width;
@@ -49,7 +49,6 @@ namespace Engine.Core.Systems.Graphics
             // Safety check
             if (spriteBatch == null || scene == null || graphicsDevice == null || lightmap == null)
             {
-                Console.WriteLine("[Lighting2D] Critical components are null, skipping draw");
                 return;
             }
 
@@ -89,4 +88,4 @@ namespace Engine.Core.Systems.Graphics
             return lightmap;
         }
     }
-} 
+}

@@ -2,7 +2,7 @@
 using Engine.Core.Data;
 using Engine.Core.Game;
 using Engine.Core.Game.Components;
-using Engine.Core.Systems.Rooms;
+using Engine.Core.Rooms;
 using GameRuntime;
 using ImGuiNET;
 using MonoGame.Extended.Serialization.Json;
@@ -21,49 +21,14 @@ namespace Editor.AssetManagement
     public class SceneHandler : IAssetHandler
     {
         private Room? scene;
+
+        /// <summary>
+        /// Load the scene from a room file
+        /// </summary>
+        /// <param name="path"></param>
         public void Load(string path)
         {
-            scene = new Room();
-
-            // Deserialize our scene
-            string name = Path.GetFileName(path);
-            scene.Name = name;
-
-            try
-            {
-                string json = File.ReadAllText(path);
-
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    Converters = { new ComponentListJsonConverter() },
-                    ReferenceHandler = ReferenceHandler.Preserve,
-                };
-                options.Converters.Add(new Vector2JsonConverter());
-                options.Converters.Add(new ColorJsonConverter());
-
-
-                scene = JsonSerializer.Deserialize<Room>(json, options);
-                if (scene != null)
-                {
-                    Console.WriteLine($"Loaded scene: {scene.Name}");
-                    foreach (var obj in scene.objects)
-                    {
-                        foreach (var component in obj.components)
-                        {
-                            if (component is ObjectComponent comp)
-                            {
-                                comp.Owner = obj;
-                                comp.Create();
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Failed to load scene: {ex.Message}");
-            }
+            scene = Room.Load(path);
         }
 
         /// <summary>
@@ -92,16 +57,18 @@ namespace Editor.AssetManagement
             }
         }
 
-        public void Open()
+        public void Open(string path)
         {
             SceneViewWindow.Instance.scene = scene;
+            SceneViewWindow.Instance.scene.FilePath = path;
             RuntimeManager.Instance.scene = scene;
         }
 
         public void Render()
         {
-          
+            
         }
+
         public void Unload()
         {
             scene = null;

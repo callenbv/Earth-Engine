@@ -5,12 +5,16 @@ using System;
 using System.IO;
 using System.Text.Json;
 using Engine.Core.Game;
-using Engine.Core.Systems.Rooms;
-using Engine.Core.Systems.Graphics;
 using Engine.Core;
 using System.Drawing;
 using System.Reflection.Metadata;
 using Engine.Core.Data;
+using System.Threading;
+using System.Diagnostics;
+using Engine.Core.Graphics;
+using Engine.Core.Rooms;
+using System.Runtime;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace GameRuntime
 {
@@ -19,7 +23,7 @@ namespace GameRuntime
         private string assetsRoot;
         private string roomsDir;
         private string gameOptionsPath;
-        private GameOptions gameOptions;
+        public GameOptions gameOptions;
         private ScriptManager scriptManager;
         private GameObjectManager objectManager;
         public GraphicsDeviceManager graphicsManager;
@@ -27,6 +31,7 @@ namespace GameRuntime
         private RenderTarget2D _sceneRenderTarget;
         public ContentManager contentManager;
         private GraphicsDevice _graphicsDevice;
+        private TextureLibrary textureLibrary;
         public Room? scene;
         private int _lastWidth, _lastHeight;
         private Game game;
@@ -42,14 +47,12 @@ namespace GameRuntime
         /// <param name="scriptManager"></param>
         public RuntimeManager(Game game_, ScriptManager scriptManager)
         {
-            // Always use the Assets folder relative to the EXE location
             assetsRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets");
             roomsDir = Path.Combine(assetsRoot, "Rooms");
             gameOptionsPath = Path.Combine(assetsRoot, "game_options.json");
             Instance = this;
             game = game_;
             _graphicsDevice = game_.GraphicsDevice;
-            LoadGameOptions();         
         }
 
         /// <summary>
@@ -61,44 +64,27 @@ namespace GameRuntime
         {
             contentManager = new ContentManager(game.Services, EnginePaths.SHARED_CONTENT_PATH);
 
+            gameOptions.Load("game_options.json");
+            game.Window.AllowUserResizing = true;
+            game.Window.Title = gameOptions.Title;
+            graphicsManager.PreferredBackBufferWidth = gameOptions.WindowWidth;
+            graphicsManager.PreferredBackBufferHeight = gameOptions.WindowHeight;
+
             Input.gameInstance = game;
             Input.graphicsManager = graphicsManager;
             FontLibrary.Main.Initialize(_graphicsDevice,contentManager);
             FontLibrary.Main.LoadFonts();
+            TextureLibrary textureLibrary = new TextureLibrary();
+            textureLibrary.graphicsDevice = _graphicsDevice;
+            textureLibrary.LoadTextures();
+
             _lighting = new Lighting2D(_graphicsDevice, INTERNAL_WIDTH, INTERNAL_HEIGHT);
             _lastWidth = INTERNAL_WIDTH;
             _lastHeight = INTERNAL_HEIGHT;
 
             _sceneRenderTarget = new RenderTarget2D(_graphicsDevice, INTERNAL_WIDTH, INTERNAL_HEIGHT);
-            Camera.Main.SetTargetViewportSize(384, 216);
-            
-        }
-
-        /// <summary>
-        /// Loads game options if possible
-        /// </summary>
-        public void LoadGameOptions()
-        {
-            if (File.Exists(gameOptionsPath))
-            {
-                Console.WriteLine($"Options found at {gameOptionsPath}");
-
-                try
-                {
-                    var json = File.ReadAllText(gameOptionsPath);
-                    gameOptions = JsonSerializer.Deserialize<GameOptions>(json);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Failed to load game options: {ex.Message}");
-                    gameOptions = new GameOptions();
-                }
-            }
-            else
-            {
-                Console.WriteLine($"No options found at {gameOptionsPath}");
-                gameOptions = new GameOptions();
-            }
+            Camera.Main.SetTargetViewportSize(384, 216);  
+            graphicsManager.ApplyChanges();
         }
 
         /// <summary>
@@ -182,6 +168,38 @@ namespace GameRuntime
             spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.LinearClamp, null, null, null, Camera.Main.GetUIViewMatrix(viewport.Width, viewport.Height));
             //runtimeManager.DrawUI(_spriteBatch);
             spriteBatch.End();
+        }
+
+        /// <summary>
+        /// Launches an instance of the runtime, starting the game
+        /// </summary>
+        public void Launch()
+        {
+            string projectPath = ProjectSettings.ProjectDirectory;
+            string runtimeExePath = ProjectSettings.RuntimePath;
+
+            if (!File.Exists(runtimeExePath))
+            {
+                Console.WriteLine($"[RuntimeManager] Cannot find runtime exe at: {runtimeExePath}");
+                return;
+            }
+
+            if (!Directory.Exists(projectPath))
+            {
+                Console.WriteLine($"[RuntimeManager] Project path does not exist: {projectPath}");
+                return;
+            }
+
+            var psi = new ProcessStartInfo
+            {
+                FileName = runtimeExePath,
+                Arguments = $"--project \"{projectPath}\"",
+                UseShellExecute = false,
+                WorkingDirectory = Path.GetDirectoryName(runtimeExePath)
+            };
+
+            Process.Start(psi);
+            Console.WriteLine($"[RuntimeManager] Launched runtime with project: {projectPath}");
         }
     }
 } 
