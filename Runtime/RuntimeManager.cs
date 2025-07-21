@@ -14,7 +14,6 @@ using System.Diagnostics;
 using Engine.Core.Graphics;
 using Engine.Core.Rooms;
 using System.Runtime;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace GameRuntime
 {

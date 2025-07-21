@@ -47,3 +47,6 @@
 /Engine/Engine.Core/obj
 /Content/obj
 /Editor2/obj
+/Runtime/bin
+/Runtime/publish-linux
+/Engine/Engine.Core/bin

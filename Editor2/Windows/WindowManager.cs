@@ -201,6 +201,7 @@ namespace EarthEngineEditor.Windows
             // Run game
             if (Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.F5))
             {
+                project.Save();
                 EditorApp.Instance.runtime.Launch();
             }
         }
