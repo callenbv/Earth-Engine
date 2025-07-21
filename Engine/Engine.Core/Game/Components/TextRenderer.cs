@@ -2,9 +2,11 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using Engine.Core.Graphics;
+using Engine.Core.Data;
 
 namespace Engine.Core.Game.Components
 {
+    [ComponentCategory("Graphics")]
     public class TextRenderer : ObjectComponent
     {
         public string Text { get; set; } = "";

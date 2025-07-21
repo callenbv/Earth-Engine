@@ -1,12 +1,14 @@
-using Engine.Core;
+﻿using Engine.Core;
 using Engine.Core.Data;
 using Engine.Core.Game;
+using Engine.Core.Game.Components;
 using Engine.Core.Rooms;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.IO;
+using System.Reflection;
 using System.Xml.Linq;
 
 namespace GameRuntime
@@ -17,6 +19,7 @@ namespace GameRuntime
         private SpriteBatch _spriteBatch;
         private RuntimeManager runtimeManager;
         private GameOptions gameOptions;
+        private string projectPath = string.Empty;
 
         public Runtime(string projectPath)
         {
@@ -27,20 +30,72 @@ namespace GameRuntime
             // Get the paths to the project directory and assets
             EnginePaths.ProjectBase = projectPath;
             EnginePaths.AssetsBase = Path.Combine(projectPath, "Assets");
+
+            // Construct early systems
+            gameOptions = new GameOptions();
         }
 
         protected override void Initialize()
         {
             // Set up the runtime manager and load the default scene
-            gameOptions = new GameOptions();
-            runtimeManager = new RuntimeManager(this, null);
+            runtimeManager = new RuntimeManager(this);
             runtimeManager.graphicsManager = _graphics;
             runtimeManager.gameOptions = gameOptions;
             runtimeManager.Initialize();
-            runtimeManager.scene = Room.Load(gameOptions.LastScene);
+
+            gameOptions.Load("game_options.json");
+            Window.AllowUserResizing = true;
+            Window.Title = gameOptions.Title;
+            _graphics.PreferredBackBufferWidth = gameOptions.WindowWidth;
+            _graphics.PreferredBackBufferHeight = gameOptions.WindowHeight;
 
             // Set up our main spritebatch
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+            string scriptDllPath = Path.Combine(EnginePaths.ProjectBase, "Build", "CompiledScripts.dll");
+
+            // Load the compiled scripts
+            if (File.Exists(scriptDllPath))
+            {
+                Console.WriteLine($"[Runtime] Loading CompiledScripts.dll from: {scriptDllPath}");
+
+                byte[] bytes = File.ReadAllBytes(scriptDllPath);
+                Assembly asm = Assembly.Load(bytes);
+
+                EngineContext.Current.ScriptManager = new ScriptManager(asm);
+                ComponentRegistry.RegisterAllComponents();
+
+                Console.WriteLine("[Runtime] ScriptManager initialized and components registered.");
+            }
+            else
+            {
+                Console.WriteLine("[Runtime] CompiledScripts.dll not found!");
+            }
+
+            // Debug: Copy the engine DLL into our folder so we can rapid test engine changes
+#if DEBUG
+            foreach (var kvp in ComponentRegistry.Components)
+                Console.WriteLine($"[Runtime] Registered: {kvp.Key}");
+            string engineCorePath = Path.Combine(AppContext.BaseDirectory, "Engine.Core.dll");
+            string buildPath = Path.Combine(EnginePaths.ProjectBase, "Build");
+            string destPath = Path.Combine(buildPath, "Engine.Core.dll");
+
+            if (File.Exists(engineCorePath))
+            {
+                Directory.CreateDirectory(buildPath); // Ensure Build exists
+                File.Copy(engineCorePath, destPath, overwrite: true);
+                Console.WriteLine($"[Launcher] Copied Engine.Core.dll to {destPath}");
+            }
+            else
+            {
+                Console.WriteLine("[Launcher] Engine.Core.dll not found at: " + engineCorePath);
+            }
+#endif
+            // Load our default scene
+            runtimeManager.scene = Room.Load(gameOptions.LastScene);
+
+            // Apply any graphics changes
+            _graphics.ApplyChanges();
+
             base.Initialize();
         }
 
@@ -89,6 +144,7 @@ namespace GameRuntime
                 projectPath = Console.ReadLine()?.Trim('"');
             }
 #endif
+
             if (string.IsNullOrWhiteSpace(projectPath) || !Directory.Exists(projectPath))
             {
                 Console.WriteLine("Invalid or missing project path.");

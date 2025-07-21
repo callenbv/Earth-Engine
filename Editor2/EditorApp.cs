@@ -12,6 +12,9 @@ using GameRuntime;
 using Engine.Core.Data;
 using Engine.Core.Rooms;
 using Engine.Core.Game;
+using Editor.Windows;
+using Editor.AssetManagement;
+using Engine.Core;
 
 namespace EarthEngineEditor
 {
@@ -19,13 +22,17 @@ namespace EarthEngineEditor
     {
         private GraphicsDeviceManager _graphics;
         private ImGuiRenderer? _imGuiRenderer;
-        private ConsoleWindow? _consoleWindow;
-        private WindowManager? _windowManager;
+        private ConsoleWindow _consoleWindow;
+        public WindowManager _windowManager;
         private EditorSettings? _settings;
         private TextureLibrary? textureLibrary;
         private Room? scene;
         private SpriteBatch spriteBatch;
         public RuntimeManager runtime;
+        public EditorOverlay editorOverlay;
+        public EditorWatcher fileWatcher;
+        public bool gameFocused = false;
+
         public static EditorApp Instance { get; private set; }
 
         public EditorApp()
@@ -41,23 +48,18 @@ namespace EarthEngineEditor
         {
             // Load settings
             spriteBatch = new SpriteBatch(GraphicsDevice);
-
             _imGuiRenderer = new ImGuiRenderer(this);
             _consoleWindow = new ConsoleWindow();
             _windowManager = new WindowManager(this,_consoleWindow);
+            editorOverlay = new EditorOverlay(GraphicsDevice);
 
             // Enable docking
             var io = ImGui.GetIO();
             io.ConfigFlags |= ImGuiConfigFlags.DockingEnable;
 
-            // Test console output
-            Console.WriteLine("Earth Engine Editor initialized successfully!");
-            Console.WriteLine($"Graphics Device: {GraphicsDevice.Adapter.Description}");
-            Console.WriteLine($"Window Size: {_graphics.PreferredBackBufferWidth}x{_graphics.PreferredBackBufferHeight}");
-
-            runtime = new RuntimeManager(this,null);
+            runtime = new RuntimeManager(this);
             runtime.graphicsManager = _graphics;
-            runtime.gameOptions = new GameOptions();
+            EngineContext.Paused = true;
 
             // Load default project for test
             _windowManager.OpenProject(_windowManager.GetLastProject());
@@ -69,6 +71,11 @@ namespace EarthEngineEditor
             _graphics.PreferredBackBufferHeight = _settings.WindowHeight;
             _graphics.ApplyChanges();
 
+            // Test console output
+            Console.WriteLine("Earth Engine Editor initialized successfully!");
+            Console.WriteLine($"Graphics Device: {GraphicsDevice.Adapter.Description}");
+            Console.WriteLine($"Window Size: {_graphics.PreferredBackBufferWidth}x{_graphics.PreferredBackBufferHeight}");
+
             base.Initialize();
         }
 
@@ -76,7 +83,7 @@ namespace EarthEngineEditor
         {
             _windowManager?.Update(gameTime);
             runtime.Update(gameTime);
-
+            editorOverlay.Update(gameTime);
             _windowManager?.UpdatePerformance(gameTime.ElapsedGameTime.TotalMilliseconds);
 
             base.Update(gameTime);
@@ -88,8 +95,8 @@ namespace EarthEngineEditor
 
             _imGuiRenderer?.BeforeLayout(gameTime);
 
-            // Render game
             runtime.Draw(spriteBatch);
+            editorOverlay.DrawEnd(spriteBatch);
 
             ImGuiViewportPtr viewport = ImGui.GetMainViewport();
             ImGui.SetNextWindowPos(viewport.Pos);
@@ -115,6 +122,16 @@ namespace EarthEngineEditor
             ImGui.Begin("DockSpace", windowFlags);
             ImGui.PopStyleVar(3);
             ImGui.PopStyleColor();
+
+            Vector2 mouse = ImGui.GetMousePos();
+            Vector2 min = viewport.Pos;
+            Vector2 max = viewport.Pos + viewport.Size;
+
+            bool isHoveringGameArea = mouse.X >= min.X && mouse.X <= max.X &&
+                                      mouse.Y >= min.Y && mouse.Y <= max.Y;
+
+            bool isInputFree = !ImGui.IsAnyItemActive() && !ImGui.IsAnyItemFocused() && !Input.IsKeyDown(XnaKeys.LeftControl);
+            gameFocused = isHoveringGameArea && isInputFree;
 
             ImGui.DockSpace(
                 ImGui.GetID("DockSpace"),

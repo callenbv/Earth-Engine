@@ -41,50 +41,53 @@ namespace EarthEngineEditor.Windows
             bool root = ImGui.TreeNodeEx("Scene");
 
             // Get the mouse world coords and select the object
-            if (Input.IsMousePressed())
+            if (EditorApp.Instance.gameFocused)
             {
-                foreach (var obj in scene.objects)
+                if (Input.IsMousePressed())
                 {
-                    Sprite2D sprite = obj.GetComponent<Sprite2D>();
-                    if (sprite == null) continue;
-
-                    Vector2 pos = obj.position;
-                    Microsoft.Xna.Framework.Rectangle rect = new Microsoft.Xna.Framework.Rectangle(
-                        (int)(pos.X-sprite.origin.X),
-                        (int)(pos.Y-sprite.origin.Y),
-                        sprite.spriteBox.Width,
-                        sprite.spriteBox.Height
-                        );
-
-                    if (Input.MouseHover(rect))
+                    foreach (var obj in scene.objects)
                     {
-                        _selectedObject = obj;
-                        InspectorWindow.Instance.Inspect(new InspectableGameObject(obj));
-                        break;
+                        Sprite2D sprite = obj.GetComponent<Sprite2D>();
+                        if (sprite == null) continue;
+
+                        Vector2 pos = obj.position;
+                        Microsoft.Xna.Framework.Rectangle rect = new Microsoft.Xna.Framework.Rectangle(
+                            (int)(pos.X - sprite.origin.X),
+                            (int)(pos.Y - sprite.origin.Y),
+                            sprite.spriteBox.Width,
+                            sprite.spriteBox.Height
+                            );
+
+                        if (Input.MouseHover(rect))
+                        {
+                            _selectedObject = obj;
+                            InspectorWindow.Instance.Inspect(new InspectableGameObject(obj));
+                            break;
+                        }
                     }
                 }
-            }
 
-            if (Input.IsMouseDown())
-            {
-                if (_selectedObject != null)
+                if (Input.IsMouseDown())
                 {
-                    Transform t = _selectedObject.GetComponent<Transform>();
+                    if (_selectedObject != null)
+                    {
+                        Transform t = _selectedObject.GetComponent<Transform>();
 
-                    if (t != null)
-                    {
-                        t.Position = Vector2.Floor(Input.mouseWorldPosition / gridSize) * gridSize;
-                    }
-                    else
-                    {
-                        _selectedObject.position = Input.mouseWorldPosition;
+                        if (t != null)
+                        {
+                            t.Position = Vector2.Floor(Input.mouseWorldPosition / gridSize) * gridSize;
+                        }
+                        else
+                        {
+                            _selectedObject.position = Input.mouseWorldPosition;
+                        }
                     }
                 }
-            }
 
-            if (Input.IsMouseReleased())
-            {
-                _selectedObject = null;
+                if (Input.IsMouseReleased())
+                {
+                    _selectedObject = null;
+                }
             }
 
             // Right-click on the "Scene" tree node
@@ -111,7 +114,6 @@ namespace EarthEngineEditor.Windows
                 ImGui.TreePop();
             }
         }
-
         private void DrawGameObjectNode(GameObject obj)
         {
             ImGui.PushID(obj.Name); // Ensure unique ID

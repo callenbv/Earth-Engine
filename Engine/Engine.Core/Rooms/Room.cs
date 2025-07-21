@@ -7,6 +7,7 @@ using Engine.Core.Game.Components;
 using System.Text.Json.Serialization;
 using MonoGame.Extended.Serialization.Json;
 using Engine.Core.Data;
+using System.IO;
 
 namespace Engine.Core.Rooms
 {

@@ -19,8 +19,12 @@ namespace Editor.AssetManagement
                     Console.WriteLine("Component missing 'type' field");
 
                 var typeName = typeProp.GetString();
-                if (!ComponentRegistry.Types.TryGetValue(typeName, out var concreteType))
+                if (!ComponentRegistry.Components.TryGetValue(typeName, out var info))
+                {
                     Console.WriteLine($"Unknown component type: {typeName}");
+                    continue;
+                }
+                var concreteType = info.Type;
 
                 var json = element.GetRawText();
                 var component = (IComponent)JsonSerializer.Deserialize(json, concreteType, options);

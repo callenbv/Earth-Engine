@@ -14,6 +14,9 @@ using System.Diagnostics;
 using Engine.Core.Graphics;
 using Engine.Core.Rooms;
 using System.Runtime;
+using Engine.Core.Scripting;
+using Microsoft.CodeAnalysis.Scripting;
+using System.Reflection;
 
 namespace GameRuntime
 {
@@ -23,7 +26,6 @@ namespace GameRuntime
         private string roomsDir;
         private string gameOptionsPath;
         public GameOptions gameOptions;
-        private ScriptManager scriptManager;
         private GameObjectManager objectManager;
         public GraphicsDeviceManager graphicsManager;
         private Lighting2D _lighting;
@@ -34,17 +36,13 @@ namespace GameRuntime
         public Room? scene;
         private int _lastWidth, _lastHeight;
         private Game game;
-
         public static RuntimeManager Instance { get; private set; }
 
         private const int INTERNAL_WIDTH = 1920;
         private const int INTERNAL_HEIGHT = 1080;
 
-        /// <summary>
-        /// Constructor to setup the runtime
-        /// </summary>
-        /// <param name="scriptManager"></param>
-        public RuntimeManager(Game game_, ScriptManager scriptManager)
+        
+        public RuntimeManager(Game game_)
         {
             assetsRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets");
             roomsDir = Path.Combine(assetsRoot, "Rooms");
@@ -62,12 +60,6 @@ namespace GameRuntime
         public void Initialize()
         {
             contentManager = new ContentManager(game.Services, EnginePaths.SHARED_CONTENT_PATH);
-
-            gameOptions.Load("game_options.json");
-            game.Window.AllowUserResizing = true;
-            game.Window.Title = gameOptions.Title;
-            graphicsManager.PreferredBackBufferWidth = gameOptions.WindowWidth;
-            graphicsManager.PreferredBackBufferHeight = gameOptions.WindowHeight;
 
             Input.gameInstance = game;
             Input.graphicsManager = graphicsManager;
@@ -189,6 +181,10 @@ namespace GameRuntime
                 return;
             }
 
+            ScriptManager scriptManager;
+            ScriptCompiler.CompileAndLoadScripts(projectPath, out scriptManager);
+
+            // Start the process if succesful
             var psi = new ProcessStartInfo
             {
                 FileName = runtimeExePath,

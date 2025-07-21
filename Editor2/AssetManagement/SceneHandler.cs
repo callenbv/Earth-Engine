@@ -57,6 +57,10 @@ namespace Editor.AssetManagement
             }
         }
 
+        /// <summary>
+        /// Set the selected scene
+        /// </summary>
+        /// <param name="path"></param>
         public void Open(string path)
         {
             SceneViewWindow.Instance.scene = scene;

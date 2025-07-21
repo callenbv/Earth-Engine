@@ -1,3 +1,4 @@
+using Engine.Core.Data;
 using Engine.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -6,6 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace Engine.Core.Game.Components
 {
+    [ComponentCategory("Tiles")]
     public class TilemapRenderer : ObjectComponent
     {
         public override string Name => "Tilemap Renderer";

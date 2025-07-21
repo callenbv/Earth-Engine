@@ -22,8 +22,21 @@ namespace Engine.Core.Game.Components
 
     public abstract class ObjectComponent : IComponent
     {
-        public virtual string Name => "Component";
+        public virtual string Name => GetType().Name;
         public string type => GetType().Name;
+
+        [JsonIgnore]
+        [HideInInspector]
+        public Vector2 Position
+        {
+            get => Owner?.GetComponent<Transform>()?.Position ?? Vector2.Zero;
+            set
+            {
+                var transform = Owner?.GetComponent<Transform>();
+                if (transform != null)
+                    transform.Position = value;
+            }
+        }
 
         [JsonIgnore]
         [HideInInspector]

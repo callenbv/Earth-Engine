@@ -107,22 +107,25 @@ namespace Editor.AssetManagement
                 // Input filter
                 ImGui.InputText("Filter", ref filter, 64);
 
-                // Iterate all registered components
-                foreach (var kvp in ComponentRegistry.Types)
+                string currentCategory = null;
+
+                foreach (var group in ComponentRegistry.Components.Values
+                             .Where(c => string.IsNullOrEmpty(filter) || c.Name.ToLower().Contains(filter.ToLower()))
+                             .GroupBy(c => c.Category)
+                             .OrderBy(g => g.Key))
                 {
-                    string name = kvp.Key;
-
-                    // Skip if doesn't match filter
-                    if (!string.IsNullOrEmpty(filter) && !name.ToLower().Contains(filter.ToLower()))
-                        continue;
-
-                    // Show selectable item
-                    if (ImGui.Selectable(name))
+                    if (ImGui.BeginMenu(group.Key))
                     {
-                        // Add the component
-                        var component = (ObjectComponent)Activator.CreateInstance(kvp.Value);
-                        prefab.AddComponent(component); // Adjust to your method
-                        ImGui.CloseCurrentPopup();
+                        foreach (var comp in group.OrderBy(c => c.Name))
+                        {
+                            if (ImGui.MenuItem(comp.Name))
+                            {
+                                var instance = (ObjectComponent)Activator.CreateInstance(comp.Type);
+                                prefab.AddComponent(instance);
+                                ImGui.CloseCurrentPopup();
+                            }
+                        }
+                        ImGui.EndMenu();
                     }
                 }
 

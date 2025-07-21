@@ -3,6 +3,7 @@ using EarthEngineEditor.Windows;
 using Engine.Core.Data;
 using Engine.Core.Game;
 using Engine.Core.Graphics;
+using Engine.Core.Scripting;
 using GameRuntime;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -50,6 +51,10 @@ namespace Editor.AssetManagement
             // Load per project assets
             EditorApp.Instance.runtime.Initialize();
 
+            // Load scripts in project if possible
+            ScriptCompiler.CompileAndLoadScripts(ProjectSettings.ProjectDirectory, out var scriptManager);
+
+            // Load any game options
             if (File.Exists(optionsPath))
             {
                 string json = File.ReadAllText(optionsPath);

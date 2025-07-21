@@ -1,9 +1,11 @@
-﻿using Engine.Core.Game.Components;
+﻿using Engine.Core.Data;
+using Engine.Core.Game.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Engine.Core.Game
 {
+    [ComponentCategory("World")]
     public class Transform : ObjectComponent
     {
         public Vector2 Position { get; set; }

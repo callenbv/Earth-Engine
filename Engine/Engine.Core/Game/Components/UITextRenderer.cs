@@ -2,9 +2,11 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Engine.Core.Graphics;
 using System;
+using Engine.Core.Data;
 
 namespace Engine.Core.Game.Components
 {
+    [ComponentCategory("Graphics")]
     public class UITextRenderer : TextRenderer
     {
         /// <summary>

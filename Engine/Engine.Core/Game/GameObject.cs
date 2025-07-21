@@ -11,6 +11,7 @@ using Editor.AssetManagement;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Engine.Core.Data;
+using System.Reflection;
 
 namespace Engine.Core.Game
 {
@@ -26,8 +27,6 @@ namespace Engine.Core.Game
 
         [JsonConverter(typeof(ComponentListJsonConverter))]
         public List<IComponent> components { get; set; } = new();
-
-        public Dictionary<string, Dictionary<string, object>> componentProperties { get; set; } = new();
 
         public bool IsDestroyed { get; private set; } = false;
                
@@ -93,22 +92,6 @@ namespace Engine.Core.Game
             if (IsDestroyed) return;
             
             IsDestroyed = true;
-            
-            // Call Destroy on all attached scripts
-            foreach (var script in scriptInstances)
-            {
-                if (script is GameScript gs)
-                {
-                    try
-                    {
-                        gs.Destroy();
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Error calling Destroy on script for {Name}: {ex.Message}");
-                    }
-                }
-            }
         }
 
         /// <summary>
@@ -121,6 +104,12 @@ namespace Engine.Core.Game
             {
                 try
                 {
+                    // Do not update scripts if the engine is paused
+                    if (EngineContext.Paused && component is GameScript)
+                    {
+                        continue;
+                    }
+
                     component.Update(gameTime);
                 }
                 catch (Exception e) 
@@ -178,43 +167,7 @@ namespace Engine.Core.Game
         /// <returns>Instantiated GameObject</returns>
         public static GameObject Instantiate(string defName, Vector2 position)
         {
-            // Try to instantiate the object
-            try
-            {
-                var objDef = GameObjectRegistry.Get(defName);
-                var go = new GameObject(objDef.Name);
-                go.position = position;
-
-                // Load default script properties
-                if (objDef?.Components != null)
-                {
-                    foreach (var script in objDef.Components)
-                    {
-                        if (objDef.componentProperties != null)
-                        {
-                            foreach (var kvp in objDef.componentProperties)
-                                go.componentProperties[kvp.Key] = new Dictionary<string, object>(kvp.Value);
-                        }
-                    }
-                }
-
-                var assetsRoot = EngineContext.Current.AssetsRoot;
-                var contentManager = EngineContext.Current.ContentManager;
-                var scriptManager = EngineContext.Current.ScriptManager;
-                var graphicsDevice = EngineContext.Current.GraphicsDevice;
-                ScriptCompiler.LoadTextureAndScripts(go, defName, assetsRoot, contentManager, scriptManager, graphicsDevice);
-
-                GameObjectManager.Main.gameObjects.Add(go);
-
-                return go;
-            }
-            catch (ArgumentException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-
-            // If failed, make an empty game object
-            return new GameObject();
+            return new GameObject("Empty");
         }
 
         /// <summary>

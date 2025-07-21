@@ -9,4 +9,13 @@ namespace Engine.Core.Data
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
     public class HideInInspectorAttribute : Attribute { }
 
+    [AttributeUsage(AttributeTargets.Class)]
+    public class ComponentCategoryAttribute : Attribute
+    {
+        public string Category { get; }
+        public ComponentCategoryAttribute(string category)
+        {
+            Category = category;
+        }
+    }
 }

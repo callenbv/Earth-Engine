@@ -1,14 +1,16 @@
-﻿using Engine.Core.Game.Components;
+﻿using Engine.Core.Data;
+using Engine.Core.Game.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Engine.Core.Game
 {
+    [ComponentCategory("Graphics")]
     public class PointLight : ObjectComponent
     {
-        public float lightRadius = 64f;
-        public float lightIntensity = 1f;
-        public Color lightColor = Color.White;
+        public float lightRadius { get; set; } = 64f;
+        public float lightIntensity { get; set; } = 1f;
+        public Color lightColor { get; set; } = Color.White;
         private Texture2D? softCircleTexture;
         public override string Name => "Point Light";
         public void SetLight(float radius, float intensity, Color color)

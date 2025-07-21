@@ -8,6 +8,7 @@ using System.Text.Json.Serialization;
 
 namespace Engine.Core.Game.Components
 {
+    [ComponentCategory("Graphics")]
     public class Sprite2D : ObjectComponent
     {
         [JsonIgnore]
@@ -54,6 +55,7 @@ namespace Engine.Core.Game.Components
             if (tex != null)
             {
                 texture = tex;
+                spriteBox = new Rectangle(0, 0, texture.Width, texture.Height);
             }
             else
             {

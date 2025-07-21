@@ -17,6 +17,9 @@ namespace Engine.Core
         
         // Reference to the GraphicsDeviceManager for fullscreen toggle
         public static Microsoft.Xna.Framework.GraphicsDeviceManager? graphicsManager;
+        public static int ScrollDelta => _currentMouse.ScrollWheelValue - _previousMouse.ScrollWheelValue;
+        public static bool ScrolledUp => ScrollDelta > 0;
+        public static bool ScrolledDown => ScrollDelta < 0;
 
         public static void Update()
         {
@@ -28,6 +31,11 @@ namespace Engine.Core
 
             HandleHotkeys();
         }
+
+        /// <summary>
+        /// Returns the mouse position in world coordinates
+        /// </summary>
+        /// <returns></returns>
         private static Vector2 GetMouseWorldPosition()
         {
             MouseState mouseState = Mouse.GetState();
@@ -61,11 +69,6 @@ namespace Engine.Core
             {
                 ToggleFullscreen();
             }
-
-            // Restart room
-            if (Keyboard.GetState().IsKeyDown(Keys.R) && (Keyboard.GetState().IsKeyDown(Keys.LeftControl) || Keyboard.GetState().IsKeyDown(Keys.RightControl)))
-            {
-            }
         }
 
         /// <summary>
@@ -85,7 +88,6 @@ namespace Engine.Core
         public static bool IsKeyPressed(Keys key) => _currentKeyboard.IsKeyDown(key) && _previousKeyboard.IsKeyUp(key);
         public static bool IsKeyReleased(Keys key) => _currentKeyboard.IsKeyUp(key) && _previousKeyboard.IsKeyDown(key);
 
-        // Mouse
         public static bool IsMouseDown(Button button = Button.Left)
         {
             return button switch

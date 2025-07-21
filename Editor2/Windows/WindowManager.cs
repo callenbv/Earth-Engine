@@ -16,10 +16,12 @@ namespace EarthEngineEditor.Windows
         private readonly AboutWindow _about;
         private readonly PerformanceWindow _performance;
         private readonly ConsoleWindow _console;
+        private readonly ToolbarWindow toolbar;
         private EarthProject project;
         private EditorApp game;
         public List<string> recentProjects = new List<string>();
         private bool _openSettingsPopup = false;
+        private bool openBuildPopup = false;
         public WindowManager(EditorApp game_, ConsoleWindow console)
         {
             _sceneView = new SceneViewWindow();
@@ -27,6 +29,7 @@ namespace EarthEngineEditor.Windows
             _project = new ProjectWindow();
             _about = new AboutWindow();
             _performance = new PerformanceWindow();
+            toolbar = new ToolbarWindow();
             _console = console;
             game = game_;
             Load();
@@ -37,6 +40,9 @@ namespace EarthEngineEditor.Windows
             _performance.Update(frameTime);
         }
 
+        /// <summary>
+        /// Render all windows in ImGui
+        /// </summary>
         public void RenderAll()
         {
             _sceneView.Render();
@@ -45,6 +51,7 @@ namespace EarthEngineEditor.Windows
             _about.Render();
             _performance.Render();
             _console.Render();
+            toolbar.Render();
         }
 
         /// <summary>
@@ -73,6 +80,7 @@ namespace EarthEngineEditor.Windows
         /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
         {
+            // Save project
             if (Input.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.LeftControl))
             {
                 if (Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.S))
@@ -110,8 +118,7 @@ namespace EarthEngineEditor.Windows
                     ImGui.EndMenu();
                 }
                 
-                // Toggle different windows
-                if (ImGui.BeginMenu("View"))
+                if (ImGui.BeginMenu("Window"))
                 {
                     bool sceneVisible = _sceneView.IsVisible;
                     if (ImGui.MenuItem("Scene View", null, ref sceneVisible))
@@ -137,7 +144,11 @@ namespace EarthEngineEditor.Windows
                     if (ImGui.MenuItem("About", null, ref aboutVisible))
                         _about.SetVisible(aboutVisible);
 
-                    if (ImGui.MenuItem("Reset", null, ref aboutVisible))
+                    bool toolbarVisible = toolbar.IsVisible;
+                    if (ImGui.MenuItem("Toolbar", null, ref toolbarVisible))
+                        toolbar.SetVisible(toolbarVisible);
+
+                    if (ImGui.MenuItem("Reset"))
                     {
                         _sceneView.SetVisible(true);
                         _inspector.SetVisible(true);
@@ -145,6 +156,7 @@ namespace EarthEngineEditor.Windows
                         _console.SetVisible(true);
                         _performance.SetVisible(true);
                         _about.SetVisible(false);
+                        toolbar.SetVisible(true);
                     }
 
                     ImGui.EndMenu();
@@ -159,11 +171,47 @@ namespace EarthEngineEditor.Windows
                     ImGui.EndMenu();
                 }
 
+                if (ImGui.BeginMenu("Build"))
+                {
+                    if (ImGui.MenuItem("Export"))
+                    {
+                        openBuildPopup = true;
+                    }
+                    ImGui.EndMenu();
+                }
+                
                 if (_openSettingsPopup)
                     ImGui.OpenPopup("Game Settings");
 
+                if (openBuildPopup)
+                    ImGui.OpenPopup("Export Game");
+
+                // Export the game
+                if (ImGui.BeginPopupModal("Export Game", ImGuiWindowFlags.AlwaysAutoResize))
+                {
+                    EditorApp.Instance.gameFocused = false;
+
+                    if (ImGui.Button("Export"))
+                    {
+                        ImGui.CloseCurrentPopup();
+                        openBuildPopup = false;
+                    }
+
+                    ImGui.SameLine();
+                    if (ImGui.Button("Cancel"))
+                    {
+                        ImGui.CloseCurrentPopup();
+                        openBuildPopup = false;
+                    }
+
+                    ImGui.EndPopup();
+                }
+
+                // Edit our game options
                 if (ImGui.BeginPopupModal("Game Settings", ImGuiWindowFlags.AlwaysAutoResize))
                 {
+                    EditorApp.Instance.gameFocused = false;
+
                     var settings = game.runtime.gameOptions;
 
                     string title = settings.Title ?? "";
@@ -197,15 +245,11 @@ namespace EarthEngineEditor.Windows
 
                 ImGui.EndMainMenuBar();
             }
-
-            // Run game
-            if (Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.F5))
-            {
-                project.Save();
-                EditorApp.Instance.runtime.Launch();
-            }
         }
 
+        /// <summary>
+        /// Called when we create a new project
+        /// </summary>
         public void CreateNewProject()
         {
             using (var folderBrowserDialog = new FolderBrowserDialog())
@@ -220,7 +264,7 @@ namespace EarthEngineEditor.Windows
                     var projectFolder = Path.Combine(projectPath, projectName);
                     var projectFile = Path.Combine(projectFolder, $"{projectName}.earthproj");
                     var assetsFolder = Path.Combine(projectFolder, "Assets");
-
+                    var csprojFile = Path.Combine(projectFolder, $"{projectName}.csproj");
                     try
                     {
                         // Create project structure
@@ -235,6 +279,32 @@ namespace EarthEngineEditor.Windows
                           ""created"": ""{DateTime.Now:yyyy-MM-dd HH:mm:ss}""
                         }}";
 
+                        var csprojContent = $@"<Project Sdk=""Microsoft.NET.Sdk"">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include=""..\\..\\Engine\\Engine.Core\\Engine.Core.csproj"" />
+    <Reference Include=""Engine.Core"">
+      <HintPath>Engine.Core.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include=""MonoGame.Framework.DesktopGL"" Version=""3.8.3"" />
+    <PackageReference Include=""ImGui.NET"" Version=""1.91.6.1"" />
+  </ItemGroup>
+
+</Project>";
+
+                        File.WriteAllText(csprojFile, csprojContent);
                         File.WriteAllText(projectFile, projectContent);
 
                         OpenProject(projectFolder);
@@ -250,6 +320,9 @@ namespace EarthEngineEditor.Windows
             }
         }
 
+        /// <summary>
+        /// Select a project to open
+        /// </summary>
         public void SelectProject()
         {
             using (var openFileDialog = new OpenFileDialog())
@@ -281,7 +354,7 @@ namespace EarthEngineEditor.Windows
         }
 
         /// <summary>
-        /// Opens the project given the filepath
+        /// Opens the project given the filepath. This sets our engine paths and reloads the project
         /// </summary>
         /// <param name="projectFilePath"></param>
         public void OpenProject(string? projectFilePath)
@@ -306,6 +379,7 @@ namespace EarthEngineEditor.Windows
             // Load project settings
             project = new EarthProject();
             project.Load();
+            EditorApp.Instance.fileWatcher = new EditorWatcher(projectDirectory);
 
             // Load existing projects (or create empty list)
             var data = File.Exists(ProjectSettings.RecentProjects)
@@ -325,12 +399,15 @@ namespace EarthEngineEditor.Windows
             // Write updated list back to file
             File.WriteAllLines(ProjectSettings.RecentProjects, data);
 
-            Console.WriteLine($"Opened project: {projectFilePath}");
+            Console.WriteLine($"Opened project {projectFilePath}");
             Console.WriteLine($"Project Directory: {ProjectSettings.ProjectDirectory}");
             Console.WriteLine($"Assets Directory: {ProjectSettings.AssetsDirectory}");
         }
 
-        private void SaveProject()
+        /// <summary>
+        /// Saves all assets and game options
+        /// </summary>
+        public void SaveProject()
         {
             _project.Save();
             project?.Save();
