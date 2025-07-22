@@ -25,7 +25,7 @@ namespace EarthEngineEditor.Windows
         private bool openBuildPopup = false;
         private static string exportPath = "";
         private static int selectedTargetIndex = 0;
-        private static readonly string[] targets = new[] { "linux-x64", "win-x64"};
+        private static readonly string[] targets = new[] { "linux-arm64", "linux-x64", "win-x64"};
 
         public WindowManager(EditorApp game_, ConsoleWindow console)
         {

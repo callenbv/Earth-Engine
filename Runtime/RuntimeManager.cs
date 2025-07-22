@@ -183,7 +183,7 @@ namespace GameRuntime
             ScriptManager scriptManager;
             ScriptCompiler.CompileAndLoadScripts(projectPath, out scriptManager);
 
-            // Start the process if succesful
+            // Start the process if successful
             var psi = new ProcessStartInfo
             {
                 FileName = runtimeExePath,

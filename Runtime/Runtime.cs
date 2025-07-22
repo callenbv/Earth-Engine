@@ -135,8 +135,9 @@ namespace GameRuntime
                 }
             }
 
-            projectPath ??= FindProjectRoot();
+            projectPath ??= AppContext.BaseDirectory;
             Console.WriteLine($"Project root set to {projectPath}");
+
 #if DEBUG
             if (projectPath == null)
             {
@@ -144,6 +145,15 @@ namespace GameRuntime
                 projectPath = Console.ReadLine()?.Trim('"');
             }
 #endif
+            // We defaut to our current directory, which should be the case for release builds
+            if (projectPath == null)
+            {
+                // Get the directory of the executable
+                string exeDir = AppContext.BaseDirectory;
+
+                // Ensure this is the actual folder (remove trailing slash just in case)
+                exeDir = exeDir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            }
 
             if (string.IsNullOrWhiteSpace(projectPath) || !Directory.Exists(projectPath))
             {
@@ -154,21 +164,5 @@ namespace GameRuntime
             using var game = new Runtime(projectPath);
             game.Run();
         }
-
-        public static string? FindProjectRoot()
-        {
-            string dir = Directory.GetCurrentDirectory();
-
-            while (dir != null)
-            {
-                if (File.Exists(Path.Combine(dir, "project.earthproj")))
-                    return dir;
-
-                dir = Directory.GetParent(dir)?.FullName;
-            }
-
-            return null;
-        }
-
     }
 } 
