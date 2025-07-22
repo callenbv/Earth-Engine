@@ -26,7 +26,6 @@ namespace GameRuntime
         private string roomsDir;
         private string gameOptionsPath;
         public GameOptions gameOptions;
-        private GameObjectManager objectManager;
         public GraphicsDeviceManager graphicsManager;
         private Lighting2D _lighting;
         private RenderTarget2D _sceneRenderTarget;

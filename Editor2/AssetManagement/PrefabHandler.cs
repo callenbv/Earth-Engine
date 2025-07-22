@@ -46,6 +46,7 @@ namespace Editor.AssetManagement
                 PropertyNameCaseInsensitive = true,
                 Converters = { new ComponentListJsonConverter() },
                 WriteIndented = true,
+                IncludeFields = true,
                 ReferenceHandler = ReferenceHandler.Preserve
             };
             options.Converters.Add(new Vector2JsonConverter());

@@ -41,6 +41,7 @@ namespace Editor.AssetManagement
                 var options = new JsonSerializerOptions
                 {
                     WriteIndented = true,
+                    IncludeFields = true,
                     Converters = { new ComponentListJsonConverter() },
                     ReferenceHandler = ReferenceHandler.Preserve
                 };

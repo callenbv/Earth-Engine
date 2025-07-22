@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using MonoGame.Extended.Serialization.Json;
+using System.Reflection;
 
 namespace Editor.AssetManagement
 {
@@ -43,5 +44,27 @@ namespace Editor.AssetManagement
             }
             writer.WriteEndArray();
         }
+
+        public static void ApplyComponentProperties(object component, JsonElement props)
+        {
+            var type = component.GetType();
+
+            foreach (var prop in props.EnumerateObject())
+            {
+                var field = type.GetField(prop.Name, BindingFlags.Public | BindingFlags.Instance);
+                if (field == null || field.IsInitOnly) continue;
+
+                try
+                {
+                    var value = JsonSerializer.Deserialize(prop.Value.GetRawText(), field.FieldType);
+                    field.SetValue(component, value);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[Deserializer] Failed to set {type.Name}.{prop.Name}: {ex.Message}");
+                }
+            }
+        }
+
     }
 }

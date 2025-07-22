@@ -14,7 +14,6 @@ namespace Engine.Core
         // Core engine services
         public ContentManager? ContentManager { get; set; }
         public GraphicsDevice? GraphicsDevice { get; set; }
-        public GameObjectManager? GameObjectManager { get; set; }
         public ScriptManager? ScriptManager { get; set; }
         public string? AssetsRoot { get; set; }
         public string? RoomsDir { get; set; }

@@ -61,6 +61,7 @@ namespace Engine.Core.Rooms
                 {
                     PropertyNameCaseInsensitive = true,
                     Converters = { new ComponentListJsonConverter() },
+                    IncludeFields = true,
                     ReferenceHandler = ReferenceHandler.Preserve,
                 };
                 options.Converters.Add(new Vector2JsonConverter());
@@ -90,6 +91,16 @@ namespace Engine.Core.Rooms
             }
 
             return scene;
+        }
+
+        /// <summary>
+        /// Find a GameObject by name
+        /// </summary>
+        /// <param name="name">Name to search for</param>
+        /// <returns>The GameObject if found, null otherwise</returns>
+        public GameObject? FindByName(string name)
+        {
+            return objects.FirstOrDefault(obj => !obj.IsDestroyed && obj.Name == name);
         }
     }
 }

@@ -56,6 +56,8 @@ namespace Engine.Core.Game.Components
             {
                 texture = tex;
                 spriteBox = new Rectangle(0, 0, texture.Width, texture.Height);
+                frameHeight = texture.Height;
+                frameWidth = texture.Width;
             }
             else
             {
@@ -117,8 +119,9 @@ namespace Engine.Core.Game.Components
         {
             if (texture != null)
             {
-                 origin = new Vector2(frameWidth / 2, frameHeight / 2);
-                 spriteBatch.Draw(texture, Owner.position, spriteBox, Tint, Owner.rotation, origin, Owner.scale, spriteEffect, depth);
+                depth = Owner.GetDepth();
+                origin = new Vector2(frameWidth / 2, frameHeight / 2);
+                spriteBatch.Draw(texture, Owner.position, spriteBox, Tint, Owner.rotation, origin, Owner.scale, spriteEffect, depth);
             }
         }
 

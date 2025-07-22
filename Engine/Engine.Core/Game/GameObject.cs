@@ -18,18 +18,23 @@ namespace Engine.Core.Game
     public class GameObject
     {
         public string Name { get; set; } = string.Empty;
-        public SpriteData? sprite;
         public Vector2 position;
         public float scale = 1f;
         public float rotation;
-        public List<object> scriptInstances = new List<object>();
         public List<GameObject> children = new List<GameObject>();
 
         [JsonConverter(typeof(ComponentListJsonConverter))]
         public List<IComponent> components { get; set; } = new();
 
         public bool IsDestroyed { get; private set; } = false;
-               
+
+        [JsonIgnore]
+        [HideInInspector]
+        public Sprite2D? Sprite
+        {
+            get => GetComponent<Sprite2D>();
+        }
+
         public GameObject()
         {
             OnCreate();
@@ -180,11 +185,33 @@ namespace Engine.Core.Game
             var options = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
+                IncludeFields = true,
                 ReferenceHandler = ReferenceHandler.Preserve
             };
             options.Converters.Add(new ComponentListJsonConverter());
 
             return JsonSerializer.Deserialize<GameObject>(json, options);
+        }
+
+        /// <summary>
+        /// Calculate the depth value based on the object's feet position (bottom of sprite)
+        /// </summary>
+        /// <param name="gameObj">The GameObject to calculate depth for</param>
+        /// <returns>Depth value (0 = front, 1 = back)</returns>
+        public float GetDepth()
+        {
+            if (Sprite == null || Sprite.texture == null)
+                return 0f;
+
+            // Calculate the bottom Y position (feet) of the sprite
+            float feetY = position.Y + Sprite.frameHeight / 2;
+            feetY /= 1000f;
+
+            feetY = Math.Clamp(feetY, 0f, 1f);
+            // Convert to depth value (0 = front, 1 = back)
+            // You can adjust this calculation based on your game's coordinate system
+            // For a typical top-down view, higher Y values should have higher depth (appear behind)
+            return feetY; // Normalize to 0-1 range, adjust divisor as needed
         }
     }
 } 
