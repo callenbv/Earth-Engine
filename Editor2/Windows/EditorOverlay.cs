@@ -82,7 +82,7 @@ namespace Editor.Windows
             {
                 Microsoft.Xna.Framework.Color gridColor = new Microsoft.Xna.Framework.Color(255, 255, 255, 50);
                 float zoom = Camera.Main.Zoom;
-                Vector2 camPos = Camera.Main.Position;
+                Vector2 camPos = Vector2.Zero;
 
                 // Get screen size in world units
                 float viewWidth = Camera.Main.ViewportWidth / zoom;

@@ -4,6 +4,7 @@ using Engine.Core.Data;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using System.Diagnostics;
 using System.IO;
 
 namespace EarthEngineEditor.Windows
@@ -22,6 +23,10 @@ namespace EarthEngineEditor.Windows
         public List<string> recentProjects = new List<string>();
         private bool _openSettingsPopup = false;
         private bool openBuildPopup = false;
+        private static string exportPath = "";
+        private static int selectedTargetIndex = 0;
+        private static readonly string[] targets = new[] { "linux-x64", "win-x64"};
+
         public WindowManager(EditorApp game_, ConsoleWindow console)
         {
             _sceneView = new SceneViewWindow();
@@ -191,10 +196,68 @@ namespace EarthEngineEditor.Windows
                 {
                     EditorApp.Instance.gameFocused = false;
 
-                    if (ImGui.Button("Export"))
+                    EditorApp.Instance.gameFocused = false;
+
+                    ImGui.Text("Select target platform:");
+                    ImGui.Combo("##TargetPlatform", ref selectedTargetIndex, targets, targets.Length);
+
+                    ImGui.InputText("Export Path", ref exportPath, 512);
+                    ImGui.SameLine();
+                    if (ImGui.Button("Browse"))
+                    {
+                        using var dialog = new FolderBrowserDialog();
+                        dialog.Description = "Choose export folder";
+                        dialog.UseDescriptionForTitle = true;
+
+                        if (dialog.ShowDialog() == DialogResult.OK)
+                        {
+                            exportPath = dialog.SelectedPath;
+                        }
+                    }
+
+                    if (ImGui.Button("Export") && !string.IsNullOrWhiteSpace(exportPath))
                     {
                         ImGui.CloseCurrentPopup();
                         openBuildPopup = false;
+
+                        string target = targets[selectedTargetIndex];
+                        string projectDir = ProjectSettings.ProjectDirectory;
+                        string runtimePath = Path.GetFullPath(Path.Combine(ProjectSettings.RuntimePath, "..", "..", "..", ".."));
+                        string runtimeCsproj = Path.Combine(runtimePath, "GameRuntime.csproj");
+
+                        Directory.CreateDirectory(exportPath);
+                        string extraProps = "";
+                        if (target.StartsWith("win"))
+                        {
+                            extraProps = "-p:UseWindowsForms=true -p:UseWPF=true";
+                        }
+
+                        var psi = new ProcessStartInfo
+                        {
+                            FileName = "dotnet",
+                            Arguments = $"publish \"{runtimeCsproj}\" -c Release -r {target} --self-contained true {extraProps} -o \"{exportPath}\"",
+                            WorkingDirectory = runtimePath,
+                            RedirectStandardOutput = true,
+                            RedirectStandardError = true,
+                            UseShellExecute = false,
+                            CreateNoWindow = true
+                        };
+
+                        try
+                        {
+                            using var process = Process.Start(psi);
+                            string output = process.StandardOutput.ReadToEnd();
+                            string error = process.StandardError.ReadToEnd();
+                            process.WaitForExit();
+
+                            Console.WriteLine($"[Export] Build for {target} complete:\n{output}");
+                            if (!string.IsNullOrWhiteSpace(error))
+                                Console.WriteLine($"[Export ERROR] {error}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"[Export ERROR] Failed to build: {ex.Message}");
+                        }
                     }
 
                     ImGui.SameLine();
