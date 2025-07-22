@@ -269,11 +269,22 @@ namespace EarthEngineEditor.Windows
                             string error = process.StandardError.ReadToEnd();
                             process.WaitForExit();
 
+                            // Copy over assets and game options to the export directory
                             try
                             {
+                                // Assets
                                 string exportAssets = Path.Combine(exportPath, "Assets");
                                 CopyDirectory(ProjectSettings.AssetsDirectory, exportAssets);
-                                Console.WriteLine("[Export] Copied Assets folder to build output.");
+
+                                // Game Options
+                                string optionsFileDest = Path.Combine(exportPath, Path.GetFileName(project.optionsPath));
+                                File.Copy(project.optionsPath, optionsFileDest, overwrite: true);
+
+                                // Compiled DLLs
+                                CopyDirectory(ProjectSettings.BuildPath, exportPath);
+
+                                // Success
+                                Console.WriteLine("[Export] Copied data to build output.");
                             }
                             catch (Exception ex)
                             {
@@ -401,7 +412,7 @@ namespace EarthEngineEditor.Windows
                         File.WriteAllText(projectFile, projectContent);
 
                         OpenProject(projectFolder);
-                        project.settings.GameName = projectName;
+                        project.settings.Title = projectName;
 
                         Console.WriteLine($"Created new project: {projectFile}");
                     }
@@ -463,6 +474,7 @@ namespace EarthEngineEditor.Windows
             ProjectSettings.AssetsDirectory = ProjectSettings.NormalizePath(assetsDirectory);
             ProjectSettings.AbsoluteProjectPath = projectDirectory;
             ProjectSettings.AbsoluteAssetsPath = assetsDirectory;
+            ProjectSettings.BuildPath = Path.Combine(ProjectSettings.ProjectDirectory, "Build");
 
             EnginePaths.AssetsBase = ProjectSettings.AssetsDirectory;
 

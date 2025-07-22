@@ -14,7 +14,6 @@ namespace Engine.Core.Game
         public string? LastScene { get; set; } = string.Empty;
         public string? Title { get; set; } = string.Empty;
         public string? RuntimePath { get; set; } = string.Empty;
-        public string? GameName { get; set; } = string.Empty;
         public int WindowWidth { get; set; } = 1280;
         public int WindowHeight { get; set; } = 720;
 
@@ -50,7 +49,6 @@ namespace Engine.Core.Game
                 LastScene = newOptions.LastScene;
                 Title = newOptions.Title;
                 RuntimePath = newOptions.RuntimePath;
-                GameName = newOptions.GameName;
                 WindowWidth = newOptions.WindowWidth;
                 WindowHeight = newOptions.WindowHeight;
                 Console.WriteLine("[DEBUG] Loaded GameOptions:");
