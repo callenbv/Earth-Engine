@@ -130,7 +130,10 @@ namespace EarthEngineEditor
             bool isHoveringGameArea = mouse.X >= min.X && mouse.X <= max.X &&
                                       mouse.Y >= min.Y && mouse.Y <= max.Y;
 
-            bool isInputFree = !ImGui.IsAnyItemActive() && !ImGui.IsAnyItemFocused() && !Input.IsKeyDown(XnaKeys.LeftControl);
+            bool isInputFree = !ImGui.IsAnyItemActive() && 
+                !ImGui.IsAnyItemFocused() && 
+                !Input.IsKeyDown(XnaKeys.LeftControl) && 
+                IsActive;
             gameFocused = isHoveringGameArea && isInputFree;
 
             ImGui.DockSpace(

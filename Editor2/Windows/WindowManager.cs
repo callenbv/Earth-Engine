@@ -96,6 +96,25 @@ namespace EarthEngineEditor.Windows
         }
 
         /// <summary>
+        /// Copy directory to a source destination
+        /// </summary>
+        /// <param name="sourceDir"></param>
+        /// <param name="destinationDir"></param>
+        private static void CopyDirectory(string sourceDir, string destinationDir)
+        {
+            foreach (var dirPath in Directory.GetDirectories(sourceDir, "*", SearchOption.AllDirectories))
+            {
+                Directory.CreateDirectory(dirPath.Replace(sourceDir, destinationDir));
+            }
+
+            foreach (var filePath in Directory.GetFiles(sourceDir, "*.*", SearchOption.AllDirectories))
+            {
+                string destPath = filePath.Replace(sourceDir, destinationDir);
+                File.Copy(filePath, destPath, overwrite: true);
+            }
+        }
+
+        /// <summary>
         /// Render the top menu bar (file, etc.)
         /// </summary>
         public void RenderMenuBar()
@@ -249,6 +268,17 @@ namespace EarthEngineEditor.Windows
                             string output = process.StandardOutput.ReadToEnd();
                             string error = process.StandardError.ReadToEnd();
                             process.WaitForExit();
+
+                            try
+                            {
+                                string exportAssets = Path.Combine(exportPath, "Assets");
+                                CopyDirectory(ProjectSettings.AssetsDirectory, exportAssets);
+                                Console.WriteLine("[Export] Copied Assets folder to build output.");
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"[Export ERROR] Failed to copy assets: {ex.Message}");
+                            }
 
                             Console.WriteLine($"[Export] Build for {target} complete:\n{output}");
                             if (!string.IsNullOrWhiteSpace(error))

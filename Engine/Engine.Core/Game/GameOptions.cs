@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace Engine.Core.Game
 {
@@ -52,7 +53,7 @@ namespace Engine.Core.Game
                 GameName = newOptions.GameName;
                 WindowWidth = newOptions.WindowWidth;
                 WindowHeight = newOptions.WindowHeight;
-                Console.WriteLine($"[GameOptions] Loaded options from: {optionsPath}");
+                Console.WriteLine("[DEBUG] Loaded GameOptions:");
             }
         }
     }

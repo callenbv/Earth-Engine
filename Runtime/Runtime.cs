@@ -3,6 +3,7 @@ using Engine.Core.Data;
 using Engine.Core.Game;
 using Engine.Core.Game.Components;
 using Engine.Core.Rooms;
+using Microsoft.CodeAnalysis;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -44,6 +45,7 @@ namespace GameRuntime
             runtimeManager.Initialize();
 
             gameOptions.Load("game_options.json");
+
             Window.AllowUserResizing = true;
             Window.Title = gameOptions.Title;
             _graphics.PreferredBackBufferWidth = gameOptions.WindowWidth;
@@ -161,6 +163,22 @@ namespace GameRuntime
                 return;
             }
 
+            string fullPath = Path.Combine(projectPath, "Assets", "Rooms","Test.room"); // Change filename as needed
+
+            Console.WriteLine($"[DEBUG] fullPath = {fullPath}");
+            Console.WriteLine($"[DEBUG] File.Exists = {File.Exists(fullPath)}");
+
+            try
+            {
+                var fi = new FileInfo(fullPath);
+                Console.WriteLine($"[DEBUG] FileInfo.Exists = {fi.Exists}");
+                Console.WriteLine($"[DEBUG] FileInfo.IsReadOnly = {fi.IsReadOnly}");
+                Console.WriteLine($"[DEBUG] Attributes = {fi.Attributes}");
+            }
+            catch (Exception infoEx)
+            {
+                Console.WriteLine($"[DEBUG] FileInfo error: {infoEx}");
+            }
             using var game = new Runtime(projectPath);
             game.Run();
         }
