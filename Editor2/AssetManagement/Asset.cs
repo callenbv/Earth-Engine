@@ -36,6 +36,14 @@ namespace Editor.AssetManagement
             _handler?.Save(absPath);
         }
 
+        public void Delete(string filePath)
+        {
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+                Console.WriteLine($"Deleted {Name} at {filePath}");
+            }
+        }
         public void EnsureLoaded()
         {
             string absPath = System.IO.Path.Combine(ProjectSettings.AssetsDirectory, Path);

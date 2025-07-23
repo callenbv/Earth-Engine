@@ -233,10 +233,21 @@ namespace EarthEngineEditor.Windows
                 ImGui.EndGroup();
                 ImGui.PopID();
 
+                xPos += itemWidth + padding;
+
+                if (xPos + itemWidth > panelWidth)
+                {
+                    xPos = 0;
+                }
+                else
+                {
+                    ImGui.SameLine();
+                }
+
                 // Each asset needs a unique ID in ImGui
                 if (_selectedItem != null)
                 {
-                    if (ImGui.BeginDragDropSource())
+                    if (ImGui.IsItemActive() && ImGui.BeginDragDropSource())
                     {
                         string str = _selectedItem.Name;
 
@@ -282,19 +293,9 @@ namespace EarthEngineEditor.Windows
                     else
                     {
                         // Show inspector and open asset
+                        _selectedItem = item;
                         InspectorWindow.Instance.Inspect(item);
                     }
-                }
-
-                xPos += itemWidth + padding;
-
-                if (xPos + itemWidth > panelWidth)
-                {
-                    xPos = 0;
-                }
-                else
-                {
-                    ImGui.SameLine();
                 }
             }
         }
@@ -336,12 +337,13 @@ namespace EarthEngineEditor.Windows
                     ImGui.Separator();
                     if (ImGui.MenuItem("Rename"))
                     {
+                        // To be implemented...
                     }
                     if (ImGui.MenuItem("Delete"))
                     {
-                        string fileName = _selectedItem.Path;
-                        string fullPath = Path.Combine(ProjectSettings.AssetsDirectory, fileName);
-                        File.Delete(fullPath);
+                        string path = Path.Combine(ProjectSettings.AssetsDirectory, _selectedItem.Path);
+                        _selectedItem.Delete(path);
+                        _selectedItem = null;
                         RefreshItems();
                     }
                 }

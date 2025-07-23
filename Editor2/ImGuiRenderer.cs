@@ -67,6 +67,55 @@ namespace EarthEngineEditor
             };
         }
 
+        public static bool IconButton(string id, string icon, Microsoft.Xna.Framework.Color color, float padding = 16f, float spacing = 6f)
+        {
+            ImGui.PushID(id);
+            float fontSize = ImGui.GetFontSize();
+            var textSize = ImGui.CalcTextSize(icon)/2;
+
+            // Make the button square
+            float boxSize = MathF.Max(textSize.X, textSize.Y) + padding * 2;
+            var buttonSize = new System.Numerics.Vector2(boxSize, boxSize);
+
+            var pos = ImGui.GetCursorScreenPos();
+            bool clicked = ImGui.InvisibleButton("btn", buttonSize);
+            bool hovered = ImGui.IsItemHovered();
+            bool held = ImGui.IsItemActive();
+
+            var drawList = ImGui.GetWindowDrawList();
+            if (hovered || held)
+            {
+                uint bg = ImGui.GetColorU32(
+                    held ? ImGuiCol.ButtonActive :
+                    hovered ? ImGuiCol.ButtonHovered :
+                              ImGuiCol.Button
+                );
+                drawList.AddRectFilled(pos, pos + buttonSize, bg, 4f);
+            }
+
+            var textPos = new System.Numerics.Vector2(
+                pos.X + (boxSize - textSize.X) * 0.5f,
+                pos.Y + (boxSize - textSize.Y + 4) * 0.5f
+            );
+
+            // Convert XNA color to ImGui color
+            var textColor = new System.Numerics.Vector4(
+                color.R / 255f,
+                color.G / 255f,
+                color.B / 255f,
+                color.A / 255f
+            );
+            uint colorU32 = ImGui.ColorConvertFloat4ToU32(textColor);
+
+            drawList.AddText(textPos, colorU32, icon);
+
+            ImGui.PopID();
+
+            return clicked;
+        }
+
+
+
         private void SetupDeviceResources()
         {
             _effect = new BasicEffect(_gd)

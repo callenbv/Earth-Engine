@@ -123,6 +123,10 @@ namespace Editor.AssetManagement
                             {
                                 var instance = (ObjectComponent)Activator.CreateInstance(comp.Type);
                                 prefab.components.Add(instance);
+
+                                if (prefab is GameObject gameObject)
+                                    instance.Owner = gameObject;
+
                                 instance.Create();
                                 ImGui.CloseCurrentPopup();
                             }

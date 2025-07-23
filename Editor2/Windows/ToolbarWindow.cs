@@ -57,23 +57,26 @@ namespace EarthEngineEditor.Windows
 
             ImGui.Begin("Game", ref showToolbarWindow);
 
+            // Play button
+            if (ImGuiRenderer.IconButton("play", "\uf04b", Microsoft.Xna.Framework.Color.White))
+                EditorApp.Instance.runtime.Launch();
+
+            ImGui.SameLine();
+
             // Grid Toggle
-            if (ImGui.Checkbox("Grid", ref showGrid))
+            string gridIcon = showGrid ? "\uf00a" : "\uf00a";
+            Microsoft.Xna.Framework.Color gridColor = showGrid ? Microsoft.Xna.Framework.Color.White : Microsoft.Xna.Framework.Color.Gray;
+
+            if (ImGuiRenderer.IconButton("grid", gridIcon, gridColor))
             {
+                showGrid = !showGrid;
                 ToggleGrid();
             }
 
             ImGui.SameLine();
 
-            // Play Button
-            if (ImGui.Button("Play"))
-            {
-                EditorApp.Instance.runtime.Launch();
-            }
-            ImGui.SameLine();
-
             // Camera Details
-            Vector2 cameraPosition = Camera.Main.Position;
+            Vector2 cameraPosition = Input.mouseWorldPosition;
             cameraPosition.Round();
             ImGui.Text($"{cameraPosition} Zoom: {Camera.Main.Zoom}x");
 

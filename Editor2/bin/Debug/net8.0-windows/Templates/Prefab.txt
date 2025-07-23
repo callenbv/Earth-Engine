@@ -1,0 +1,12 @@
+{
+  "name": "NewPrefab",
+  "components": [
+    {
+      "type": "Transform",
+      "Name": "Transform",
+      "Position": "0 0",
+      "Rotation": 0,
+      "Scale": 1
+    }
+  ]
+}

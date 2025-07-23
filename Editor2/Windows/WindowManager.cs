@@ -141,6 +141,35 @@ namespace EarthEngineEditor.Windows
                     {
                         SaveProject();
                     }
+                    if (ImGui.MenuItem("Show In File Explorer"))
+                    {
+                        if (Directory.Exists(ProjectSettings.AbsoluteProjectPath))
+                        {
+                            Process.Start("explorer.exe", $"\"{ProjectSettings.AbsoluteProjectPath}\"");
+                        }
+                    }
+                    if (ImGui.MenuItem("Open Visual Studio"))
+                    {
+                        if (Directory.Exists(ProjectSettings.AbsoluteProjectPath))
+                        {
+                            var csprojPath = Directory.GetFiles(ProjectSettings.AbsoluteProjectPath, "*.csproj").FirstOrDefault();
+
+                            if (csprojPath != null)
+                            {
+                                ProcessStartInfo psi = new()
+                                {
+                                    FileName = csprojPath,
+                                    UseShellExecute = true // needed to open with default associated app (Visual Studio)
+                                };
+
+                                Process.Start(psi);
+                            }
+                            else
+                            {
+                                Console.WriteLine("[DEBUG] No .csproj file found in: " + ProjectSettings.ProjectDirectory);
+                            }
+                        }
+                    }
                     if (ImGui.MenuItem("Exit"))
                     {
                         EditorApp.Instance.Exit();
