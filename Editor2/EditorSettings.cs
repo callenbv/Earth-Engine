@@ -12,8 +12,8 @@ namespace EarthEngineEditor
         public bool ShowMetricsWindow { get; set; } = false;
         public bool ShowAboutWindow { get; set; } = false;
         public bool ShowConsole { get; set; } = true;
-        public int WindowWidth { get; set; } = 1920;
-        public int WindowHeight { get; set; } = 1080;
+        public int WindowWidth { get; set; } = 1280;
+        public int WindowHeight { get; set; } = 720;
         public List<string> OpenPanels = new();
         public string? LastFocusedPanel = null;
 

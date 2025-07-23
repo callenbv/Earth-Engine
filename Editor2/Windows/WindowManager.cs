@@ -32,6 +32,7 @@ namespace EarthEngineEditor.Windows
             _sceneView = new SceneViewWindow();
             _inspector = new InspectorWindow();
             _project = new ProjectWindow();
+            project = new EarthProject();
             _about = new AboutWindow();
             _performance = new PerformanceWindow();
             toolbar = new ToolbarWindow();
@@ -75,6 +76,11 @@ namespace EarthEngineEditor.Windows
         public string? GetLastProject()
         {
             string? recentProject = recentProjects.FirstOrDefault();
+
+            if (!File.Exists(recentProject))
+            {
+                recentProject = null;
+            }
 
             return recentProject;
         }
@@ -215,8 +221,6 @@ namespace EarthEngineEditor.Windows
                 {
                     EditorApp.Instance.gameFocused = false;
 
-                    EditorApp.Instance.gameFocused = false;
-
                     ImGui.Text("Select target platform:");
                     ImGui.Combo("##TargetPlatform", ref selectedTargetIndex, targets, targets.Length);
 
@@ -312,11 +316,11 @@ namespace EarthEngineEditor.Windows
                 }
 
                 // Edit our game options
+                var settings = game.runtime.gameOptions;
+
                 if (ImGui.BeginPopupModal("Game Settings", ImGuiWindowFlags.AlwaysAutoResize))
                 {
                     EditorApp.Instance.gameFocused = false;
-
-                    var settings = game.runtime.gameOptions;
 
                     string title = settings.Title ?? "";
                     if (ImGui.InputText("Game Title", ref title, 100))
@@ -366,6 +370,7 @@ namespace EarthEngineEditor.Windows
                     var projectPath = folderBrowserDialog.SelectedPath;
                     var projectName = "NewProject";
                     var projectFolder = Path.Combine(projectPath, projectName);
+                    var buildFolder = Path.Combine(projectFolder, "Build");
                     var projectFile = Path.Combine(projectFolder, $"{projectName}.earthproj");
                     var assetsFolder = Path.Combine(projectFolder, "Assets");
                     var csprojFile = Path.Combine(projectFolder, $"{projectName}.csproj");
@@ -374,6 +379,7 @@ namespace EarthEngineEditor.Windows
                         // Create project structure
                         Directory.CreateDirectory(projectFolder);
                         Directory.CreateDirectory(assetsFolder);
+                        Directory.CreateDirectory(buildFolder);
 
                         // Create project file
                         var projectContent = $@"{{
@@ -408,13 +414,20 @@ namespace EarthEngineEditor.Windows
 
 </Project>";
 
+                        // Create the csproj and project file
                         File.WriteAllText(csprojFile, csprojContent);
                         File.WriteAllText(projectFile, projectContent);
 
-                        OpenProject(projectFolder);
-                        project.settings.Title = projectName;
+                        // Create a default scene file
+                        var roomData = $@"";
+                        string defaultScene = Path.Combine(assetsFolder, "Scene.room");
+                        File.WriteAllText(defaultScene, roomData);
 
                         Console.WriteLine($"Created new project: {projectFile}");
+
+                        // Open the newly created project
+                        OpenProject(projectFile);
+                        project.settings.Title = projectName;
                     }
                     catch (Exception ex)
                     {
@@ -461,12 +474,12 @@ namespace EarthEngineEditor.Windows
         /// Opens the project given the filepath. This sets our engine paths and reloads the project
         /// </summary>
         /// <param name="projectFilePath"></param>
-        public void OpenProject(string? projectFilePath)
+        public void OpenProject(string? projectFile)
         {
-            if (projectFilePath == null)
+            if (projectFile == null)
                 return;
 
-            var projectDirectory = Path.GetDirectoryName(projectFilePath);
+            string projectDirectory = Path.GetDirectoryName(projectFile);
             var assetsDirectory = Path.Combine(projectDirectory, "Assets");
 
             // Set project directories
@@ -492,10 +505,10 @@ namespace EarthEngineEditor.Windows
                 : new List<string>();
 
             // Normalize path and remove duplicates
-            data.RemoveAll(p => string.Equals(p, projectFilePath, StringComparison.OrdinalIgnoreCase));
+            data.RemoveAll(p => string.Equals(p, projectFile, StringComparison.OrdinalIgnoreCase));
 
             // Insert the new project at the top
-            data.Insert(0, projectFilePath);
+            data.Insert(0, projectFile);
 
             // Limit to 10 recent entries
             if (data.Count > 10)
@@ -504,7 +517,7 @@ namespace EarthEngineEditor.Windows
             // Write updated list back to file
             File.WriteAllLines(ProjectSettings.RecentProjects, data);
 
-            Console.WriteLine($"Opened project {projectFilePath}");
+            Console.WriteLine($"Opened project {projectDirectory}");
             Console.WriteLine($"Project Directory: {ProjectSettings.ProjectDirectory}");
             Console.WriteLine($"Assets Directory: {ProjectSettings.AssetsDirectory}");
         }

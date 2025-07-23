@@ -48,6 +48,10 @@ namespace GameRuntime
             Instance = this;
             game = game_;
             _graphicsDevice = game_.GraphicsDevice;
+            _lighting = new Lighting2D(_graphicsDevice, INTERNAL_WIDTH, INTERNAL_HEIGHT);
+            _lastWidth = INTERNAL_WIDTH;
+            _lastHeight = INTERNAL_HEIGHT;
+            _sceneRenderTarget = new RenderTarget2D(_graphicsDevice, INTERNAL_WIDTH, INTERNAL_HEIGHT);
         }
 
         /// <summary>
@@ -67,11 +71,6 @@ namespace GameRuntime
             textureLibrary.graphicsDevice = _graphicsDevice;
             textureLibrary.LoadTextures();
 
-            _lighting = new Lighting2D(_graphicsDevice, INTERNAL_WIDTH, INTERNAL_HEIGHT);
-            _lastWidth = INTERNAL_WIDTH;
-            _lastHeight = INTERNAL_HEIGHT;
-
-            _sceneRenderTarget = new RenderTarget2D(_graphicsDevice, INTERNAL_WIDTH, INTERNAL_HEIGHT);
             Camera.Main.SetTargetViewportSize(384, 216);  
             graphicsManager.ApplyChanges();
         }

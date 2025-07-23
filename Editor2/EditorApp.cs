@@ -61,6 +61,7 @@ namespace EarthEngineEditor
 
             runtime = new RuntimeManager(this);
             runtime.graphicsManager = _graphics;
+            runtime.gameOptions = new GameOptions(); // We use default options until we load per-project
             EngineContext.Paused = true;
 
             // Load default project for test
