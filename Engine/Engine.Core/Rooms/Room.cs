@@ -34,9 +34,21 @@ namespace Engine.Core.Rooms
         /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
         {
+            List<GameObject> destroyedObjects = new List<GameObject>();
+
             foreach (var obj in objects)
             {
+                // Destroyed objects defer their destruction
+                if (obj.IsDestroyed)
+                    destroyedObjects.Add(obj);
+
                 obj.Update(gameTime);
+            }
+
+            // Remove destroyed objects
+            foreach (GameObject obj in destroyedObjects)
+            {
+                objects.Remove(obj);
             }
         }
 

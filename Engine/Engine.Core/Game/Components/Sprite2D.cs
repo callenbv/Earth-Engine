@@ -59,12 +59,6 @@ namespace Engine.Core.Game.Components
                 frameHeight = texture.Height;
                 frameWidth = texture.Width;
             }
-            else
-            {
-                // Default red square
-                texture = new Texture2D(TextureLibrary.Instance.graphicsDevice, 1, 1);
-                texture.SetData(new[] { Color.Red });
-            }
         }
 
         /// <summary>
@@ -117,12 +111,12 @@ namespace Engine.Core.Game.Components
         /// <param name="scale"></param>
         public override void Draw(SpriteBatch spriteBatch)
         {
-            if (texture != null)
-            {
-                depth = Owner.GetDepth();
-                origin = new Vector2(frameWidth / 2, frameHeight / 2);
-                spriteBatch.Draw(texture, Owner.position, spriteBox, Tint, Owner.rotation, origin, Owner.scale, spriteEffect, depth);
-            }
+            if (texture == null)
+                return;
+
+            depth = Owner.GetDepth();
+            origin = new Vector2(frameWidth / 2, frameHeight / 2);
+            spriteBatch.Draw(texture, Owner.position, spriteBox, Tint, Owner.rotation, origin, Owner.scale, spriteEffect, depth);
         }
 
         /// <summary>

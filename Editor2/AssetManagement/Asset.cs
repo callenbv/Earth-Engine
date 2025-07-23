@@ -84,7 +84,6 @@ namespace Editor.AssetManagement
         {
             return ProjectWindow.Instance.Get(path);
         }
-
         public static string GetExtensionFromType(AssetType type)
         {
             return type switch

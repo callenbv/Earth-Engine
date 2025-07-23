@@ -6,6 +6,7 @@ using Engine.Core.Game.Components;
 using Engine.Core.Rooms;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
+using System.Text;
 
 namespace EarthEngineEditor.Windows
 {
@@ -16,7 +17,11 @@ namespace EarthEngineEditor.Windows
         private GameObject? _selectedObject;
         public static SceneViewWindow Instance { get; private set; }
         private int gridSize = 8;
-
+        private bool _showRenamePopup = false;
+        private string _renameBuffer = "";
+        private string currentName = "";
+        private GameObject? _nodeBeingRenamed;
+        private bool _isRenaming = false;
         public SceneViewWindow()
         {
             Instance = this;
@@ -36,6 +41,9 @@ namespace EarthEngineEditor.Windows
             ImGui.End();
         }
 
+        /// <summary>
+        /// Render the scene hierarchy of objects
+        /// </summary>
         private void RenderHierarchy()
         {
             bool root = ImGui.TreeNodeEx("Scene");
@@ -95,9 +103,9 @@ namespace EarthEngineEditor.Windows
             {
                 if (ImGui.MenuItem("Create Blank GameObject"))
                 {
-                    var newObj = new GameObject("Empty");
-                    Sprite2D sprite = new Sprite2D();
-                    newObj.AddComponent(sprite);
+                    var newObj = new GameObject($"Empty{scene.objects.Count}");
+                    newObj.AddComponent<Transform>();
+                    newObj.AddComponent<Sprite2D>();
                     scene.objects.Add(newObj);
                 }
 
@@ -114,27 +122,78 @@ namespace EarthEngineEditor.Windows
                 ImGui.TreePop();
             }
         }
+
+        /// <summary>
+        /// Draw a game object node and its children
+        /// </summary>
+        /// <param name="obj"></param>
         private void DrawGameObjectNode(GameObject obj)
         {
             ImGui.PushID(obj.Name); // Ensure unique ID
 
             bool hasChildren = obj.children != null && obj.children.Count > 0;
-
             bool open = false;
+            ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags.None;
+
             if (hasChildren)
                 open = ImGui.TreeNodeEx(obj.Name);
             else
                 open = ImGui.TreeNodeEx(obj.Name, ImGuiTreeNodeFlags.Leaf | ImGuiTreeNodeFlags.NoTreePushOnOpen);
 
+            var nodeId = obj.Name.GetHashCode();
+
+            // If currently renaming THIS node, draw InputText instead of label
+            if (_isRenaming && _nodeBeingRenamed == obj)
+            {
+                ImGui.PushItemWidth(200); // prevent layout shifting
+                if (ImGui.InputText("##renameNode", ref _renameBuffer, 256, ImGuiInputTextFlags.EnterReturnsTrue | ImGuiInputTextFlags.AutoSelectAll))
+                {
+                    obj.Name = _renameBuffer.Trim();
+                    _isRenaming = false;
+                    _nodeBeingRenamed = null;
+                    InspectorWindow.Instance.Inspect(new InspectableGameObject(obj));
+                }
+
+                // Cancel rename on ESC or click away
+                if (!ImGui.IsItemActive() && (ImGui.IsMouseClicked(0) || ImGui.IsKeyPressed(ImGuiKey.Escape)))
+                {
+                    _isRenaming = false;
+                    _nodeBeingRenamed = null;
+                }
+                ImGui.PopItemWidth();
+            }
+            else
+            {
+                // Context menu for Rename and Delete
+                if (ImGui.BeginPopupContextItem($"ObjectContext_{nodeId}"))
+                {
+                    if (ImGui.MenuItem("Rename"))
+                    {
+                        _isRenaming = true;
+                        _renameBuffer = obj.Name;
+                        _nodeBeingRenamed = obj;
+                    }
+
+                    if (ImGui.MenuItem("Delete"))
+                    {
+                        obj.Destroy();
+                    }
+                    ImGui.EndPopup();
+                }
+            }
+
+            // Rename
+            if (Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.F2))
+            {
+                _isRenaming = true;
+                _renameBuffer = obj.Name;
+                _nodeBeingRenamed = obj;
+            }
+
             if (ImGui.IsItemClicked())
             {
                 // Handle selection
                 InspectorWindow.Instance.Inspect(new InspectableGameObject(obj));
-
-                if (Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.F2))
-                {
-
-                }
             }
 
             if (open && hasChildren)

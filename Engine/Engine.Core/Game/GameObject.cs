@@ -12,10 +12,11 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Engine.Core.Data;
 using System.Reflection;
+using MonoGame.Extended.Serialization.Json;
 
 namespace Engine.Core.Game
 {
-    public class GameObject
+    public class GameObject : IComponentContainer
     {
         public string Name { get; set; } = string.Empty;
         public Vector2 position;
@@ -47,7 +48,7 @@ namespace Engine.Core.Game
 
         public void OnCreate()
         {
-            AddComponent<Transform>();
+
         }
 
         /// <summary>
@@ -66,6 +67,18 @@ namespace Engine.Core.Game
             Console.WriteLine($"Added component {component.Name}");
 
             return component;
+        }
+
+        /// <summary>
+        /// Add an Icomponent
+        /// </summary>
+        /// <param name="component"></param>
+        public void AddComponent(IComponent component)
+        {
+            ((ObjectComponent)component).Owner = this;
+            components.Add(component);
+            component.Create();
+            Console.WriteLine($"Added component {component.Name}");
         }
 
         /// <summary>
@@ -172,7 +185,59 @@ namespace Engine.Core.Game
         /// <returns>Instantiated GameObject</returns>
         public static GameObject Instantiate(string defName, Vector2 position)
         {
-            return new GameObject("Empty");
+            // Check that the prefab exists
+            string path = Path.Combine(ProjectSettings.AssetsDirectory, defName);
+            if (!File.Exists(path))
+            {
+                Console.WriteLine($"[Instantiate] Prefab not found: {path}");
+                return new GameObject("Missing");
+            }
+
+            try
+            {
+                // Deserialize game object
+                string json = File.ReadAllText(path);
+
+                var options = new JsonSerializerOptions
+                {
+                    Converters = { new ComponentListJsonConverter() },
+                    PropertyNameCaseInsensitive = true
+                };
+
+                options.Converters.Add(new Vector2JsonConverter());
+                options.Converters.Add(new ColorJsonConverter());
+
+                var def = JsonSerializer.Deserialize<GameObjectDefinition>(json, options);
+                if (def == null)
+                {
+                    Console.WriteLine($"[Instantiate] Failed to deserialize prefab: {defName}");
+                    return new GameObject("Error");
+                }
+
+                // Attach components
+                GameObject obj = new GameObject(def.Name);
+                foreach (var comp in def.components)
+                    obj.AddComponent(comp);
+
+                // Set transform position
+                var transform = obj.GetComponent<Transform>();
+                if (transform != null)
+                    transform.Position = position;
+
+                // Give an empty visual
+                var sprite = obj.GetComponent<Sprite2D>();
+                if (sprite != null)
+                    sprite.Create();
+
+                // Add to the scene
+                EngineContext.Current.Scene?.objects.Add(obj);
+                return obj;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Instantiate] Error loading prefab '{defName}': {ex.Message}");
+                return new GameObject("Error");
+            }
         }
 
         /// <summary>
@@ -180,7 +245,7 @@ namespace Engine.Core.Game
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public static GameObject Deserialize(string json)
+        public static GameObjectDefinition Deserialize(string json)
         {
             var options = new JsonSerializerOptions
             {
@@ -189,8 +254,10 @@ namespace Engine.Core.Game
                 ReferenceHandler = ReferenceHandler.Preserve
             };
             options.Converters.Add(new ComponentListJsonConverter());
+            options.Converters.Add(new Vector2JsonConverter());
+            options.Converters.Add(new ColorJsonConverter());
 
-            return JsonSerializer.Deserialize<GameObject>(json, options);
+            return JsonSerializer.Deserialize<GameObjectDefinition>(json, options);
         }
 
         /// <summary>

@@ -280,8 +280,8 @@ namespace EarthEngineEditor.Windows
                                 string optionsFileDest = Path.Combine(exportPath, Path.GetFileName(project.optionsPath));
                                 File.Copy(project.optionsPath, optionsFileDest, overwrite: true);
 
-                                // Compiled DLLs
-                                CopyDirectory(ProjectSettings.BuildPath, exportPath);
+                                // Compiled DLLs (Build Folder)
+                                CopyDirectory(ProjectSettings.BuildPath, Path.Combine(exportPath, "Build"));
 
                                 // Success
                                 Console.WriteLine("[Export] Copied data to build output.");

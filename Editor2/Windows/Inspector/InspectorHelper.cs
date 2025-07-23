@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Engine.Core.Data;
 
 namespace Editor.Windows.Inspector
 {
@@ -33,7 +34,7 @@ namespace Editor.Windows.Inspector
             }
         }
 
-        public static void DrawGameObject(GameObject obj)
+        public static void DrawGameObject(IComponentContainer obj)
         {
             foreach (var comp in obj.components)
             {

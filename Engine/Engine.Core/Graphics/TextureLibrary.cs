@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Engine.Core.Data;
 using System.ComponentModel;
+using Microsoft.Xna.Framework;
 
 namespace Engine.Core.Graphics
 {
@@ -57,6 +58,11 @@ namespace Engine.Core.Graphics
             }
 
             defaultTexture = new Texture2D(graphicsDevice, 16, 16);
+            Color[] pixels = new Color[16 * 16];
+            for (int i = 0; i < pixels.Length; i++)
+                pixels[i] = Color.White;
+
+            defaultTexture.SetData(pixels);
         }
 
         /// <summary>

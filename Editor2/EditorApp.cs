@@ -15,6 +15,8 @@ using Engine.Core.Game;
 using Editor.Windows;
 using Editor.AssetManagement;
 using Engine.Core;
+using System.Text;
+using System.Runtime.InteropServices;
 
 namespace EarthEngineEditor
 {
@@ -120,10 +122,11 @@ namespace EarthEngineEditor
                     ImGuiWindowFlags.MenuBar;
 
             ImGui.Begin("DockSpace", windowFlags);
+            Vector2 mouse = ImGui.GetMousePos();
+
             ImGui.PopStyleVar(3);
             ImGui.PopStyleColor();
 
-            Vector2 mouse = ImGui.GetMousePos();
             Vector2 min = viewport.Pos;
             Vector2 max = viewport.Pos + viewport.Size;
 
@@ -134,6 +137,7 @@ namespace EarthEngineEditor
                 !ImGui.IsAnyItemFocused() && 
                 !Input.IsKeyDown(XnaKeys.LeftControl) && 
                 IsActive;
+
             gameFocused = isHoveringGameArea && isInputFree;
 
             ImGui.DockSpace(

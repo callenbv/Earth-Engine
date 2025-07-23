@@ -46,16 +46,20 @@ namespace GameRuntime
 
             gameOptions.Load("game_options.json");
 
+            // Game settings based on options 
+            IsFixedTimeStep = false;
             Window.AllowUserResizing = true;
             Window.Title = gameOptions.Title;
+            _graphics.SynchronizeWithVerticalRetrace = false;
             _graphics.PreferredBackBufferWidth = gameOptions.WindowWidth;
             _graphics.PreferredBackBufferHeight = gameOptions.WindowHeight;
 
             // Set up our main spritebatch
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            string scriptDllPath = Path.Combine(EnginePaths.ProjectBase, "Build", "CompiledScripts.dll");
 
             // Load the compiled scripts
+            string scriptDllPath = Path.Combine(EnginePaths.ProjectBase, "Build", "CompiledScripts.dll");
+
             if (File.Exists(scriptDllPath))
             {
                 Console.WriteLine($"[Runtime] Loading CompiledScripts.dll from: {scriptDllPath}");

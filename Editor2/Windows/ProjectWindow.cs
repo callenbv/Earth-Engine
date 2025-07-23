@@ -6,6 +6,10 @@ using System.Numerics;
 using Microsoft.Xna.Framework.Graphics;
 using Editor.AssetManagement;
 using Engine.Core.Data;
+using System.Text;
+using System.Runtime.InteropServices;
+using Engine.Core;
+using Engine.Core.Game;
 
 namespace EarthEngineEditor.Windows
 {
@@ -34,7 +38,9 @@ namespace EarthEngineEditor.Windows
         private string _newAssetName = string.Empty;
         private AssetType _selectedAssetType = AssetType.Prefab;
         public static ProjectWindow Instance { get; set; }
-
+        private GCHandle? _dragHandle = null;
+        private byte[]? _dragData = null;
+        private bool _awaitingDrop = false;
         public ProjectWindow()
         {
             Instance = this;
@@ -177,6 +183,43 @@ namespace EarthEngineEditor.Windows
                     _selectedItem = item;
                 }
 
+                // Each asset needs a unique ID in ImGui
+                if (_selectedItem != null)
+                {
+                    if (ImGui.BeginDragDropSource())
+                    {
+                        string str = _selectedItem.Name;
+
+                        if (!_awaitingDrop)
+                        {
+                            _dragData = Encoding.UTF8.GetBytes(str);
+                            _dragHandle = GCHandle.Alloc(_dragData, GCHandleType.Pinned);
+                            _awaitingDrop = true;
+
+                            Console.WriteLine("[DEBUG] Payload pinned");
+                        }
+
+                        IntPtr ptr = _dragHandle.Value.AddrOfPinnedObject();
+                        ImGui.SetDragDropPayload("TEST_PAYLOAD", ptr, (uint)_dragData.Length);
+                        ImGui.Text($"{str}");
+
+                        ImGui.EndDragDropSource();
+                    }
+                }
+
+                if (Input.IsMouseReleased())
+                {
+                    if (_awaitingDrop)
+                    {
+                        GameObject.Instantiate(_selectedItem.Path, Input.mouseWorldPosition);
+                        _awaitingDrop = false;
+                        _dragHandle?.Free();
+                        _dragHandle = null;
+                        _dragData = null;
+                        Console.WriteLine("[DEBUG] Dropped payload");
+                    }
+                }
+
                 if (ImGui.IsItemHovered() && ImGui.IsMouseClicked(0))
                 {
                     if (item.Folder)
@@ -205,6 +248,7 @@ namespace EarthEngineEditor.Windows
                 }
             }
         }
+       
         private string GetParentPath(string path)
         {
             if (string.IsNullOrEmpty(path))

@@ -25,7 +25,7 @@ namespace Editor.AssetManagement
 {
     public class PrefabHandler : IAssetHandler
     {
-        private GameObject? _prefab;
+        private GameObjectDefinition? _prefab;
         public static string filter = string.Empty;
 
         public void Load(string path)
@@ -52,7 +52,7 @@ namespace Editor.AssetManagement
             options.Converters.Add(new Vector2JsonConverter());
             options.Converters.Add(new ColorJsonConverter());
 
-            string json = JsonSerializer.Serialize<GameObject>(_prefab, options);
+            string json = JsonSerializer.Serialize<GameObjectDefinition>(_prefab, options);
             File.WriteAllText(path, json);
         }
 
@@ -95,7 +95,7 @@ namespace Editor.AssetManagement
             DrawEditableButtons(_prefab);
         }
 
-        public static void DrawEditableButtons(GameObject prefab)
+        public static void DrawEditableButtons(IComponentContainer prefab)
         {
             // Allow for adding new component
             if (ImGui.Button("Add Component"))
@@ -122,7 +122,8 @@ namespace Editor.AssetManagement
                             if (ImGui.MenuItem(comp.Name))
                             {
                                 var instance = (ObjectComponent)Activator.CreateInstance(comp.Type);
-                                prefab.AddComponent(instance);
+                                prefab.components.Add(instance);
+                                instance.Create();
                                 ImGui.CloseCurrentPopup();
                             }
                         }

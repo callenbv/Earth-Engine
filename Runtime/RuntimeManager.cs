@@ -39,8 +39,7 @@ namespace GameRuntime
 
         private const int INTERNAL_WIDTH = 1920;
         private const int INTERNAL_HEIGHT = 1080;
-
-        
+    
         public RuntimeManager(Game game_)
         {
             assetsRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets");
@@ -93,6 +92,7 @@ namespace GameRuntime
             if (scene != null)
             {
                 scene.Update(gameTime);
+                EngineContext.Current.Scene = scene;
             }
 
             // Resize lighting and scene render target if needed (only if internal resolution changes)
