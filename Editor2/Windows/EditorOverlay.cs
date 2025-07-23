@@ -100,7 +100,6 @@ namespace Editor.Windows
                 int endY = (int)Math.Ceiling(worldBottom / gridSize) * gridSize;
 
                 // Vertical lines
-                // Vertical lines
                 for (int x = startX; x <= endX; x += gridSize)
                 {
                     spriteBatch.Draw(
@@ -129,7 +128,6 @@ namespace Editor.Windows
                         0f
                     );
                 }
-
             }
         }
     }

@@ -487,7 +487,7 @@ namespace EarthEngineEditor.Windows
                         string fullPath = Path.Combine(ProjectSettings.AssetsDirectory, _currentFolder ?? "", fileName);
 
                         // Create the new file (basic template content)
-                        File.WriteAllText(fullPath, Asset.GenerateTemplateForAssetType(_selectedAssetType));
+                        File.WriteAllText(fullPath, Asset.GenerateTemplateForAssetType(_selectedAssetType, _newAssetName));
                         RefreshItems();
                         _showNewAssetDialog = false;
                     }

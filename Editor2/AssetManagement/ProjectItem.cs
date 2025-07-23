@@ -37,10 +37,13 @@ namespace Editor.AssetManagement
         /// </summary>
         public void Save()
         {
+            // Project settings
             settings.LastScene = SceneViewWindow.Instance.scene?.FilePath;
-
             string json = JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(optionsPath, json);
+
+            // Editor settings
+            EditorApp.Instance?._settings?.Save();
         }
 
         /// <summary>

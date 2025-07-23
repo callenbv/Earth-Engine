@@ -1,0 +1,26 @@
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+
+public class {CLASS_NAME} : GameScript
+{
+    public override void Create() 
+    { 
+        
+    }
+
+    public override void Update(GameTime gameTime) 
+    { 
+
+    }
+
+    public override void Draw(SpriteBatch spriteBatch) 
+    { 
+        
+    }
+
+    public override void Destroy() 
+    {
+
+    }
+}
+

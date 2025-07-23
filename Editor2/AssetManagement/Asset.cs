@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Shapes;
 
 namespace Editor.AssetManagement
 {
@@ -96,17 +97,32 @@ namespace Editor.AssetManagement
                 _ => ".asset"
             };
         }
-        public static string GenerateTemplateForAssetType(AssetType type)
+        public static string GenerateTemplateForAssetType(AssetType type, string assetName = "NewAsset")
         {
+            string baseDir = AppContext.BaseDirectory;
+            string templatePath = System.IO.Path.Combine(baseDir, "Templates", $"{type}.txt");
+
+            if (File.Exists(templatePath))
+            {
+                string template = File.ReadAllText(templatePath);
+
+                if (type == AssetType.Script)
+                    template = template.Replace("{CLASS_NAME}", assetName);
+
+                return template;
+            }
+
+            // Fallbacks only for non-script types
             return type switch
             {
                 AssetType.Prefab => "{\n  \"name\": \"NewPrefab\",\n  \"components\": []\n}",
                 AssetType.Scene => "{\n  \"entities\": []\n}",
                 AssetType.Data => "{\n  \"key\": \"value\"\n}",
-                AssetType.Script => "// New Script\npublic class ScriptName { }",
                 _ => ""
             };
         }
+
+
         public void Render()
         {
             EnsureLoaded();

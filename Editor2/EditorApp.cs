@@ -26,7 +26,7 @@ namespace EarthEngineEditor
         private ImGuiRenderer? _imGuiRenderer;
         private ConsoleWindow _consoleWindow;
         public WindowManager _windowManager;
-        private EditorSettings? _settings;
+        public EditorSettings? _settings;
         private TextureLibrary? textureLibrary;
         private Room? scene;
         private SpriteBatch spriteBatch;

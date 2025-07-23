@@ -19,10 +19,12 @@ namespace Engine.Core.Game.Components
             {
                 _texture = value;
 
-                // Optional safety check
                 if (_texture != null && !string.IsNullOrEmpty(_texture.Name))
                 {
-                    texturePath = _texture.Name; // Store the path from the texture name
+                    texturePath = _texture.Name;
+                    frameHeight = _texture.Height;
+                    frameWidth = _texture.Width;
+                    spriteBox = new Rectangle(0, 0, frameWidth, frameHeight);
                 }
             }
         }
@@ -55,9 +57,6 @@ namespace Engine.Core.Game.Components
             if (tex != null)
             {
                 texture = tex;
-                spriteBox = new Rectangle(0, 0, texture.Width, texture.Height);
-                frameHeight = texture.Height;
-                frameWidth = texture.Width;
             }
         }
 
