@@ -67,21 +67,6 @@ namespace Engine.Core.Game.Components
         public void Set(string textureName)
         {
             texture = TextureLibrary.Instance.Get(textureName);
-
-            if (texture == null)
-            {
-                Console.WriteLine($"Failed to load texture {textureName}");
-                return;
-            }
-
-            frameWidth = texture.Width;
-            frameHeight = texture.Height;
-            this.frameCount = texture.Width / frameWidth;
-
-            if (frame >= frameCount)
-            {
-                frame = 0;
-            }
         }
 
         /// <summary>
@@ -94,11 +79,8 @@ namespace Engine.Core.Game.Components
             this.frameWidth = frameWidth;
             this.frameHeight = frameHeight;
             this.frameCount = texture.Width / frameWidth;
-
-            if (frame >= frameCount)
-            {
-                frame = 0;
-            }
+            animated = frameCount > 1;
+            spriteBox = new Rectangle(0, 0, frameWidth, frameHeight);
         }
 
         /// <summary>

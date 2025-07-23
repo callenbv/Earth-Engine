@@ -23,7 +23,7 @@ namespace EarthEngineEditor
     public class EditorApp : Game
     {
         private GraphicsDeviceManager _graphics;
-        private ImGuiRenderer? _imGuiRenderer;
+        public ImGuiRenderer? _imGuiRenderer;
         private ConsoleWindow _consoleWindow;
         public WindowManager _windowManager;
         public EditorSettings? _settings;
@@ -49,9 +49,9 @@ namespace EarthEngineEditor
         protected override void Initialize()
         {
             // Load settings
+            _consoleWindow = new ConsoleWindow();
             spriteBatch = new SpriteBatch(GraphicsDevice);
             _imGuiRenderer = new ImGuiRenderer(this);
-            _consoleWindow = new ConsoleWindow();
             _windowManager = new WindowManager(this,_consoleWindow);
             editorOverlay = new EditorOverlay(GraphicsDevice);
 

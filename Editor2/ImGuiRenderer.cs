@@ -35,6 +35,7 @@ namespace EarthEngineEditor
         private byte[]? _robotoFontData;
         private GCHandle _robotoFontHandle;
         public ImFontPtr _robotoFont;
+        public ImFontPtr _fontAwesome;
 
         public ImGuiRenderer(Game game)
         {
@@ -87,45 +88,57 @@ namespace EarthEngineEditor
             var fontAtlas = io.Fonts;
             fontAtlas.Clear();
 
-            // Load Roboto font from file
-            string fontPath = "Roboto-VariableFont_wdth.ttf";
-            Console.WriteLine($"Looking for font at: {fontPath}");
-            Console.WriteLine($"Font file exists: {File.Exists(fontPath)}");
-            Console.WriteLine($"Current directory: {Environment.CurrentDirectory}");
+            string iconFontPath = Path.GetFullPath("fa-solid-900.ttf");
+            string robotoFontPath = Path.GetFullPath("Roboto-VariableFont_wdth.ttf");
 
-            if (File.Exists(fontPath))
+            // Load Roboto font from memory
+            byte[] robotoData = File.ReadAllBytes(robotoFontPath);
+            GCHandle robotoHandle = GCHandle.Alloc(robotoData, GCHandleType.Pinned);
+            IntPtr robotoPtr = robotoHandle.AddrOfPinnedObject();
+
+            // Add Roboto as base font
+            _robotoFont = fontAtlas.AddFontFromMemoryTTF(robotoPtr, robotoData.Length, 16.0f);
+
+            // Load Font Awesome font from memory
+            byte[] iconData = File.ReadAllBytes(iconFontPath);
+            GCHandle iconHandle = GCHandle.Alloc(iconData, GCHandleType.Pinned);
+            IntPtr iconPtr = iconHandle.AddrOfPinnedObject();
+
+            // Setup font config for merging
+            ImFontConfig iconConfig = new ImFontConfig
             {
-                try
-                {
-                    _robotoFontData = System.IO.File.ReadAllBytes(fontPath);
-                    System.Diagnostics.Debug.WriteLine($"Font data loaded, size: {_robotoFontData.Length} bytes");
-                    _robotoFontHandle = GCHandle.Alloc(_robotoFontData, GCHandleType.Pinned);
-                    IntPtr fontPtr = _robotoFontHandle.AddrOfPinnedObject();
-                    _robotoFont = fontAtlas.AddFontFromMemoryTTF(fontPtr, _robotoFontData.Length, 16.0f);
-                    System.Diagnostics.Debug.WriteLine($"Font loaded successfully: {(IntPtr)_robotoFont.NativePtr != IntPtr.Zero}");
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Error loading font: {ex.Message}");
-                    fontAtlas.AddFontDefault();
-                }
-            }
-            else
+                MergeMode = 1,
+                PixelSnapH = 1,
+                OversampleH = 1,
+                OversampleV = 1,
+                RasterizerMultiply = 1.0f,
+                RasterizerDensity = 1.0f,
+            };
+
+            // Define icon range (Font Awesome typically uses 0xF000–0xF8FF)
+            ushort[] iconRanges = new ushort[] { 0xF000, 0xF8FF, 0 };
+            fixed (ushort* rangePtr = iconRanges)
             {
-                System.Diagnostics.Debug.WriteLine("Font file not found, using default font");
-                // Fallback to default font
-                fontAtlas.AddFontDefault();
+                fontAtlas.AddFontFromMemoryTTF(iconPtr, iconData.Length, 16.0f, &iconConfig, (IntPtr)rangePtr);
             }
-            
-            fontAtlas.Build();
+
+            // Build font atlas and upload texture
             fontAtlas.GetTexDataAsRGBA32(out byte* pixels, out int width, out int height, out int bytesPerPixel);
-            _fontTexture = new Texture2D(_gd, width, height, false, SurfaceFormat.Color);
             byte[] data = new byte[width * height * bytesPerPixel];
             Marshal.Copy((IntPtr)pixels, data, 0, data.Length);
+
+            _fontTexture = new Texture2D(_gd, width, height, false, SurfaceFormat.Color);
             _fontTexture.SetData(data);
             _fontTextureId = RegisterTexture(_fontTexture);
             fontAtlas.SetTexID(_fontTextureId);
+
+            // Free memory
+            robotoHandle.Free();
+            iconHandle.Free();
+
+            Console.WriteLine("Font atlas built with Roboto and Font Awesome.");
         }
+
 
         public IntPtr RegisterTexture(Texture2D texture)
         {
