@@ -119,7 +119,7 @@ namespace EarthEngineEditor
             ushort[] iconRanges = new ushort[] { 0xF000, 0xF8FF, 0 };
             fixed (ushort* rangePtr = iconRanges)
             {
-                fontAtlas.AddFontFromMemoryTTF(iconPtr, iconData.Length, 16.0f, &iconConfig, (IntPtr)rangePtr);
+                fontAtlas.AddFontFromMemoryTTF(iconPtr, iconData.Length, 32.0f, &iconConfig, (IntPtr)rangePtr);
             }
 
             // Build font atlas and upload texture

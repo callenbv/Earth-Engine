@@ -162,7 +162,8 @@ namespace EarthEngineEditor.Windows
 
             float itemWidth = 100f;
             float itemHeight = 20f;
-            float padding = 10f;
+            float padding = 4f;
+            float textWidth = 100f;
 
             float panelWidth = ImGui.GetContentRegionAvail().X;
             float xPos = 0;
@@ -170,60 +171,56 @@ namespace EarthEngineEditor.Windows
             foreach (var item in items)
             {
                 // Show only items directly in the current folder
-                string parentPath = GetParentPath(item.Path);
-                if (parentPath != _currentFolder)
-                    continue;
-
                 bool isSelected = _selectedItem == item;
                 string label = $"{item.Name}##{item.Path}";
                 ImGui.PushID(label);
                 ImGui.BeginGroup();
 
-                // Begin drawing with layering
                 ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-                drawList.ChannelsSplit(2); // 0 = background, 1 = content
+                drawList.ChannelsSplit(2);
                 drawList.ChannelsSetCurrent(1); // Draw content
 
                 Vector2 startPos = ImGui.GetCursorScreenPos();
+                float iconSize = ImGui.GetFontSize();
+                float spacing = 4f;
+                float wrapWidth = textWidth - 8f;
 
-                // Clickable region
-                Vector2 buttonSize = new Vector2(itemWidth, itemHeight);
-                ImGui.InvisibleButton("selectable", buttonSize);
+                // Reserve space *before* padding
+                float estimatedHeight = iconSize + spacing + ImGui.GetTextLineHeightWithSpacing() * 2;
+                ImGui.InvisibleButton("selectable", new Vector2(itemWidth, estimatedHeight));
                 bool hovered = ImGui.IsItemHovered();
-                if (ImGui.IsItemClicked())
-                    _selectedItem = item;
 
-                // Reset position to draw icon and text
-                ImGui.SetCursorScreenPos(startPos);
+                // Move cursor down for content only
+                Vector2 contentStartPos = startPos + new Vector2(0, 16f);
+                ImGui.SetCursorScreenPos(contentStartPos);
 
+                // Icon
                 string icon = item.Folder ? "\uf07b" : "\uf15b";
-
-                // Draw icon
-                ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 4); // Padding top
-                ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (itemWidth - ImGui.CalcTextSize(icon).X) * 0.5f);
+                Vector2 iconSizeVec = ImGui.CalcTextSize(icon);
+                ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (itemWidth - iconSizeVec.X) * 0.5f);
                 ImGui.Text(icon);
                 Vector2 iconMin = ImGui.GetItemRectMin();
                 Vector2 iconMax = ImGui.GetItemRectMax();
 
-                // Draw name
-                ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (itemWidth - ImGui.CalcTextSize(item.Name).X) * 0.5f);
-                ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 4); // Padding below icon
-                ImGui.Text(item.Name);
+                // Text (wrapped and centered)
+                ImGui.PushTextWrapPos(contentStartPos.X + wrapWidth);
+                Vector2 textStart = ImGui.GetCursorScreenPos();
+                float wrappedTextWidth = ImGui.CalcTextSize(item.Name, wrapWidth).X;
+                ImGui.SetCursorScreenPos(new Vector2(
+                    contentStartPos.X + (itemWidth - wrappedTextWidth) * 0.5f,
+                    textStart.Y
+                ));
+                ImGui.TextWrapped(item.Name);
+                ImGui.PopTextWrapPos();
+
                 Vector2 textMin = ImGui.GetItemRectMin();
                 Vector2 textMax = ImGui.GetItemRectMax();
 
-                // Compute full content bounding box
-                Vector2 highlightMin = new Vector2(
-                    MathF.Min(iconMin.X, textMin.X),
-                    MathF.Min(iconMin.Y, textMin.Y)
-                );
-                Vector2 highlightMax = new Vector2(
-                    MathF.Max(iconMax.X, textMax.X),
-                    MathF.Max(iconMax.Y, textMax.Y)
-                );
+                // Highlight area
+                Vector2 highlightMin = startPos - new Vector2(0,padding);
+                Vector2 highlightMax = startPos + new Vector2(itemWidth, estimatedHeight) + new Vector2(0, padding);
 
-                // Draw background highlight behind content
-                drawList.ChannelsSetCurrent(0); // Background channel
+                drawList.ChannelsSetCurrent(0);
                 if (hovered || isSelected)
                 {
                     uint color = isSelected
@@ -231,11 +228,10 @@ namespace EarthEngineEditor.Windows
                         : ImGui.GetColorU32(ImGuiCol.HeaderHovered);
                     drawList.AddRectFilled(highlightMin, highlightMax, color, 4.0f);
                 }
-                drawList.ChannelsMerge(); // Done layering
+                drawList.ChannelsMerge();
 
                 ImGui.EndGroup();
                 ImGui.PopID();
-
 
                 // Each asset needs a unique ID in ImGui
                 if (_selectedItem != null)
