@@ -5,6 +5,7 @@
 /// <Copyright>    @2025 Callen Betts Virott. All rights reserved.
 /// <Summary>                
 /// -----------------------------------------------------------------------------
+#define WINDOWS
 
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
@@ -13,6 +14,15 @@ using System.Device.Gpio;
 
 namespace Engine.Core
 {
+    /// <summary>
+    /// Mock GpioController for platforms without GPIO support (e.g., Windows).
+    /// </summary>
+    public class MockGpioController
+    {
+        public void OpenPin(int pin, PinMode mode) { /* no-op */ }
+        public bool Read(int pin) => false; // Always not pressed
+    }
+
     /// <summary>
     /// Handles input from keyboard and mouse, including hotkeys and fullscreen toggling.
     /// </summary>
@@ -54,7 +64,12 @@ namespace Engine.Core
         public static Microsoft.Xna.Framework.Game? gameInstance;
         public static Microsoft.Xna.Framework.GraphicsDeviceManager? graphicsManager;
 
-        private static GpioController? _gpio;
+#if WINDOWS
+        private static MockGpioController _gpio;
+#else
+        private static GpioController _gpio;
+#endif
+
         private static readonly Dictionary<VirtualButton, int> _gpioPins = new() // To be set once GPIO is available
         {
             { VirtualButton.A, 25 },
@@ -98,6 +113,9 @@ namespace Engine.Core
         /// </summary>
         public static void Initialize()
         {
+#if WINDOWS
+            _gpio = new MockGpioController();
+#else
             _gpio = new GpioController();
 
             foreach (var kv in _gpioPins)
@@ -105,6 +123,7 @@ namespace Engine.Core
                 _gpio.OpenPin(kv.Value, PinMode.InputPullUp);
                 _gpioStates[kv.Key] = false;
             }
+#endif
         }
 
         /// <summary>
