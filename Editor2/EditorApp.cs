@@ -20,6 +20,12 @@ using System.Runtime.InteropServices;
 
 namespace EarthEngineEditor
 {
+    public enum EditorSelectionMode
+    {
+        Tile,
+        Object
+    }
+
     public class EditorApp : Game
     {
         private GraphicsDeviceManager _graphics;
@@ -34,6 +40,7 @@ namespace EarthEngineEditor
         public EditorOverlay editorOverlay;
         public EditorWatcher fileWatcher;
         public bool gameFocused = false;
+        public EditorSelectionMode selectionMode = EditorSelectionMode.Object;
         public static EditorApp Instance { get; private set; }
 
         public EditorApp()
@@ -84,6 +91,13 @@ namespace EarthEngineEditor
 
         protected override void Update(GameTime gameTime)
         {
+            bool isInputFree = !ImGui.IsAnyItemActive() &&
+                !ImGui.IsAnyItemFocused() &&
+                !Input.IsKeyDown(XnaKeys.LeftControl) &&
+                IsActive &&
+                !ImGui.GetIO().WantCaptureMouse;
+
+            gameFocused = isInputFree;
             _windowManager?.Update(gameTime);
             runtime.Update(gameTime);
             editorOverlay.Update(gameTime);
@@ -130,16 +144,6 @@ namespace EarthEngineEditor
 
             Vector2 min = viewport.Pos;
             Vector2 max = viewport.Pos + viewport.Size;
-
-            bool isHoveringGameArea = mouse.X >= min.X && mouse.X <= max.X &&
-                                      mouse.Y >= min.Y && mouse.Y <= max.Y;
-
-            bool isInputFree = !ImGui.IsAnyItemActive() && 
-                !ImGui.IsAnyItemFocused() && 
-                !Input.IsKeyDown(XnaKeys.LeftControl) && 
-                IsActive;
-
-            gameFocused = isHoveringGameArea && isInputFree;
 
             ImGui.DockSpace(
                 ImGui.GetID("DockSpace"),

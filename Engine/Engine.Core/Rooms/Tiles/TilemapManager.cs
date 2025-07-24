@@ -3,6 +3,7 @@ using Engine.Core.Game.Components;
 using Engine.Core.Graphics;
 using Engine.Core.Rooms.Tiles;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended.Serialization.Json;
 using System.Text.Json;
 
 public static class TilemapManager
@@ -34,7 +35,14 @@ public static class TilemapManager
             saveData.Layers.Add(renderer.ToData());
         }
 
-        var json = JsonSerializer.Serialize(saveData, new JsonSerializerOptions { WriteIndented = true });
+        JsonSerializerOptions options = new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            IncludeFields = true
+        };
+        options.Converters.Add(new Vector2JsonConverter());
+
+        var json = JsonSerializer.Serialize(saveData, options);
         File.WriteAllText(path, json);
     }
 
@@ -44,7 +52,15 @@ public static class TilemapManager
         if (!File.Exists(path)) return;
 
         var json = File.ReadAllText(path);
-        var saveData = JsonSerializer.Deserialize<TilemapSaveData>(json);
+
+        JsonSerializerOptions options = new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            IncludeFields = true
+        };
+        options.Converters.Add(new Vector2JsonConverter());
+        var saveData = JsonSerializer.Deserialize<TilemapSaveData>(json, options);
+
         if (saveData == null) return;
 
         layers.Clear(); // Start fresh

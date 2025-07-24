@@ -27,9 +27,13 @@ namespace EarthEngineEditor.Windows
             Instance = this;
         }
 
+        /// <summary>
+        /// Render the scene view and enable object selection mode
+        /// </summary>
         public void Render()
         {
-            ImGui.Begin("Scene View", ref _showSceneView);
+           if (ImGui.Begin("Scene View", ref _showSceneView))
+                EditorApp.Instance.selectionMode = EditorSelectionMode.Object;
 
             if (_showSceneView && scene != null)
             {
@@ -49,7 +53,7 @@ namespace EarthEngineEditor.Windows
             bool root = ImGui.TreeNodeEx("Scene");
 
             // Get the mouse world coords and select the object
-            if (EditorApp.Instance.gameFocused)
+            if (EditorApp.Instance.gameFocused && EditorApp.Instance.selectionMode == EditorSelectionMode.Object)
             {
                 if (Input.IsMousePressed())
                 {
@@ -210,6 +214,10 @@ namespace EarthEngineEditor.Windows
         }
 
         public bool IsVisible => _showSceneView;
-        public void SetVisible(bool visible) => _showSceneView = visible;
+        public void SetVisible(bool visible)
+        {
+            _showSceneView = visible;
+            EditorApp.Instance.selectionMode = EditorSelectionMode.Object;
+        }
     }
 } 

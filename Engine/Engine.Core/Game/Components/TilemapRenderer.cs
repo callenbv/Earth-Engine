@@ -3,6 +3,7 @@ using Engine.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Numerics;
 using System.Text.Json.Serialization;
 
 namespace Engine.Core.Game.Components
@@ -21,7 +22,7 @@ namespace Engine.Core.Game.Components
         [JsonIgnore]
         public Texture2D? Texture { get; set; }
         public IntPtr TexturePtr { get; set; }
-
+        public System.Numerics.Vector2 Offset = System.Numerics.Vector2.Zero;
         public TilemapRenderer()
         {
 
@@ -39,10 +40,14 @@ namespace Engine.Core.Game.Components
         public void SetTile(int x, int y, int index)
         {
             if (index < 0)
-                Tiles[x,y] = null;
-                else
-            if (x >= 0 && x < Width && y >= 0 && y < Height)
-                Tiles[x, y] = new Tile(index);
+            {
+                Tiles[x, y] = null;
+            }
+            else
+            {
+                if (x >= 0 && x < Width && y >= 0 && y < Height)
+                    Tiles[x, y] = new Tile(index);
+            }
         }
 
         public Tile? GetTile(int x, int y)
@@ -77,7 +82,7 @@ namespace Engine.Core.Game.Components
 
                         spriteBatch.Draw(
                             Texture,
-                            Position + new Vector2(x * TileSize, y * TileSize),
+                            Position + Offset + new System.Numerics.Vector2(x * TileSize, y * TileSize),
                             source,
                             Color.White);
 

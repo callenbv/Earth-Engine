@@ -20,6 +20,7 @@ namespace Editor.Windows.TileEditor
         Erase,
         Select
     }
+
     public class TileEditorWindow
     {
         private bool show = true;
@@ -35,7 +36,8 @@ namespace Editor.Windows.TileEditor
         {
             if (!show) return;
 
-            ImGui.Begin("Tile Editor", ref show);
+            if(ImGui.Begin("Tile Editor", ref show))
+                EditorApp.Instance.selectionMode = EditorSelectionMode.Tile;
 
             bool tree = ImGui.TreeNodeEx("Tile Layers", ImGuiTreeNodeFlags.DefaultOpen);
             open = false;
@@ -49,6 +51,9 @@ namespace Editor.Windows.TileEditor
                     {
                         // Draw the editable fields
                         selectedLayer = layer; // Set the selected layer for painting
+                        ImGui.SliderInt("Width", ref layer.Width, 50,200);
+                        ImGui.SliderInt("Height", ref layer.Height, 50,200);
+                        ImGui.InputFloat2("Offset", ref layer.Offset);
                         ImGui.TreePop();
                     }
                 }
@@ -70,6 +75,16 @@ namespace Editor.Windows.TileEditor
             {
                 // Draw data for each tileset
                 ImGui.Text(selectedLayer.Title);
+
+                bool clicked;
+
+                ImGui.SameLine();
+                CircularSelectable("tile", "T", TileEditorMode.Paint, mode, out clicked);
+                if (clicked) mode = TileEditorMode.Paint;
+
+                ImGui.SameLine();
+                CircularSelectable("erase", "X", TileEditorMode.Erase, mode, out clicked);
+                if (clicked) mode = TileEditorMode.Erase;
 
                 ImGui.SliderInt("Brush Size", ref BrushSize, 1, 10);
 
@@ -130,8 +145,8 @@ namespace Editor.Windows.TileEditor
                 if (!ImGui.GetIO().WantCaptureMouse)
                 {
                     var mousePos = Input.mouseWorldPosition;
-                    int tileX = (int)(mousePos.X / selectedLayer.TileSize);
-                    int tileY = (int)(mousePos.Y / selectedLayer.TileSize);
+                    int tileX = (int)((mousePos.X - selectedLayer.Offset.X) / selectedLayer.TileSize);
+                    int tileY = (int)((mousePos.Y - selectedLayer.Offset.Y) / selectedLayer.TileSize);
 
                     if (Input.IsMouseDown())
                     {
@@ -167,8 +182,36 @@ namespace Editor.Windows.TileEditor
             ImGui.End();
         }
 
+        private bool CircularSelectable(string id, string icon, TileEditorMode mode, TileEditorMode selectedMode, out bool clicked)
+        {
+            ImGui.PushID(id);
+
+            float size = 36f;
+            var drawList = ImGui.GetWindowDrawList();
+            var cursor = ImGui.GetCursorScreenPos();
+            var center = cursor + new Vector2(size / 2f);
+            var color = mode == selectedMode ? new Vector4(0.4f, 0.7f, 1.0f, 1.0f) : new Vector4(0.2f, 0.2f, 0.2f, 1.0f);
+
+            ImGui.InvisibleButton("##btn", new Vector2(size));
+            bool hovered = ImGui.IsItemHovered();
+            clicked = ImGui.IsItemClicked();
+
+            drawList.AddCircleFilled(center, size / 2f, ImGui.ColorConvertFloat4ToU32(color), 20);
+
+            // Icon/text
+            var textSize = ImGui.CalcTextSize(icon);
+            var textPos = center - textSize / 2;
+            drawList.AddText(textPos, ImGui.GetColorU32(ImGuiCol.Text), icon);
+
+            ImGui.PopID();
+            return hovered;
+        }
 
         public bool IsVisible => show;
-        public void SetVisible(bool visible) => show = visible;
+        public void SetVisible(bool visible)
+        {
+            show = visible;
+            EditorApp.Instance.selectionMode = EditorSelectionMode.Tile;
+        }
     }
 }

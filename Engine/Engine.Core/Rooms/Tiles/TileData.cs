@@ -3,6 +3,7 @@ using Engine.Core.Graphics;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace Engine.Core.Rooms.Tiles
 {
@@ -46,6 +47,7 @@ namespace Engine.Core.Rooms.Tiles
         public string TexturePath { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
+        public Vector2 Offset { get; set; }
         public int[][] TileIndices { get; set; } // Tile indices in the tileset
         public bool[][] Collision { get; set; } // Collision flags for each tile
         public int[][] HeightMap { get; set; } // Height values for each tile
@@ -90,7 +92,8 @@ namespace Engine.Core.Rooms.Tiles
                 Height = h,
                 TileIndices = TileArrayUtils.ToJagged(indices),
                 Collision = TileArrayUtils.ToJagged(solid),
-                HeightMap = TileArrayUtils.ToJagged(height)
+                HeightMap = TileArrayUtils.ToJagged(height),
+                Offset = renderer.Offset
             };
         }
 
@@ -101,6 +104,7 @@ namespace Engine.Core.Rooms.Tiles
             renderer.Texture = TextureLibrary.Instance.Get(renderer.TexturePath);
             renderer.Width = data.Width;
             renderer.Height = data.Height;
+            renderer.Offset = data.Offset;
 
             int[,] indices = TileArrayUtils.To2D(data.TileIndices);
             bool[,] collision = TileArrayUtils.To2D(data.Collision);
