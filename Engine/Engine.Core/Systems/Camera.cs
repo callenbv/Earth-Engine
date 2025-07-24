@@ -13,11 +13,10 @@ namespace Engine.Core
         public float SmoothSpeed { get; set; } = 8f;
         public float UIScale { get; set; } = 1f;
         
-        // Viewport settings
-        public int ViewportWidth { get; set; } = 384;
-        public int ViewportHeight { get; set; } = 216;
-        public int TargetViewportWidth { get; set; } = 384;
-        public int TargetViewportHeight { get; set; } = 216;
+        public int ViewportWidth { get; set; } = 320;
+        public int ViewportHeight { get; set; } = 180;
+        public int TargetViewportHeight { get; set; } = 180;
+        public int TargetViewportWidth { get; set; } = 320;
 
         public void Update(GameTime gameTime)
         {
@@ -84,14 +83,8 @@ namespace Engine.Core
 
         public void SetViewportSize(int viewportWidth, int viewportHeight)
         {
-            // Don't update the actual viewport size - we always use target viewport size for rendering
-            // This method is kept for compatibility but doesn't affect the camera calculations
-        }
-
-        public void SetTargetViewportSize(int targetWidth, int targetHeight)
-        {
-            TargetViewportWidth = targetWidth;
-            TargetViewportHeight = targetHeight;
+            ViewportWidth = viewportWidth;
+            ViewportHeight = viewportHeight;
         }
 
         // Singleton for easy access

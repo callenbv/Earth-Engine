@@ -109,6 +109,7 @@ namespace GameRuntime
             // Load static tilemaps
             TilemapManager.Load(Path.Combine(EnginePaths.ProjectBase, "Tilemaps", "tilemaps.json"));
 
+
             // Apply any graphics changes
             _graphics.ApplyChanges();
 

@@ -39,6 +39,10 @@ namespace GameRuntime
         private Game game;
         public static RuntimeManager Instance { get; private set; }
 
+        /// <summary>
+        /// Initialize the runtime manager
+        /// </summary>
+        /// <param name="game_"></param>
         public RuntimeManager(Game game_)
         {
             assetsRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets");
@@ -70,7 +74,6 @@ namespace GameRuntime
             textureLibrary.graphicsDevice = _graphicsDevice;
             textureLibrary.LoadTextures();
 
-            Camera.Main.SetTargetViewportSize(384, 216);  
             graphicsManager.ApplyChanges();
         }
 
@@ -103,6 +106,7 @@ namespace GameRuntime
                 _sceneRenderTarget = new RenderTarget2D(_graphicsDevice, EngineContext.InternalWidth, EngineContext.InternalHeight);
                 _lastWidth = EngineContext.InternalWidth;
                 _lastHeight = EngineContext.InternalHeight;
+                Console.WriteLine($"Resized to {_lastWidth},{_lastHeight}");
             }
         }
 

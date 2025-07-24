@@ -53,6 +53,8 @@ namespace Engine.Core.Game
                 RuntimePath = newOptions.RuntimePath;
                 WindowWidth = newOptions.WindowWidth;
                 WindowHeight = newOptions.WindowHeight;
+                TargetResolutionHeight = newOptions.TargetResolutionHeight;
+                TargetResolutionWidth = newOptions.TargetResolutionWidth;
                 EngineContext.InternalWidth = TargetResolutionWidth;
                 EngineContext.InternalHeight = TargetResolutionHeight;
                 Console.WriteLine("[DEBUG] Loaded GameOptions:");
