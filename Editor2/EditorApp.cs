@@ -34,7 +34,6 @@ namespace EarthEngineEditor
         public EditorOverlay editorOverlay;
         public EditorWatcher fileWatcher;
         public bool gameFocused = false;
-
         public static EditorApp Instance { get; private set; }
 
         public EditorApp()
@@ -63,6 +62,7 @@ namespace EarthEngineEditor
             runtime.graphicsManager = _graphics;
             runtime.gameOptions = new GameOptions(); // We use default options until we load per-project
             EngineContext.Paused = true;
+            EngineContext.SpriteBatch = spriteBatch;
 
             // Load default project for test
             _windowManager.OpenProject(_windowManager.GetLastProject());

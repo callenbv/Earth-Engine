@@ -52,7 +52,7 @@ namespace Editor.AssetManagement
             if (!File.Exists(absPath)) return;
 
             var modified = File.GetLastWriteTimeUtc(absPath);
-            if (_handler != null && modified == _lastModified)
+            if (_handler != null)
                 return;
 
             _lastModified = modified;
@@ -129,7 +129,6 @@ namespace Editor.AssetManagement
                 _ => ""
             };
         }
-
 
         public void Render()
         {

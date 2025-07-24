@@ -44,6 +44,7 @@ namespace Editor.AssetManagement
 
             // Editor settings
             EditorApp.Instance?._settings?.Save();
+            TilemapManager.Save();
         }
 
         /// <summary>
@@ -53,6 +54,9 @@ namespace Editor.AssetManagement
         {
             // Load per project assets
             EditorApp.Instance.runtime.Initialize();
+
+            // Load static tilemaps
+            TilemapManager.Load(Path.Combine(ProjectSettings.ProjectDirectory,"Tilemaps","tilemaps.json"));
 
             // Load scripts in project if possible
             ScriptCompiler.CompileAndLoadScripts(ProjectSettings.ProjectDirectory, out var scriptManager);
@@ -65,7 +69,6 @@ namespace Editor.AssetManagement
 
                 Asset scene = Asset.Get(Path.GetFileName(settings.LastScene));
                 InspectorWindow.Instance.Inspect(scene);
-                ProjectSettings.RuntimePath = settings.RuntimePath ?? string.Empty;
 
                 if (scene != null)
                 {

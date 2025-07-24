@@ -1,4 +1,5 @@
 using Editor.AssetManagement;
+using Editor.Windows.TileEditor;
 using Engine.Core;
 using Engine.Core.Data;
 using ImGuiNET;
@@ -18,6 +19,7 @@ namespace EarthEngineEditor.Windows
         private readonly PerformanceWindow _performance;
         private readonly ConsoleWindow _console;
         private readonly ToolbarWindow toolbar;
+        private readonly TileEditorWindow tileEditor;
         private EarthProject project;
         private EditorApp game;
         public List<string> recentProjects = new List<string>();
@@ -36,6 +38,7 @@ namespace EarthEngineEditor.Windows
             _about = new AboutWindow();
             _performance = new PerformanceWindow();
             toolbar = new ToolbarWindow();
+            tileEditor = new TileEditorWindow();
             _console = console;
             game = game_;
             Load();
@@ -57,6 +60,7 @@ namespace EarthEngineEditor.Windows
             _about.Render();
             _performance.Render();
             _console.Render();
+            tileEditor.Render();
             toolbar.Render();
         }
 
@@ -206,6 +210,10 @@ namespace EarthEngineEditor.Windows
                     bool toolbarVisible = toolbar.IsVisible;
                     if (ImGui.MenuItem("Toolbar", null, ref toolbarVisible))
                         toolbar.SetVisible(toolbarVisible);
+
+                    bool tileVisible = tileEditor.IsVisible;
+                    if (ImGui.MenuItem("Tile Editor", null, ref tileVisible))
+                        toolbar.SetVisible(tileVisible);
 
                     if (ImGui.MenuItem("Reset"))
                     {

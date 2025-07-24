@@ -13,9 +13,11 @@ namespace Engine.Core.Game.Components
         public override string Name => "Tilemap Renderer";
         public int Width = 100;
         public int Height = 100;
+        public string TexturePath = string.Empty;
+        public string Title { get; set; } = "Tilemap Layer";
         public int TileSize { get; private set; } = 16;
         [JsonIgnore]
-        public Tile[,] Tiles { get; private set; } = new Tile[100,100];
+        public Tile[,] Tiles { get; set; } = new Tile[100,100];
         [JsonIgnore]
         public Texture2D? Texture { get; set; }
 
@@ -29,6 +31,7 @@ namespace Engine.Core.Game.Components
             Width = width;
             Height = height;
             Texture = TextureLibrary.Instance.Get(texture);
+            TexturePath = texture;
             Tiles = new Tile[width, height];
         }
 
@@ -70,7 +73,7 @@ namespace Engine.Core.Game.Components
 
                         spriteBatch.Draw(
                             Texture,
-                            Owner.Position + new Vector2(x * TileSize, y * TileSize),
+                            Position + new Vector2(x * TileSize, y * TileSize),
                             source,
                             Color.White);
 

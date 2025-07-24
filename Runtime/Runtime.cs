@@ -104,6 +104,7 @@ namespace GameRuntime
             // Load our default scene
             runtimeManager.scene = Room.Load(gameOptions.LastScene);
             runtimeManager.scene.Initialize();
+            TilemapManager.Load(Path.Combine(EnginePaths.ProjectBase, "Tilemaps", "tilemaps.json"));
 
             // Apply any graphics changes
             _graphics.ApplyChanges();
@@ -166,7 +167,6 @@ namespace GameRuntime
                 // Ensure this is the actual folder (remove trailing slash just in case)
                 exeDir = exeDir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
             }
-
             if (string.IsNullOrWhiteSpace(projectPath) || !Directory.Exists(projectPath))
             {
                 Console.WriteLine("Invalid or missing project path.");
@@ -189,6 +189,8 @@ namespace GameRuntime
             {
                 Console.WriteLine($"[DEBUG] FileInfo error: {infoEx}");
             }
+            EnginePaths.ProjectBase = projectPath;
+
             using var game = new Runtime(projectPath);
             game.Run();
         }

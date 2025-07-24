@@ -18,6 +18,7 @@ using Engine.Core.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using System.Reflection;
 using Engine.Core.Audio;
+using Engine.Core.Rooms.Tiles;
 
 namespace GameRuntime
 {
@@ -72,7 +73,6 @@ namespace GameRuntime
             textureLibrary.graphicsDevice = _graphicsDevice;
             textureLibrary.LoadTextures();
 
-
             Camera.Main.SetTargetViewportSize(384, 216);  
             graphicsManager.ApplyChanges();
         }
@@ -123,6 +123,7 @@ namespace GameRuntime
             spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.Main.GetViewMatrix(INTERNAL_WIDTH, INTERNAL_HEIGHT));
             if (scene != null)
             {
+                TilemapManager.Render(spriteBatch);
                 scene.Render(spriteBatch);
             }
             spriteBatch.End();

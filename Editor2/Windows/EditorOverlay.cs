@@ -67,7 +67,7 @@ namespace Editor.Windows
         /// <param name="spriteBatch"></param>
         public void DrawEnd(SpriteBatch spriteBatch)
         {
-            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.NonPremultiplied, SamplerState.PointClamp, null, null, null, Camera.Main.GetViewMatrix(1920, 1080));
+            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.NonPremultiplied, SamplerState.PointClamp, null, null, null, Camera.Main.GetViewMatrix(Camera.Main.ViewportWidth, Camera.Main.ViewportHeight));
             DrawGrid(spriteBatch);
             spriteBatch.End();
         }
