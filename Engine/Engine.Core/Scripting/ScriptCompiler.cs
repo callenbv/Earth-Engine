@@ -11,6 +11,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Engine.Core.Game.Components;
 using GameRuntime;
 using System.Reflection;
+using Engine.Core.Data;
 
 namespace Engine.Core.Scripting
 {
@@ -179,6 +180,56 @@ namespace Engine.Core.Scripting
                 Console.WriteLine($"[ScriptLoader] Failed to load scripts: {ex.Message}");
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Reads the compiled scripts from the Build directory and updates the ComponentRegistry.
+        /// </summary>
+        /// <returns></returns>
+        public static bool LoadScripts()
+        {
+            string scriptDllPath = Path.Combine(EnginePaths.ProjectBase, "Build", "CompiledScripts.dll");
+            bool success;
+
+            if (File.Exists(scriptDllPath))
+            {
+                Console.WriteLine($"[Runtime] Loading CompiledScripts.dll from: {scriptDllPath}");
+
+                byte[] bytes = File.ReadAllBytes(scriptDllPath);
+                Assembly asm = Assembly.Load(bytes);
+
+                EngineContext.Current.ScriptManager = new ScriptManager(asm);
+                ComponentRegistry.RegisterAllComponents();
+
+                Console.WriteLine("[Runtime] ScriptManager initialized and components registered.");
+                success = true;
+            }
+            else
+            {
+                Console.WriteLine("[Runtime] CompiledScripts.dll not found!");
+                success = false;
+            }
+
+#if DEBUG
+            foreach (var kvp in ComponentRegistry.Components)
+                Console.WriteLine($"[Runtime] Registered: {kvp.Key}");
+            string engineCorePath = Path.Combine(AppContext.BaseDirectory, "Engine.Core.dll");
+            string buildPath = Path.Combine(EnginePaths.ProjectBase, "Build");
+            string destPath = Path.Combine(buildPath, "Engine.Core.dll");
+
+            if (File.Exists(engineCorePath))
+            {
+                Directory.CreateDirectory(buildPath); // Ensure Build exists
+                File.Copy(engineCorePath, destPath, overwrite: true);
+                Console.WriteLine($"[Launcher] Copied Engine.Core.dll to {destPath}");
+            }
+            else
+            {
+                Console.WriteLine("[Launcher] Engine.Core.dll not found at: " + engineCorePath);
+            }
+#endif
+
+            return success;
         }
     }
 }

@@ -6,32 +6,33 @@
 /// <Summary>                
 /// -----------------------------------------------------------------------------
 
-using Engine.Core;
 using Engine.Core.Audio;
 using Engine.Core.Data;
 using Engine.Core.Game;
-using Engine.Core.Game.Components;
 using Engine.Core.Rooms;
-using Microsoft.CodeAnalysis;
+using Engine.Core.Scripting;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
 using System.IO;
-using System.Reflection;
-using System.Xml.Linq;
 
 namespace GameRuntime
 {
+    /// <summary>
+    /// Main runtime class for the game engine, responsible for initializing and running the game.
+    /// </summary>
     public class Runtime : Game
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         private RuntimeManager runtimeManager;
         private GameOptions gameOptions;
-        private string projectPath = string.Empty;
         public AudioManager audioManager = new AudioManager();
 
+        /// <summary>
+        /// Constructs a new Runtime instance with the specified project path.
+        /// </summary>
+        /// <param name="projectPath"></param>
         public Runtime(string projectPath)
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -46,8 +47,14 @@ namespace GameRuntime
             gameOptions = new GameOptions();
         }
 
+        /// <summary>
+        /// Initializes the game, setting up graphics, audio, and loading the default scene.
+        /// </summary>
         protected override void Initialize()
         {
+            // Set up our main spritebatch
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
+
             // Set up the runtime manager and load the default scene
             runtimeManager = new RuntimeManager(this);
             runtimeManager.graphicsManager = _graphics;
@@ -65,58 +72,18 @@ namespace GameRuntime
             _graphics.PreferredBackBufferWidth = gameOptions.WindowWidth;
             _graphics.PreferredBackBufferHeight = gameOptions.WindowHeight;
 
-            // Set up our main spritebatch
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
-
-            // Set up and load audio
-            audioManager.Initialize();
-
             // Load the compiled scripts
-            string scriptDllPath = Path.Combine(EnginePaths.ProjectBase, "Build", "CompiledScripts.dll");
+            ScriptCompiler.LoadScripts();
 
-            if (File.Exists(scriptDllPath))
-            {
-                Console.WriteLine($"[Runtime] Loading CompiledScripts.dll from: {scriptDllPath}");
-
-                byte[] bytes = File.ReadAllBytes(scriptDllPath);
-                Assembly asm = Assembly.Load(bytes);
-
-                EngineContext.Current.ScriptManager = new ScriptManager(asm);
-                ComponentRegistry.RegisterAllComponents();
-
-                Console.WriteLine("[Runtime] ScriptManager initialized and components registered.");
-            }
-            else
-            {
-                Console.WriteLine("[Runtime] CompiledScripts.dll not found!");
-            }
-
-            // Debug: Copy the engine DLL into our folder so we can rapid test engine changes
-#if DEBUG
-            foreach (var kvp in ComponentRegistry.Components)
-                Console.WriteLine($"[Runtime] Registered: {kvp.Key}");
-            string engineCorePath = Path.Combine(AppContext.BaseDirectory, "Engine.Core.dll");
-            string buildPath = Path.Combine(EnginePaths.ProjectBase, "Build");
-            string destPath = Path.Combine(buildPath, "Engine.Core.dll");
-
-            if (File.Exists(engineCorePath))
-            {
-                Directory.CreateDirectory(buildPath); // Ensure Build exists
-                File.Copy(engineCorePath, destPath, overwrite: true);
-                Console.WriteLine($"[Launcher] Copied Engine.Core.dll to {destPath}");
-            }
-            else
-            {
-                Console.WriteLine("[Launcher] Engine.Core.dll not found at: " + engineCorePath);
-            }
-#endif
             // Load our default scene
             runtimeManager.scene = Room.Load(gameOptions.LastScene);
             runtimeManager.scene.Initialize();
 
+            // Set up and load audio
+            audioManager.Initialize();
+
             // Load static tilemaps
             TilemapManager.Load(Path.Combine(EnginePaths.ProjectBase, "Tilemaps", "tilemaps.json"));
-
 
             // Apply any graphics changes
             _graphics.ApplyChanges();
@@ -124,87 +91,28 @@ namespace GameRuntime
             base.Initialize();
         }
 
+        /// <summary>
+        /// Updates the game state, including input handling and runtime updates.
+        /// </summary>
+        /// <param name="gameTime"></param>
         protected override void Update(GameTime gameTime)
         {
+#if DEBUG
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-
+#endif
             runtimeManager.Update(gameTime);
             base.Update(gameTime);
         }
 
+        /// <summary>
+        /// Draws the game scene, rendering the current room and any overlays or UI elements.
+        /// </summary>
+        /// <param name="gameTime"></param>
         protected override void Draw(GameTime gameTime)
         {
             runtimeManager.Draw(_spriteBatch);
             base.Draw(gameTime);
-        }
-    }
-
-    /// <summary>
-    /// Robust program class that lets us launch runtimes with a given project path
-    /// </summary>
-    public static class Program
-    {
-        [STAThread]
-        public static void Main(string[] args)
-        {
-            string? projectPath = null;
-
-            // 1. Check for CLI argument
-            for (int i = 0; i < args.Length - 1; i++)
-            {
-                if (args[i] == "--project")
-                {
-                    projectPath = args[i + 1];
-                    break;
-                }
-            }
-
-            projectPath ??= AppContext.BaseDirectory;
-            Console.WriteLine($"Project root set to {projectPath}");
-
-#if DEBUG
-            if (projectPath == null)
-            {
-                Console.WriteLine("No project specified. Drag your project folder here:");
-                projectPath = Console.ReadLine()?.Trim('"');
-            }
-#endif
-            // We defaut to our current directory, which should be the case for release builds
-            if (projectPath == null)
-            {
-                // Get the directory of the executable
-                string exeDir = AppContext.BaseDirectory;
-
-                // Ensure this is the actual folder (remove trailing slash just in case)
-                exeDir = exeDir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-            }
-            if (string.IsNullOrWhiteSpace(projectPath) || !Directory.Exists(projectPath))
-            {
-                Console.WriteLine("Invalid or missing project path.");
-                return;
-            }
-
-            string fullPath = Path.Combine(projectPath, "Assets", "Rooms","Test.room"); // Change filename as needed
-
-            Console.WriteLine($"[DEBUG] fullPath = {fullPath}");
-            Console.WriteLine($"[DEBUG] File.Exists = {File.Exists(fullPath)}");
-
-            try
-            {
-                var fi = new FileInfo(fullPath);
-                Console.WriteLine($"[DEBUG] FileInfo.Exists = {fi.Exists}");
-                Console.WriteLine($"[DEBUG] FileInfo.IsReadOnly = {fi.IsReadOnly}");
-                Console.WriteLine($"[DEBUG] Attributes = {fi.Attributes}");
-            }
-            catch (Exception infoEx)
-            {
-                Console.WriteLine($"[DEBUG] FileInfo error: {infoEx}");
-            }
-            EnginePaths.ProjectBase = projectPath;
-
-            using var game = new Runtime(projectPath);
-            game.Run();
         }
     }
 } 
