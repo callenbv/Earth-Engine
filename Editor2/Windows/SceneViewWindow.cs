@@ -58,7 +58,7 @@ namespace EarthEngineEditor.Windows
                         Sprite2D sprite = obj.GetComponent<Sprite2D>();
                         if (sprite == null) continue;
 
-                        Vector2 pos = obj.position;
+                        Vector2 pos = obj.Position;
                         Microsoft.Xna.Framework.Rectangle rect = new Microsoft.Xna.Framework.Rectangle(
                             (int)(pos.X - sprite.origin.X),
                             (int)(pos.Y - sprite.origin.Y),
@@ -87,7 +87,7 @@ namespace EarthEngineEditor.Windows
                         }
                         else
                         {
-                            _selectedObject.position = Input.mouseWorldPosition;
+                            _selectedObject.Position = Input.mouseWorldPosition;
                         }
                     }
                 }

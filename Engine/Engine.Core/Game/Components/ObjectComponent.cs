@@ -18,6 +18,9 @@ namespace Engine.Core.Game.Components
         virtual void Draw(SpriteBatch spriteBatch) { }
         virtual void DrawUI(SpriteBatch spriteBatch) { }
         virtual void Create() { }
+
+        [EditorOnlyAttribute]
+        virtual void Initialize() { }
     }
 
     public abstract class ObjectComponent : IComponent
@@ -45,7 +48,7 @@ namespace Engine.Core.Game.Components
         [JsonIgnore]
         public static GraphicsDevice? GraphicsDevice => TextureLibrary.Instance.graphicsDevice;
 
-
+        public virtual void Initialize() { }
         public virtual void Create() { }
         public virtual void Update(GameTime gameTime) { }
         public virtual void Draw(SpriteBatch spriteBatch) { }

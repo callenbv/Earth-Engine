@@ -16,11 +16,6 @@ namespace Engine.Core.Game.Components
         public Vector2 UIPosition;
         public override string Name => "UI Text Renderer";
 
-        public override void Create()
-        {
-            base.Create();
-        }
-
         /// <summary>
         /// Does not inherit draw from text renderer in world
         /// </summary>
@@ -29,13 +24,17 @@ namespace Engine.Core.Game.Components
         {
 
         }
-
+        
+        /// <summary>
+        /// Draw our text in the UI
+        /// </summary>
+        /// <param name="spriteBatch"></param>
         public override void DrawUI(SpriteBatch spriteBatch)
         {
             if (!Visible || string.IsNullOrEmpty(Text) || currentFont == null || Owner == null)
                 return;
 
-            Vector2 position = Owner.position + Offset;
+            Vector2 position = Owner.Position + Offset;
 
             if (!Tethered)
             {

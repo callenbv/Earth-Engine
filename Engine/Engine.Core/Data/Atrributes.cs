@@ -18,4 +18,6 @@ namespace Engine.Core.Data
             Category = category;
         }
     }
+    [AttributeUsage(AttributeTargets.Method)]
+    public class EditorOnlyAttribute : Attribute { }
 }

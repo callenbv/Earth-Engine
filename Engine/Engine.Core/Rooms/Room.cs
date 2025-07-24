@@ -62,7 +62,7 @@ namespace Engine.Core.Rooms
             string fullPath = Path.Combine(EnginePaths.ProjectBase, "Assets", path);
             Console.WriteLine($"Loading scene from: {fullPath}");
 
-            Room scene = new Room();
+            Room? scene = new Room();
             string name = Path.GetFileName(path);
 
             try
@@ -90,7 +90,7 @@ namespace Engine.Core.Rooms
                             if (component is ObjectComponent comp)
                             {
                                 comp.Owner = obj;
-                                comp.Create();
+                                comp.Initialize();
                             }
                         }
                     }
@@ -103,6 +103,20 @@ namespace Engine.Core.Rooms
             }
 
             return scene;
+        }
+
+        /// <summary>
+        /// Initialize the room and all of its objects & components
+        /// </summary>
+        public void Initialize()
+        {
+            foreach (var obj in objects)
+            {
+                foreach (var component in obj.components)
+                {
+                    component.Create();
+                }
+            }
         }
 
         /// <summary>

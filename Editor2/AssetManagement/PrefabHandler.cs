@@ -1,4 +1,6 @@
-﻿using Engine.Core.CustomMath;
+﻿using EarthEngineEditor;
+using Engine.Core;
+using Engine.Core.CustomMath;
 using Engine.Core.Data;
 using Engine.Core.Game;
 using Engine.Core.Game.Components;
@@ -8,6 +10,7 @@ using ImGuiNET;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Graphics;
+using MonoGame.Extended.Screens;
 using MonoGame.Extended.Serialization.Json;
 using System;
 using System.Collections.Generic;
@@ -124,10 +127,12 @@ namespace Editor.AssetManagement
                                 var instance = (ObjectComponent)Activator.CreateInstance(comp.Type);
                                 prefab.components.Add(instance);
 
+                                // If actual game object, set owner
                                 if (prefab is GameObject gameObject)
                                     instance.Owner = gameObject;
 
-                                instance.Create();
+                                instance.Initialize();
+
                                 ImGui.CloseCurrentPopup();
                             }
                         }

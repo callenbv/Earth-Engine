@@ -48,9 +48,9 @@ namespace Engine.Core.Game.Components
         private float frameTimer = 0;
 
         /// <summary>
-        /// Initialize
+        /// Initialize sprite with a texture if possible
         /// </summary>
-        public override void Create()
+        public override void Initialize()
         {
             Texture2D tex = TextureLibrary.Instance.Get(texturePath);
 
@@ -97,7 +97,7 @@ namespace Engine.Core.Game.Components
 
             depth = Owner.GetDepth();
             origin = new Vector2(frameWidth / 2, frameHeight / 2);
-            spriteBatch.Draw(texture, Owner.position, spriteBox, Tint, Owner.rotation, origin, Owner.scale, spriteEffect, depth);
+            spriteBatch.Draw(texture, Owner.Position, spriteBox, Tint, Owner.rotation, origin, Owner.scale, spriteEffect, depth);
         }
 
         /// <summary>

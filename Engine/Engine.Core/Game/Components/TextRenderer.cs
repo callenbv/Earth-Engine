@@ -25,12 +25,6 @@ namespace Engine.Core.Game.Components
         protected Vector2 textSize;
         public override string Name => "Text Renderer";
 
-        public override void Create()
-        {
-            LoadFont();
-            UpdateTextSize();
-        }
-
         public override void Update(GameTime gameTime)
         {
             if (currentFont == null)
@@ -44,7 +38,7 @@ namespace Engine.Core.Game.Components
             if (!Visible || string.IsNullOrEmpty(Text) || currentFont == null || Owner == null)
                 return;
 
-            Vector2 position = Owner.position + Offset;
+            Vector2 position = Owner.Position + Offset;
             
             if (Centered)
             {

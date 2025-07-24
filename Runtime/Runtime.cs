@@ -1,4 +1,5 @@
 ﻿using Engine.Core;
+using Engine.Core.Audio;
 using Engine.Core.Data;
 using Engine.Core.Game;
 using Engine.Core.Game.Components;
@@ -21,6 +22,7 @@ namespace GameRuntime
         private RuntimeManager runtimeManager;
         private GameOptions gameOptions;
         private string projectPath = string.Empty;
+        public AudioManager audioManager = new AudioManager();
 
         public Runtime(string projectPath)
         {
@@ -50,12 +52,15 @@ namespace GameRuntime
             IsFixedTimeStep = false;
             Window.AllowUserResizing = true;
             Window.Title = gameOptions.Title;
-            _graphics.SynchronizeWithVerticalRetrace = false;
+            _graphics.SynchronizeWithVerticalRetrace = true;
             _graphics.PreferredBackBufferWidth = gameOptions.WindowWidth;
             _graphics.PreferredBackBufferHeight = gameOptions.WindowHeight;
 
             // Set up our main spritebatch
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            // Set up and load audio
+            audioManager.Initialize();
 
             // Load the compiled scripts
             string scriptDllPath = Path.Combine(EnginePaths.ProjectBase, "Build", "CompiledScripts.dll");
@@ -98,6 +103,7 @@ namespace GameRuntime
 #endif
             // Load our default scene
             runtimeManager.scene = Room.Load(gameOptions.LastScene);
+            runtimeManager.scene.Initialize();
 
             // Apply any graphics changes
             _graphics.ApplyChanges();

@@ -70,7 +70,7 @@ namespace Engine.Core.Game.Components
 
                         spriteBatch.Draw(
                             Texture,
-                            Owner.position + new Vector2(x * TileSize, y * TileSize),
+                            Owner.Position + new Vector2(x * TileSize, y * TileSize),
                             source,
                             Color.White);
 

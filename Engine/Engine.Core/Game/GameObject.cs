@@ -19,7 +19,16 @@ namespace Engine.Core.Game
     public class GameObject : IComponentContainer
     {
         public string Name { get; set; } = string.Empty;
-        public Vector2 position;
+        public Vector2 Position
+        {
+            get => GetComponent<Transform>()?.Position ?? Vector2.Zero;
+            set
+            {
+                var transform = GetComponent<Transform>();
+                if (transform != null)
+                    transform.Position = value;
+            }
+        }
         public float scale = 1f;
         public float rotation;
         public List<GameObject> children = new List<GameObject>();
@@ -227,7 +236,7 @@ namespace Engine.Core.Game
                 // Give an empty visual
                 var sprite = obj.GetComponent<Sprite2D>();
                 if (sprite != null)
-                    sprite.Create();
+                    sprite.Initialize();
 
                 // Add to the scene
                 EngineContext.Current.Scene?.objects.Add(obj);
@@ -271,7 +280,7 @@ namespace Engine.Core.Game
                 return 0f;
 
             // Calculate the bottom Y position (feet) of the sprite
-            float feetY = position.Y + Sprite.frameHeight / 2;
+            float feetY = Position.Y + Sprite.frameHeight / 2;
             feetY /= 1000f;
 
             feetY = Math.Clamp(feetY, 0f, 1f);

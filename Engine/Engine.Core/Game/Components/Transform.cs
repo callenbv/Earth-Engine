@@ -19,7 +19,7 @@ namespace Engine.Core.Game
         /// <param name="gameTime"></param>
         public override void Update(GameTime gameTime)
         {
-            Owner.position = Position;
+            Owner.Position = Position;
             Owner.scale = Scale;
             Owner.rotation = Rotation;
         }

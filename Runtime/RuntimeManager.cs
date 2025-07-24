@@ -17,6 +17,7 @@ using System.Runtime;
 using Engine.Core.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using System.Reflection;
+using Engine.Core.Audio;
 
 namespace GameRuntime
 {
@@ -70,6 +71,7 @@ namespace GameRuntime
             TextureLibrary textureLibrary = new TextureLibrary();
             textureLibrary.graphicsDevice = _graphicsDevice;
             textureLibrary.LoadTextures();
+
 
             Camera.Main.SetTargetViewportSize(384, 216);  
             graphicsManager.ApplyChanges();

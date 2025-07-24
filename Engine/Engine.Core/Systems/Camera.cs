@@ -24,7 +24,7 @@ namespace Engine.Core
 
             if (Target != null)
             {
-                Position = Vector2.Lerp(Position, Target.position, SmoothSpeed * dt);
+                Position = Vector2.Lerp(Position, Target.Position, SmoothSpeed * dt);
             }
         }
 

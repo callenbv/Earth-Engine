@@ -9,11 +9,16 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Engine.Core.Data;
+using EarthEngineEditor;
 
 namespace Editor.Windows.Inspector
 {
     public static class InspectorUI
     {
+        /// <summary>
+        /// Draw a component in the inspector
+        /// </summary>
+        /// <param name="comp"></param>
         public static void DrawComponent(IComponent comp)
         {
             var type = comp.GetType();
@@ -34,6 +39,10 @@ namespace Editor.Windows.Inspector
             }
         }
 
+        /// <summary>
+        /// Give a GameObject, draw all its components in a tree view
+        /// </summary>
+        /// <param name="obj"></param>
         public static void DrawGameObject(IComponentContainer obj)
         {
             foreach (var comp in obj.components)
@@ -43,6 +52,12 @@ namespace Editor.Windows.Inspector
                 {
                     DrawComponent(comp);
                     ImGui.TreePop();
+
+                    if (ImGuiRenderer.IconButton("Remove", "\uf1f8", Microsoft.Xna.Framework.Color.Red))
+                    {
+                        ((ObjectComponent)comp).Owner.components.Remove(comp);
+                        break;
+                    }
                 }
             }
             PrefabHandler.DrawEditableButtons(obj);

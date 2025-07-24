@@ -57,7 +57,7 @@ namespace Engine.Core.Game
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.PointClamp, null, null, null, Camera.Main.GetViewMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight));
             spriteBatch.Draw(
                 softCircleTexture,
-                Owner.position,
+                Owner.Position,
                 null,
                 lightColor * lightIntensity,
                 0f,
