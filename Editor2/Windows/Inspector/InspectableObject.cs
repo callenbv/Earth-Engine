@@ -13,7 +13,7 @@ namespace Editor.Windows.Inspector
     {
         private readonly IComponentContainer obj;
         public string Name = string.Empty;
-
+        public GameObject? GameObject => obj as GameObject;
         public InspectableGameObject(IComponentContainer obj_)
         {
             obj = obj_;

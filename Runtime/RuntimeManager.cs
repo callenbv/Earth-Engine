@@ -39,9 +39,6 @@ namespace GameRuntime
         private Game game;
         public static RuntimeManager Instance { get; private set; }
 
-        private const int INTERNAL_WIDTH = 1920;
-        private const int INTERNAL_HEIGHT = 1080;
-    
         public RuntimeManager(Game game_)
         {
             assetsRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets");
@@ -50,10 +47,10 @@ namespace GameRuntime
             Instance = this;
             game = game_;
             _graphicsDevice = game_.GraphicsDevice;
-            _lighting = new Lighting2D(_graphicsDevice, INTERNAL_WIDTH, INTERNAL_HEIGHT);
-            _lastWidth = INTERNAL_WIDTH;
-            _lastHeight = INTERNAL_HEIGHT;
-            _sceneRenderTarget = new RenderTarget2D(_graphicsDevice, INTERNAL_WIDTH, INTERNAL_HEIGHT);
+            _lighting = new Lighting2D(_graphicsDevice, EngineContext.InternalWidth, EngineContext.InternalHeight);
+            _lastWidth = EngineContext.InternalWidth;
+            _lastHeight = EngineContext.InternalHeight;
+            _sceneRenderTarget = new RenderTarget2D(_graphicsDevice, EngineContext.InternalWidth, EngineContext.InternalHeight);
         }
 
         /// <summary>
@@ -96,14 +93,16 @@ namespace GameRuntime
                 EngineContext.Current.Scene = scene;
             }
 
+            EngineContext.DeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
             // Resize lighting and scene render target if needed (only if internal resolution changes)
-            if (INTERNAL_WIDTH != _lastWidth || INTERNAL_HEIGHT != _lastHeight)
+            if (EngineContext.InternalWidth != _lastWidth || EngineContext.InternalHeight != _lastHeight)
             {
-                _lighting.Resize(INTERNAL_WIDTH, INTERNAL_HEIGHT);
+                _lighting.Resize(EngineContext.InternalWidth, EngineContext.InternalHeight);
                 _sceneRenderTarget?.Dispose();
-                _sceneRenderTarget = new RenderTarget2D(_graphicsDevice, INTERNAL_WIDTH, INTERNAL_HEIGHT);
-                _lastWidth = INTERNAL_WIDTH;
-                _lastHeight = INTERNAL_HEIGHT;
+                _sceneRenderTarget = new RenderTarget2D(_graphicsDevice, EngineContext.InternalWidth, EngineContext.InternalHeight);
+                _lastWidth = EngineContext.InternalWidth;
+                _lastHeight = EngineContext.InternalHeight;
             }
         }
 
@@ -119,14 +118,18 @@ namespace GameRuntime
             _graphicsDevice.SetRenderTarget(_sceneRenderTarget);
             _graphicsDevice.Clear(Microsoft.Xna.Framework.Color.CornflowerBlue);
 
-            // Draw world with camera transform at internal resolution
-            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.Main.GetViewMatrix(INTERNAL_WIDTH, INTERNAL_HEIGHT));
             if (scene != null)
             {
+                // Draw the tilemaps immediately
+                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.Main.GetViewMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight));
                 TilemapManager.Render(spriteBatch);
+                spriteBatch.End();
+
+                // Draw the sprites depth sorted
+                spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.Main.GetViewMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight));
                 scene.Render(spriteBatch);
+                spriteBatch.End();
             }
-            spriteBatch.End();
 
             // Update the lightmap
             _lighting.Draw(scene,spriteBatch);
@@ -137,13 +140,13 @@ namespace GameRuntime
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.LinearClamp);
 
             // Calculate scale to fit the internal render target in the window while maintaining aspect ratio
-            float scaleX = (float)viewport.Width / INTERNAL_WIDTH;
-            float scaleY = (float)viewport.Height / INTERNAL_HEIGHT;
+            float scaleX = (float)viewport.Width / EngineContext.InternalWidth;
+            float scaleY = (float)viewport.Height / EngineContext.InternalHeight;
             float scale = Math.Min(scaleX, scaleY);
 
             // Calculate position to center the render target
-            float scaledWidth = INTERNAL_WIDTH * scale;
-            float scaledHeight = INTERNAL_HEIGHT * scale;
+            float scaledWidth = EngineContext.InternalWidth * scale;
+            float scaledHeight = EngineContext.InternalHeight * scale;
             float offsetX = (viewport.Width - scaledWidth) * 0.5f;
             float offsetY = (viewport.Height - scaledHeight) * 0.5f;
 

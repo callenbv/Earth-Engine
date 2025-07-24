@@ -52,6 +52,7 @@ namespace Editor.AssetManagement
             if (!File.Exists(absPath)) return;
 
             var modified = File.GetLastWriteTimeUtc(absPath);
+
             if (_handler != null)
                 return;
 

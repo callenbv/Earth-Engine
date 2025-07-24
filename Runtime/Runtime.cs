@@ -49,10 +49,11 @@ namespace GameRuntime
             gameOptions.Load("game_options.json");
 
             // Game settings based on options 
-            IsFixedTimeStep = false;
             Window.AllowUserResizing = true;
             Window.Title = gameOptions.Title;
-            _graphics.SynchronizeWithVerticalRetrace = true;
+            _graphics.SynchronizeWithVerticalRetrace = false;
+            _graphics.PreferMultiSampling = false;
+            IsFixedTimeStep = false;
             _graphics.PreferredBackBufferWidth = gameOptions.WindowWidth;
             _graphics.PreferredBackBufferHeight = gameOptions.WindowHeight;
 
@@ -104,6 +105,8 @@ namespace GameRuntime
             // Load our default scene
             runtimeManager.scene = Room.Load(gameOptions.LastScene);
             runtimeManager.scene.Initialize();
+
+            // Load static tilemaps
             TilemapManager.Load(Path.Combine(EnginePaths.ProjectBase, "Tilemaps", "tilemaps.json"));
 
             // Apply any graphics changes

@@ -30,6 +30,7 @@ namespace Engine.Core.Audio
                 Console.WriteLine($"[ERROR] Failed to play sound {Name}: {result}");
                 return;
             }
+
             // Set the channel group to the main channel
             channel.setChannelGroup(AudioManager.Instance.MainChannel);
         }

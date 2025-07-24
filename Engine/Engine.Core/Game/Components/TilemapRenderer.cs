@@ -17,6 +17,7 @@ namespace Engine.Core.Game.Components
         public string TexturePath = string.Empty;
         public string Title { get; set; } = "Tilemap Layer";
         public int TileSize { get; private set; } = 16;
+        public float Depth = 0; // Depth for rendering order
         [JsonIgnore]
         public Tile[,] Tiles { get; set; } = new Tile[100,100];
         [JsonIgnore]
@@ -84,7 +85,13 @@ namespace Engine.Core.Game.Components
                             Texture,
                             Position + Offset + new System.Numerics.Vector2(x * TileSize, y * TileSize),
                             source,
-                            Color.White);
+                            Color.White,
+                            0f,
+                            Microsoft.Xna.Framework.Vector2.Zero,
+                            1f,
+                            SpriteEffects.None,
+                            Depth
+                            );
 
                     }
                 }

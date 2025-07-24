@@ -54,6 +54,7 @@ namespace Editor.Windows.TileEditor
                         ImGui.SliderInt("Width", ref layer.Width, 50,200);
                         ImGui.SliderInt("Height", ref layer.Height, 50,200);
                         ImGui.InputFloat2("Offset", ref layer.Offset);
+                        ImGui.InputFloat("Depth", ref layer.Depth);
                         ImGui.TreePop();
                     }
                 }
@@ -71,14 +72,13 @@ namespace Editor.Windows.TileEditor
             ImGui.Separator();
 
             // Paint on the selected layer
-            if (selectedLayer != null && open)
+            if (selectedLayer != null && EditorApp.Instance.selectionMode == EditorSelectionMode.Tile)
             {
                 // Draw data for each tileset
                 ImGui.Text(selectedLayer.Title);
 
                 bool clicked;
 
-                ImGui.SameLine();
                 CircularSelectable("tile", "T", TileEditorMode.Paint, mode, out clicked);
                 if (clicked) mode = TileEditorMode.Paint;
 
@@ -101,7 +101,6 @@ namespace Editor.Windows.TileEditor
                     Vector2 scaledTileSize = new Vector2(tileSize * previewScale);
 
                     // Show full tileset image
-                    ImGui.Text("Tileset Preview:");
                     Vector2 imageSize = new Vector2(texWidth * previewScale, texHeight * previewScale);
 
                     if (selectedLayer.TexturePtr == IntPtr.Zero)
@@ -133,7 +132,7 @@ namespace Editor.Windows.TileEditor
                             // Draw outline if selected
                             if (index == selectedTileIndex)
                             {
-                                drawList.AddRect(min, max, ImGui.GetColorU32(ImGuiCol.ButtonActive), 0f, ImDrawFlags.None, 2.0f);
+                                drawList.AddRect(min, max, ImGui.ColorConvertFloat4ToU32(new Vector4(255,0,0,1)), 0f, ImDrawFlags.None, 2.0f);
                             }
 
                             ImGui.PopID();
@@ -142,7 +141,7 @@ namespace Editor.Windows.TileEditor
                 }
 
                 // Now paint with the selected tile index
-                if (!ImGui.GetIO().WantCaptureMouse)
+                if (!ImGui.GetIO().WantCaptureMouse && EditorApp.Instance.gameFocused)
                 {
                     var mousePos = Input.mouseWorldPosition;
                     int tileX = (int)((mousePos.X - selectedLayer.Offset.X) / selectedLayer.TileSize);
@@ -211,7 +210,6 @@ namespace Editor.Windows.TileEditor
         public void SetVisible(bool visible)
         {
             show = visible;
-            EditorApp.Instance.selectionMode = EditorSelectionMode.Tile;
         }
     }
 }

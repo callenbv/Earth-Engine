@@ -21,9 +21,10 @@ namespace Engine.Core
         public string? AssetsRoot { get; set; }
         public string? RoomsDir { get; set; }
         public GameOptions? GameOptions { get; set; }
-        public const int InternalWidth = 1920;
-        public const int InternalHeight = 1080;
+        public static int InternalWidth = 1920;
+        public static int InternalHeight = 1080;
         public static bool Paused = false;
+        public static float DeltaTime = 0f;
         // Add more as needed
 
         private EngineContext() { }

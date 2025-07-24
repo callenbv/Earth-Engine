@@ -47,6 +47,7 @@ namespace Engine.Core.Rooms.Tiles
         public string TexturePath { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
+        public float Depth { get; set; }
         public Vector2 Offset { get; set; }
         public int[][] TileIndices { get; set; } // Tile indices in the tileset
         public bool[][] Collision { get; set; } // Collision flags for each tile
@@ -90,6 +91,7 @@ namespace Engine.Core.Rooms.Tiles
                 TexturePath = renderer.TexturePath,
                 Width = w,
                 Height = h,
+                Depth = renderer.Depth,
                 TileIndices = TileArrayUtils.ToJagged(indices),
                 Collision = TileArrayUtils.ToJagged(solid),
                 HeightMap = TileArrayUtils.ToJagged(height),
@@ -105,6 +107,7 @@ namespace Engine.Core.Rooms.Tiles
             renderer.Width = data.Width;
             renderer.Height = data.Height;
             renderer.Offset = data.Offset;
+            renderer.Depth = data.Depth;
 
             int[,] indices = TileArrayUtils.To2D(data.TileIndices);
             bool[,] collision = TileArrayUtils.To2D(data.Collision);

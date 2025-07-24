@@ -16,6 +16,8 @@ namespace Engine.Core.Game
         public string? RuntimePath { get; set; } = string.Empty;
         public int WindowWidth { get; set; } = 1280;
         public int WindowHeight { get; set; } = 720;
+        public int TargetResolutionWidth { get; set; } = 1920;
+        public int TargetResolutionHeight { get; set; } = 1080;
 
         private static GameOptions? Instance;
         public static GameOptions Main => Instance ??= new GameOptions();
@@ -51,6 +53,8 @@ namespace Engine.Core.Game
                 RuntimePath = newOptions.RuntimePath;
                 WindowWidth = newOptions.WindowWidth;
                 WindowHeight = newOptions.WindowHeight;
+                EngineContext.InternalWidth = TargetResolutionWidth;
+                EngineContext.InternalHeight = TargetResolutionHeight;
                 Console.WriteLine("[DEBUG] Loaded GameOptions:");
             }
         }

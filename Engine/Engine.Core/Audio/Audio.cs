@@ -21,8 +21,6 @@ namespace Engine.Core.Audio
     /// </summary>
     public enum SoundID
     {
-        MenuMusic,
-        Explosion
     }
 
     public static class Audio

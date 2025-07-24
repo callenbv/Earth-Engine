@@ -268,7 +268,7 @@ namespace EarthEngineEditor.Windows
                     }
                 }
 
-                if (Input.IsMouseReleased())
+                if (!ImGui.GetIO().WantCaptureMouse && Input.IsMouseReleased())
                 {
                     if (_awaitingDrop)
                     {

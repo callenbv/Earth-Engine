@@ -1,4 +1,5 @@
-﻿using Engine.Core.Game;
+﻿using Engine.Core.CustomMath;
+using Engine.Core.Game;
 using Microsoft.Xna.Framework;
 
 namespace Engine.Core
@@ -59,16 +60,13 @@ namespace Engine.Core
             int screenW = ViewportWidth;
             int screenH = ViewportHeight;
 
-            const int INTERNAL_WIDTH = 1920;
-            const int INTERNAL_HEIGHT = 1080;
-
             // 1. Match the Draw() code: get scale and offset
-            float scaleX = (float)screenW / INTERNAL_WIDTH;
-            float scaleY = (float)screenH / INTERNAL_HEIGHT;
+            float scaleX = (float)screenW / EngineContext.InternalWidth;
+            float scaleY = (float)screenH / EngineContext.InternalHeight;
             float scale = Math.Min(scaleX, scaleY);
 
-            float offsetX = (screenW - INTERNAL_WIDTH * scale) * 0.5f;
-            float offsetY = (screenH - INTERNAL_HEIGHT * scale) * 0.5f;
+            float offsetX = (screenW - EngineContext.InternalWidth * scale) * 0.5f;
+            float offsetY = (screenH - EngineContext.InternalHeight * scale) * 0.5f;
 
             // 2. Convert mouse screen pos → internal render target space
             float internalX = (screenPos.X - offsetX) / scale;
@@ -76,7 +74,7 @@ namespace Engine.Core
 
             // 3. Convert internal point → world space
             Vector3 internalVec = new Vector3(internalX, internalY, 0f);
-            Matrix view = GetViewMatrix(INTERNAL_WIDTH, INTERNAL_HEIGHT);
+            Matrix view = GetViewMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight);
             Matrix inverse = Matrix.Invert(view);
             Vector3 worldVec = Vector3.Transform(internalVec, inverse);
 

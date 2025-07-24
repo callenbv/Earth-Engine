@@ -363,13 +363,33 @@ namespace EarthEngineEditor.Windows
                     if (ImGui.InputText("Game Title", ref title, 100))
                         settings.Title = title;
 
+                    if (ImGui.IsItemHovered())
+                        ImGui.SetTooltip("Name of the game window");
+
+
                     int width = settings.WindowWidth;
                     if (ImGui.InputInt("Window Width", ref width))
-                        settings.WindowWidth = Math.Max(100, width);
+                        settings.WindowWidth = Math.Max(384, width);
 
                     int height = settings.WindowHeight;
                     if (ImGui.InputInt("Window Height", ref height))
-                        settings.WindowHeight = Math.Max(100, height);
+                        settings.WindowHeight = Math.Max(216, height);
+
+
+                    int internalWidth = settings.TargetResolutionWidth;
+                    if (ImGui.InputInt("Target Render Width", ref internalWidth))
+                        settings.TargetResolutionWidth = Math.Max(384, internalWidth);
+
+                    if (ImGui.IsItemHovered())
+                        ImGui.SetTooltip("The internal width used for rendering. Higher is more detailed");
+
+                    int internalHeight = settings.TargetResolutionHeight;
+                    if (ImGui.InputInt("Target Render Height", ref internalHeight))
+                        settings.TargetResolutionHeight = Math.Max(216, internalHeight);
+
+                    if (ImGui.IsItemHovered())
+                        ImGui.SetTooltip("The internal height used for rendering. Higher is more detailed");
+
 
                     if (ImGui.Button("Save"))
                     {

@@ -5,6 +5,7 @@ using ImGuiNET;
 using System.IO;
 using System.Device.Gpio;
 using Editor.Windows.Inspector;
+using Engine.Core;
 
 namespace EarthEngineEditor.Windows
 {
@@ -26,15 +27,39 @@ namespace EarthEngineEditor.Windows
         /// </summary>
         public void Render()
         {
-            if (!_showInspector || selectedItem == null) return;
+            if (!_showInspector) return;
 
             ImGui.Begin("Inspector", ref _showInspector);
             ImGui.Text($"{Title}");
             ImGui.Separator();
 
-            selectedItem.Render();
+            selectedItem?.Render();
+            Update();
 
             ImGui.End();
+        }
+
+        /// <summary>
+        /// Update the inspector window
+        /// </summary>
+        public void Update()
+        {
+            if (selectedItem != null)
+            {
+                // Delete
+                if (Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Delete))
+                {
+                    if (selectedItem is InspectableGameObject obj)
+                    {
+                        obj.GameObject?.Destroy();
+                        selectedItem = null;
+                    }
+                }
+            }
+            else
+            {
+                Title = string.Empty;
+            }
         }
 
         /// <summary>
@@ -48,6 +73,7 @@ namespace EarthEngineEditor.Windows
         /// <param name="visible"></param>
         public void SetVisible(bool visible) => _showInspector = visible;
 
+       
         /// <summary>
         /// Trigger an inspect
         /// </summary>

@@ -47,6 +47,9 @@ namespace Engine.Core.Game.Components
 
         [JsonIgnore]
         public static GraphicsDevice? GraphicsDevice => TextureLibrary.Instance.graphicsDevice;
+        [JsonIgnore]
+        [HideInInspector]
+        public float dt => EngineContext.DeltaTime; // Retrieve the delta time from any component
 
         public virtual void Initialize() { }
         public virtual void Create() { }

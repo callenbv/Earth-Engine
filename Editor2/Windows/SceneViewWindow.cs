@@ -102,6 +102,14 @@ namespace EarthEngineEditor.Windows
                 }
             }
 
+
+            // Delete
+            if (_selectedObject != null && Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Delete))
+            {
+                _selectedObject.Destroy();
+                _selectedObject = null; // Clear selection
+            }
+
             // Right-click on the "Scene" tree node
             if (ImGui.BeginPopupContextItem("SceneContext"))
             {
@@ -217,7 +225,6 @@ namespace EarthEngineEditor.Windows
         public void SetVisible(bool visible)
         {
             _showSceneView = visible;
-            EditorApp.Instance.selectionMode = EditorSelectionMode.Object;
         }
     }
 } 

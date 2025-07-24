@@ -239,6 +239,8 @@ namespace Engine.Core.Game
                     sprite.Initialize();
 
                 // Add to the scene
+                string objectName = Path.GetFileNameWithoutExtension(defName);
+                obj.Name = $"{objectName}{EngineContext.Current.Scene?.objects.Count}";
                 EngineContext.Current.Scene?.objects.Add(obj);
                 return obj;
             }
@@ -284,6 +286,7 @@ namespace Engine.Core.Game
             feetY /= 1000f;
 
             feetY = Math.Clamp(feetY, 0f, 1f);
+
             // Convert to depth value (0 = front, 1 = back)
             // You can adjust this calculation based on your game's coordinate system
             // For a typical top-down view, higher Y values should have higher depth (appear behind)
