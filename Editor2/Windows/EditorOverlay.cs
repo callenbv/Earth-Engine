@@ -8,12 +8,14 @@
 
 using EarthEngineEditor;
 using Engine.Core;
-using ImGuiNET;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Editor.Windows
 {
+    /// <summary>
+    /// EditorOverlay provides an overlay for the editor, including a grid and camera controls.
+    /// </summary>
     public class EditorOverlay
     {
         public static EditorOverlay Instance { get; private set; }
@@ -23,6 +25,10 @@ namespace Editor.Windows
         private GraphicsDevice graphicsDevice;
         public int PanSpeed = 3;
 
+        /// <summary>
+        /// Initialize the editor overlay with the graphics device.
+        /// </summary>
+        /// <param name="graphicsDevice_"></param>
         public EditorOverlay(GraphicsDevice graphicsDevice_)
         {
             Instance = this;

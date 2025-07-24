@@ -7,21 +7,16 @@
 /// -----------------------------------------------------------------------------
 
 using EarthEngineEditor;
-using Editor.AssetManagement;
 using Engine.Core;
 using Engine.Core.Game.Components;
-using Engine.Core.Rooms.Tiles;
 using ImGuiNET;
-using System;
-using System.Collections.Generic;
-using System.Device.Gpio;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Editor.Windows.TileEditor
 {
+    /// <summary>
+    /// Represents the mode of the tile editor, which can be used to paint, erase, or select tiles.
+    /// </summary>
     public enum TileEditorMode
     {
         Paint,
@@ -29,6 +24,9 @@ namespace Editor.Windows.TileEditor
         Select
     }
 
+    /// <summary>
+    /// Represents the Tile Editor window in the editor, allowing users to create and edit tile layers.
+    /// </summary>
     public class TileEditorWindow
     {
         private bool show = true;
@@ -40,6 +38,9 @@ namespace Editor.Windows.TileEditor
         public int BrushSize = 1;
         TileEditorMode mode = TileEditorMode.Paint;
 
+        /// <summary>
+        /// Renders the tile editor panel
+        /// </summary>
         public void Render()
         {
             if (!show) return;
@@ -189,6 +190,15 @@ namespace Editor.Windows.TileEditor
             ImGui.End();
         }
 
+        /// <summary>
+        /// Draws a circular selectable button with an icon/text inside it.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="icon"></param>
+        /// <param name="mode"></param>
+        /// <param name="selectedMode"></param>
+        /// <param name="clicked"></param>
+        /// <returns></returns>
         private bool CircularSelectable(string id, string icon, TileEditorMode mode, TileEditorMode selectedMode, out bool clicked)
         {
             ImGui.PushID(id);
@@ -215,10 +225,7 @@ namespace Editor.Windows.TileEditor
         }
 
         public bool IsVisible => show;
-        public void SetVisible(bool visible)
-        {
-            show = visible;
-        }
+        public void SetVisible(bool visible) => show = visible;
     }
 }
 

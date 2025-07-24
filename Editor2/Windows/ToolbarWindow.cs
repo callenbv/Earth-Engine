@@ -13,6 +13,9 @@ using Microsoft.Xna.Framework;
 
 namespace EarthEngineEditor.Windows
 {
+    /// <summary>
+    /// Represents the Toolbar window in the editor, providing controls for game actions such as running the game and toggling the grid.
+    /// </summary>
     public class ToolbarWindow
     {
         private bool showToolbarWindow = true;

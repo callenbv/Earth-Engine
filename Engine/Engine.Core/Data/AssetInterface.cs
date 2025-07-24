@@ -15,17 +15,23 @@ using System.Threading.Tasks;
 
 namespace Engine.Core.Data
 {
+    /// <summary>
+    /// Interface for any asset that can be inspected in the editor.
+    /// </summary>
     public interface IInspectable
     {
         virtual void Render() { }
     }
 
+    /// <summary>
+    /// Interface for handling assets in the editor.
+    /// </summary>
     public interface IAssetHandler
     {
         void Load(string path);
-        void Render();
-        void Unload();
-        void Open(string path);
+        virtual void Render() { }
+        virtual void Unload() { }
+        virtual void Open(string path) { }
         void Save(string path);
     }
 }

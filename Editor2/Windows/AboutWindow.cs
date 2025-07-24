@@ -10,10 +10,16 @@ using ImGuiNET;
 
 namespace EarthEngineEditor.Windows
 {
+    /// <summary>
+    /// Represents the About window in the editor, displaying information about the Earth Engine Editor.
+    /// </summary>
     public class AboutWindow
     {
         private bool _showAboutWindow = false;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AboutWindow"/> class.
+        /// </summary>
         public void Render()
         {
             if (!_showAboutWindow) return;
@@ -23,17 +29,9 @@ namespace EarthEngineEditor.Windows
             ImGui.Text("A modern game engine editor built with MonoGame and ImGui");
             ImGui.Separator();
             ImGui.Text("Features:");
-            ImGui.BulletText("Modern dark theme");
-            ImGui.BulletText("Dockable windows");
-            ImGui.BulletText("Asset management");
-            ImGui.BulletText("Scene editing");
-            ImGui.BulletText("Console window");
-            ImGui.BulletText("Performance monitoring");
+            ImGui.BulletText("Windows, Linux, MacOS exports");
+            ImGui.BulletText("Custom GPIO Input");
             ImGui.Separator();
-            ImGui.Text("Built with:");
-            ImGui.BulletText("MonoGame Framework");
-            ImGui.BulletText("ImGui.NET");
-            ImGui.BulletText(".NET 8");
             ImGui.End();
         }
 

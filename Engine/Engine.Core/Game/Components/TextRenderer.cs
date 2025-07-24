@@ -3,37 +3,42 @@
 /// <File>         TextRenderer.cs
 /// <Author>       Callen Betts Virott 
 /// <Copyright>    @2025 Callen Betts Virott. All rights reserved.
-/// <Summary>                
+/// <Summary>      Renders text to the screen in world coordinates.          
 /// -----------------------------------------------------------------------------
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 using Engine.Core.Graphics;
 using Engine.Core.Data;
 
 namespace Engine.Core.Game.Components
 {
+    /// <summary>
+    /// A component for rendering text in the game world.
+    /// </summary>
     [ComponentCategory("Graphics")]
     public class TextRenderer : ObjectComponent
     {
+        public override string Name => "Text Renderer";
         public string Text { get; set; } = "";
-        public string FontName = "Default";
         public Color Color { get; set; } = Color.White;
-        public float Scale { get; set; } = 1.0f;
-        public float Rotation { get; set; } = 0.0f;
-        public Vector2 Origin = Vector2.Zero;
-        public SpriteEffects Effects = SpriteEffects.None;
+        new public float Scale { get; set; } = 1.0f;
+        new public float Rotation { get; set; } = 0.0f;
         public float Depth { get; set; } = 1.0f;
         public bool Visible { get; set; } = true;
         public bool Centered { get; set; } = false;
-        public Vector2 Offset = Vector2.Zero;
 
+        public string FontName = "Default";
+        public Vector2 Origin = Vector2.Zero;
+        public SpriteEffects Effects = SpriteEffects.None;
+        public Vector2 Offset = Vector2.Zero;
         protected SpriteFont? currentFont;
         protected Vector2 textSize;
-        public override string Name => "Text Renderer";
 
-        public override void Update(GameTime gameTime)
+        /// <summary>
+        /// Initialize the text renderer component.
+        /// </summary>
+        public override void Create()
         {
             if (currentFont == null)
             {
@@ -41,6 +46,10 @@ namespace Engine.Core.Game.Components
             }
         }
 
+        /// <summary>
+        /// Update the text size based on the current font and text content.
+        /// </summary>
+        /// <param name="spriteBatch"></param>
         public override void Draw(SpriteBatch spriteBatch)
         {
             if (!Visible || string.IsNullOrEmpty(Text) || currentFont == null || Owner == null)

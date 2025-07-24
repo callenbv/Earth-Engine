@@ -6,9 +6,6 @@
 /// <Summary>                
 /// -----------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Numerics;
 using System.Runtime.InteropServices;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
@@ -21,6 +18,12 @@ using System.IO;
 
 namespace EarthEngineEditor
 {
+    /// <summary>
+    /// ImGuiRenderer is responsible for rendering ImGui UI elements in an XNA/MonoGame application.
+    /// It handles input, font loading, and rendering of draw data.
+    /// It also provides utility methods for creating buttons and binding textures.
+    /// This class is designed to be used within a Game instance and integrates with the XNA/MonoGame graphics pipeline.
+    /// </summary>
     public class ImGuiRenderer : IDisposable
     {
         private readonly Game _game;
@@ -31,22 +34,25 @@ namespace EarthEngineEditor
         private IntPtr _fontTextureId;
         private int _vertexBufferSize = 5000;
         private int _indexBufferSize = 10000;
+        private int _lastScrollWheelValue = 0;
+        private int _textureId = 1;
         private VertexBuffer? _vertexBuffer;
         private IndexBuffer? _indexBuffer;
         private Dictionary<IntPtr, Texture2D> _textures = new();
-        private int _textureId = 1;
         private KeyboardState _lastKeyboard;
         private MouseState _lastMouse;
-        private int _lastScrollWheelValue = 0;
         private static Dictionary<Texture2D, IntPtr> _bindings = new();
 
-        // Keep font data pinned for ImGui lifetime
         private byte[]? _robotoFontData;
         private GCHandle _robotoFontHandle;
         public ImFontPtr _robotoFont;
         public ImFontPtr _fontAwesome;
         public static ImGuiRenderer Instance { get; private set; }
 
+        /// <summary>
+        /// Initializes a new instance of the ImGuiRenderer class.
+        /// </summary>
+        /// <param name="game"></param>
         public ImGuiRenderer(Game game)
         {
             _game = game;
@@ -62,6 +68,9 @@ namespace EarthEngineEditor
             SetupTextInput();
         }
 
+        /// <summary>
+        /// Sets up text input handling for ImGui.
+        /// </summary>
         private void SetupTextInput()
         {
             // Inside your game's window or input manager
@@ -78,6 +87,11 @@ namespace EarthEngineEditor
             };
         }
 
+        /// <summary>
+        /// Binds a Texture2D to an IntPtr handle for use in ImGui rendering.
+        /// </summary>
+        /// <param name="texture"></param>
+        /// <returns></returns>
         public IntPtr BindTexture(Texture2D texture)
         {
             if (_bindings.TryGetValue(texture, out var handle))
@@ -88,6 +102,15 @@ namespace EarthEngineEditor
             return handle;
         }
 
+        /// <summary>
+        /// Creates an icon button with a specified ID, icon, color, padding, and spacing.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="icon"></param>
+        /// <param name="color"></param>
+        /// <param name="padding"></param>
+        /// <param name="spacing"></param>
+        /// <returns></returns>
         public static bool IconButton(string id, string icon, Microsoft.Xna.Framework.Color color, float padding = 16f, float spacing = 6f)
         {
             ImGui.PushID(id);
@@ -135,8 +158,9 @@ namespace EarthEngineEditor
             return clicked;
         }
 
-
-
+        /// <summary>
+        /// Sets up device resources required for rendering ImGui.
+        /// </summary>
         private void SetupDeviceResources()
         {
             _effect = new BasicEffect(_gd)
@@ -152,6 +176,9 @@ namespace EarthEngineEditor
             _indexBuffer = new IndexBuffer(_gd, IndexElementSize.SixteenBits, _indexBufferSize, BufferUsage.None);
         }
 
+        /// <summary>
+        /// Builds the font atlas for ImGui, loading custom fonts and setting up the texture.
+        /// </summary>
         private unsafe void BuildFontAtlas()
         {
             var io = ImGui.GetIO();
@@ -209,7 +236,11 @@ namespace EarthEngineEditor
             Console.WriteLine("Font atlas built with Roboto and Font Awesome.");
         }
 
-
+        /// <summary>
+        /// Registers a Texture2D with a unique IntPtr ID for use in ImGui rendering.
+        /// </summary>
+        /// <param name="texture"></param>
+        /// <returns></returns>
         public IntPtr RegisterTexture(Texture2D texture)
         {
             var id = new IntPtr(_textureId++);
@@ -217,6 +248,10 @@ namespace EarthEngineEditor
             return id;
         }
 
+        /// <summary>
+        /// Prepares ImGui for rendering before the layout phase of the game loop.
+        /// </summary>
+        /// <param name="gameTime"></param>
         public void BeforeLayout(GameTime gameTime)
         {
             UpdateInput();
@@ -224,12 +259,19 @@ namespace EarthEngineEditor
             ImGui.NewFrame();
         }
 
+        /// <summary>
+        /// Finalizes the ImGui layout and renders the draw data to the screen.
+        /// </summary>
         public void AfterLayout()
         {
             ImGui.Render();
             RenderDrawData(ImGui.GetDrawData());
         }
 
+        /// <summary>
+        /// Sets per-frame ImGui data such as display size and delta time.
+        /// </summary>
+        /// <param name="deltaSeconds"></param>
         private void SetPerFrameImGuiData(float deltaSeconds)
         {
             var io = ImGui.GetIO();
@@ -240,6 +282,9 @@ namespace EarthEngineEditor
             _effect.Projection = Matrix.CreateOrthographicOffCenter(0, _gd.Viewport.Width, _gd.Viewport.Height, 0, -1, 1);
         }
 
+        /// <summary>
+        /// Updates the input state for ImGui, capturing mouse and keyboard events.
+        /// </summary>
         private void UpdateInput()
         {
             var io = ImGui.GetIO();
@@ -274,6 +319,11 @@ namespace EarthEngineEditor
             _lastMouse = mouse;
         }
 
+        /// <summary>
+        /// Maps ImGuiKey to XnaKeys for keyboard input handling.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         private XnaKeys? ImGuiKeyToXnaKey(ImGuiKey key)
         {
             // Map only the most common keys for demo purposes
@@ -302,6 +352,10 @@ namespace EarthEngineEditor
             };
         }
 
+        /// <summary>
+        /// Renders the ImGui draw data to the screen using the GraphicsDevice.
+        /// </summary>
+        /// <param name="drawData"></param>
         private void RenderDrawData(ImDrawDataPtr drawData)
         {
             if (drawData.CmdListsCount == 0)
@@ -387,6 +441,9 @@ namespace EarthEngineEditor
             _gd.ScissorRectangle = lastScissor;
         }
 
+        /// <summary>
+        /// Disposes of the ImGuiRenderer resources, including textures, buffers, and effects.
+        /// </summary>
         public void Dispose()
         {
             _fontTexture?.Dispose();
@@ -396,6 +453,9 @@ namespace EarthEngineEditor
             if (_robotoFontHandle.IsAllocated) _robotoFontHandle.Free();
         }
 
+        /// <summary>
+        /// Checks if a custom font is loaded and available for use in ImGui.
+        /// </summary>
         public bool HasCustomFont => _robotoFontData != null && _robotoFontData.Length > 0;
     }
 } 

@@ -6,21 +6,24 @@
 /// <Summary>                
 /// -----------------------------------------------------------------------------
 
-using Engine.Core.Game.Components;
 using Engine.Core.Scripting;
-using System;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Editor.AssetManagement
 {
+    /// <summary>
+    /// Watches for changes in the compiled script DLL and reloads scripts when modified.
+    /// </summary>
     public class EditorWatcher
     {
         private readonly FileSystemWatcher watcher;
         private readonly string projectPath;
         private DateTime lastTriggerTime = DateTime.MinValue;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EditorWatcher"/> class.
+        /// </summary>
+        /// <param name="projectPath"></param>
         public EditorWatcher(string projectPath)
         {
             this.projectPath = projectPath;
@@ -38,6 +41,11 @@ namespace Editor.AssetManagement
             watcher.Changed += OnScriptDllChanged;
         }
 
+        /// <summary>
+        /// Handles the Changed event of the script DLL watcher and compiles scripts if code was changed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnScriptDllChanged(object sender, FileSystemEventArgs e)
         {
             // Simple debounce: only reload if 500ms passed since last trigger

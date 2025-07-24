@@ -10,6 +10,9 @@ using ImGuiNET;
 
 namespace EarthEngineEditor.Windows
 {
+    /// <summary>
+    /// PerformanceWindow is a window that displays performance metrics such as frame time, average frame time, and FPS.
+    /// </summary>
     public class PerformanceWindow
     {
         private bool _showPerformanceWindow = false;
@@ -17,6 +20,10 @@ namespace EarthEngineEditor.Windows
         private double _averageFrameTime = 0;
         private int _frameCount = 0;
 
+        /// <summary>
+        /// Initializes a new instance of the PerformanceWindow class.
+        /// </summary>
+        /// <param name="frameTime"></param>
         public void Update(double frameTime)
         {
             _lastFrameTime = frameTime;
@@ -24,6 +31,9 @@ namespace EarthEngineEditor.Windows
             _frameCount++;
         }
 
+        /// <summary>
+        /// Renders the performance window with the current frame statistics.
+        /// </summary>
         public void Render()
         {
             if (!_showPerformanceWindow) return;

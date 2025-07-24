@@ -57,9 +57,9 @@ namespace Engine.Core.Rooms.Tiles
         public int Height { get; set; }
         public float Depth { get; set; }
         public Vector2 Offset { get; set; }
-        public int[][] TileIndices { get; set; } // Tile indices in the tileset
-        public bool[][] Collision { get; set; } // Collision flags for each tile
-        public int[][] HeightMap { get; set; } // Height values for each tile
+        public int[][] TileIndices { get; set; } 
+        public bool[][] Collision { get; set; }
+        public int[][] HeightMap { get; set; }
     }
 
     public class TilemapSaveData

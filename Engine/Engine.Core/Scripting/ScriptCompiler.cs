@@ -6,28 +6,46 @@
 /// <Summary>                
 /// -----------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using System.Runtime.InteropServices;
 using Engine.Core.Game.Components;
 using GameRuntime;
 using System.Reflection;
 
 namespace Engine.Core.Scripting
 {
+    /// <summary>
+    /// Represents the result of a script compilation process.
+    /// </summary>
     public class CompilationResult
     {
+        /// <summary>
+        /// Indicates whether the compilation was successful or not.
+        /// </summary>
         public bool Success { get; set; }
+
+        /// <summary>
+        /// A list of errors encountered during the compilation process.
+        /// </summary>
         public List<string> Errors { get; } = new();
+
+        /// <summary>
+        /// The compiled assembly as a byte array. This can be used to load the assembly into the application.
+        /// </summary>
         public byte[]? CompiledAssembly { get; set; }
     }
 
+    /// <summary>
+    /// Compiles C# scripts found in the Assets directory of the project.
+    /// </summary>
     public static class ScriptCompiler
     {
+        /// <summary>
+        /// Compiles all C# scripts found in the Assets directory of the specified project.
+        /// </summary>
+        /// <param name="projectDir"></param>
+        /// <param name="outputDllPath"></param>
+        /// <returns></returns>
         public static CompilationResult CompileAllScriptsInAssets(string projectDir, string outputDllPath)
         {
             var result = new CompilationResult();
@@ -80,6 +98,10 @@ namespace Engine.Core.Scripting
             return result;
         }
 
+        /// <summary>
+        /// Resolves references to necessary assemblies for script compilation.
+        /// </summary>
+        /// <returns></returns>
         private static IEnumerable<MetadataReference> ResolveReferences()
         {
             var refs = new List<MetadataReference>();
@@ -112,13 +134,13 @@ namespace Engine.Core.Scripting
         /// <param name="projectPath"></param>
         /// <param name="scriptManager"></param>
         /// <returns></returns>
-        public static bool CompileAndLoadScripts(string projectPath, out ScriptManager scriptManager)
+        public static bool CompileAndLoadScripts(string projectPath, out ScriptManager? scriptManager)
         {
             scriptManager = null;
 
             string outputDll = Path.Combine(projectPath, "Build", "CompiledScripts.dll");
 
-            // Step 1: Compile
+            // Compile the scripts
             var compileResult = CompileAllScriptsInAssets(projectPath, outputDll);
             if (!compileResult.Success)
             {
@@ -130,17 +152,15 @@ namespace Engine.Core.Scripting
 
             Console.WriteLine("[ScriptCompiler] Compilation succeeded.");
 
-            // Step 2: Load DLL from memory
+            // Load the assembly
             try
             {
                 byte[] assemblyBytes = File.ReadAllBytes(outputDll);
                 Assembly scriptAssembly = Assembly.Load(assemblyBytes);
 
-                // Step 3: Create script manager
                 scriptManager = new ScriptManager(scriptAssembly);
                 EngineContext.Current.ScriptManager = scriptManager;
 
-                // Step 4: Register component types
                 ComponentRegistry.RefreshAll();
                 foreach (var type in scriptAssembly.GetTypes())
                 {

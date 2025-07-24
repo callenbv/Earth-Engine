@@ -9,28 +9,19 @@
 using Engine.Core.Data;
 using Engine.Core.Game.Components;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Engine.Core.Game
 {
+    /// <summary>
+    /// Represents a transform component that can be attached to a GameObject.
+    /// </summary>
     [ComponentCategory("World")]
     public class Transform : ObjectComponent
     {
-        public Vector2 Position { get; set; }
-        public float Rotation { get; set; }
-        public float Scale { get; set; } = 1f;
+        new public Vector2 Position { get; set; }
+        new public float Rotation { get; set; }
+        new public float Scale { get; set; } = 1f;
         public override string Name => "Transform";
-
-        /// <summary>
-        /// Object should follow the transform
-        /// </summary>
-        /// <param name="gameTime"></param>
-        public override void Update(GameTime gameTime)
-        {
-            Owner.Position = Position;
-            Owner.scale = Scale;
-            Owner.rotation = Rotation;
-        }
     }
 }
 

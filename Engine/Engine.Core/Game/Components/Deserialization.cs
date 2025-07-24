@@ -7,16 +7,24 @@
 /// -----------------------------------------------------------------------------
 
 using Engine.Core.Game.Components;
-using Microsoft.Xna.Framework;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using MonoGame.Extended.Serialization.Json;
 using System.Reflection;
 
 namespace Editor.AssetManagement
 {
+    /// <summary>
+    /// Custom JSON converter for serializing and deserializing lists of IComponent.
+    /// </summary>
     public class ComponentListJsonConverter : JsonConverter<List<IComponent>>
     {
+        /// <summary>
+        /// Reads a JSON array and converts it to a list of IComponent.
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="typeToConvert"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
         public override List<IComponent> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             var components = new List<IComponent>();
@@ -36,13 +44,23 @@ namespace Editor.AssetManagement
                 var concreteType = info.Type;
 
                 var json = element.GetRawText();
-                var component = (IComponent)JsonSerializer.Deserialize(json, concreteType, options);
-                components.Add(component);
+                var component = JsonSerializer.Deserialize(json, concreteType, options);
+
+                if (component is IComponent comp)
+                {
+                    components.Add(comp);
+                }
             }
 
             return components;
         }
 
+        /// <summary>
+        /// Writes a list of IComponent to JSON.
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="value"></param>
+        /// <param name="options"></param>
         public override void Write(Utf8JsonWriter writer, List<IComponent> value, JsonSerializerOptions options)
         {
             writer.WriteStartArray();
@@ -53,6 +71,11 @@ namespace Editor.AssetManagement
             writer.WriteEndArray();
         }
 
+        /// <summary>
+        /// Checks if the converter can convert the specified type.
+        /// </summary>
+        /// <param name="component"></param>
+        /// <param name="props"></param>
         public static void ApplyComponentProperties(object component, JsonElement props)
         {
             var type = component.GetType();
@@ -73,7 +96,6 @@ namespace Editor.AssetManagement
                 }
             }
         }
-
     }
 }
 

@@ -18,18 +18,23 @@ using System.Text;
 
 namespace EarthEngineEditor.Windows
 {
+    /// <summary>
+    /// Represents the Scene View window in the editor, allowing users to view and manipulate game objects in a scene.
+    /// </summary>
     public class SceneViewWindow
     {
-        private bool _showSceneView = true;
         public Room? scene;
         private GameObject? _selectedObject;
-        public static SceneViewWindow Instance { get; private set; }
-        private int gridSize = 8;
-        private bool _showRenamePopup = false;
-        private string _renameBuffer = "";
-        private string currentName = "";
         private GameObject? _nodeBeingRenamed;
+        private int gridSize = 8;
+        private string _renameBuffer = "";
         private bool _isRenaming = false;
+        private bool _showSceneView = true;
+        public static SceneViewWindow Instance { get; private set; }
+
+        /// <summary>
+        /// Singleton instance of the SceneViewWindow
+        /// </summary>
         public SceneViewWindow()
         {
             Instance = this;
@@ -40,13 +45,13 @@ namespace EarthEngineEditor.Windows
         /// </summary>
         public void Render()
         {
-           if (ImGui.Begin("Scene View", ref _showSceneView))
-                EditorApp.Instance.selectionMode = EditorSelectionMode.Object;
-
-            if (_showSceneView && scene != null)
+            if (ImGui.Begin("Scene View", ref _showSceneView))
             {
-                ImGui.Text($"{scene.Name}");
-                ImGui.Separator();
+                EditorApp.Instance.selectionMode = EditorSelectionMode.Object;
+            }
+
+            if (_showSceneView)
+            {
                 RenderHierarchy();
             }
 
@@ -58,6 +63,17 @@ namespace EarthEngineEditor.Windows
         /// </summary>
         private void RenderHierarchy()
         {
+            if (scene == null)
+            {
+                ImGui.Text("No scene open");
+                return;
+            }
+
+            // Draw scene title
+            ImGui.Text($"{scene.Name}");
+            ImGui.Separator();
+
+            // Draw the scene root node
             bool root = ImGui.TreeNodeEx("Scene");
 
             // Get the mouse world coords and select the object
@@ -67,7 +83,7 @@ namespace EarthEngineEditor.Windows
                 {
                     foreach (var obj in scene.objects)
                     {
-                        Sprite2D sprite = obj.GetComponent<Sprite2D>();
+                        Sprite2D? sprite = obj.GetComponent<Sprite2D>();
                         if (sprite == null) continue;
 
                         Vector2 pos = obj.Position;
@@ -91,16 +107,7 @@ namespace EarthEngineEditor.Windows
                 {
                     if (_selectedObject != null)
                     {
-                        Transform t = _selectedObject.GetComponent<Transform>();
-
-                        if (t != null)
-                        {
-                            t.Position = Vector2.Floor(Input.mouseWorldPosition / gridSize) * gridSize;
-                        }
-                        else
-                        {
-                            _selectedObject.Position = Input.mouseWorldPosition;
-                        }
+                        _selectedObject.Position = Vector2.Floor(Input.mouseWorldPosition / gridSize) * gridSize;
                     }
                 }
 
@@ -109,7 +116,6 @@ namespace EarthEngineEditor.Windows
                     _selectedObject = null;
                 }
             }
-
 
             // Delete
             if (_selectedObject != null && Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Delete))
@@ -151,9 +157,8 @@ namespace EarthEngineEditor.Windows
         {
             ImGui.PushID(obj.Name); // Ensure unique ID
 
-            bool hasChildren = obj.children != null && obj.children.Count > 0;
+            bool hasChildren = (obj.children != null && obj.children.Count > 0);
             bool open = false;
-            ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags.None;
 
             if (hasChildren)
                 open = ImGui.TreeNodeEx(obj.Name);
@@ -202,7 +207,7 @@ namespace EarthEngineEditor.Windows
                 }
             }
 
-            // Rename
+            // Quick rename F2
             if (Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.F2))
             {
                 _isRenaming = true;
@@ -210,13 +215,13 @@ namespace EarthEngineEditor.Windows
                 _nodeBeingRenamed = obj;
             }
 
+            // Inspect an item in the scene
             if (ImGui.IsItemClicked())
             {
-                // Handle selection
                 InspectorWindow.Instance.Inspect(new InspectableGameObject(obj));
             }
 
-            if (open && hasChildren)
+            if (open && hasChildren && obj.children != null)
             {
                 foreach (var child in obj.children)
                 {
@@ -230,9 +235,6 @@ namespace EarthEngineEditor.Windows
         }
 
         public bool IsVisible => _showSceneView;
-        public void SetVisible(bool visible)
-        {
-            _showSceneView = visible;
-        }
+        public void SetVisible(bool visible) => _showSceneView = visible;
     }
 } 

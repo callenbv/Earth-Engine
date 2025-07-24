@@ -6,52 +6,53 @@
 /// <Summary>                
 /// -----------------------------------------------------------------------------
 
-using EarthEngineEditor;
-using Engine.Core;
 using Engine.Core.CustomMath;
 using Engine.Core.Data;
 using Engine.Core.Game;
 using Engine.Core.Game.Components;
 using Engine.Core.Graphics;
-using Engine.Core.Rooms;
 using ImGuiNET;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended.Graphics;
-using MonoGame.Extended.Screens;
 using MonoGame.Extended.Serialization.Json;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Numerics;
 using System.Reflection;
-using System.Security.Policy;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace Editor.AssetManagement
 {
+    /// <summary>
+    /// Handles loading, saving, and rendering prefabs in the editor.
+    /// </summary>
     public class PrefabHandler : IAssetHandler
     {
         private GameObjectDefinition? _prefab;
         public static string filter = string.Empty;
 
+        /// <summary>
+        /// Loads a prefab from a JSON file.
+        /// </summary>
+        /// <param name="path"></param>
         public void Load(string path)
         {
             string json = File.ReadAllText(path);
             _prefab = GameObject.Deserialize(json);
         }
 
-        public void Open(string path)
-        {
-
-        }
-
+        /// <summary>
+        /// Saves the current prefab to a JSON file.
+        /// </summary>
+        /// <param name="path"></param>
         public void Save(string path)
         {
+            // Do not save null prefab
+            if (_prefab == null)
+            {
+                Console.WriteLine("No prefab loaded to save.");
+                return;
+            }
+
             var options = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
@@ -67,6 +68,9 @@ namespace Editor.AssetManagement
             File.WriteAllText(path, json);
         }
 
+        /// <summary>
+        /// Renders the prefab's components in the editor UI.
+        /// </summary>
         public void Render()
         {
             if (_prefab == null) return;
@@ -106,6 +110,10 @@ namespace Editor.AssetManagement
             DrawEditableButtons(_prefab);
         }
 
+        /// <summary>
+        /// Draws the button to add a new component to the prefab.
+        /// </summary>
+        /// <param name="prefab"></param>
         public static void DrawEditableButtons(IComponentContainer prefab)
         {
             // Allow for adding new component
@@ -119,8 +127,6 @@ namespace Editor.AssetManagement
                 // Input filter
                 ImGui.InputText("Filter", ref filter, 64);
 
-                string currentCategory = null;
-
                 foreach (var group in ComponentRegistry.Components.Values
                              .Where(c => string.IsNullOrEmpty(filter) || c.Name.ToLower().Contains(filter.ToLower()))
                              .GroupBy(c => c.Category)
@@ -132,15 +138,8 @@ namespace Editor.AssetManagement
                         {
                             if (ImGui.MenuItem(comp.Name))
                             {
-                                var instance = (ObjectComponent)Activator.CreateInstance(comp.Type);
-                                prefab.components.Add(instance);
-
-                                // If actual game object, set owner
-                                if (prefab is GameObject gameObject)
-                                    instance.Owner = gameObject;
-
-                                instance.Initialize();
-
+                                var instance = Activator.CreateInstance(comp.Type) as ObjectComponent;
+                                prefab.AddComponent(instance);
                                 ImGui.CloseCurrentPopup();
                             }
                         }
@@ -152,7 +151,15 @@ namespace Editor.AssetManagement
             }
         }
 
-        public static void DrawField(string name, object value, Type expectedType, Action<object> setValue, MemberInfo memberInfo)
+        /// <summary>
+        /// Draws a field in the inspector with appropriate input controls based on the value type.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <param name="expectedType"></param>
+        /// <param name="setValue"></param>
+        /// <param name="memberInfo"></param>
+        public static void DrawField(string name, object? value, Type expectedType, Action<object> setValue, MemberInfo memberInfo)
         {
             // Check for custom attribute tag
             if (memberInfo.GetCustomAttribute<HideInInspectorAttribute>() != null)
@@ -262,11 +269,6 @@ namespace Editor.AssetManagement
             ImGui.PopItemWidth();
             ImGui.NextColumn(); // Move to next row
             ImGui.Columns(1);
-        }
-
-        public void Unload()
-        {
-            _prefab = null;
         }
     }
 }

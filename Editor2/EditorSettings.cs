@@ -6,23 +6,44 @@
 /// <Summary>                
 /// -----------------------------------------------------------------------------
 
-using Engine.Core;
 using Engine.Core.Data;
-using System;
 using System.IO;
 using System.Text.Json;
 
 namespace EarthEngineEditor
 {
+    /// <summary>
+    /// Represents the settings for the Earth Engine Editor.
+    /// </summary>
     public class EditorSettings
     {
+        /// <summary>
+        /// Path to the settings file.
+        /// </summary>
         private static readonly string SettingsPath = Path.Combine(
-    AppContext.BaseDirectory, "settings.json");
+        AppContext.BaseDirectory, "settings.json");
 
-        private static readonly string RuntimePath = "C:\\Users\\calle\\Desktop\\Earth Engine\\Runtime\\bin\\Debug\\net8.0\\GameRuntime.exe";
+        /// <summary>
+        /// Path to the runtime executable.
+        /// </summary>
+        private static readonly string RuntimePath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+        "Earth-Engine", "Runtime", "bin", "Debug", "net8.0", "GameRuntime.exe");
+
+        /// <summary>
+        /// The window width of the editor.
+        /// </summary>
         public int WindowWidth { get; set; } = 1280;
+
+        /// <summary>
+        /// The height of the editor window.
+        /// </summary>
         public int WindowHeight { get; set; } = 720;
 
+        /// <summary>
+        /// Loads the editor settings from a JSON file.
+        /// </summary>
+        /// <returns></returns>
         public static EditorSettings Load()
         {
             try
@@ -51,6 +72,9 @@ namespace EarthEngineEditor
             return new EditorSettings();
         }
 
+        /// <summary>
+        /// Saves the current editor settings to a JSON file.
+        /// </summary>
         public void Save()
         {
             try

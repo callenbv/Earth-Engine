@@ -10,33 +10,84 @@ using Engine.Core.Data;
 using Engine.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Numerics;
 using System.Text.Json.Serialization;
 
 namespace Engine.Core.Game.Components
 {
+    /// <summary>
+    /// Represents a tilemap renderer component that can be attached to a GameObject.
+    /// </summary>
     [ComponentCategory("Tiles")]
     public class TilemapRenderer : ObjectComponent
     {
         public override string Name => "Tilemap Renderer";
+
+        /// <summary>
+        /// Width of the tilemap in tiles. Default is 100x100 tiles.
+        /// </summary>
         public int Width = 100;
+
+        /// <summary>
+        /// Height of the tilemap in tiles. Default is 100x100 tiles.
+        /// </summary>
         public int Height = 100;
+
+        /// <summary>
+        /// Path to the texture used for the tilemap. This is set automatically when the texture is assigned.
+        /// </summary>
         public string TexturePath = string.Empty;
+
+        /// <summary>
+        /// Title of the tilemap layer, used for identification in the editor.
+        /// </summary>
         public string Title { get; set; } = "Tilemap Layer";
+
+        /// <summary>
+        /// Size of each tile in pixels. Default is 16x16 pixels.
+        /// </summary>
         public int TileSize { get; private set; } = 16;
-        public float Depth = 0; // Depth for rendering order
+
+        /// <summary>
+        /// Depth of the tilemap layer, used for rendering order. Default is 0.
+        /// </summary>
+        public float Depth = 0;
+
+        /// <summary>
+        /// Array of tiles in the tilemap. Each tile is represented by a Tile object, which contains its index in the tileset and other properties.
+        /// </summary>
         [JsonIgnore]
         public Tile[,] Tiles { get; set; } = new Tile[100,100];
+
+        /// <summary>
+        /// Texture used for the tilemap. This is set automatically when the texture is assigned.
+        /// </summary>
         [JsonIgnore]
         public Texture2D? Texture { get; set; }
+
+        /// <summary>
+        /// Pointer to the texture used for the tilemap. This is used for rendering the tileset preview in the editor.
+        /// </summary>
         public IntPtr TexturePtr { get; set; }
+
+        /// <summary>
+        /// Offset for the tilemap position, used to adjust the rendering position of the tilemap in the world.
+        /// </summary>
         public System.Numerics.Vector2 Offset = System.Numerics.Vector2.Zero;
+
+        /// <summary>
+        /// Default constructor for TilemapRenderer, initializes with default values.
+        /// </summary>
         public TilemapRenderer()
         {
 
         }
 
+        /// <summary>
+        /// Create a new TilemapRenderer with specified width, height, and texture path.
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="texture"></param>
         public TilemapRenderer(int width, int height, string texture)
         {
             Width = width;
@@ -46,6 +97,12 @@ namespace Engine.Core.Game.Components
             Tiles = new Tile[width, height];
         }
 
+        /// <summary>
+        /// Set the tile at the specified position to the given index.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="index"></param>
         public void SetTile(int x, int y, int index)
         {
             if (index < 0)
@@ -59,6 +116,12 @@ namespace Engine.Core.Game.Components
             }
         }
 
+        /// <summary>
+        /// Get the tile at the specified position.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
         public Tile? GetTile(int x, int y)
         {
             if (x >= 0 && x < Width && y >= 0 && y < Height)
@@ -67,6 +130,10 @@ namespace Engine.Core.Game.Components
             return null;
         }
 
+        /// <summary>
+        /// Render the tilemap layer using the provided SpriteBatch. This method draws each tile in the layer based on its index in the tileset texture.
+        /// </summary>
+        /// <param name="spriteBatch"></param>
         public override void Draw(SpriteBatch spriteBatch)
         {
             for (int y = 0; y < Height; y++)

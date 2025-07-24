@@ -6,12 +6,6 @@
 /// <Summary>                
 /// -----------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Engine.Core.Audio
 {
     /// <summary>
@@ -19,9 +13,25 @@ namespace Engine.Core.Audio
     /// </summary>
     public class GameSound
     {
+        /// <summary>
+        /// Name of the sound. This is used to identify the sound in the editor and in the game.
+        /// </summary>
         string Name { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Name of the sound. This is used to identify the sound in the editor and in the game.
+        /// </summary>
         public FMOD.Sound Sound { get; set; }
+
+        /// <summary>
+        /// Type of audio this sound represents, either Sound or Music.
+        /// </summary>
         public AudioType Type { get; set; } = AudioType.Sound;
+
+        /// <summary>
+        /// Indicates whether the sound should loop when played. Default is false.
+        /// </summary>
+        public bool Loop { get; set; } = false;
 
         /// <summary>
         /// Create a new GameSound instance
@@ -34,6 +44,7 @@ namespace Engine.Core.Audio
             Name = name;
             Sound = sound;
             Type = type;
+            Loop = (AudioType.Music == type ? true : false);
         }
 
         /// <summary>
@@ -41,6 +52,9 @@ namespace Engine.Core.Audio
         /// </summary>
         public void Play()
         {
+            // Enable or disable loop mode
+            Sound.setMode(Loop ? FMOD.MODE.LOOP_NORMAL : FMOD.MODE.LOOP_OFF);
+
             FMOD.RESULT result = AudioManager.Instance.AudioSystem.playSound(Sound, AudioManager.Instance.MainChannel, false, out FMOD.Channel channel);
             if (result != FMOD.RESULT.OK)
             {

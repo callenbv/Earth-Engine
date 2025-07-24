@@ -6,13 +6,6 @@
 /// <Summary>                
 /// -----------------------------------------------------------------------------
 
-using FMOD;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Engine.Core.Audio
 {
     /// <summary>
@@ -25,23 +18,10 @@ namespace Engine.Core.Audio
     }
 
     /// <summary>
-    /// Optionally use SoundIDs for type safe audio play
+    /// Audio provides methods to play sounds and manage audio in the game engine.
     /// </summary>
-    public enum SoundID
-    {
-    }
-
     public static class Audio
     {
-        /// <summary>
-        /// Play a sound given a sound ID
-        /// </summary>
-        /// <param name="sound"></param>
-        public static void Play(SoundID sound)
-        {
-            Play(sound.ToString());
-        }
-
         /// <summary>
         /// Play a sound given a string
         /// </summary>

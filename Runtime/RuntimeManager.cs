@@ -11,25 +11,19 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
 using System;
 using System.IO;
-using System.Text.Json;
 using Engine.Core.Game;
 using Engine.Core;
-using System.Drawing;
-using System.Reflection.Metadata;
 using Engine.Core.Data;
-using System.Threading;
 using System.Diagnostics;
 using Engine.Core.Graphics;
 using Engine.Core.Rooms;
-using System.Runtime;
 using Engine.Core.Scripting;
-using Microsoft.CodeAnalysis.Scripting;
-using System.Reflection;
-using Engine.Core.Audio;
-using Engine.Core.Rooms.Tiles;
 
 namespace GameRuntime
 {
+    /// <summary>
+    /// Manages the runtime environment for the game, including loading assets, managing scenes, and rendering.
+    /// </summary>
     public class RuntimeManager
     {
         private string assetsRoot;

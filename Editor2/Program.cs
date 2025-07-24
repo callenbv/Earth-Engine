@@ -6,12 +6,14 @@
 /// <Summary>                
 /// -----------------------------------------------------------------------------
 
-using System;
-
 namespace EarthEngineEditor
 {
     class Program
     {
+        /// <summary>
+        /// Main entry point for the application.
+        /// </summary>
+        /// <param name="args"></param>
         [STAThread]
         static void Main(string[] args)
         {

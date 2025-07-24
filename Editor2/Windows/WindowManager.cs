@@ -436,6 +436,7 @@ namespace EarthEngineEditor.Windows
                     var projectName = "NewProject";
                     var projectFolder = Path.Combine(projectPath, projectName);
                     var buildFolder = Path.Combine(projectFolder, "Build");
+                    var tilemapFolder = Path.Combine(projectFolder, "Tilemaps");
                     var projectFile = Path.Combine(projectFolder, $"{projectName}.earthproj");
                     var assetsFolder = Path.Combine(projectFolder, "Assets");
                     var csprojFile = Path.Combine(projectFolder, $"{projectName}.csproj");
@@ -445,6 +446,7 @@ namespace EarthEngineEditor.Windows
                         Directory.CreateDirectory(projectFolder);
                         Directory.CreateDirectory(assetsFolder);
                         Directory.CreateDirectory(buildFolder);
+                        Directory.CreateDirectory(tilemapFolder);
 
                         // Create project file
                         var projectContent = $@"{{
@@ -557,7 +559,7 @@ namespace EarthEngineEditor.Windows
             EnginePaths.AssetsBase = ProjectSettings.AssetsDirectory;
 
             // Update the project window
-            _project.SetProjectPath(projectDirectory);
+            _project.RefreshItems();
                
             // Load project settings
             project = new EarthProject();

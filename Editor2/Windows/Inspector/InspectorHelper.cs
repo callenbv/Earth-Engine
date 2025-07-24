@@ -8,19 +8,16 @@
 
 using Editor.AssetManagement;
 using Engine.Core.Game.Components;
-using Engine.Core.Game;
 using ImGuiNET;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Engine.Core.Data;
 using EarthEngineEditor;
 
 namespace Editor.Windows.Inspector
 {
+    /// <summary>
+    /// InspectorUI provides methods to draw components and game objects in the inspector window.
+    /// </summary>
     public static class InspectorUI
     {
         /// <summary>
@@ -63,8 +60,11 @@ namespace Editor.Windows.Inspector
 
                     if (ImGuiRenderer.IconButton("Remove", "\uf1f8", Microsoft.Xna.Framework.Color.Red))
                     {
-                        ((ObjectComponent)comp).Owner.components.Remove(comp);
-                        break;
+                        if (comp is ObjectComponent objectComponent)
+                        {
+                            objectComponent.Owner?.components.Remove(objectComponent);
+                            break;
+                        }
                     }
                 }
             }

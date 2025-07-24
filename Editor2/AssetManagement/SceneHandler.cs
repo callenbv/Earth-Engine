@@ -14,21 +14,18 @@ using Engine.Core.Rooms;
 using GameRuntime;
 using ImGuiNET;
 using MonoGame.Extended.Serialization.Json;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace Editor.AssetManagement
 {
+    /// <summary>
+    /// Handles loading, saving, and opening scenes in the editor.
+    /// </summary>
     public class SceneHandler : IAssetHandler
     {
-        private Room? scene;
+        private Room scene = new Room();
 
         /// <summary>
         /// Load the scene from a room file
@@ -75,16 +72,6 @@ namespace Editor.AssetManagement
             SceneViewWindow.Instance.scene = scene;
             SceneViewWindow.Instance.scene.FilePath = path;
             RuntimeManager.Instance.scene = scene;
-        }
-
-        public void Render()
-        {
-            
-        }
-
-        public void Unload()
-        {
-            scene = null;
         }
     }
 }

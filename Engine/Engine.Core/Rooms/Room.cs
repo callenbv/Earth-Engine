@@ -15,7 +15,6 @@ using Engine.Core.Game.Components;
 using System.Text.Json.Serialization;
 using MonoGame.Extended.Serialization.Json;
 using Engine.Core.Data;
-using System.IO;
 
 namespace Engine.Core.Rooms
 {
@@ -24,8 +23,19 @@ namespace Engine.Core.Rooms
     /// </summary>
     public class Room
     {
+        /// <summary>
+        /// Name of the room. This is used to identify the room in the editor and in the game.
+        /// </summary>
         public string Name { get; set; } = "Room";
+
+        /// <summary>
+        /// File path of the room. This is used to load the room from disk.
+        /// </summary>
         public string FilePath { get; set; } = string.Empty;
+
+        /// <summary>
+        /// List of GameObjects in the room. Each GameObject can have multiple components.
+        /// </summary>
         public List<GameObject> objects { get; set; } = new List<GameObject>();
 
         /// <summary>
@@ -67,13 +77,13 @@ namespace Engine.Core.Rooms
         /// Creates a room given a path
         /// </summary>
         /// <param name="path"></param>
-        public static Room? Load(string path)
+        public static Room Load(string path)
         {
             // Deserialize our scene
             string fullPath = Path.Combine(EnginePaths.ProjectBase, "Assets", path);
             Console.WriteLine($"Loading scene from: {fullPath}");
 
-            Room? scene = new Room();
+            Room scene = new Room();
             string name = Path.GetFileName(path);
 
             try
@@ -90,9 +100,12 @@ namespace Engine.Core.Rooms
                 options.Converters.Add(new Vector2JsonConverter());
                 options.Converters.Add(new ColorJsonConverter());
 
-                scene = JsonSerializer.Deserialize<Room>(json, options);
-                if (scene != null)
+                // Deserialize, and then assign if successful
+                var sceneData = JsonSerializer.Deserialize<Room>(json, options);
+
+                if (sceneData != null)
                 {
+                    scene = sceneData;
                     Console.WriteLine($"Loaded scene: {scene.Name}");
                     foreach (var obj in scene.objects)
                     {

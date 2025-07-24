@@ -8,15 +8,15 @@
 
 using Editor.AssetManagement;
 using Engine.Core.Data;
-using Engine.Core.Game;
 using ImGuiNET;
-using System.IO;
-using System.Device.Gpio;
 using Editor.Windows.Inspector;
 using Engine.Core;
 
 namespace EarthEngineEditor.Windows
 {
+    /// <summary>
+    /// Represents the Inspector window in the editor, allowing users to inspect and modify game objects and assets.
+    /// </summary>
     public class InspectorWindow
     {
         private bool _showInspector = true;
@@ -80,7 +80,6 @@ namespace EarthEngineEditor.Windows
         /// </summary>
         /// <param name="visible"></param>
         public void SetVisible(bool visible) => _showInspector = visible;
-
        
         /// <summary>
         /// Trigger an inspect

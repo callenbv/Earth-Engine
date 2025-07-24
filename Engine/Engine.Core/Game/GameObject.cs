@@ -8,25 +8,28 @@
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Content;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using Engine.Core.Game.Components;
-using System.Security.AccessControl;
 using Editor.AssetManagement;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Engine.Core.Data;
-using System.Reflection;
 using MonoGame.Extended.Serialization.Json;
 
 namespace Engine.Core.Game
 {
+    /// <summary>
+    /// Represents a game object in the scene, which can have multiple components attached to it.
+    /// </summary>
     public class GameObject : IComponentContainer
     {
+        /// <summary>
+        /// Name of the GameObject, used for identification and debugging.
+        /// </summary>
         public string Name { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Position of the GameObject in the game world.
+        /// </summary>
         public Vector2 Position
         {
             get => GetComponent<Transform>()?.Position ?? Vector2.Zero;
@@ -37,15 +40,55 @@ namespace Engine.Core.Game
                     transform.Position = value;
             }
         }
-        public float scale = 1f;
-        public float rotation;
+
+        /// <summary>
+        /// Rotation of the GameObject in radians, affecting its orientation in the game world.
+        /// </summary>
+        public float Rotation
+        {
+            get => GetComponent<Transform>()?.Rotation ?? 0f;
+            set
+            {
+                var transform = GetComponent<Transform>();
+                if (transform != null)
+                    transform.Rotation = value;
+            }
+        }
+
+        /// <summary>
+        /// Scale of the GameObject, affecting its size in the game world.
+        /// </summary>
+        public float Scale
+        {
+            get => GetComponent<Transform>()?.Scale ?? 1f;
+            set
+            {
+                var transform = GetComponent<Transform>();
+                if (transform != null)
+                    transform.Scale = value;
+            }
+        }
+
+        /// <summary>
+        /// List of child GameObjects that are part of this GameObject's hierarchy.
+        /// </summary>
         public List<GameObject> children = new List<GameObject>();
+
+        /// <summary>
+        /// List of components attached to this GameObject.
+        /// </summary>
 
         [JsonConverter(typeof(ComponentListJsonConverter))]
         public List<IComponent> components { get; set; } = new();
 
+        /// <summary>
+        /// Indicates whether the GameObject has been destroyed.
+        /// </summary>
         public bool IsDestroyed { get; private set; } = false;
 
+        /// <summary>
+        /// Gets the Sprite2D component if it exists, otherwise returns null.
+        /// </summary>
         [JsonIgnore]
         [HideInInspector]
         public Sprite2D? Sprite
@@ -53,16 +96,27 @@ namespace Engine.Core.Game
             get => GetComponent<Sprite2D>();
         }
 
+        /// <summary>
+        /// Default constructor for GameObject, initializes with an empty name.
+        /// </summary>
         public GameObject()
         {
             OnCreate();
         }
+
+        /// <summary>
+        /// Constructor for GameObject with a specified name.
+        /// </summary>
+        /// <param name="name"></param>
         public GameObject(string name)
         {
             Name = name;
             OnCreate();
         }
 
+        /// <summary>
+        /// Called when the GameObject is created.
+        /// </summary>
         public void OnCreate()
         {
 
@@ -112,8 +166,14 @@ namespace Engine.Core.Game
         /// Add an already existing component 
         /// </summary>
         /// <param name="comp"></param>
-        public void AddComponent(ObjectComponent component)
+        public void AddComponent(ObjectComponent? component)
         {
+            if (component == null)
+            {
+                Console.WriteLine($"Tried to add null component");
+                return;
+            }
+
             component.Owner = this;
             components.Add(component);
             component.Create();
@@ -141,6 +201,12 @@ namespace Engine.Core.Game
                 {
                     // Do not update scripts if the engine is paused
                     if (EngineContext.Paused && component is GameScript)
+                    {
+                        continue;
+                    }
+
+                    // Check for no owner
+                    if (component is ObjectComponent objComp && objComp.Owner == null)
                     {
                         continue;
                     }
@@ -276,29 +342,15 @@ namespace Engine.Core.Game
             options.Converters.Add(new Vector2JsonConverter());
             options.Converters.Add(new ColorJsonConverter());
 
-            return JsonSerializer.Deserialize<GameObjectDefinition>(json, options);
-        }
+            GameObjectDefinition gameObject = new GameObjectDefinition();
+            var gameObjectData = JsonSerializer.Deserialize<GameObjectDefinition>(json, options);
 
-        /// <summary>
-        /// Calculate the depth value based on the object's feet position (bottom of sprite)
-        /// </summary>
-        /// <param name="gameObj">The GameObject to calculate depth for</param>
-        /// <returns>Depth value (0 = front, 1 = back)</returns>
-        public float GetDepth()
-        {
-            if (Sprite == null || Sprite.texture == null)
-                return 0f;
+            if (gameObjectData != null)
+            {
+                gameObject = gameObjectData;
+            }
 
-            // Calculate the bottom Y position (feet) of the sprite
-            float feetY = Position.Y + Sprite.frameHeight / 2;
-            feetY /= 1000f;
-
-            feetY = Math.Clamp(feetY, 0f, 1f);
-
-            // Convert to depth value (0 = front, 1 = back)
-            // You can adjust this calculation based on your game's coordinate system
-            // For a typical top-down view, higher Y values should have higher depth (appear behind)
-            return feetY; // Normalize to 0-1 range, adjust divisor as needed
+            return gameObject;
         }
     }
 } 

@@ -6,8 +6,6 @@
 /// <Summary>                
 /// -----------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using ImGuiNET;
@@ -15,6 +13,9 @@ using System.Numerics;
 
 namespace EarthEngineEditor
 {
+    /// <summary>
+    /// Represents a console window that captures and displays console output.
+    /// </summary>
     public class ConsoleWindow
     {
         private readonly List<string> _logLines = new();
@@ -28,6 +29,9 @@ namespace EarthEngineEditor
         private bool _autoScroll = true;
         private int _maxLines = 200;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConsoleWindow"/> class.
+        /// </summary>
         public ConsoleWindow()
         {
             _originalOut = Console.Out;
@@ -39,6 +43,10 @@ namespace EarthEngineEditor
             Console.SetError(_consoleWriter);
         }
 
+        /// <summary>
+        /// Adds a line to the console log.
+        /// </summary>
+        /// <param name="line"></param>
         public void AddLine(string line)
         {
             if (string.IsNullOrEmpty(line)) return;
@@ -111,6 +119,9 @@ namespace EarthEngineEditor
             ImGui.End();
         }
 
+        /// <summary>
+        /// Disposes the console window and restores original console output.
+        /// </summary>
         public void Dispose()
         {
             // Restore original console output
@@ -118,22 +129,36 @@ namespace EarthEngineEditor
             Console.SetError(_originalError);
         }
 
+        /// <summary>
+        /// Custom TextWriter that writes to the console window.
+        /// </summary>
         private class ConsoleWriter : TextWriter
         {
             private readonly ConsoleWindow _consoleWindow;
+            public override Encoding Encoding => Encoding.UTF8;
 
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ConsoleWriter"/> class.
+            /// </summary>
+            /// <param name="consoleWindow"></param>
             public ConsoleWriter(ConsoleWindow consoleWindow)
             {
                 _consoleWindow = consoleWindow;
             }
 
-            public override Encoding Encoding => Encoding.UTF8;
-
+            /// <summary>
+            /// Writes a character to the console window without adding a new line.
+            /// </summary>
+            /// <param name="value"></param>
             public override void Write(char value)
             {
                 _consoleWindow._currentLine.Append(value);
             }
 
+            /// <summary>
+            /// Writes a string to the console window without adding a new line.
+            /// </summary>
+            /// <param name="value"></param>
             public override void Write(string? value)
             {
                 if (value != null)
@@ -142,6 +167,10 @@ namespace EarthEngineEditor
                 }
             }
 
+            /// <summary>
+            /// Writes a line to the console window and clears the current line buffer.
+            /// </summary>
+            /// <param name="value"></param>
             public override void WriteLine(string? value)
             {
                 _consoleWindow._currentLine.Append(value);
@@ -149,6 +178,9 @@ namespace EarthEngineEditor
                 _consoleWindow._currentLine.Clear();
             }
 
+            /// <summary>
+            /// Writes a new line to the console window and clears the current line buffer.
+            /// </summary>
             public override void WriteLine()
             {
                 _consoleWindow.AddLine(_consoleWindow._currentLine.ToString());

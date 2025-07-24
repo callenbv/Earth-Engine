@@ -10,15 +10,24 @@ using Engine.Core.Data;
 using Engine.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended.Graphics;
 using System;
 using System.ComponentModel;
 using System.Text.Json.Serialization;
 
 namespace Engine.Core.Game.Components
 {
+    /// <summary>
+    /// A 2D sprite component that can be attached to a GameObject.
+    /// </summary>
     [ComponentCategory("Graphics")]
     public class Sprite2D : ObjectComponent
     {
+        public override string Name => "Sprite 2D";
+
+        /// <summary>
+        /// The texture used for the sprite. If set, it will automatically update the texturePath, frameWidth, frameHeight, and spriteBox properties.
+        /// </summary>
         [JsonIgnore]
         public Texture2D? texture
         {
@@ -36,22 +45,70 @@ namespace Engine.Core.Game.Components
                 }
             }
         }
+
+        /// <summary>
+        /// The texture used for the sprite. If set, it will automatically update the texturePath, frameWidth, frameHeight, and spriteBox properties.
+        /// </summary>
         private Texture2D? _texture;
-        public override string Name => "Sprite 2D";
+
+        /// <summary>
+        /// The path to the texture file used for the sprite. This is set automatically when the texture is assigned.
+        /// </summary>
         [HideInInspector]
         public string texturePath { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The width and height of each frame in the sprite sheet.
+        /// </summary>
         public int frameWidth { get; set; } = 16;
+
+        /// <summary>
+        /// The height of each frame in the sprite sheet.
+        /// </summary>
         public int frameHeight { get; set; } = 16;
+
+        /// <summary>
+        /// The number of frames in the sprite sheet. If greater than 1, the sprite is considered animated.
+        /// </summary>
         public int frameCount { get; set; } = 1;
+
+        /// <summary>
+        /// The speed at which the frames are animated. Higher values result in faster animations.
+        /// </summary>
         public int frameSpeed { get; set; } = 1;
+
+        /// <summary>
+        /// Indicates whether the sprite is animated. If true, the sprite will cycle through frames based on frameSpeed.
+        /// </summary>
         public bool animated = false;
+
+        /// <summary>
+        /// The depth of the sprite in the scene. This is used for rendering order.
+        /// </summary>
         public float depth = 0;
+
+        /// <summary>
+        /// The sprite effects applied to the sprite, such as flipping or mirroring.
+        /// </summary>
         [HideInInspector]
         public SpriteEffects spriteEffect = SpriteEffects.None;
+
+        /// <summary>
+        /// The origin point of the sprite, used for rotation and scaling. This is typically the center of the sprite.
+        /// </summary>
         public Vector2 origin;
+
+        /// <summary>
+        /// The scale of the sprite. This allows for resizing the sprite when drawn.
+        /// </summary>
         public Color Tint = Color.White;
+
+        /// <summary>
+        /// The bounding box of the sprite, used for collision detection and rendering.
+        /// </summary>
         [HideInInspector]
         public Rectangle spriteBox = new Rectangle();
+
         private int frame = 0;
         private float frameTimer = 0;
 
@@ -66,6 +123,25 @@ namespace Engine.Core.Game.Components
             {
                 texture = tex;
             }
+        }
+
+        /// <summary>
+        /// Get the depth of the sprite based on its position
+        /// </summary>
+        /// <returns></returns>
+        public float GetDepth()
+        {
+            if (texture == null)
+                return 0f;
+
+            // Calculate the bottom Y position (feet) of the sprite
+            float feetY = Position.Y + frameHeight / 2;
+            feetY /= 1000f;
+
+            // Ensure doesn't go over bounds
+            feetY = Math.Clamp(feetY, 0f, 1f);
+
+            return feetY; 
         }
 
         /// <summary>
@@ -103,9 +179,9 @@ namespace Engine.Core.Game.Components
             if (texture == null)
                 return;
 
-            depth = Owner.GetDepth();
+            depth = GetDepth();
             origin = new Vector2(frameWidth / 2, frameHeight / 2);
-            spriteBatch.Draw(texture, Owner.Position, spriteBox, Tint, Owner.rotation, origin, Owner.scale, spriteEffect, depth);
+            spriteBatch.Draw(texture, Position, spriteBox, Tint, Rotation, origin, Scale, spriteEffect, depth);
         }
 
         /// <summary>

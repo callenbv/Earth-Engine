@@ -8,32 +8,30 @@
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using ImGuiNET;
 using EarthEngineEditor.Windows;
-using System.IO;
 using XnaKeys = Microsoft.Xna.Framework.Input.Keys;
-using XnaButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using XnaColor = Microsoft.Xna.Framework.Color;
-using Engine.Core.Graphics;
 using GameRuntime;
-using Engine.Core.Data;
-using Engine.Core.Rooms;
 using Engine.Core.Game;
 using Editor.Windows;
 using Editor.AssetManagement;
 using Engine.Core;
-using System.Text;
-using System.Runtime.InteropServices;
 
 namespace EarthEngineEditor
 {
+    /// <summary>
+    /// EditorSelectionMode defines the selection modes available in the editor.
+    /// </summary>
     public enum EditorSelectionMode
     {
         Tile,
         Object
     }
 
+    /// <summary>
+    /// EditorApp is the main class for the Earth Engine Editor application.
+    /// </summary>
     public class EditorApp : Game
     {
         private GraphicsDeviceManager _graphics;
@@ -41,8 +39,6 @@ namespace EarthEngineEditor
         private ConsoleWindow _consoleWindow;
         public WindowManager _windowManager;
         public EditorSettings? _settings;
-        private TextureLibrary? textureLibrary;
-        private Room? scene;
         private SpriteBatch spriteBatch;
         public RuntimeManager runtime;
         public EditorOverlay editorOverlay;
@@ -51,6 +47,9 @@ namespace EarthEngineEditor
         public EditorSelectionMode selectionMode = EditorSelectionMode.Object;
         public static EditorApp Instance { get; private set; }
 
+        /// <summary>
+        /// Initializes a new instance of the EditorApp class.
+        /// </summary>
         public EditorApp()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -60,6 +59,9 @@ namespace EarthEngineEditor
             Instance = this;
         }
 
+        /// <summary>
+        /// Initializes the game, loading settings and preparing the runtime environment.
+        /// </summary>
         protected override void Initialize()
         {
             // Load settings
@@ -97,6 +99,10 @@ namespace EarthEngineEditor
             base.Initialize();
         }
 
+        /// <summary>
+        /// Updates the game state, including input handling and window management.
+        /// </summary>
+        /// <param name="gameTime"></param>
         protected override void Update(GameTime gameTime)
         {
             bool isInputFree = !ImGui.IsAnyItemActive() &&
@@ -114,6 +120,10 @@ namespace EarthEngineEditor
             base.Update(gameTime);
         }
 
+        /// <summary>
+        /// Draws the game, rendering the ImGui interface and the runtime environment.
+        /// </summary>
+        /// <param name="gameTime"></param>
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(XnaColor.CornflowerBlue);
@@ -183,6 +193,9 @@ namespace EarthEngineEditor
             base.Draw(gameTime);
         }
 
+        /// <summary>
+        /// Unloads the content of the game, saving settings and disposing resources.
+        /// </summary>
         protected override void UnloadContent()
         {
             // Save settings before exiting

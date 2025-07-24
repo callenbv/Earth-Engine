@@ -10,21 +10,15 @@ using EarthEngineEditor;
 using EarthEngineEditor.Windows;
 using Engine.Core.Data;
 using Engine.Core.Game;
-using Engine.Core.Graphics;
 using Engine.Core.Scripting;
-using GameRuntime;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Editor.AssetManagement
 {
-
+    /// <summary>
+    /// Represents the Earth Engine project, containing settings and assets.
+    /// </summary>
     public class EarthProject
     {
         public string optionsPath = string.Empty;

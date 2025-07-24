@@ -11,8 +11,14 @@ using System.Numerics;
 
 namespace EarthEngineEditor
 {
+    /// <summary>
+    /// Provides methods to apply a modern dark theme to the ImGui editor interface.
+    /// </summary>
     public static class EditorTheme
     {
+        /// <summary>
+        /// Applies a modern dark theme to the ImGui editor interface.
+        /// </summary>
         public static void ApplyDarkTheme()
         {
             var style = ImGui.GetStyle();

@@ -8,26 +8,31 @@
 
 using Engine.Core.Data;
 using Engine.Core.Game;
-using ImGuiNET;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Editor.Windows.Inspector
 {
+    /// <summary>
+    /// Represents an inspectable game object in the editor.
+    /// </summary>
     public class InspectableGameObject : IInspectable
     {
         private readonly IComponentContainer obj;
         public string Name = string.Empty;
         public GameObject? GameObject => obj as GameObject;
+
+        /// <summary>
+        /// Creates an instance of InspectableGameObject with the specified IComponentContainer.
+        /// </summary>
+        /// <param name="obj_"></param>
         public InspectableGameObject(IComponentContainer obj_)
         {
             obj = obj_;
             Name = obj.Name;
         }
 
+        /// <summary>
+        /// Renders the inspectable game object in the inspector window.
+        /// </summary>
         public void Render()
         {
             InspectorUI.DrawGameObject(this.obj);

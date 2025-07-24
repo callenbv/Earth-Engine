@@ -7,11 +7,8 @@
 /// -----------------------------------------------------------------------------
 
 using ImGuiNET;
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
-using Microsoft.Xna.Framework.Graphics;
 using Editor.AssetManagement;
 using Engine.Core.Data;
 using System.Text;
@@ -21,25 +18,24 @@ using Engine.Core.Game;
 
 namespace EarthEngineEditor.Windows
 {
+    /// <summary>
+    /// Represents the project window in the editor, allowing users to manage assets and folders.
+    /// </summary>
     public class ProjectWindow
     {
         private bool _showProject = true;
-        private string _currentProjectPath = "";
         private string _currentFolder = "";
         private List<Asset> items = new();
         private List<Asset> allAssets = new();
         private Asset? _selectedItem = null;
-        private string _searchText = "";
 
         // Folder creation dialog
         private bool _showCreateFolderDialog = false;
         private string _newFolderName = "New Folder";
-        private string? _pendingFolderPath = null;
 
         // Asset import dialog
         private bool _showImportAssetDialog = false;
         private string _importAssetPath = "";
-        private string? _pendingImportPath = null;
 
         // Asset creation dialog
         private bool _showNewAssetDialog = false;
@@ -49,6 +45,10 @@ namespace EarthEngineEditor.Windows
         private GCHandle? _dragHandle = null;
         private byte[]? _dragData = null;
         private bool _awaitingDrop = false;
+
+        /// <summary>
+        /// Singleton instance of the ProjectWindow
+        /// </summary>
         public ProjectWindow()
         {
             Instance = this;
@@ -70,7 +70,6 @@ namespace EarthEngineEditor.Windows
             return null;
         }
 
-
         /// <summary>
         /// Try to save any changes made to assets
         /// </summary>
@@ -90,13 +89,9 @@ namespace EarthEngineEditor.Windows
             }
         }
 
-        public void SetProjectPath(string projectPath)
-        {
-            _currentProjectPath = ProjectSettings.ProjectDirectory;
-            _currentFolder = "";
-            RefreshItems();
-        }
-
+        /// <summary>
+        /// Renders the project window, displaying the list of assets and folders in a grid layout.
+        /// </summary>
         public void Render()
         {
             if (!_showProject) return;
@@ -125,7 +120,10 @@ namespace EarthEngineEditor.Windows
             ImGui.End();
         }
 
-        void DrawBreadcrumb()
+        /// <summary>
+        /// Draws the breadcrumb navigation for the current folder path.
+        /// </summary>
+        private void DrawBreadcrumb()
         {
             ImGui.Text("Path: ");
             ImGui.SameLine();
@@ -164,6 +162,9 @@ namespace EarthEngineEditor.Windows
             ImGui.Separator();
         }
 
+        /// <summary>
+        /// Renders the project items in a grid layout with icons and text.
+        /// </summary>
         private void RenderProjectItems()
         {
             DrawBreadcrumb();
@@ -307,7 +308,12 @@ namespace EarthEngineEditor.Windows
                 }
             }
         }
-       
+
+        /// <summary>
+        /// Returns the parent path of the given path.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         private string GetParentPath(string path)
         {
             if (string.IsNullOrEmpty(path))
@@ -322,6 +328,9 @@ namespace EarthEngineEditor.Windows
             return path.Substring(0, lastSlash);
         }
 
+        /// <summary>
+        /// Renders the context menu for the project window, allowing users to create folders, assets, and import files.
+        /// </summary>
         private void RenderContextMenu()
         {
             if (ImGui.BeginPopupContextWindow("ProjectContextMenu"))
@@ -359,6 +368,9 @@ namespace EarthEngineEditor.Windows
             }
         }
 
+        /// <summary>
+        /// Renders the dialog for creating a new folder in the project.
+        /// </summary>
         private void RenderCreateFolderDialog()
         {
             ImGui.OpenPopup("Create Folder");
@@ -401,6 +413,9 @@ namespace EarthEngineEditor.Windows
             }
         }
 
+        /// <summary>
+        /// Renders the dialog for importing an asset into the project.
+        /// </summary>
         private void RenderImportAssetDialog()
         {
             ImGui.OpenPopup("Import Asset");
@@ -427,7 +442,10 @@ namespace EarthEngineEditor.Windows
             }
         }
 
-        private void RefreshItems()
+        /// <summary>
+        /// Refreshes the list of items in the project window.
+        /// </summary>
+        public void RefreshItems()
         {
             items.Clear();
             allAssets.Clear();
@@ -481,6 +499,11 @@ namespace EarthEngineEditor.Windows
                 System.Diagnostics.Debug.WriteLine($"Error loading items: {ex.Message}");
             }
         }
+
+        /// <summary>
+        /// Recursively populates the list of all assets in the project directory.
+        /// </summary>
+        /// <param name="directory"></param>
         private void PopulateAllAssetsRecursively(string directory)
         {
             var folders = Directory.GetDirectories(directory);
@@ -505,6 +528,10 @@ namespace EarthEngineEditor.Windows
                 }
             }
         }
+
+        /// <summary>
+        /// Renders the dialog for creating a new asset in the project.
+        /// </summary>
         private void RenderNewAssetDialog()
         {
             ImGui.OpenPopup("New Asset");
