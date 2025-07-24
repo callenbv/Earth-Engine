@@ -22,6 +22,11 @@ namespace GameRuntime
             _scriptAssembly = scriptAssembly;
         }
 
+        /// <summary>
+        /// Creates an instance of an ObjectComponent by its type name.
+        /// </summary>
+        /// <param name="typeName"></param>
+        /// <returns></returns>
         public ObjectComponent? CreateComponentInstanceByName(string typeName)
         {
             // Full type scan (or optimize with caching later)

@@ -12,20 +12,48 @@ using Microsoft.Xna.Framework;
 
 namespace Engine.Core
 {
+    /// <summary>
+    /// Represents the camera in the game, handling position, zoom, rotation, and target tracking.
+    /// </summary>
     public class Camera
     {
+        /// <summary>
+        /// The position of the camera in world space.
+        /// </summary>
         public Vector2 Position { get; set; } = Vector2.Zero;
+
+        /// <summary>
+        /// The zoom level of the camera, where 1f is normal size.
+        /// </summary>
         public float Zoom { get; set; } = 1f;
+
+        /// <summary>
+        /// The rotation of the camera in radians. 0f means no rotation.
+        /// </summary>
         public float Rotation { get; set; } = 0f;
+
+        /// <summary>
+        /// The target GameObject that the camera will follow. If null, the camera does not follow any object.
+        /// </summary>
         public GameObject? Target { get; set; } = null;
+
+        /// <summary>
+        /// The speed at which the camera smoothly follows the target. Higher values result in faster following.
+        /// </summary>
         public float SmoothSpeed { get; set; } = 8f;
         public float UIScale { get; set; } = 1f;
-        
         public int ViewportWidth { get; set; } = 320;
         public int ViewportHeight { get; set; } = 180;
         public int TargetViewportHeight { get; set; } = 180;
         public int TargetViewportWidth { get; set; } = 320;
 
+        private static Camera? _main;
+        public static Camera Main => _main ??= new Camera();
+
+        /// <summary>
+        /// Update the camera position based on the target GameObject.
+        /// </summary>
+        /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
         {
             float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -36,6 +64,12 @@ namespace Engine.Core
             }
         }
 
+        /// <summary>
+        /// Get the view matrix for rendering, taking into account zoom, rotation, and position.
+        /// </summary>
+        /// <param name="viewportWidth"></param>
+        /// <param name="viewportHeight"></param>
+        /// <returns></returns>
         public Matrix GetViewMatrix(int viewportWidth, int viewportHeight)
         {
             // Calculate scale factor from base resolution to actual rendering resolution
@@ -57,11 +91,22 @@ namespace Engine.Core
             return baseTransform * scaleTransform;
         }
 
+        /// <summary>
+        /// Get the UI view matrix, which is typically an identity matrix since UI is not affected by camera transformations.
+        /// </summary>
+        /// <param name="viewportWidth"></param>
+        /// <param name="viewportHeight"></param>
+        /// <returns></returns>
         public Matrix GetUIViewMatrix(int viewportWidth, int viewportHeight)
         {
             return Matrix.Identity;
         }
 
+        /// <summary>
+        /// Convert a screen position to world coordinates.
+        /// </summary>
+        /// <param name="screenPos"></param>
+        /// <returns></returns>
         public Vector2 ScreenToWorld(Point screenPos)
         {
             int screenW = ViewportWidth;
@@ -88,15 +133,15 @@ namespace Engine.Core
             return new Vector2(worldVec.X, worldVec.Y);
         }
 
-
+        /// <summary>
+        /// Set the viewport size for rendering.
+        /// </summary>
+        /// <param name="viewportWidth"></param>
+        /// <param name="viewportHeight"></param>
         public void SetViewportSize(int viewportWidth, int viewportHeight)
         {
             ViewportWidth = viewportWidth;
             ViewportHeight = viewportHeight;
         }
-
-        // Singleton for easy access
-        private static Camera? _main;
-        public static Camera Main => _main ??= new Camera();
     }
 } 

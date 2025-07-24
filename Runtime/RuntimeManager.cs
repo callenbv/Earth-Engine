@@ -76,6 +76,8 @@ namespace GameRuntime
 
             Input.gameInstance = game;
             Input.graphicsManager = graphicsManager;
+            Input.Initialize();
+
             FontLibrary.Main.Initialize(_graphicsDevice,contentManager);
             FontLibrary.Main.LoadFonts();
             TextureLibrary textureLibrary = new TextureLibrary();

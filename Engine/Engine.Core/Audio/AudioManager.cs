@@ -16,6 +16,9 @@ using System.Threading.Tasks;
 
 namespace Engine.Core.Audio
 {
+    /// <summary>
+    /// Manages audio playback using FMOD
+    /// </summary>
     public class AudioManager
     {
         public Dictionary<string, GameSound> Sounds = new Dictionary<string, GameSound>(); // List of all sounds
@@ -24,8 +27,11 @@ namespace Engine.Core.Audio
         public int MaxChannels { get; private set; } = 32;
         public FMOD.Channel Sound { get; private set; }
         public FMOD.Channel Music { get; private set; }
-        public static AudioManager Instance { get; private set; } 
+        public static AudioManager Instance { get; private set; }
 
+        /// <summary>
+        /// Singleton instance of AudioManager
+        /// </summary>
         public AudioManager()
         {
             Instance = this;

@@ -19,6 +19,9 @@ using System.IO;
 
 namespace Engine.Core.Rooms
 {
+    /// <summary>
+    /// Represents a room or scene in the game, containing GameObjects and their components.
+    /// </summary>
     public class Room
     {
         public string Name { get; set; } = "Room";

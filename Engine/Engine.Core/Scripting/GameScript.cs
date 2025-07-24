@@ -13,6 +13,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Engine.Core
 {
+    /// <summary>
+    /// Base class for game scripts that can be attached to game objects.
+    /// </summary>
     public class GameScript : ObjectComponent
     {
 

@@ -14,12 +14,21 @@ using System.Threading.Tasks;
 
 namespace Engine.Core.Audio
 {
+    /// <summary>
+    /// Represents a sound in the game, encapsulating its name, FMOD sound object, and type (Sound or Music).
+    /// </summary>
     public class GameSound
     {
         string Name { get; set; } = string.Empty;
         public FMOD.Sound Sound { get; set; }
         public AudioType Type { get; set; } = AudioType.Sound;
 
+        /// <summary>
+        /// Create a new GameSound instance
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="sound"></param>
+        /// <param name="type"></param>
         public GameSound(string name, FMOD.Sound sound, AudioType type)
         {
             Name = name;

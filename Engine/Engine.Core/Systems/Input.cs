@@ -9,26 +9,107 @@
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
 using System.Reflection;
+using System.Device.Gpio;
 
 namespace Engine.Core
 {
+    /// <summary>
+    /// Handles input from keyboard and mouse, including hotkeys and fullscreen toggling.
+    /// </summary>
     public static class Input
     {
+        /// <summary>
+        /// Each virtual button is mapped to a GPIO pin button
+        /// </summary>
+        public enum VirtualButton
+        {
+            A,
+            B,
+            X,
+            Y,
+            Up,
+            Down,
+            Left,
+            Right,
+            Start,
+            Select
+        }
+
+        /// <summary>
+        /// Enumeration for mouse buttons.
+        /// </summary>
+        public enum Button 
+        { 
+            Left, 
+            Right, 
+            Middle 
+        }
+
         private static KeyboardState _currentKeyboard;
         private static KeyboardState _previousKeyboard;
         private static MouseState _currentMouse;
         private static MouseState _previousMouse;
         public static Vector2 mouseWorldPosition;
         
-        // Reference to the Game instance for calling Exit()
         public static Microsoft.Xna.Framework.Game? gameInstance;
-        
-        // Reference to the GraphicsDeviceManager for fullscreen toggle
         public static Microsoft.Xna.Framework.GraphicsDeviceManager? graphicsManager;
+
+        private static GpioController? _gpio;
+        private static readonly Dictionary<VirtualButton, int> _gpioPins = new() // To be set once GPIO is available
+        {
+            { VirtualButton.A, 25 },
+            { VirtualButton.B, 4 },
+            { VirtualButton.X, 5 },
+            { VirtualButton.Y, 6 },
+            { VirtualButton.Up, 17 },
+            { VirtualButton.Down, 18 },
+            { VirtualButton.Left, 27 },
+            { VirtualButton.Right, 22 },
+            { VirtualButton.Start, 24 },
+            { VirtualButton.Select, 23 },
+        };
+
+        private static Dictionary<VirtualButton, bool> _gpioStates = new();
+        private static readonly Dictionary<VirtualButton, bool> _currentButtonStates = new();
+        private static readonly Dictionary<VirtualButton, bool> _previousButtonStates = new();
+
+        /// <summary>
+        /// Scroll delta value (positive for scroll up, negative for scroll down).
+        /// </summary>
         public static int ScrollDelta => _currentMouse.ScrollWheelValue - _previousMouse.ScrollWheelValue;
+
+        /// <summary>
+        /// Indicates if the mouse was scrolled up (positive delta).
+        /// </summary>
         public static bool ScrolledUp => ScrollDelta > 0;
+
+        /// <summary>
+        /// Indicates if the mouse was scrolled down (negative delta).
+        /// </summary>
         public static bool ScrolledDown => ScrollDelta < 0;
 
+        /// <summary>
+        /// Get the current mouse position in screen coordinates.
+        /// </summary>
+        public static Point MousePosition => _currentMouse.Position;
+
+        /// <summary>
+        /// Initializes the Input system, setting up keyboard and mouse states, and GPIO pins if available.
+        /// </summary>
+        public static void Initialize()
+        {
+            _gpio = new GpioController();
+
+            foreach (var kv in _gpioPins)
+            {
+                _gpio.OpenPin(kv.Value, PinMode.InputPullUp);
+                _gpioStates[kv.Key] = false;
+            }
+        }
+
+        /// <summary>
+        /// Initializes the Input system with the game instance and graphics manager.
+        /// </summary>
         public static void Update()
         {
             _previousKeyboard = _currentKeyboard;
@@ -36,6 +117,16 @@ namespace Engine.Core
             _currentKeyboard = Keyboard.GetState();
             _currentMouse = Mouse.GetState();
             mouseWorldPosition = GetMouseWorldPosition();
+
+            // Update GPIO Pins
+            if (_gpio != null)
+            {
+                foreach (var kv in _gpioPins)
+                {
+                    // GPIO input is pulled up, so pressed = Low (false)
+                    _gpioStates[kv.Key] = !_gpio.Read(kv.Value).Equals(PinValue.High);
+                }
+            }
 
             HandleHotkeys();
         }
@@ -90,12 +181,72 @@ namespace Engine.Core
             }
         }
 
-        // Keyboard
+        /// <summary>
+        /// Check if a specific virtual button is currently pressed, released, or just pressed/released.
+        /// </summary>
+        /// <param name="button"></param>
+        /// <returns></returns>
+        public static bool IsButtonDown(VirtualButton button)
+        {
+            return _currentButtonStates.TryGetValue(button, out var isDown) ? isDown : false;
+        }
+
+        /// <summary>
+        /// Check if a specific virtual button is currently released (not pressed).
+        /// </summary>
+        /// <param name="button"></param>
+        /// <returns></returns>
+        public static bool IsButtonPressed(VirtualButton button)
+        {
+            bool wasDown = _previousButtonStates.TryGetValue(button, out var prev) && prev;
+            return IsButtonDown(button) && !wasDown;
+        }
+
+        /// <summary>
+        /// Check if a specific virtual button was just released (transition from down to up).
+        /// </summary>
+        /// <param name="button"></param>
+        /// <returns></returns>
+        public static bool IsButtonReleased(VirtualButton button)
+        {
+            bool prevState;
+            _previousButtonStates.TryGetValue(button, out prevState);
+            return !IsButtonDown(button) && prevState;
+        }
+
+        /// <summary>
+        /// Check if a specific key is currently pressed, released, or just pressed/released.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public static bool IsKeyDown(Keys key) => _currentKeyboard.IsKeyDown(key);
+
+        /// <summary>
+        /// Check if a specific key is currently released (not pressed).
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public static bool IsKeyUp(Keys key) => _currentKeyboard.IsKeyUp(key);
+
+        /// <summary>
+        /// Check if a specific key was just pressed (transition from up to down).
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public static bool IsKeyPressed(Keys key) => _currentKeyboard.IsKeyDown(key) && _previousKeyboard.IsKeyUp(key);
+
+        /// <summary>
+        /// Check if a specific key was just released (transition from down to up).
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public static bool IsKeyReleased(Keys key) => _currentKeyboard.IsKeyUp(key) && _previousKeyboard.IsKeyDown(key);
 
+        /// <summary>
+        /// Check if a specific mouse button is currently pressed, released, or just pressed/released.
+        /// </summary>
+        /// <param name="button"></param>
+        /// <returns></returns>
         public static bool IsMouseDown(Button button = Button.Left)
         {
             return button switch
@@ -106,6 +257,12 @@ namespace Engine.Core
                 _ => false
             };
         }
+
+        /// <summary>
+        /// Check if a specific mouse button is currently released (not pressed).
+        /// </summary>
+        /// <param name="button"></param>
+        /// <returns></returns>
         public static bool IsMouseUp(Button button)
         {
             return button switch
@@ -116,30 +273,39 @@ namespace Engine.Core
                 _ => false
             };
         }
+
+        /// <summary>
+        /// Check if a specific mouse button was just pressed (transition from up to down).
+        /// </summary>
+        /// <param name="button"></param>
+        /// <returns></returns>
         public static bool IsMousePressed(Button button = Button.Left)
         {
             return IsMouseDown(button) &&
-                (button switch
-                {
-                    Button.Left => _previousMouse.LeftButton == ButtonState.Released,
-                    Button.Right => _previousMouse.RightButton == ButtonState.Released,
-                    Button.Middle => _previousMouse.MiddleButton == ButtonState.Released,
-                    _ => false
-                });
+            (button switch
+            {
+                Button.Left => _previousMouse.LeftButton == ButtonState.Released,
+                Button.Right => _previousMouse.RightButton == ButtonState.Released,
+                Button.Middle => _previousMouse.MiddleButton == ButtonState.Released,
+                _ => false
+            });
         }
+
+        /// <summary>
+        /// Check if a specific mouse button was just released (transition from down to up).
+        /// </summary>
+        /// <param name="button"></param>
+        /// <returns></returns>
         public static bool IsMouseReleased(Button button = Button.Left)
         {
             return IsMouseUp(button) &&
-                (button switch
-                {
-                    Button.Left => _previousMouse.LeftButton == ButtonState.Pressed,
-                    Button.Right => _previousMouse.RightButton == ButtonState.Pressed,
-                    Button.Middle => _previousMouse.MiddleButton == ButtonState.Pressed,
-                    _ => false
-                });
+            (button switch
+            {
+                Button.Left => _previousMouse.LeftButton == ButtonState.Pressed,
+                Button.Right => _previousMouse.RightButton == ButtonState.Pressed,
+                Button.Middle => _previousMouse.MiddleButton == ButtonState.Pressed,
+                _ => false
+            });
         }
-        public static Point MousePosition => _currentMouse.Position;
-
-        public enum Button { Left, Right, Middle }
     }
 } 
