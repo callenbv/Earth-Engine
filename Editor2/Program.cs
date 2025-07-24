@@ -1,3 +1,11 @@
+﻿/// -----------------------------------------------------------------------------
+/// <Project>      Earth Engine 
+/// <File>         Program.cs
+/// <Author>       Callen Betts Virott 
+/// <Copyright>    @2025 Callen Betts Virott. All rights reserved.
+/// <Summary>                
+/// -----------------------------------------------------------------------------
+
 using System;
 
 namespace EarthEngineEditor

@@ -1,3 +1,11 @@
+﻿/// -----------------------------------------------------------------------------
+/// <Project>      Earth Engine 
+/// <File>         ScriptManager.cs
+/// <Author>       Callen Betts Virott 
+/// <Copyright>    @2025 Callen Betts Virott. All rights reserved.
+/// <Summary>                
+/// -----------------------------------------------------------------------------
+
 using System;
 using System.Reflection;
 using System.Linq;

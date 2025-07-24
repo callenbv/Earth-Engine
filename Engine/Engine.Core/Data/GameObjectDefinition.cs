@@ -1,4 +1,12 @@
-﻿using Engine.Core.Game.Components;
+﻿/// -----------------------------------------------------------------------------
+/// <Project>      Earth Engine 
+/// <File>         GameObjectDefinition.cs
+/// <Author>       Callen Betts Virott 
+/// <Copyright>    @2025 Callen Betts Virott. All rights reserved.
+/// <Summary>                
+/// -----------------------------------------------------------------------------
+
+using Engine.Core.Game.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,3 +26,4 @@ namespace Engine.Core.Data
         public List<IComponent> components { get; set; } = new();
     }
 }
+

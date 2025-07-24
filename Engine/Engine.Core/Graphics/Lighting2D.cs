@@ -1,4 +1,12 @@
-﻿using Microsoft.Xna.Framework;
+﻿/// -----------------------------------------------------------------------------
+/// <Project>      Earth Engine 
+/// <File>         Lighting2D.cs
+/// <Author>       Callen Betts Virott 
+/// <Copyright>    @2025 Callen Betts Virott. All rights reserved.
+/// <Summary>                
+/// -----------------------------------------------------------------------------
+
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Engine.Core.Game;
 using Engine.Core.Rooms;

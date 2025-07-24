@@ -1,4 +1,12 @@
-﻿using Engine.Core.CustomMath;
+﻿/// -----------------------------------------------------------------------------
+/// <Project>      Earth Engine 
+/// <File>         Camera.cs
+/// <Author>       Callen Betts Virott 
+/// <Copyright>    @2025 Callen Betts Virott. All rights reserved.
+/// <Summary>                
+/// -----------------------------------------------------------------------------
+
+using Engine.Core.CustomMath;
 using Engine.Core.Game;
 using Microsoft.Xna.Framework;
 

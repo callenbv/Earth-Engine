@@ -1,4 +1,12 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿/// -----------------------------------------------------------------------------
+/// <Project>      Earth Engine 
+/// <File>         Room.cs
+/// <Author>       Callen Betts Virott 
+/// <Copyright>    @2025 Callen Betts Virott. All rights reserved.
+/// <Summary>                
+/// -----------------------------------------------------------------------------
+
+using Microsoft.Xna.Framework.Graphics;
 using System.Text.Json;
 using Microsoft.Xna.Framework;
 using Engine.Core.Game;
@@ -130,3 +138,4 @@ namespace Engine.Core.Rooms
         }
     }
 }
+

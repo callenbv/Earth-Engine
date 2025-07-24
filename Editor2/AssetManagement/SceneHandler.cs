@@ -1,4 +1,12 @@
-﻿using EarthEngineEditor.Windows;
+﻿/// -----------------------------------------------------------------------------
+/// <Project>      Earth Engine 
+/// <File>         SceneHandler.cs
+/// <Author>       Callen Betts Virott 
+/// <Copyright>    @2025 Callen Betts Virott. All rights reserved.
+/// <Summary>                
+/// -----------------------------------------------------------------------------
+
+using EarthEngineEditor.Windows;
 using Engine.Core.Data;
 using Engine.Core.Game;
 using Engine.Core.Game.Components;
@@ -80,3 +88,4 @@ namespace Editor.AssetManagement
         }
     }
 }
+

@@ -1,4 +1,12 @@
-﻿using Engine.Core.Game.Components;
+﻿/// -----------------------------------------------------------------------------
+/// <Project>      Earth Engine 
+/// <File>         Deserialization.cs
+/// <Author>       Callen Betts Virott 
+/// <Copyright>    @2025 Callen Betts Virott. All rights reserved.
+/// <Summary>                
+/// -----------------------------------------------------------------------------
+
+using Engine.Core.Game.Components;
 using Microsoft.Xna.Framework;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -68,3 +76,4 @@ namespace Editor.AssetManagement
 
     }
 }
+

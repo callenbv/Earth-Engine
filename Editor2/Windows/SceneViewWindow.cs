@@ -1,3 +1,11 @@
+﻿/// -----------------------------------------------------------------------------
+/// <Project>      Earth Engine 
+/// <File>         SceneViewWindow.cs
+/// <Author>       Callen Betts Virott 
+/// <Copyright>    @2025 Callen Betts Virott. All rights reserved.
+/// <Summary>                
+/// -----------------------------------------------------------------------------
+
 using Editor.AssetManagement;
 using Editor.Windows.Inspector;
 using Engine.Core;

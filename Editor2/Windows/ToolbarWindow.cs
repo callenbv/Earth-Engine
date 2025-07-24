@@ -1,4 +1,12 @@
-﻿using Editor.Windows;
+﻿/// -----------------------------------------------------------------------------
+/// <Project>      Earth Engine 
+/// <File>         ToolbarWindow.cs
+/// <Author>       Callen Betts Virott 
+/// <Copyright>    @2025 Callen Betts Virott. All rights reserved.
+/// <Summary>                
+/// -----------------------------------------------------------------------------
+
+using Editor.Windows;
 using Engine.Core;
 using ImGuiNET;
 using Microsoft.Xna.Framework;

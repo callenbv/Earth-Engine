@@ -1,4 +1,12 @@
-﻿using Engine.Core.Game.Components;
+﻿/// -----------------------------------------------------------------------------
+/// <Project>      Earth Engine 
+/// <File>         EditorWatcher.cs
+/// <Author>       Callen Betts Virott 
+/// <Copyright>    @2025 Callen Betts Virott. All rights reserved.
+/// <Summary>                
+/// -----------------------------------------------------------------------------
+
+using Engine.Core.Game.Components;
 using Engine.Core.Scripting;
 using System;
 using System.IO;
@@ -50,3 +58,4 @@ namespace Editor.AssetManagement
         }
     }
 }
+

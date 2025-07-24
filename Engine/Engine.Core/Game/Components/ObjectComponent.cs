@@ -1,4 +1,12 @@
-﻿using Engine.Core.Data;
+﻿/// -----------------------------------------------------------------------------
+/// <Project>      Earth Engine 
+/// <File>         ObjectComponent.cs
+/// <Author>       Callen Betts Virott 
+/// <Copyright>    @2025 Callen Betts Virott. All rights reserved.
+/// <Summary>                
+/// -----------------------------------------------------------------------------
+
+using Engine.Core.Data;
 using Engine.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -60,3 +68,4 @@ namespace Engine.Core.Game.Components
         public virtual void Destroy() { }
     }
 }
+

@@ -1,4 +1,12 @@
-﻿using FMOD;
+﻿/// -----------------------------------------------------------------------------
+/// <Project>      Earth Engine 
+/// <File>         Audio.cs
+/// <Author>       Callen Betts Virott 
+/// <Copyright>    @2025 Callen Betts Virott. All rights reserved.
+/// <Summary>                
+/// -----------------------------------------------------------------------------
+
+using FMOD;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,3 +65,4 @@ namespace Engine.Core.Audio
         }
     }
 }
+

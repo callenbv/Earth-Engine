@@ -1,4 +1,12 @@
-﻿using EarthEngineEditor;
+﻿/// -----------------------------------------------------------------------------
+/// <Project>      Earth Engine 
+/// <File>         ProjectItem.cs
+/// <Author>       Callen Betts Virott 
+/// <Copyright>    @2025 Callen Betts Virott. All rights reserved.
+/// <Summary>                
+/// -----------------------------------------------------------------------------
+
+using EarthEngineEditor;
 using EarthEngineEditor.Windows;
 using Engine.Core.Data;
 using Engine.Core.Game;
@@ -85,3 +93,4 @@ namespace Editor.AssetManagement
         }
     }
 }
+

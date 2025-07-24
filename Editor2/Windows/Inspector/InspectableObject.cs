@@ -1,4 +1,12 @@
-﻿using Engine.Core.Data;
+﻿/// -----------------------------------------------------------------------------
+/// <Project>      Earth Engine 
+/// <File>         InspectableObject.cs
+/// <Author>       Callen Betts Virott 
+/// <Copyright>    @2025 Callen Betts Virott. All rights reserved.
+/// <Summary>                
+/// -----------------------------------------------------------------------------
+
+using Engine.Core.Data;
 using Engine.Core.Game;
 using ImGuiNET;
 using System;
@@ -26,3 +34,4 @@ namespace Editor.Windows.Inspector
         }
     }
 }
+

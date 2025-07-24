@@ -1,4 +1,12 @@
-﻿using Engine.Core.Game;
+﻿/// -----------------------------------------------------------------------------
+/// <Project>      Earth Engine 
+/// <File>         AssetInterface.cs
+/// <Author>       Callen Betts Virott 
+/// <Copyright>    @2025 Callen Betts Virott. All rights reserved.
+/// <Summary>                
+/// -----------------------------------------------------------------------------
+
+using Engine.Core.Game;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,3 +29,4 @@ namespace Engine.Core.Data
         void Save(string path);
     }
 }
+

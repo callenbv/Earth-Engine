@@ -1,4 +1,12 @@
-﻿using EarthEngineEditor;
+﻿/// -----------------------------------------------------------------------------
+/// <Project>      Earth Engine 
+/// <File>         PrefabHandler.cs
+/// <Author>       Callen Betts Virott 
+/// <Copyright>    @2025 Callen Betts Virott. All rights reserved.
+/// <Summary>                
+/// -----------------------------------------------------------------------------
+
+using EarthEngineEditor;
 using Engine.Core;
 using Engine.Core.CustomMath;
 using Engine.Core.Data;
@@ -262,3 +270,4 @@ namespace Editor.AssetManagement
         }
     }
 }
+

@@ -1,4 +1,12 @@
-﻿using Editor.AssetManagement;
+﻿/// -----------------------------------------------------------------------------
+/// <Project>      Earth Engine 
+/// <File>         InspectorHelper.cs
+/// <Author>       Callen Betts Virott 
+/// <Copyright>    @2025 Callen Betts Virott. All rights reserved.
+/// <Summary>                
+/// -----------------------------------------------------------------------------
+
+using Editor.AssetManagement;
 using Engine.Core.Game.Components;
 using Engine.Core.Game;
 using ImGuiNET;
@@ -65,3 +73,4 @@ namespace Editor.Windows.Inspector
     }
 
 }
+

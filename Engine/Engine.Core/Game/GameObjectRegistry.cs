@@ -1,4 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿/// -----------------------------------------------------------------------------
+/// <Project>      Earth Engine 
+/// <File>         GameObjectRegistry.cs
+/// <Author>       Callen Betts Virott 
+/// <Copyright>    @2025 Callen Betts Virott. All rights reserved.
+/// <Summary>                
+/// -----------------------------------------------------------------------------
+
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -61,3 +69,4 @@ namespace Engine.Core.Game
         public static IEnumerable<string> AllKeys => _definitions.Keys;
     }
 }
+

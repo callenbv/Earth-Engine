@@ -1,4 +1,12 @@
-﻿using System;
+﻿/// -----------------------------------------------------------------------------
+/// <Project>      Earth Engine 
+/// <File>         Atrributes.cs
+/// <Author>       Callen Betts Virott 
+/// <Copyright>    @2025 Callen Betts Virott. All rights reserved.
+/// <Summary>                
+/// -----------------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,3 +29,4 @@ namespace Engine.Core.Data
     [AttributeUsage(AttributeTargets.Method)]
     public class EditorOnlyAttribute : Attribute { }
 }
+

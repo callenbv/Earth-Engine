@@ -1,4 +1,12 @@
-﻿using Engine.Core;
+﻿/// -----------------------------------------------------------------------------
+/// <Project>      Earth Engine 
+/// <File>         Runtime.cs
+/// <Author>       Callen Betts Virott 
+/// <Copyright>    @2025 Callen Betts Virott. All rights reserved.
+/// <Summary>                
+/// -----------------------------------------------------------------------------
+
+using Engine.Core;
 using Engine.Core.Audio;
 using Engine.Core.Data;
 using Engine.Core.Game;
@@ -200,3 +208,4 @@ namespace GameRuntime
         }
     }
 } 
+

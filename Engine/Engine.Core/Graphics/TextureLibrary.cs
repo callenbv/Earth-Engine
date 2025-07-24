@@ -1,4 +1,12 @@
-﻿using Engine.Core.Game.Components;
+﻿/// -----------------------------------------------------------------------------
+/// <Project>      Earth Engine 
+/// <File>         TextureLibrary.cs
+/// <Author>       Callen Betts Virott 
+/// <Copyright>    @2025 Callen Betts Virott. All rights reserved.
+/// <Summary>                
+/// -----------------------------------------------------------------------------
+
+using Engine.Core.Game.Components;
 using Engine.Core.Game;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -77,3 +85,4 @@ namespace Engine.Core.Graphics
         }
     }
 }
+

@@ -1,4 +1,12 @@
-﻿using EarthEngineEditor;
+﻿/// -----------------------------------------------------------------------------
+/// <Project>      Earth Engine 
+/// <File>         EditorOverlay.cs
+/// <Author>       Callen Betts Virott 
+/// <Copyright>    @2025 Callen Betts Virott. All rights reserved.
+/// <Summary>                
+/// -----------------------------------------------------------------------------
+
+using EarthEngineEditor;
 using Engine.Core;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
@@ -132,3 +140,4 @@ namespace Editor.Windows
         }
     }
 }
+
