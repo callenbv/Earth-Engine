@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.InteropServices;
@@ -30,17 +30,20 @@ namespace EarthEngineEditor
         private KeyboardState _lastKeyboard;
         private MouseState _lastMouse;
         private int _lastScrollWheelValue = 0;
+        private static Dictionary<Texture2D, IntPtr> _bindings = new();
 
         // Keep font data pinned for ImGui lifetime
         private byte[]? _robotoFontData;
         private GCHandle _robotoFontHandle;
         public ImFontPtr _robotoFont;
         public ImFontPtr _fontAwesome;
+        public static ImGuiRenderer Instance { get; private set; }
 
         public ImGuiRenderer(Game game)
         {
             _game = game;
             _gd = game.GraphicsDevice;
+            Instance = this;
             ImGui.CreateContext();
             
             // Apply modern dark theme
@@ -65,6 +68,16 @@ namespace EarthEngineEditor
                 if (e.Character != '\t') // ImGui handles tab internally
                     io.AddInputCharacter(e.Character);
             };
+        }
+
+        public IntPtr BindTexture(Texture2D texture)
+        {
+            if (_bindings.TryGetValue(texture, out var handle))
+                return handle;
+
+            handle = RegisterTexture(texture);
+            _bindings[texture] = handle;
+            return handle;
         }
 
         public static bool IconButton(string id, string icon, Microsoft.Xna.Framework.Color color, float padding = 16f, float spacing = 6f)
@@ -164,7 +177,7 @@ namespace EarthEngineEditor
                 RasterizerDensity = 1.0f,
             };
 
-            // Define icon range (Font Awesome typically uses 0xF000�0xF8FF)
+            // Define icon range (Font Awesome typically uses 0xF000–0xF8FF)
             ushort[] iconRanges = new ushort[] { 0xF000, 0xF8FF, 0 };
             fixed (ushort* rangePtr = iconRanges)
             {

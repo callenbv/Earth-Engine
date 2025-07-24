@@ -1,4 +1,5 @@
-﻿using Editor.AssetManagement;
+﻿using EarthEngineEditor;
+using Editor.AssetManagement;
 using Engine.Core;
 using Engine.Core.Game.Components;
 using Engine.Core.Rooms.Tiles;
@@ -7,15 +8,28 @@ using System;
 using System.Collections.Generic;
 using System.Device.Gpio;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Editor.Windows.TileEditor
 {
+    public enum TileEditorMode
+    {
+        Paint,
+        Erase,
+        Select
+    }
     public class TileEditorWindow
     {
         private bool show = true;
+        private bool open = false;
+        private float previewScale = 1;
+        private int selectedTileIndex = 1;
         private TilemapRenderer? selectedLayer;
+        public int TileSize = 16;
+        public int BrushSize = 1;
+        TileEditorMode mode = TileEditorMode.Paint;
 
         public void Render()
         {
@@ -24,9 +38,11 @@ namespace Editor.Windows.TileEditor
             ImGui.Begin("Tile Editor", ref show);
 
             bool tree = ImGui.TreeNodeEx("Tile Layers", ImGuiTreeNodeFlags.DefaultOpen);
+            open = false;
 
             if (tree)
             {
+                open = true;
                 foreach (var layer in TilemapManager.layers)
                 {
                     if (ImGui.TreeNodeEx(layer.Title))
@@ -50,17 +66,100 @@ namespace Editor.Windows.TileEditor
             ImGui.Separator();
 
             // Paint on the selected layer
-            if (selectedLayer != null)
+            if (selectedLayer != null && open)
             {
+                // Draw data for each tileset
                 ImGui.Text(selectedLayer.Title);
-                if (Input.IsMouseDown())
+
+                ImGui.SliderInt("Brush Size", ref BrushSize, 1, 10);
+
+                // Tileset preview
+                if (selectedLayer.Texture != null)
+                {
+                    int tileSize = selectedLayer.TileSize;
+                    int texWidth = selectedLayer.Texture.Width;
+                    int texHeight = selectedLayer.Texture.Height;
+
+                    int tilesX = texWidth / tileSize;
+                    int tilesY = texHeight / tileSize;
+
+                    Vector2 scaledTileSize = new Vector2(tileSize * previewScale);
+
+                    // Show full tileset image
+                    ImGui.Text("Tileset Preview:");
+                    Vector2 imageSize = new Vector2(texWidth * previewScale, texHeight * previewScale);
+
+                    if (selectedLayer.TexturePtr == IntPtr.Zero)
+                        selectedLayer.TexturePtr = ImGuiRenderer.Instance.BindTexture(selectedLayer.Texture);
+
+                    ImGui.Image(selectedLayer.TexturePtr, imageSize);
+
+                    // Draw overlay grid of invisible buttons
+                    Vector2 imagePos = ImGui.GetItemRectMin(); // top-left corner of the image
+                    var drawList = ImGui.GetWindowDrawList();
+
+                    for (int y = 0; y < tilesY; y++)
+                    {
+                        for (int x = 0; x < tilesX; x++)
+                        {
+                            int index = y * tilesX + x;
+
+                            Vector2 min = imagePos + new Vector2(x * scaledTileSize.X, y * scaledTileSize.Y);
+                            Vector2 max = min + scaledTileSize;
+
+                            ImGui.SetCursorScreenPos(min);
+                            ImGui.PushID(index);
+
+                            if (ImGui.InvisibleButton("tile", scaledTileSize))
+                            {
+                                selectedTileIndex = index;
+                            }
+
+                            // Draw outline if selected
+                            if (index == selectedTileIndex)
+                            {
+                                drawList.AddRect(min, max, ImGui.GetColorU32(ImGuiCol.ButtonActive), 0f, ImDrawFlags.None, 2.0f);
+                            }
+
+                            ImGui.PopID();
+                        }
+                    }
+                }
+
+                // Now paint with the selected tile index
+                if (!ImGui.GetIO().WantCaptureMouse)
                 {
                     var mousePos = Input.mouseWorldPosition;
                     int tileX = (int)(mousePos.X / selectedLayer.TileSize);
                     int tileY = (int)(mousePos.Y / selectedLayer.TileSize);
-                    if (tileX >= 0 && tileX < selectedLayer.Width && tileY >= 0 && tileY < selectedLayer.Height)
+
+                    if (Input.IsMouseDown())
                     {
-                        selectedLayer.SetTile(tileX, tileY, 5); // Test grass tile
+                        if (tileX >= 0 && tileX < selectedLayer.Width && tileY >= 0 && tileY < selectedLayer.Height)
+                        {
+                            for (int dx = -BrushSize / 2; dx <= BrushSize / 2; dx++)
+                            {
+                                for (int dy = -BrushSize / 2; dy <= BrushSize / 2; dy++)
+                                {
+                                    int px = tileX + dx;
+                                    int py = tileY + dy;
+
+                                    if (px >= 0 && px < selectedLayer.Width &&
+                                        py >= 0 && py < selectedLayer.Height)
+                                    {
+
+                                        if (mode == TileEditorMode.Paint)
+                                        {
+                                            selectedLayer.SetTile(px, py, selectedTileIndex);
+                                        }
+                                        else if (mode == TileEditorMode.Erase)
+                                        {
+                                            selectedLayer.SetTile(px, py, -1);
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }

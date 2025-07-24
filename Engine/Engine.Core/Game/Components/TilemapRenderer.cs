@@ -20,6 +20,7 @@ namespace Engine.Core.Game.Components
         public Tile[,] Tiles { get; set; } = new Tile[100,100];
         [JsonIgnore]
         public Texture2D? Texture { get; set; }
+        public IntPtr TexturePtr { get; set; }
 
         public TilemapRenderer()
         {
@@ -37,6 +38,9 @@ namespace Engine.Core.Game.Components
 
         public void SetTile(int x, int y, int index)
         {
+            if (index < 0)
+                Tiles[x,y] = null;
+                else
             if (x >= 0 && x < Width && y >= 0 && y < Height)
                 Tiles[x, y] = new Tile(index);
         }
