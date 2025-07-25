@@ -148,14 +148,20 @@ namespace EarthEngineEditor.Windows
             // Right-click on the "Scene" tree node
             if (ImGui.BeginPopupContextItem("SceneContext"))
             {
-                if (ImGui.MenuItem("Create Blank GameObject"))
+                if (ImGui.MenuItem("Create Empty GameObject"))
                 {
                     var newObj = new GameObject($"Empty{scene.objects.Count}");
                     newObj.AddComponent<Transform>();
                     newObj.AddComponent<Sprite2D>();
                     scene.objects.Add(newObj);
                 }
-
+                if (ImGui.MenuItem("Create 2D Lighting"))
+                {
+                    var newObj = new GameObject($"Lighting{scene.objects.Count}");
+                    newObj.AddComponent<Transform>();
+                    newObj.AddComponent<Lighting2D>();
+                    scene.objects.Add(newObj);
+                }
                 ImGui.EndPopup();
             }
 

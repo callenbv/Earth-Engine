@@ -15,6 +15,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using Engine.Core;
 using Engine.Core.Game;
+using Editor.Windows.Inspector;
 
 namespace EarthEngineEditor.Windows
 {
@@ -329,7 +330,9 @@ namespace EarthEngineEditor.Windows
                 {
                     if (_awaitingDrop && _selectedItem.Type == AssetType.Prefab)
                     {
-                        GameObject.Instantiate(_selectedItem.Path, Input.mouseWorldPosition);
+                        GameObject obj = GameObject.Instantiate(_selectedItem.Path, Input.mouseWorldPosition);
+                        InspectableGameObject inspectableGameObject = new InspectableGameObject(obj);
+                        InspectorWindow.Instance.Inspect(inspectableGameObject);
                         _awaitingDrop = false;
                         _dragHandle?.Free();
                         _dragHandle = null;

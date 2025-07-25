@@ -31,7 +31,7 @@ namespace GameRuntime
         private string gameOptionsPath;
         public GameOptions gameOptions;
         public GraphicsDeviceManager graphicsManager;
-        private Lighting2D _lighting;
+        private Lighting _lighting;
         private RenderTarget2D _sceneRenderTarget;
         public ContentManager contentManager;
         private GraphicsDevice _graphicsDevice;
@@ -53,7 +53,7 @@ namespace GameRuntime
             Instance = this;
             game = game_;
             _graphicsDevice = game_.GraphicsDevice;
-            _lighting = new Lighting2D(_graphicsDevice, EngineContext.InternalWidth, EngineContext.InternalHeight);
+            _lighting = new Lighting(_graphicsDevice, EngineContext.InternalWidth, EngineContext.InternalHeight);
             _lastWidth = EngineContext.InternalWidth;
             _lastHeight = EngineContext.InternalHeight;
             _sceneRenderTarget = new RenderTarget2D(_graphicsDevice, EngineContext.InternalWidth, EngineContext.InternalHeight);
@@ -128,7 +128,7 @@ namespace GameRuntime
 
             if (scene != null)
             {
-                // Draw the tilemaps immediately
+                // Draw the tilemaps deferred
                 spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.Main.GetViewMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight));
                 TilemapManager.Render(spriteBatch);
                 spriteBatch.End();
@@ -163,7 +163,7 @@ namespace GameRuntime
             spriteBatch.End();
 
             // Draw lighting overlay (multiply blend) with same scaling
-            spriteBatch.Begin(SpriteSortMode.Immediate, Lighting2D.MultiplyBlend);
+            spriteBatch.Begin(SpriteSortMode.Immediate, Lighting.MultiplyBlend);
             spriteBatch.Draw(_lighting.GetLightmap(), new Vector2(offsetX, offsetY), null, Microsoft.Xna.Framework.Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
             spriteBatch.End();
 

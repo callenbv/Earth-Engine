@@ -117,6 +117,18 @@ namespace EarthEngineEditor
             editorOverlay.Update(gameTime);
             _windowManager?.UpdatePerformance(gameTime.ElapsedGameTime.TotalMilliseconds);
 
+            int newWidth = GraphicsDevice.Viewport.Width;
+            int newHeight = GraphicsDevice.Viewport.Height;
+
+            if (EngineContext.InternalWidth != newWidth || EngineContext.InternalHeight != newHeight)
+            {
+                EngineContext.InternalWidth = newWidth;
+                EngineContext.InternalHeight = newHeight;
+
+                Camera.Main.ViewportWidth = newWidth;
+                Camera.Main.ViewportHeight = newHeight;
+            }
+
             base.Update(gameTime);
         }
 

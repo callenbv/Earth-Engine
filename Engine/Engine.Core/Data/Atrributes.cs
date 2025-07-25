@@ -6,17 +6,17 @@
 /// <Summary>                
 /// -----------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Engine.Core.Data
 {
+    /// <summary>
+    /// Attribute to mark a property or field as editable in the editor.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
     public class HideInInspectorAttribute : Attribute { }
 
+    /// <summary>
+    /// Attribute to mark a class as a component category for organization in the editor.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
     public class ComponentCategoryAttribute : Attribute
     {
@@ -26,7 +26,28 @@ namespace Engine.Core.Data
             Category = category;
         }
     }
+
+    /// <summary>
+    /// Attribute to mark a method as editor-only, meaning it should not be called in the final build of the game.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
     public class EditorOnlyAttribute : Attribute { }
+
+    /// <summary>
+    /// Attribute to mark a property or field as editable in the editor with a slider.
+    /// </summary>
+
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+    public class SliderEditorAttribute : Attribute
+    {
+        public float Min { get; }
+        public float Max { get; }
+
+        public SliderEditorAttribute(float min = 0f, float max = 1f)
+        {
+            Min = min;
+            Max = max;
+        }
+    }
 }
 

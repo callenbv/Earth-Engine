@@ -6,10 +6,13 @@
 /// <Summary>                
 /// -----------------------------------------------------------------------------
 
+using Engine.Core.CustomMath;
 using Engine.Core.Data;
 using Engine.Core.Game.Components;
+using Engine.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Text.Json.Serialization;
 
 namespace Engine.Core.Game
 {
@@ -26,12 +29,18 @@ namespace Engine.Core.Game
         /// <summary>
         /// The radius of the light in pixels. This determines how far the light will reach.
         /// </summary>
+        [SliderEditor(0f, 1000f)]
         public float lightRadius { get; set; } = 64f;
+        [HideInInspector]
+        public float finalRadius { get; set; } = 1f;
 
         /// <summary>
         /// The intensity of the light. This determines how bright the light will be.
         /// </summary>
+        [SliderEditor(0f, 2f)]
         public float lightIntensity { get; set; } = 1f;
+        [HideInInspector]
+        public float finalIntensity { get; set; } = 1f;
 
         /// <summary>
         /// The color of the light. This determines the color of the light emitted by the point light.
@@ -44,6 +53,26 @@ namespace Engine.Core.Game
         public Vector2 Offset { get; set; } = Vector2.Zero;
 
         /// <summary>
+        /// The intensity of the flicker effect. This determines how much the light's intensity will vary when flickering is enabled.
+        /// </summary>
+        [SliderEditor(0f, 20f)]
+        public float FlickerIntensity { get; set; } = 0f;
+
+        /// <summary>
+        /// The granularity of the light effect. This controls how blocky the light appears, with higher values resulting in smoother transitions.
+        /// </summary>
+        private int Granularity
+        {
+            get => granularity_;
+            set 
+            {
+                granularity_ = Lighting.Instance.Granularity;
+                Initialize();
+            }
+        }
+        private int granularity_ = 10;
+
+        /// <summary>
         /// Initializes the point light component, creating a soft circle texture for the light effect.
         /// </summary>
         public override void Initialize()
@@ -52,17 +81,25 @@ namespace Engine.Core.Game
             Color[] data = new Color[diameter * diameter];
 
             float r = diameter / 2f;
+
+            int steps = granularity_;
+
             for (int y = 0; y < diameter; y++)
             {
                 for (int x = 0; x < diameter; x++)
                 {
                     float dx = x - r + 0.5f;
                     float dy = y - r + 0.5f;
-                    float dist = (float)System.Math.Sqrt(dx * dx + dy * dy) / r;
-                    float alpha = 1f - MathHelper.Clamp(dist, 0f, 1f);
-                    data[y * diameter + x] = new Color(1f, 1f, 1f, alpha * alpha); // Soft falloff
+                    float dist = (float)Math.Sqrt(dx * dx + dy * dy) / r;
+
+                    // Snap to blocky levels
+                    float stepped = (float)Math.Floor(dist * steps) / steps;
+                    float alpha = 1f - MathHelper.Clamp(stepped, 0f, 1f);
+
+                    data[y * diameter + x] = new Color(1f, 1f, 1f, alpha * alpha);
                 }
             }
+
             softCircleTexture.SetData(data);
         }
 
@@ -89,20 +126,38 @@ namespace Engine.Core.Game
         }
 
         /// <summary>
+        /// Updates the point light component. This can be used to update the light's properties or behavior, such as flickering.
+        /// </summary>
+        /// <param name="gameTime"></param>
+        public override void Update(GameTime gameTime)
+        {
+            // Apply flicker effect if enabled
+            float flickerIntensity = FlickerIntensity * Lighting.Instance.Wind;
+            finalRadius = lightRadius+MathF.Sin(gameTime.TotalGameTime.Milliseconds/100f) * flickerIntensity;
+            finalIntensity = lightIntensity;
+
+            // Apply granularity
+            if (granularity_ != Lighting.Instance.Granularity)
+            {
+                Granularity = Lighting.Instance.Granularity;
+            }
+        }
+
+        /// <summary>
         /// Draws the point light to the screen using a soft circle texture.
         /// </summary>
         /// <param name="spriteBatch"></param>
         public void DrawLight(SpriteBatch spriteBatch)
         {
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.PointClamp, null, null, null, Camera.Main.GetViewMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight));
+            spriteBatch.Begin(SpriteSortMode.Immediate, Lighting.AlphaAdditiveBlend, SamplerState.PointClamp, null, null, null, Camera.Main.GetViewMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight));
             spriteBatch.Draw(
                 softCircleTexture,
                 Position + Offset,
                 null,
-                lightColor * lightIntensity,
+                lightColor * finalIntensity,
                 0f,
                 new Vector2(diameter / 2, diameter / 2),
-                lightRadius/ diameter,
+                finalRadius / diameter,
                 SpriteEffects.None,
                 0f);
             spriteBatch.End();

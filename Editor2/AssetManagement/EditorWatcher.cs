@@ -52,7 +52,7 @@ namespace Editor.AssetManagement
 
                     switch (ext)
                     {
-                        case ".dll":
+                        case ".cs":
                             OnScriptDllChanged(sender, e);
                             break;
 

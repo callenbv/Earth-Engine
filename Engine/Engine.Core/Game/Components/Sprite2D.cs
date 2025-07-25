@@ -73,6 +73,7 @@ namespace Engine.Core.Game.Components
         /// <summary>
         /// The speed at which the frames are animated. Higher values result in faster animations.
         /// </summary>
+        [SliderEditor(0f, 60f)]
         public int frameSpeed { get; set; } = 1;
 
         /// <summary>

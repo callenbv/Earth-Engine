@@ -176,11 +176,13 @@ namespace Editor.AssetManagement
             if (memberInfo.GetCustomAttribute<HideInInspectorAttribute>() != null)
                 return;
 
+            var sliderAttr = memberInfo.GetCustomAttribute<SliderEditorAttribute>();
+
             // Start two-column layout
             ImGui.Columns(2, null, false);
 
             // Measure label width and pad it slightly
-            float minLabelWidth = 100f;
+            float minLabelWidth = 140f;
             float labelWidth = Math.Max(minLabelWidth, ImGui.CalcTextSize(name).X + 20f);
             ImGui.SetColumnWidth(0, labelWidth);
 
@@ -199,14 +201,30 @@ namespace Editor.AssetManagement
             if (value is int i)
             {
                 int v = i;
-                if (ImGui.InputInt($"##{name}", ref v))
-                    setValue(v);
+                if (sliderAttr != null)
+                {
+                    if (ImGui.SliderInt($"##{name}", ref v, (int)sliderAttr.Min, (int)sliderAttr.Max))
+                        setValue(v);
+                }
+                else
+                {
+                    if (ImGui.InputInt($"##{name}", ref v))
+                        setValue(v);
+                }
             }
             else if (value is float f)
             {
                 float v = f;
-                if (ImGui.InputFloat($"##{name}", ref v))
-                    setValue(v);
+                if (sliderAttr != null)
+                {
+                    if (ImGui.SliderFloat($"##{name}", ref v, sliderAttr.Min, sliderAttr.Max))
+                        setValue(v);
+                }
+                else
+                {
+                    if (ImGui.InputFloat($"##{name}", ref v))
+                        setValue(v);
+                }
             }
             else if (value is bool b)
             {

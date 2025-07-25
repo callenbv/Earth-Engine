@@ -248,7 +248,7 @@ namespace Editor.Windows.TileEditor
             int centerY = (int)((mousePos.Y - offy) / tileSize);
 
             int halfBrush = BrushSize / 2;
-            Microsoft.Xna.Framework.Color col = Microsoft.Xna.Framework.Color.FromNonPremultiplied(0, 255, 0, 100);
+            Microsoft.Xna.Framework.Color col = Microsoft.Xna.Framework.Color.FromNonPremultiplied(255, 255, 255, 100);
             for (int dy = -halfBrush; dy <= halfBrush; dy++)
             {
                 for (int dx = -halfBrush; dx <= halfBrush; dx++)

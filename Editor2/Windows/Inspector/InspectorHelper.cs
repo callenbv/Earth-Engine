@@ -63,6 +63,7 @@ namespace Editor.Windows.Inspector
                         if (comp is ObjectComponent objectComponent)
                         {
                             objectComponent.Owner?.components.Remove(objectComponent);
+                            break;
                         }
                     }
                 }

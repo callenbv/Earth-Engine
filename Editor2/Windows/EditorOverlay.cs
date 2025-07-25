@@ -82,7 +82,7 @@ namespace Editor.Windows
         /// <param name="spriteBatch"></param>
         public void DrawEnd(SpriteBatch spriteBatch)
         {
-            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.NonPremultiplied, SamplerState.PointClamp, null, null, null, Camera.Main.GetViewMatrix(Camera.Main.ViewportWidth, Camera.Main.ViewportHeight));
+            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.NonPremultiplied, SamplerState.PointClamp, null, null, null, Camera.Main.GetViewMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight));
             DrawGrid(spriteBatch);
             spriteBatch.End();
         }
@@ -98,22 +98,22 @@ namespace Editor.Windows
                 gridSize = SceneViewWindow.gridSize;
                 Microsoft.Xna.Framework.Color gridColor = new Microsoft.Xna.Framework.Color(255, 255, 255, 50);
                 float zoom = Camera.Main.Zoom;
-                Vector2 camPos = Vector2.Zero;
+                Vector2 camPos = Camera.Main.Position; // Use the actual camera position
 
-                // Get screen size in world units
                 float viewWidth = Camera.Main.ViewportWidth / zoom;
                 float viewHeight = Camera.Main.ViewportHeight / zoom;
 
-                float worldLeft = camPos.X-viewWidth;
-                float worldTop = camPos.Y-viewHeight;
-                float worldRight = camPos.X + viewWidth;
-                float worldBottom = camPos.Y + viewHeight;
-
+                float worldLeft = camPos.X - viewWidth / 2f;
+                float worldRight = camPos.X + viewWidth / 2f;
+                float worldTop = camPos.Y - viewHeight / 2f;
+                float worldBottom = camPos.Y + viewHeight / 2f;
+    
                 // Clamp to nearest grid lines
                 int startX = (int)Math.Floor(worldLeft / gridSize) * gridSize;
                 int endX = (int)Math.Ceiling(worldRight / gridSize) * gridSize;
                 int startY = (int)Math.Floor(worldTop / gridSize) * gridSize;
                 int endY = (int)Math.Ceiling(worldBottom / gridSize) * gridSize;
+                Vector2 origin = Vector2.Zero;
 
                 // Vertical lines
                 for (int x = startX; x <= endX; x += gridSize)
@@ -124,7 +124,7 @@ namespace Editor.Windows
                         null,
                         gridColor,
                         0f,
-                        Vector2.Zero,
+                        origin,
                         SpriteEffects.None,
                         0f
                     );
@@ -139,7 +139,7 @@ namespace Editor.Windows
                         null,
                         gridColor,
                         0f,
-                        Vector2.Zero,
+                        origin,
                         SpriteEffects.None,
                         0f
                     );
