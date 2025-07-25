@@ -127,9 +127,11 @@ namespace EarthEngineEditor.Windows
             foreach (var filePath in Directory.GetFiles(sourceDir, "*.*", SearchOption.AllDirectories))
             {
                 string destPath = filePath.Replace(sourceDir, destinationDir);
+                Directory.CreateDirectory(Path.GetDirectoryName(destPath));
                 File.Copy(filePath, destPath, overwrite: true);
             }
         }
+
 
         /// <summary>
         /// Render the top menu bar (file, etc.)
@@ -324,12 +326,18 @@ namespace EarthEngineEditor.Windows
                                 string exportAssets = Path.Combine(exportPath, "Assets");
                                 CopyDirectory(ProjectSettings.AssetsDirectory, exportAssets);
 
+                                // Tilemaps
+                                string exportTilemap = Path.Combine(exportPath, "Tilemaps");
+                                string tilemapDir = Path.Combine(ProjectSettings.ProjectDirectory, "Tilemaps");
+                                CopyDirectory(tilemapDir, exportTilemap);
+
                                 // Game Options
                                 string optionsFileDest = Path.Combine(exportPath, Path.GetFileName(project.optionsPath));
                                 File.Copy(project.optionsPath, optionsFileDest, overwrite: true);
 
                                 // Compiled DLLs (Build Folder)
                                 CopyDirectory(ProjectSettings.BuildPath, Path.Combine(exportPath, "Build"));
+
 
                                 // Success
                                 Console.WriteLine("[Export] Copied data to build output.");
