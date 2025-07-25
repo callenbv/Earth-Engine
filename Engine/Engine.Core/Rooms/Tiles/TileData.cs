@@ -8,15 +8,21 @@
 
 using Engine.Core.Game.Components;
 using Engine.Core.Graphics;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
 using System.Numerics;
 
 namespace Engine.Core.Rooms.Tiles
 {
+    /// <summary>
+    /// Utility class for converting between jagged arrays and 2D arrays for tile data.
+    /// </summary>
     public static class TileArrayUtils
     {
+        /// <summary>
+        /// Converts a 2D array to a jagged array.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="array"></param>
+        /// <returns></returns>
         public static T[][] ToJagged<T>(T[,] array)
         {
             int width = array.GetLength(0);
@@ -32,6 +38,12 @@ namespace Engine.Core.Rooms.Tiles
             return jagged;
         }
 
+        /// <summary>
+        /// Converts a jagged array to a 2D array.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="jagged"></param>
+        /// <returns></returns>
         public static T[,] To2D<T>(T[][] jagged)
         {
             int width = jagged.Length;
@@ -62,13 +74,24 @@ namespace Engine.Core.Rooms.Tiles
         public int[][] HeightMap { get; set; }
     }
 
+    /// <summary>
+    /// Serializable data for a tilemap, containing multiple layers.
+    /// </summary>
     public class TilemapSaveData
     {
         public List<TilemapLayerData> Layers { get; set; } = new();
     }
 
+    /// <summary>
+    /// Extensions for TilemapRenderer to convert to and from TilemapLayerData.
+    /// </summary>
     public static class TilemapRendererExtensions
     {
+        /// <summary>
+        /// Converts the TilemapRenderer to TilemapLayerData, extracting its properties and tiles.
+        /// </summary>
+        /// <param name="renderer"></param>
+        /// <returns></returns>
         public static TilemapLayerData ToData(this TilemapRenderer renderer)
         {
             int w = renderer.Width;
@@ -110,6 +133,11 @@ namespace Engine.Core.Rooms.Tiles
             };
         }
 
+        /// <summary>
+        /// Applies the given TilemapLayerData to the TilemapRenderer, updating its properties and tiles.
+        /// </summary>
+        /// <param name="renderer"></param>
+        /// <param name="data"></param>
         public static void ApplyData(this TilemapRenderer renderer, TilemapLayerData data)
         {
             renderer.Title = data.Title;

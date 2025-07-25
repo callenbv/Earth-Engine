@@ -290,6 +290,14 @@ namespace EarthEngineEditor.Windows
                     }
                 }
 
+                // Right-click select
+                if (ImGui.IsItemHovered() && ImGui.IsMouseClicked(ImGuiMouseButton.Right))
+                {
+                    _selectedItem = item;
+                    InspectorWindow.Instance.Inspect(item);
+                }
+
+                // Left-click inspect
                 if (ImGui.IsItemHovered() && ImGui.IsMouseClicked(0))
                 {
                     if (item.Folder)
