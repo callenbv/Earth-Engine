@@ -73,7 +73,7 @@ namespace Editor.Windows.TileEditor
             if (ImGui.Button("Add Layer"))
             {
                 // Create a new layer with default values
-                var newLayer = new TilemapRenderer(100, 100, "CoraglowCityTileset");
+                var newLayer = new TilemapRenderer(100, 100, "");
                 newLayer.Title = $"Layer {TilemapManager.layers.Count + 1}";
                 TilemapManager.layers.Add(newLayer);
             }

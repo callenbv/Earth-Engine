@@ -85,7 +85,10 @@ namespace Engine.Core.Rooms.Tiles
                     var tile = renderer.Tiles[x, y];
 
                     if (tile == null)
+                    {
+                        indices[x, y] = -1;
                         continue;
+                    }
 
                     indices[x, y] = tile.TileIndex;
                     solid[x, y] = tile.IsCollidable;
@@ -126,6 +129,11 @@ namespace Engine.Core.Rooms.Tiles
             {
                 for (int y = 0; y < renderer.Height; y++)
                 {
+                    if (indices[x, y] < 0)
+                    {
+                        continue;
+                    }
+
                     renderer.Tiles[x, y] = new Tile
                     {
                         TileIndex = indices[x, y],

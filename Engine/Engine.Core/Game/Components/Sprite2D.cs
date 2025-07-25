@@ -10,9 +10,6 @@ using Engine.Core.Data;
 using Engine.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended.Graphics;
-using System;
-using System.ComponentModel;
 using System.Text.Json.Serialization;
 
 namespace Engine.Core.Game.Components
@@ -40,7 +37,7 @@ namespace Engine.Core.Game.Components
                 {
                     texturePath = _texture.Name;
                     frameHeight = _texture.Height;
-                    frameWidth = _texture.Width;
+                    frameWidth = _texture.Width/frameCount;
                     spriteBox = new Rectangle(0, 0, frameWidth, frameHeight);
                 }
             }
