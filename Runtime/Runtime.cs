@@ -75,12 +75,12 @@ namespace GameRuntime
             // Load the compiled scripts
             ScriptCompiler.LoadScripts();
 
+            // Set up and load audio
+            audioManager.Initialize();
+
             // Load our default scene
             runtimeManager.scene = Room.Load(gameOptions.LastScene);
             runtimeManager.scene.Initialize();
-
-            // Set up and load audio
-            audioManager.Initialize();
 
             // Load static tilemaps
             TilemapManager.Load(Path.Combine(EnginePaths.ProjectBase, "Tilemaps", "tilemaps.json"));

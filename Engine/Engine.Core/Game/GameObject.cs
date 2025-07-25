@@ -134,7 +134,7 @@ namespace Engine.Core.Game
             };
 
             components.Add(component);
-            component.Create();
+            component.Initialize();
             Console.WriteLine($"Added component {component.Name}");
 
             return component;
@@ -148,7 +148,7 @@ namespace Engine.Core.Game
         {
             ((ObjectComponent)component).Owner = this;
             components.Add(component);
-            component.Create();
+            component.Initialize();
             Console.WriteLine($"Added component {component.Name}");
         }
 
@@ -176,7 +176,7 @@ namespace Engine.Core.Game
 
             component.Owner = this;
             components.Add(component);
-            component.Create();
+            component.Initialize();
         }
 
         /// <summary>

@@ -138,6 +138,7 @@ namespace Engine.Core.Rooms
             {
                 foreach (var component in obj.components)
                 {
+                    Console.WriteLine($"Initializing component {component.Name} on object {obj.Name}");
                     component.Create();
                 }
             }

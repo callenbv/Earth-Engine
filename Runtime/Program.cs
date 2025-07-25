@@ -32,9 +32,6 @@ namespace GameRuntime
                 }
             }
 
-            projectPath ??= AppContext.BaseDirectory;
-            Console.WriteLine($"Project root set to {projectPath}");
-
 #if DEBUG
             if (projectPath == null)
             {
@@ -42,6 +39,9 @@ namespace GameRuntime
                 projectPath = Console.ReadLine()?.Trim('"');
             }
 #endif
+            projectPath ??= AppContext.BaseDirectory;
+            Console.WriteLine($"Project root set to {projectPath}");
+
             // We defaut to our current directory, which should be the case for release builds
             if (projectPath == null)
             {

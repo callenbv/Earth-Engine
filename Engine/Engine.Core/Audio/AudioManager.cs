@@ -82,6 +82,7 @@ namespace Engine.Core.Audio
                 }
 
                 GameSound gameSound = new GameSound(fileName, sound, audioType);
+                Console.WriteLine($"[AUDIO] Loaded sound: {fileName} (Type: {audioType})");
                 Sounds[fileName] = gameSound;
             }
         }

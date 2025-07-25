@@ -383,7 +383,8 @@ namespace EarthEngineEditor.Windows
                 {
                     if (!string.IsNullOrWhiteSpace(_newFolderName))
                     {
-                        var folderPath = Path.Combine(_currentFolder, _newFolderName);
+                        string currentFolder = Path.Combine(ProjectSettings.AssetsDirectory, _currentFolder);
+                        var folderPath = Path.Combine(currentFolder, _newFolderName);
                         Console.WriteLine($"Creating folder: {folderPath}");
                         if (!Directory.Exists(folderPath))
                         {

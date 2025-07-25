@@ -39,7 +39,6 @@ namespace Engine.Core.Audio
         public static void Play(string sound, bool loop = false)
         {
             GameSound? soundObject = AudioManager.Instance.Sounds.TryGetValue(sound, out var gameSound) ? gameSound : null;
-
             if (soundObject != null)
             {
                 soundObject.Loop = loop;
