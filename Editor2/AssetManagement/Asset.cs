@@ -27,6 +27,7 @@ namespace Editor.AssetManagement
         public string Path = string.Empty;
         public bool Folder = false;
         private IAssetHandler? _handler;
+        public string FileIcon = "\uf15b";
         private DateTime _lastModified;
 
         /// <summary>
@@ -94,6 +95,26 @@ namespace Editor.AssetManagement
             {
                 Console.WriteLine($"[ERROR] {ex.Message}");
             }
+        }
+
+        /// <summary>
+        /// Gets the icon for the given asset type.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static string GetIconForType(AssetType type)
+        {
+            return type switch
+            {
+                AssetType.Texture => "\uf1c5", // Image file icon
+                AssetType.Scene => "\uf279", // Project diagram / sitemap
+                AssetType.Script => "\uf1c9", // Code file
+                AssetType.Data => "\uf1c0", // Database / data
+                AssetType.Audio => "\uf001", // Music note
+                AssetType.Prefab => "\uf1b2", // Cube / 3D object
+                AssetType.Unknown => "\uf15b", // Generic file
+                _ => "\uf15b", // Fallback
+            };
         }
 
         /// <summary>

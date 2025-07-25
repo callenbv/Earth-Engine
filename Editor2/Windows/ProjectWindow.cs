@@ -204,7 +204,7 @@ namespace EarthEngineEditor.Windows
                 ImGui.SetCursorScreenPos(contentStartPos);
 
                 // Icon
-                string icon = item.Folder ? "\uf07b" : "\uf15b";
+                string icon = item.Folder ? "\uf07b" : item.FileIcon;
                 Vector2 iconSizeVec = ImGui.CalcTextSize(icon);
                 ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (itemWidth - iconSizeVec.X) * 0.5f);
                 ImGui.Text(icon);
@@ -483,7 +483,7 @@ namespace EarthEngineEditor.Windows
                     {
                         Name = folderName,
                         Path = relPath, // store relative path
-                        Folder = true
+                        Folder = true,
                     });
                 }
 
@@ -519,12 +519,14 @@ namespace EarthEngineEditor.Windows
 
                 if (!allAssets.Any(a => a.Path == relPath))
                 {
+                    AssetType type = Asset.GetAssetTypeFromExtension(fileName);
                     allAssets.Add(new Asset
                     {
                         Name = fileName,
                         Path = relPath,
                         Folder = false,
-                        Type = Asset.GetAssetTypeFromExtension(fileName)
+                        Type = type,
+                        FileIcon = Asset.GetIconForType(type)
                     });
                 }
             }
