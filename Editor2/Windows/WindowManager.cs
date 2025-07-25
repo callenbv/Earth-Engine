@@ -12,7 +12,6 @@ using Engine.Core;
 using Engine.Core.Data;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using System.Diagnostics;
 using System.IO;
 
@@ -27,7 +26,7 @@ namespace EarthEngineEditor.Windows
         private readonly PerformanceWindow _performance;
         private readonly ConsoleWindow _console;
         private readonly ToolbarWindow toolbar;
-        private readonly TileEditorWindow tileEditor;
+        public TileEditorWindow tileEditor;
         private EarthProject project;
         private EditorApp game;
         public List<string> recentProjects = new List<string>();

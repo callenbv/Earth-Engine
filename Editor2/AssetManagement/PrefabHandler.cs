@@ -169,7 +169,8 @@ namespace Editor.AssetManagement
             ImGui.Columns(2, null, false);
 
             // Measure label width and pad it slightly
-            float labelWidth = ImGui.CalcTextSize(name).X + ImGui.GetStyle().ItemSpacing.X * 2;
+            float minLabelWidth = 100f;
+            float labelWidth = Math.Max(minLabelWidth, ImGui.CalcTextSize(name).X + 20f);
             ImGui.SetColumnWidth(0, labelWidth);
 
             // Draw label, vertically aligned

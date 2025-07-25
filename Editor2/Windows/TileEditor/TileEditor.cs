@@ -7,10 +7,15 @@
 /// -----------------------------------------------------------------------------
 
 using EarthEngineEditor;
+using EarthEngineEditor.Windows;
+using Editor.AssetManagement;
 using Engine.Core;
+using Engine.Core.CustomMath;
 using Engine.Core.Game.Components;
 using ImGuiNET;
+using Microsoft.Xna.Framework.Graphics;
 using System.Numerics;
+using System.Reflection;
 
 namespace Editor.Windows.TileEditor
 {
@@ -62,8 +67,21 @@ namespace Editor.Windows.TileEditor
                         selectedLayer = layer; // Set the selected layer for painting
                         ImGui.SliderInt("Width", ref layer.Width, 50,200);
                         ImGui.SliderInt("Height", ref layer.Height, 50,200);
+                        if (ImGui.SliderInt("Grid Size", ref SceneViewWindow.gridSize, 4, 64))
+                        {
+                            SceneViewWindow.gridSize = (int)Rounding.RoundToNearest(SceneViewWindow.gridSize, 4);
+                        }
                         ImGui.InputFloat2("Offset", ref layer.Offset);
                         ImGui.InputFloat("Depth", ref layer.Depth);
+                        var member = typeof(TilemapRenderer).GetMember("Texture", BindingFlags.Public | BindingFlags.Instance).FirstOrDefault();
+                        PrefabHandler.DrawField(
+                            "Texture",
+                            layer.Texture,
+                            typeof(Texture2D),
+                            newVal => layer.Texture = (Texture2D)newVal,
+                            member
+                        );
+
                         ImGui.TreePop();
                     }
                 }
@@ -115,6 +133,7 @@ namespace Editor.Windows.TileEditor
                     if (selectedLayer.TexturePtr == IntPtr.Zero)
                         selectedLayer.TexturePtr = ImGuiRenderer.Instance.BindTexture(selectedLayer.Texture);
 
+                    // Preview in editor
                     ImGui.Image(selectedLayer.TexturePtr, imageSize);
 
                     // Draw overlay grid of invisible buttons
@@ -152,9 +171,13 @@ namespace Editor.Windows.TileEditor
                 // Now paint with the selected tile index
                 if (!ImGui.GetIO().WantCaptureMouse && EditorApp.Instance.gameFocused)
                 {
-                    var mousePos = Input.mouseWorldPosition;
-                    int tileX = (int)((mousePos.X - selectedLayer.Offset.X) / selectedLayer.TileSize);
-                    int tileY = (int)((mousePos.Y - selectedLayer.Offset.Y) / selectedLayer.TileSize);
+                    int offx = (int)selectedLayer.Offset.X;
+                    int offy = (int)selectedLayer.Offset.Y;
+                    int gridSize = selectedLayer.TileSize;
+
+                    Microsoft.Xna.Framework.Vector2 mousePos = Input.mouseWorldPosition;
+                    int tileX = (int)((mousePos.X - offx) / gridSize);
+                    int tileY = (int)((mousePos.Y - offy) / gridSize);
 
                     if (Input.IsMouseDown())
                     {
@@ -164,8 +187,8 @@ namespace Editor.Windows.TileEditor
                             {
                                 for (int dy = -BrushSize / 2; dy <= BrushSize / 2; dy++)
                                 {
-                                    int px = tileX + dx;
-                                    int py = tileY + dy;
+                                    int px = (tileX) + dx;
+                                    int py = (tileY) + dy;
 
                                     if (px >= 0 && px < selectedLayer.Width &&
                                         py >= 0 && py < selectedLayer.Height)
@@ -189,6 +212,62 @@ namespace Editor.Windows.TileEditor
 
             ImGui.End();
         }
+
+        /// <summary>
+        /// Draws a preview of the world in the tile editor, showing the current tilemap layers and their tiles.
+        /// </summary>
+        /// <param name="spriteBatch"></param>
+        public void DrawWorldPreview(SpriteBatch spriteBatch)
+        {
+            if (selectedLayer == null || EditorApp.Instance.selectionMode != EditorSelectionMode.Tile || selectedTileIndex < 0) return;
+
+            spriteBatch.Begin(
+                SpriteSortMode.Immediate,
+                BlendState.AlphaBlend,
+                SamplerState.PointClamp,
+                null, null, null,
+                Camera.Main.GetViewMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight)
+            );
+
+            int tileSize = selectedLayer.TileSize;
+            int tilesPerRow = selectedLayer.Texture.Width / tileSize;
+
+            if (tilesPerRow <= 0)
+                tilesPerRow = 1;
+
+            int tileIndex = selectedTileIndex;
+            int srcX = tileIndex % tilesPerRow;
+            int srcY = tileIndex / tilesPerRow;
+            Microsoft.Xna.Framework.Rectangle sourceRect = new Microsoft.Xna.Framework.Rectangle(srcX * tileSize, srcY * tileSize, tileSize, tileSize);
+
+            int offx = (int)selectedLayer.Offset.X;
+            int offy = (int)selectedLayer.Offset.Y;
+
+            Microsoft.Xna.Framework.Vector2 mousePos = Input.mouseWorldPosition;
+            int centerX = (int)((mousePos.X - offx) / tileSize);
+            int centerY = (int)((mousePos.Y - offy) / tileSize);
+
+            int halfBrush = BrushSize / 2;
+            Microsoft.Xna.Framework.Color col = Microsoft.Xna.Framework.Color.FromNonPremultiplied(0, 255, 0, 100);
+            for (int dy = -halfBrush; dy <= halfBrush; dy++)
+            {
+                for (int dx = -halfBrush; dx <= halfBrush; dx++)
+                {
+                    int tileX = (centerX + dx) * tileSize + offx;
+                    int tileY = (centerY + dy) * tileSize + offy;
+
+                    spriteBatch.Draw(
+                        selectedLayer.Texture,
+                        new Vector2(tileX, tileY),
+                        sourceRect,
+                        col
+                    );
+                }
+            }
+
+            spriteBatch.End();
+        }
+
 
         /// <summary>
         /// Draws a circular selectable button with an icon/text inside it.

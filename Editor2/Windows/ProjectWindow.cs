@@ -33,10 +33,6 @@ namespace EarthEngineEditor.Windows
         private bool _showCreateFolderDialog = false;
         private string _newFolderName = "New Folder";
 
-        // Asset import dialog
-        private bool _showImportAssetDialog = false;
-        private string _importAssetPath = "";
-
         // Asset creation dialog
         private bool _showNewAssetDialog = false;
         private string _newAssetName = string.Empty;
@@ -52,6 +48,61 @@ namespace EarthEngineEditor.Windows
         public ProjectWindow()
         {
             Instance = this;
+        }
+
+        /// <summary>
+        /// Imports a file into the project, copying it to the Assets directory and registering it as an asset.
+        /// </summary>
+        /// <param name="fullFilePath"></param>
+        public void TryImportFile(string fullFilePath)
+        {
+            if (!File.Exists(fullFilePath))
+            {
+                Console.WriteLine($"[IMPORT] File does not exist: {fullFilePath}");
+                return;
+            }
+
+            string extension = Path.GetExtension(fullFilePath).ToLowerInvariant();
+            AssetType type = Asset.GetAssetTypeFromExtension(fullFilePath);
+
+            if (type == AssetType.Unknown)
+            {
+                Console.WriteLine($"[IMPORT] Unsupported file type: {extension}");
+                return;
+            }
+
+            string fileName = Path.GetFileName(fullFilePath);
+
+            // Destination path inside the Assets folder (preserve current folder)
+            string relTargetPath = Path.Combine(_currentFolder ?? "", fileName);
+            string absTargetPath = Path.Combine(ProjectSettings.AssetsDirectory, relTargetPath);
+
+            // Create target directory if needed
+            Directory.CreateDirectory(Path.GetDirectoryName(absTargetPath)!);
+
+            try
+            {
+                File.Copy(fullFilePath, absTargetPath, overwrite: true);
+
+                Console.WriteLine($"[IMPORT] Imported {fileName} to project folder: {relTargetPath}");
+
+                // Register as an asset
+                var asset = new Asset
+                {
+                    Name = Path.GetFileNameWithoutExtension(fileName),
+                    Path = ProjectSettings.NormalizePath(relTargetPath),
+                    Type = type,
+                    FileIcon = Asset.GetIconForType(type),
+                    Folder = false
+                };
+
+                allAssets.Add(asset);
+                RefreshItems();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[IMPORT] Failed to import file: {ex.Message}");
+            }
         }
 
         /// <summary>
@@ -109,10 +160,6 @@ namespace EarthEngineEditor.Windows
             // Folder creation dialog
             if (_showCreateFolderDialog)
                 RenderCreateFolderDialog();
-
-            // Asset import dialog
-            if (_showImportAssetDialog)
-                RenderImportAssetDialog();
 
             if (_showNewAssetDialog)
                 RenderNewAssetDialog();
@@ -277,9 +324,10 @@ namespace EarthEngineEditor.Windows
                     }
                 }
 
+                // Drag files into scene
                 if (!ImGui.GetIO().WantCaptureMouse && Input.IsMouseReleased())
                 {
-                    if (_awaitingDrop)
+                    if (_awaitingDrop && _selectedItem.Type == AssetType.Prefab)
                     {
                         GameObject.Instantiate(_selectedItem.Path, Input.mouseWorldPosition);
                         _awaitingDrop = false;
@@ -288,6 +336,51 @@ namespace EarthEngineEditor.Windows
                         _dragData = null;
                         Console.WriteLine("[DEBUG] Dropped payload");
                     }
+                }
+
+                // Move file
+                Vector2 min = ImGui.GetItemRectMin();
+                Vector2 max = ImGui.GetItemRectMax();
+
+                if (ImGui.IsMouseHoveringRect(min, max) && Input.IsMouseReleased() && _awaitingDrop)
+                {
+                    string targetFolderRel = item.Path;
+                    string sourceRel = _selectedItem.Path;
+
+                    if (_selectedItem.Folder || targetFolderRel == GetParentPath(sourceRel))
+                    {
+                        // Ignore moving folders or moving into current folder
+                        _awaitingDrop = false;
+                        return;
+                    }
+
+                    string sourceAbs = Path.Combine(ProjectSettings.AssetsDirectory, sourceRel);
+                    string fileName = Path.GetFileName(sourceRel);
+                    string newRelPath = Path.Combine(targetFolderRel, fileName);
+                    string newAbsPath = Path.Combine(ProjectSettings.AssetsDirectory, newRelPath);
+
+                    // Make sure target folder exists
+                    Directory.CreateDirectory(Path.GetDirectoryName(newAbsPath)!);
+
+                    try
+                    {
+                        File.Move(sourceAbs, newAbsPath, overwrite: true);
+                        Console.WriteLine($"[MOVE] {sourceRel} → {newRelPath}");
+
+                        _selectedItem.Path = ProjectSettings.NormalizePath(newRelPath);
+                        _selectedItem.Folder = false;
+                        RefreshItems();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[ERROR] Failed to move: {ex.Message}");
+                    }
+
+                    _awaitingDrop = false;
+                    _dragHandle?.Free();
+                    _dragHandle = null;
+                    _dragData = null;
+                    break;
                 }
 
                 // Right-click select
@@ -354,8 +447,27 @@ namespace EarthEngineEditor.Windows
                 }
                 if (ImGui.MenuItem("Import Asset"))
                 {
-                    _showImportAssetDialog = true;
-                    _importAssetPath = "";
+                    using var dialog = new OpenFileDialog();
+                    dialog.Title = "Select Assets to Import";
+                    dialog.Filter = "All Files (*.*)|*.*";
+                    dialog.Multiselect = true;
+
+                    if (dialog.ShowDialog() == DialogResult.OK)
+                    {
+                        string currentFolder = Path.Combine(ProjectSettings.AssetsDirectory, _currentFolder);
+
+                        foreach (string selectedPath in dialog.FileNames)
+                        {
+                            if (File.Exists(selectedPath))
+                            {
+                                string destPath = Path.Combine(currentFolder, Path.GetFileName(selectedPath));
+                                File.Copy(selectedPath, destPath, overwrite: true);
+                                Console.WriteLine($"[Import] Imported: {destPath}");
+                            }
+                        }
+
+                        RefreshItems();
+                    }
                 }
                 if (_selectedItem != null)
                 {
@@ -367,7 +479,16 @@ namespace EarthEngineEditor.Windows
                     if (ImGui.MenuItem("Delete"))
                     {
                         string path = Path.Combine(ProjectSettings.AssetsDirectory, _selectedItem.Path);
-                        _selectedItem.Delete(path);
+
+                        if (Directory.Exists(path))
+                        {
+                            Directory.Delete(path);
+                        }
+                        else
+                        {
+                            _selectedItem.Delete(path);
+                        }
+
                         _selectedItem = null;
                         RefreshItems();
                     }
@@ -422,34 +543,6 @@ namespace EarthEngineEditor.Windows
             }
         }
 
-        /// <summary>
-        /// Renders the dialog for importing an asset into the project.
-        /// </summary>
-        private void RenderImportAssetDialog()
-        {
-            ImGui.OpenPopup("Import Asset");
-            if (ImGui.BeginPopupModal("Import Asset", ref _showImportAssetDialog, ImGuiWindowFlags.AlwaysAutoResize))
-            {
-                ImGui.InputText("##ImportAssetPath", ref _importAssetPath, 256);
-                ImGui.Spacing();
-                if (ImGui.Button("Import", new Vector2(120, 0)))
-                {
-                    if (File.Exists(_importAssetPath))
-                    {
-                        var destPath = Path.Combine(_currentFolder, Path.GetFileName(_importAssetPath));
-                        File.Copy(_importAssetPath, destPath, overwrite: true);
-                        RefreshItems();
-                        _showImportAssetDialog = false;
-                    }
-                }
-                ImGui.SameLine();
-                if (ImGui.Button("Cancel", new Vector2(120, 0)))
-                {
-                    _showImportAssetDialog = false;
-                }
-                ImGui.EndPopup();
-            }
-        }
 
         /// <summary>
         /// Refreshes the list of items in the project window.

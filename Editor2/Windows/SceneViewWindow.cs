@@ -26,7 +26,7 @@ namespace EarthEngineEditor.Windows
         public Room? scene;
         private GameObject? _selectedObject;
         private GameObject? _nodeBeingRenamed;
-        private int gridSize = 8;
+        public static int gridSize = 16;
         private string _renameBuffer = "";
         private bool _isRenaming = false;
         private bool _showSceneView = true;
@@ -97,6 +97,7 @@ namespace EarthEngineEditor.Windows
                         if (Input.MouseHover(rect))
                         {
                             _selectedObject = obj;
+                            Camera.Main.Position = obj.Position;
                             InspectorWindow.Instance.Inspect(new InspectableGameObject(obj));
                             break;
                         }

@@ -7,6 +7,7 @@
 /// -----------------------------------------------------------------------------
 
 using EarthEngineEditor;
+using EarthEngineEditor.Windows;
 using Engine.Core;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -20,7 +21,7 @@ namespace Editor.Windows
     {
         public static EditorOverlay Instance { get; private set; }
         public bool showGrid = true;
-        public int gridSize = 16;
+        public int gridSize;
         private Texture2D gridTexture;
         private GraphicsDevice graphicsDevice;
         public int PanSpeed = 3;
@@ -94,6 +95,7 @@ namespace Editor.Windows
         {
             if (showGrid)
             {
+                gridSize = SceneViewWindow.gridSize;
                 Microsoft.Xna.Framework.Color gridColor = new Microsoft.Xna.Framework.Color(255, 255, 255, 50);
                 float zoom = Camera.Main.Zoom;
                 Vector2 camPos = Vector2.Zero;

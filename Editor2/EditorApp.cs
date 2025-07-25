@@ -132,6 +132,7 @@ namespace EarthEngineEditor
 
             runtime.Draw(spriteBatch);
             editorOverlay.DrawEnd(spriteBatch);
+            _windowManager.tileEditor.DrawWorldPreview(spriteBatch);
 
             ImGuiViewportPtr viewport = ImGui.GetMainViewport();
             ImGui.SetNextWindowPos(viewport.Pos);

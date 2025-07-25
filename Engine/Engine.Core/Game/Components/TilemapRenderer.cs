@@ -45,7 +45,7 @@ namespace Engine.Core.Game.Components
         /// <summary>
         /// Size of each tile in pixels. Default is 16x16 pixels.
         /// </summary>
-        public int TileSize { get; private set; } = 16;
+        public int TileSize = 16;
 
         /// <summary>
         /// Depth of the tilemap layer, used for rendering order. Default is 0.
@@ -62,7 +62,26 @@ namespace Engine.Core.Game.Components
         /// Texture used for the tilemap. This is set automatically when the texture is assigned.
         /// </summary>
         [JsonIgnore]
-        public Texture2D? Texture { get; set; }
+        public Texture2D? Texture
+        {
+            get => texture_;
+            set
+            {
+                texture_ = value;
+
+                if (texture_ != null && !string.IsNullOrEmpty(texture_.Name))
+                {
+                    TexturePath = texture_.Name;
+                    TexturePtr = IntPtr.Zero;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Real texture
+        /// </summary>
+        [JsonIgnore]
+        private Texture2D? texture_;
 
         /// <summary>
         /// Pointer to the texture used for the tilemap. This is used for rendering the tileset preview in the editor.
