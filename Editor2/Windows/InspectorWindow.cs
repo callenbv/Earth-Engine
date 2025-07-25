@@ -95,9 +95,6 @@ namespace EarthEngineEditor.Windows
             {
                 // Set the title and display name
                 Title = $"{asset.Name}\n{asset.Type}";
-
-                // Open the asset if possible
-                asset.Open();
             }
 
             if (item is InspectableGameObject gameObject)

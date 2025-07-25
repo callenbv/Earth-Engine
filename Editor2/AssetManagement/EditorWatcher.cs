@@ -6,6 +6,7 @@
 /// <Summary>                
 /// -----------------------------------------------------------------------------
 
+using Engine.Core.Graphics;
 using Engine.Core.Scripting;
 using System.IO;
 
@@ -33,12 +34,45 @@ namespace Editor.AssetManagement
             watcher = new FileSystemWatcher
             {
                 Path = buildPath,
-                Filter = "CompiledScripts.dll",
+                Filter = "*.*",
                 NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size,
                 EnableRaisingEvents = true,
             };
 
-            watcher.Changed += OnScriptDllChanged;
+            watcher.Changed += (sender, e) =>
+            {
+                // Only reload if 500ms passed since last trigger
+                var now = DateTime.Now;
+                if ((now - lastTriggerTime).TotalMilliseconds < 500)
+                    return;
+                lastTriggerTime = now;
+
+                Task.Delay(200).ContinueWith(_ =>
+                {
+                    string ext = Path.GetExtension(e.FullPath);
+
+                    switch (ext)
+                    {
+                        case ".dll":
+                            OnScriptDllChanged(sender, e);
+                            break;
+
+                        case ".png":
+                            OnTextureChanged(sender, e);
+                            break;
+                    }
+                });
+            };
+        }
+
+        /// <summary>
+        /// Handles the Changed event of the texture watcher and reloads textures if a texture was changed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnTextureChanged(object sender, FileSystemEventArgs e)
+        {
+            TextureLibrary.Instance.LoadTextures();
         }
 
         /// <summary>
@@ -48,21 +82,11 @@ namespace Editor.AssetManagement
         /// <param name="e"></param>
         private void OnScriptDllChanged(object sender, FileSystemEventArgs e)
         {
-            // Simple debounce: only reload if 500ms passed since last trigger
-            var now = DateTime.Now;
-            if ((now - lastTriggerTime).TotalMilliseconds < 500)
-                return;
-
-            lastTriggerTime = now;
-
-            Task.Delay(200).ContinueWith(_ =>
-            {
-                Console.WriteLine("[EditorWatcher] Detected script DLL change. Reloading...");
-                if (ScriptCompiler.CompileAndLoadScripts(projectPath, out var scriptManager))
-                    Console.WriteLine("[EditorWatcher] Reload succeeded.");
-                else
-                    Console.WriteLine("[EditorWatcher] Reload failed.");
-            });
+            Console.WriteLine("[EditorWatcher] Detected script DLL change. Reloading...");
+            if (ScriptCompiler.CompileAndLoadScripts(projectPath, out var scriptManager))
+                Console.WriteLine("[EditorWatcher] Reload succeeded.");
+            else
+                Console.WriteLine("[EditorWatcher] Reload failed.");
         }
     }
 }

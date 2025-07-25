@@ -80,7 +80,8 @@ namespace Engine.Core.Rooms
         public static Room Load(string path)
         {
             // Deserialize our scene
-            string fullPath = Path.Combine(EnginePaths.ProjectBase, "Assets", path);
+            string fullPath = EnginePaths.AssetsBase;
+            fullPath = Path.Combine(fullPath, path);
             Console.WriteLine($"Loading scene from: {fullPath}");
 
             Room scene = new Room();

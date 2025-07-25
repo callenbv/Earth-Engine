@@ -8,16 +8,7 @@
 
 using EarthEngineEditor.Windows;
 using Engine.Core.Data;
-using Engine.Core.Game;
-using Engine.Core.Game.Components;
-using ImGuiNET;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Shapes;
 
 namespace Editor.AssetManagement
 {
@@ -54,6 +45,7 @@ namespace Editor.AssetManagement
         {
             string absPath = System.IO.Path.Combine(ProjectSettings.AssetsDirectory, Path);
             absPath = System.IO.Path.GetFullPath(absPath);
+            EnsureLoaded();
             _handler?.Save(absPath);
         }
 

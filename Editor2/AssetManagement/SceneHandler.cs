@@ -8,11 +8,8 @@
 
 using EarthEngineEditor.Windows;
 using Engine.Core.Data;
-using Engine.Core.Game;
-using Engine.Core.Game.Components;
 using Engine.Core.Rooms;
 using GameRuntime;
-using ImGuiNET;
 using MonoGame.Extended.Serialization.Json;
 using System.IO;
 using System.Text.Json;
@@ -25,7 +22,7 @@ namespace Editor.AssetManagement
     /// </summary>
     public class SceneHandler : IAssetHandler
     {
-        private Room scene = new Room();
+        private Room? scene;
 
         /// <summary>
         /// Load the scene from a room file
@@ -33,7 +30,7 @@ namespace Editor.AssetManagement
         /// <param name="path"></param>
         public void Load(string path)
         {
-            scene = Room.Load(path);
+            
         }
 
         /// <summary>
@@ -41,6 +38,14 @@ namespace Editor.AssetManagement
         /// </summary>
         public void Save(string path)
         {
+            scene = SceneViewWindow.Instance.scene;
+
+            if (scene == null)
+            {
+                Console.WriteLine("No scene to save.");
+                return;
+            }
+
             try
             {
                 var options = new JsonSerializerOptions
@@ -69,6 +74,7 @@ namespace Editor.AssetManagement
         /// <param name="path"></param>
         public void Open(string path)
         {
+            scene = Room.Load(path);
             SceneViewWindow.Instance.scene = scene;
             SceneViewWindow.Instance.scene.FilePath = path;
             RuntimeManager.Instance.scene = scene;
