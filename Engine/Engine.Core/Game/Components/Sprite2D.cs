@@ -38,6 +38,7 @@ namespace Engine.Core.Game.Components
                     texturePath = _texture.Name;
                     frameHeight = _texture.Height;
                     frameWidth = _texture.Width/frameCount;
+                    animated = frameCount > 1;
                     spriteBox = new Rectangle(0, 0, frameWidth, frameHeight);
                 }
             }

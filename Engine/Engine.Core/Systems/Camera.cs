@@ -62,6 +62,8 @@ namespace Engine.Core
             {
                 Position = Vector2.Lerp(Position, Target.Position, SmoothSpeed * dt);
             }
+
+            Math.Clamp(Zoom, 0.1f, 4f);
         }
 
         /// <summary>

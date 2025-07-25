@@ -9,6 +9,7 @@
 using Editor.AssetManagement;
 using Editor.Windows.Inspector;
 using Engine.Core;
+using Engine.Core.Data;
 using Engine.Core.Game;
 using Engine.Core.Game.Components;
 using Engine.Core.Rooms;
@@ -25,6 +26,7 @@ namespace EarthEngineEditor.Windows
     {
         public Room? scene;
         private GameObject? _selectedObject;
+        private GameObject? previousSelection;
         private GameObject? _nodeBeingRenamed;
         public static int gridSize = 16;
         private string _renameBuffer = "";
@@ -96,8 +98,11 @@ namespace EarthEngineEditor.Windows
 
                         if (Input.MouseHover(rect))
                         {
-                            _selectedObject = obj;
-                            Camera.Main.Position = obj.Position;
+                            if (previousSelection == obj)
+                            {
+                                _selectedObject = obj;
+                            }
+                            previousSelection = obj;
                             InspectorWindow.Instance.Inspect(new InspectableGameObject(obj));
                             break;
                         }
@@ -108,6 +113,21 @@ namespace EarthEngineEditor.Windows
                 {
                     if (_selectedObject != null)
                     {
+                        string text = _selectedObject.Name;
+                        var drawList = ImGui.GetForegroundDrawList();
+                        System.Numerics.Vector2 mousePos = ImGui.GetMousePos() + new System.Numerics.Vector2(8,-8);
+                        System.Numerics.Vector2 textSize = ImGui.CalcTextSize(text);
+
+                        float padding = 4f;
+                        System.Numerics.Vector2 min = mousePos;
+                        System.Numerics.Vector2 max = min + textSize + new System.Numerics.Vector2(padding * 2, padding * 2);
+
+                        // Background box
+                        drawList.AddRectFilled(min, max, ImGui.ColorConvertFloat4ToU32(new System.Numerics.Vector4(0, 0, 0, 0.7f)), 4f);
+
+                        // Text
+                        drawList.AddText(min + new System.Numerics.Vector2(padding, padding), ImGui.ColorConvertFloat4ToU32(new System.Numerics.Vector4(1, 1, 1, 1)), text);
+
                         _selectedObject.Position = Vector2.Floor(Input.mouseWorldPosition / gridSize) * gridSize;
                     }
                 }
@@ -220,6 +240,7 @@ namespace EarthEngineEditor.Windows
             if (ImGui.IsItemClicked())
             {
                 InspectorWindow.Instance.Inspect(new InspectableGameObject(obj));
+                Camera.Main.Position = obj.Position;
             }
 
             if (open && hasChildren && obj.children != null)

@@ -29,14 +29,13 @@ namespace Editor.AssetManagement
         {
             this.projectPath = projectPath;
 
-            string buildPath = Path.Combine(projectPath, "Build");
-
             watcher = new FileSystemWatcher
             {
-                Path = buildPath,
+                Path = projectPath,
                 Filter = "*.*",
                 NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size,
                 EnableRaisingEvents = true,
+                IncludeSubdirectories = true
             };
 
             watcher.Changed += (sender, e) =>

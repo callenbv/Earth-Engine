@@ -52,18 +52,17 @@ namespace Editor.Windows.Inspector
         {
             foreach (var comp in obj.components)
             {
-                bool open = ImGui.TreeNodeEx(comp.Name);
+                bool open = ImGui.TreeNodeEx($"{comp.Name}##{comp.GetID()}");
+
                 if (open)
                 {
                     DrawComponent(comp);
                     ImGui.TreePop();
-
                     if (ImGuiRenderer.IconButton("Remove", "\uf1f8", Microsoft.Xna.Framework.Color.Red))
                     {
                         if (comp is ObjectComponent objectComponent)
                         {
                             objectComponent.Owner?.components.Remove(objectComponent);
-                            break;
                         }
                     }
                 }

@@ -6,6 +6,7 @@
 /// <Summary>                
 /// -----------------------------------------------------------------------------
 
+using EarthEngineEditor;
 using Engine.Core.CustomMath;
 using Engine.Core.Data;
 using Engine.Core.Game;
@@ -15,6 +16,7 @@ using ImGuiNET;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Serialization.Json;
 using System.IO;
+using System.Numerics;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
@@ -78,7 +80,7 @@ namespace Editor.AssetManagement
             // Show each component
             foreach (var comp in _prefab.components)
             {
-                bool selected = ImGui.TreeNodeEx(comp.Name);
+                bool selected = ImGui.TreeNodeEx($"{comp.Name}##{comp.GetID()}");
 
                 if (selected)
                 {
@@ -103,6 +105,15 @@ namespace Editor.AssetManagement
                     }
 
                     ImGui.TreePop();
+
+                    if (ImGuiRenderer.IconButton("Remove", "\uf1f8", Microsoft.Xna.Framework.Color.Red))
+                    {
+                        if (comp is ObjectComponent objectComponent)
+                        {
+                            _prefab.components.Remove(objectComponent);
+                            break;
+                        }
+                    }
                 }
             }
 
@@ -260,6 +271,27 @@ namespace Editor.AssetManagement
                     }
 
                     ImGui.EndCombo();
+                }
+
+                if (value != null)
+                {
+                    Texture2D imTex = (Texture2D)value;
+                    float maxSize = 128f;
+                    Vector2 originalSize = new(imTex.Width*4, imTex.Height * 4);
+                    Vector2 targetSize = originalSize;
+
+                    // Scale down if larger than maxSize
+                    float scale = 1f;
+                    if (originalSize.X > maxSize || originalSize.Y > maxSize)
+                    {
+                        float scaleX = maxSize / originalSize.X;
+                        float scaleY = maxSize / originalSize.Y;
+                        scale = MathF.Min(scaleX, scaleY);
+                        targetSize *= scale;
+                    }
+
+                    IntPtr imImage = ImGuiRenderer.Instance.BindTexture(imTex);
+                    ImGui.Image(imImage, targetSize);
                 }
             }
             else

@@ -334,7 +334,6 @@ namespace EarthEngineEditor.Windows
                         _dragHandle?.Free();
                         _dragHandle = null;
                         _dragData = null;
-                        Console.WriteLine("[DEBUG] Dropped payload");
                     }
                 }
 
@@ -345,9 +344,9 @@ namespace EarthEngineEditor.Windows
                 if (ImGui.IsMouseHoveringRect(min, max) && Input.IsMouseReleased() && _awaitingDrop)
                 {
                     string targetFolderRel = item.Path;
-                    string sourceRel = _selectedItem.Path;
+                    string sourceRel = _selectedItem?.Path;
 
-                    if (_selectedItem.Folder || targetFolderRel == GetParentPath(sourceRel))
+                    if (_selectedItem.Folder || targetFolderRel == GetParentPath(sourceRel) || targetFolderRel == sourceRel)
                     {
                         // Ignore moving folders or moving into current folder
                         _awaitingDrop = false;

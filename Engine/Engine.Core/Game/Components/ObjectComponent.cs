@@ -6,6 +6,7 @@
 /// <Summary>                
 /// -----------------------------------------------------------------------------
 
+using Engine.Core.CustomMath;
 using Engine.Core.Data;
 using Engine.Core.Graphics;
 using Microsoft.Xna.Framework;
@@ -27,6 +28,12 @@ namespace Engine.Core.Game.Components
 
         [EditorOnlyAttribute]
         virtual void Initialize() { }
+
+        /// <summary>
+        /// Get the unique identifier for the component.
+        /// </summary>
+        /// <returns></returns>
+        public int GetID() { return (this as ObjectComponent)?.ID ?? 0; }
     }
 
     public abstract class ObjectComponent : IComponent
@@ -35,6 +42,13 @@ namespace Engine.Core.Game.Components
         /// Name of the component. This is used to identify the component in the editor and in the game.
         /// </summary>
         public virtual string Name => GetType().Name;
+
+        /// <summary>
+        /// Unique identifier for the component. This is used to identify the component in the editor and in the game
+        /// </summary>
+        [JsonIgnore]
+        [HideInInspector]
+        public int ID { get; set; } = ERandom.Range(0, 9999999);
 
         /// <summary>
         /// Type of the component. This is used to identify the component in the editor and in the game.
