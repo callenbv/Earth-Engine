@@ -108,7 +108,22 @@ namespace Engine.Core.Game.Components
         [HideInInspector]
         public Rectangle spriteBox = new Rectangle();
 
-        private int frame = 0;
+        /// <summary>
+        /// The current frame of the sprite. This is used to determine which part of the sprite sheet to draw.
+        /// </summary>
+        public int frame
+        {
+            get => frame_;
+            set 
+            {
+                spriteBox.Width = frameWidth;
+                spriteBox.X = frame * frameWidth;
+                spriteBox.Y = 0;
+                frame_ = value;
+            }
+        }
+
+        private int frame_ = 0;
         private float frameTimer = 0;
 
         /// <summary>
@@ -158,12 +173,15 @@ namespace Engine.Core.Game.Components
         /// <param name="textureName"></param>
         public void Set(string textureName, int frameWidth, int frameHeight)
         {
-            texture = TextureLibrary.Instance.Get(textureName);
-            this.frameWidth = frameWidth;
-            this.frameHeight = frameHeight;
-            this.frameCount = texture.Width / frameWidth;
-            animated = frameCount > 1;
-            spriteBox = new Rectangle(0, 0, frameWidth, frameHeight);
+            if (texturePath != textureName)
+            {
+                texture = TextureLibrary.Instance.Get(textureName);
+                this.frameWidth = frameWidth;
+                this.frameHeight = frameHeight;
+                this.frameCount = texture.Width / frameWidth;
+                animated = frameCount > 1;
+                spriteBox = new Rectangle(0, 0, frameWidth, frameHeight);
+            }
         }
 
         /// <summary>
@@ -178,6 +196,7 @@ namespace Engine.Core.Game.Components
             if (texture == null)
                 return;
 
+            frame = Math.Clamp(frame, 0, frameCount - 1);
             depth = GetDepth();
             origin = new Vector2(frameWidth / 2, frameHeight / 2);
             spriteBatch.Draw(texture, Position, spriteBox, Tint, Rotation, origin, Scale, spriteEffect, depth);
@@ -224,10 +243,6 @@ namespace Engine.Core.Game.Components
                     frame = (frame + 1) % frameCount;
                     frameTimer = 0f;
                 }
-
-                spriteBox.Width = frameWidth;
-                spriteBox.X = frame * frameWidth;
-                spriteBox.Y = 0;
             }
         }
     }
