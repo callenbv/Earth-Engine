@@ -10,6 +10,7 @@ using Editor.AssetManagement;
 using Editor.Windows.TileEditor;
 using Engine.Core;
 using Engine.Core.Data;
+using Engine.Core.Game;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;
@@ -350,7 +351,8 @@ namespace EarthEngineEditor.Windows
                             // Create ZIP archive
                             try
                             {
-                                string zipPath = exportPath.TrimEnd(Path.DirectorySeparatorChar) + ".zip";
+                                string zipFileName = $"{game.runtime.gameOptions.Title}.zip"; // target might be "win-x64", etc.
+                                string zipPath = Path.Combine(Path.GetDirectoryName(exportPath)!, zipFileName);
 
                                 if (File.Exists(zipPath))
                                     File.Delete(zipPath); // Overwrite existing zip if present
