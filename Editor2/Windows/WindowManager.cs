@@ -14,6 +14,7 @@ using ImGuiNET;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 
 namespace EarthEngineEditor.Windows
 {
@@ -338,13 +339,28 @@ namespace EarthEngineEditor.Windows
                                 // Compiled DLLs (Build Folder)
                                 CopyDirectory(ProjectSettings.BuildPath, Path.Combine(exportPath, "Build"));
 
-
                                 // Success
                                 Console.WriteLine("[Export] Copied data to build output.");
                             }
                             catch (Exception ex)
                             {
                                 Console.WriteLine($"[Export ERROR] Failed to copy assets: {ex.Message}");
+                            }
+
+                            // Create ZIP archive
+                            try
+                            {
+                                string zipPath = exportPath.TrimEnd(Path.DirectorySeparatorChar) + ".zip";
+
+                                if (File.Exists(zipPath))
+                                    File.Delete(zipPath); // Overwrite existing zip if present
+
+                                ZipFile.CreateFromDirectory(exportPath, zipPath, CompressionLevel.Optimal, includeBaseDirectory: false);
+                                Console.WriteLine($"[Export] Zipped build to: {zipPath}");
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"[Export ERROR] Failed to zip folder: {ex.Message}");
                             }
 
                             Console.WriteLine($"[Export] Build for {target} complete:\n{output}");
@@ -381,6 +397,7 @@ namespace EarthEngineEditor.Windows
                     if (ImGui.IsItemHovered())
                         ImGui.SetTooltip("Name of the game window");
 
+                    ImGui.NewLine();
 
                     int width = settings.WindowWidth;
                     if (ImGui.InputInt("Window Width", ref width))
@@ -389,7 +406,6 @@ namespace EarthEngineEditor.Windows
                     int height = settings.WindowHeight;
                     if (ImGui.InputInt("Window Height", ref height))
                         settings.WindowHeight = Math.Max(216, height);
-
 
                     int internalWidth = settings.TargetResolutionWidth;
                     if (ImGui.InputInt("Target Render Width", ref internalWidth))
@@ -405,6 +421,33 @@ namespace EarthEngineEditor.Windows
                     if (ImGui.IsItemHovered())
                         ImGui.SetTooltip("The internal height used for rendering. Higher is more detailed");
 
+                    ImGui.NewLine();
+
+                    bool fullscreen = settings.Fullscreen;
+                    if (ImGui.Checkbox("Start in Fullscreen", ref fullscreen))
+                        settings.Fullscreen = fullscreen;
+
+                    bool canResize = settings.CanResizeWindow;
+                    if (ImGui.Checkbox("Can re-size Window", ref canResize))
+                        settings.CanResizeWindow = canResize;
+
+                    bool vsync = settings.VerticalSync;
+                    if (ImGui.Checkbox("Vsync", ref vsync))
+                        settings.VerticalSync = vsync;
+
+                    bool fixedTimestep = settings.FixedTimestep;
+                    if (ImGui.Checkbox("Lock FPS", ref fixedTimestep))
+                        settings.FixedTimestep = fixedTimestep;
+                    if (ImGui.IsItemHovered())
+                        ImGui.SetTooltip("Caps the target frame rate to the target FPS (60 by default)");
+
+                    int targetFPS = settings.TargetFPS;
+                    if (ImGui.InputInt("Target FPS", ref targetFPS))
+                        settings.TargetFPS = Math.Clamp(settings.TargetFPS, 30, 144);
+                    if (ImGui.IsItemHovered())
+                        ImGui.SetTooltip("The FPS the game will try to run at");
+
+                    ImGui.NewLine();
 
                     if (ImGui.Button("Save"))
                     {

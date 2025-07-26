@@ -405,8 +405,12 @@ namespace EarthEngineEditor.Windows
                     else
                     {
                         // Show inspector and open asset
-                        _selectedItem = item;
-                        InspectorWindow.Instance.Inspect(item);
+                        if (_selectedItem != item)
+                        {
+                            _selectedItem = item;
+                            item.Open();
+                            InspectorWindow.Instance.Inspect(item);
+                        }
                     }
                 }
             }

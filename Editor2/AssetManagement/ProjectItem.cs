@@ -40,7 +40,7 @@ namespace Editor.AssetManagement
         public void Save()
         {
             // Project settings
-            settings.LastScene = SceneViewWindow.Instance.scene?.FilePath;
+            settings.StartScene = SceneViewWindow.Instance.scene?.FilePath;
             string json = JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(optionsPath, json);
 
@@ -55,7 +55,7 @@ namespace Editor.AssetManagement
         public void Load()
         {
             // Load per project assets
-            EditorApp.Instance.runtime.Initialize();
+            EditorApp.Instance.runtime.InitializeSystems();
 
             // Load static tilemaps
             TilemapManager.Load(Path.Combine(ProjectSettings.ProjectDirectory,"Tilemaps","tilemaps.json"));
@@ -69,7 +69,7 @@ namespace Editor.AssetManagement
                 string json = File.ReadAllText(optionsPath);
                 settings = JsonSerializer.Deserialize<GameOptions>(json);
 
-                Asset scene = Asset.Get(Path.GetFileName(settings.LastScene));
+                Asset scene = Asset.Get(Path.GetFileName(settings.StartScene));
                 InspectorWindow.Instance.Inspect(scene);
 
                 if (scene != null)
@@ -78,7 +78,7 @@ namespace Editor.AssetManagement
                 }
 
                 EditorApp.Instance.runtime.gameOptions = settings;
-                Console.WriteLine("Last Scene: " + settings.LastScene);
+                Console.WriteLine("Last Scene: " + settings.StartScene);
             }
             else
             {

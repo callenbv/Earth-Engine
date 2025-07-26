@@ -6,6 +6,7 @@
 /// <Summary>                
 /// -----------------------------------------------------------------------------
 
+using Engine.Core;
 using Engine.Core.Audio;
 using Engine.Core.Data;
 using Engine.Core.Game;
@@ -14,6 +15,7 @@ using Engine.Core.Scripting;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using System.IO;
 
 namespace GameRuntime
@@ -59,16 +61,17 @@ namespace GameRuntime
             runtimeManager = new RuntimeManager(this);
             runtimeManager.graphicsManager = _graphics;
             runtimeManager.gameOptions = gameOptions;
+            gameOptions.Load("game_options.json");
             runtimeManager.Initialize();
 
-            gameOptions.Load("game_options.json");
-
             // Game settings based on options 
-            Window.AllowUserResizing = true;
+            Window.AllowUserResizing = gameOptions.CanResizeWindow;
             Window.Title = gameOptions.Title;
-            _graphics.SynchronizeWithVerticalRetrace = false;
+            IsFixedTimeStep = gameOptions.FixedTimestep;
+            TargetElapsedTime = TimeSpan.FromSeconds(1.0 / gameOptions.TargetFPS);
+            _graphics.IsFullScreen = gameOptions.Fullscreen;
+            _graphics.SynchronizeWithVerticalRetrace = gameOptions.VerticalSync;
             _graphics.PreferMultiSampling = false;
-            IsFixedTimeStep = false;
             _graphics.PreferredBackBufferWidth = gameOptions.WindowWidth;
             _graphics.PreferredBackBufferHeight = gameOptions.WindowHeight;
 
@@ -79,7 +82,7 @@ namespace GameRuntime
             audioManager.Initialize();
 
             // Load our default scene
-            runtimeManager.scene = Room.Load(gameOptions.LastScene);
+            runtimeManager.scene = Room.Load(gameOptions.StartScene);
             runtimeManager.scene.Initialize();
 
             // Load static tilemaps

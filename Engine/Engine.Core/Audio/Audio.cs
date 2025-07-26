@@ -23,15 +23,6 @@ namespace Engine.Core.Audio
     public static class Audio
     {
         /// <summary>
-        /// Play a sound given a string
-        /// </summary>
-        /// <param name="sound"></param>
-        public static void Play(string sound)
-        {
-            Play(sound);
-        }
-
-        /// <summary>
         /// Extended play audio method
         /// </summary>
         /// <param name="sound"></param>

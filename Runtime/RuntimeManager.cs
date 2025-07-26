@@ -66,19 +66,25 @@ namespace GameRuntime
         /// <param name="contentManager"></param>
         public void Initialize()
         {
+            InitializeSystems();
+        }
+
+        /// <summary>
+        /// Initialize all systems in the runtime manager
+        /// </summary>
+        public void InitializeSystems()
+        {
             contentManager = new ContentManager(game.Services, EnginePaths.SHARED_CONTENT_PATH);
 
             Input.gameInstance = game;
             Input.graphicsManager = graphicsManager;
             Input.Initialize();
 
-            FontLibrary.Main.Initialize(_graphicsDevice,contentManager);
+            FontLibrary.Main.Initialize(_graphicsDevice, contentManager);
             FontLibrary.Main.LoadFonts();
             TextureLibrary textureLibrary = new TextureLibrary();
             textureLibrary.graphicsDevice = _graphicsDevice;
             textureLibrary.LoadTextures();
-
-            graphicsManager.ApplyChanges();
         }
 
         /// <summary>
@@ -167,10 +173,9 @@ namespace GameRuntime
             spriteBatch.Draw(_lighting.GetLightmap(), new Vector2(offsetX, offsetY), null, Microsoft.Xna.Framework.Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
             spriteBatch.End();
 
-            // Draw UI elements directly to screen (no separate render target for now)
-            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.LinearClamp, null, null, null, Camera.Main.GetUIViewMatrix(viewport.Width, viewport.Height));
-            //runtimeManager.DrawUI(_spriteBatch);
-            spriteBatch.End();
+            //// Draw UI elements directly to screen (no separate render target for now)
+            //spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.LinearClamp, null, null, null, Camera.Main.GetUIViewMatrix(viewport.Width, viewport.Height));
+            //spriteBatch.End();
         }
 
         /// <summary>
