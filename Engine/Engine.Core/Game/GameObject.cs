@@ -199,16 +199,17 @@ namespace Engine.Core.Game
             {
                 try
                 {
-                    // Do not update scripts if the engine is paused
-                    if (EngineContext.Paused && component is GameScript)
-                    {
-                        continue;
-                    }
-
                     // Check for no owner
-                    if (component is ObjectComponent objComp && objComp.Owner == null)
+                    if (component is ObjectComponent objComp)
                     {
-                        continue;
+                        if (objComp.Owner == null)
+                            continue;
+
+                        // Do not update scripts if the engine is paused
+                        if (!EngineContext.Running && !objComp.UpdateInEditor)
+                        {
+                            continue;
+                        }
                     }
 
                     component.Update(gameTime);

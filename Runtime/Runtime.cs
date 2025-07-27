@@ -92,6 +92,9 @@ namespace GameRuntime
             // Apply any graphics changes
             _graphics.ApplyChanges();
 
+            // Engine is now running
+            EngineContext.Running = true;
+
             base.Initialize();
         }
 

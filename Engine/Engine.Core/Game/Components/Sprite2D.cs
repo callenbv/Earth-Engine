@@ -231,8 +231,6 @@ namespace Engine.Core.Game.Components
         /// <param name="gameTime"></param>
         public void Animate(GameTime gameTime)
         {
-            float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
             if (frameCount > 1)
             {
                 frameTimer += frameSpeed * dt;

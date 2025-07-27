@@ -18,6 +18,5 @@ namespace Engine.Core
     /// </summary>
     public class GameScript : ObjectComponent
     {
-
     }
 } 

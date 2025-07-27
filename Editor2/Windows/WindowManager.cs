@@ -34,6 +34,7 @@ namespace EarthEngineEditor.Windows
         public List<string> recentProjects = new List<string>();
         private bool _openSettingsPopup = false;
         private bool openBuildPopup = false;
+        private bool openEditorSettings = false;
         private static string exportPath = "";
         private static int selectedTargetIndex = 0;
         private static readonly string[] targets = new[] { "linux-arm64", "linux-x64", "win-x64"};
@@ -242,9 +243,13 @@ namespace EarthEngineEditor.Windows
 
                 if (ImGui.BeginMenu("Project"))
                 {
-                    if (ImGui.MenuItem("Settings"))
+                    if (ImGui.MenuItem("Game Settings"))
                     {
                         _openSettingsPopup = true;
+                    }
+                    if (ImGui.MenuItem("Editor Settings"))
+                    {
+                        openEditorSettings = true;
                     }
                     ImGui.EndMenu();
                 }
@@ -263,6 +268,41 @@ namespace EarthEngineEditor.Windows
 
                 if (openBuildPopup)
                     ImGui.OpenPopup("Export Game");
+
+                if (openEditorSettings)
+                    ImGui.OpenPopup("Editor Settings");
+
+                // Change editor settings
+                if (ImGui.BeginPopupModal("Editor Settings", ImGuiWindowFlags.AlwaysAutoResize))
+                {
+                    bool editor = EditorApp.Instance._settings.PlayInEditor;
+                    if (ImGui.Checkbox("Play In Editor", ref editor))
+                        EditorApp.Instance._settings.PlayInEditor = editor;
+                    if (ImGui.IsItemHovered())
+                        ImGui.SetTooltip("If the editor launches a new instance of the runtime on play");
+
+                    bool restartOnPlay = EditorApp.Instance._settings.RestartOnPlay;
+                    if (ImGui.Checkbox("Restart On Play", ref restartOnPlay))
+                        EditorApp.Instance._settings.RestartOnPlay = restartOnPlay;
+                    if (ImGui.IsItemHovered())
+                        ImGui.SetTooltip("If the scene is re-initialized on play");
+
+                    if (ImGui.Button("Save"))
+                    {
+                        project.Save();
+                        ImGui.CloseCurrentPopup();
+                        openEditorSettings = false;
+                    }
+
+                    ImGui.SameLine();
+
+                    if (ImGui.Button("Cancel"))
+                    {
+                        ImGui.CloseCurrentPopup();
+                        openEditorSettings = false;
+                    }
+                    ImGui.EndPopup();
+                }
 
                 // Export the game
                 if (ImGui.BeginPopupModal("Export Game", ImGuiWindowFlags.AlwaysAutoResize))

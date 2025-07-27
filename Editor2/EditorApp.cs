@@ -17,6 +17,8 @@ using Engine.Core.Game;
 using Editor.Windows;
 using Editor.AssetManagement;
 using Engine.Core;
+using Engine.Core.CustomMath;
+using Engine.Core.Rooms;
 
 namespace EarthEngineEditor
 {
@@ -38,7 +40,7 @@ namespace EarthEngineEditor
         public ImGuiRenderer? _imGuiRenderer;
         private ConsoleWindow _consoleWindow;
         public WindowManager _windowManager;
-        public EditorSettings? _settings;
+        public EditorSettings _settings;
         private SpriteBatch spriteBatch;
         public RuntimeManager runtime;
         public EditorOverlay editorOverlay;
@@ -46,6 +48,7 @@ namespace EarthEngineEditor
         public bool gameFocused = false;
         public EditorSelectionMode selectionMode = EditorSelectionMode.Object;
         public static EditorApp Instance { get; private set; }
+        public bool playingInEditor = false;
 
         /// <summary>
         /// Initializes a new instance of the EditorApp class.
@@ -78,7 +81,6 @@ namespace EarthEngineEditor
             runtime = new RuntimeManager(this);
             runtime.graphicsManager = _graphics;
             runtime.gameOptions = new GameOptions(); // We use default options until we load per-project
-            EngineContext.Paused = true;
             EngineContext.SpriteBatch = spriteBatch;
 
             // Load default project for test
@@ -111,10 +113,16 @@ namespace EarthEngineEditor
                 IsActive &&
                 !ImGui.GetIO().WantCaptureMouse;
 
+            playingInEditor = (_settings.PlayInEditor && EngineContext.Running);
+
             gameFocused = isInputFree;
             _windowManager?.Update(gameTime);
             runtime.Update(gameTime);
-            editorOverlay.Update(gameTime);
+
+            if (!playingInEditor)
+            {
+                editorOverlay.Update(gameTime);
+            }
             _windowManager?.UpdatePerformance(gameTime.ElapsedGameTime.TotalMilliseconds);
 
             int newWidth = GraphicsDevice.Viewport.Width;
@@ -129,6 +137,17 @@ namespace EarthEngineEditor
                 Camera.Main.ViewportHeight = newHeight;
             }
 
+            if (EngineContext.Running)
+            {
+                if (Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.F4))
+                {
+                    // Stop the game if running
+                    EngineContext.Running = false;
+                    Camera.Main.Reset();
+                    Console.WriteLine("[EDITOR] Game stopped");
+                }
+            }
+
             base.Update(gameTime);
         }
 
@@ -140,68 +159,71 @@ namespace EarthEngineEditor
         {
             GraphicsDevice.Clear(XnaColor.CornflowerBlue);
 
-            _imGuiRenderer?.BeforeLayout(gameTime);
+            runtime.Draw(spriteBatch); // Render the game
 
-            runtime.Draw(spriteBatch);
-            editorOverlay.DrawEnd(spriteBatch);
-            _windowManager.tileEditor.DrawWorldPreview(spriteBatch);
-
-            ImGuiViewportPtr viewport = ImGui.GetMainViewport();
-            ImGui.SetNextWindowPos(viewport.Pos);
-            ImGui.SetNextWindowSize(viewport.Size);
-            ImGui.SetNextWindowViewport(viewport.ID);
-
-            ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0.0f);
-            ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0.0f);
-            ImGui.PushStyleColor(ImGuiCol.WindowBg, new System.Numerics.Vector4(0, 0, 0, 0)); // Transparent background
-            ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, System.Numerics.Vector2.Zero);
-
-            ImGuiWindowFlags windowFlags =
-                    ImGuiWindowFlags.NoDocking |
-                    ImGuiWindowFlags.NoTitleBar |
-                    ImGuiWindowFlags.NoCollapse |
-                    ImGuiWindowFlags.NoResize |
-                    ImGuiWindowFlags.NoMove |
-                    ImGuiWindowFlags.NoBringToFrontOnFocus |
-                    ImGuiWindowFlags.NoNavFocus |
-                    ImGuiWindowFlags.NoBackground |
-                    ImGuiWindowFlags.MenuBar;
-
-            ImGui.Begin("DockSpace", windowFlags);
-            Vector2 mouse = ImGui.GetMousePos();
-
-            ImGui.PopStyleVar(3);
-            ImGui.PopStyleColor();
-
-            Vector2 min = viewport.Pos;
-            Vector2 max = viewport.Pos + viewport.Size;
-
-            ImGui.DockSpace(
-                ImGui.GetID("DockSpace"),
-                System.Numerics.Vector2.Zero,
-                ImGuiDockNodeFlags.PassthruCentralNode  // ✅ Let background show through center
-            );
-
-            // Push the Roboto font if available
-            if (_imGuiRenderer?.HasCustomFont == true)
+            if (!playingInEditor)
             {
-                ImGui.PushFont(_imGuiRenderer._robotoFont);
+                editorOverlay.DrawEnd(spriteBatch);
+                _windowManager.tileEditor.DrawWorldPreview(spriteBatch);
+                _imGuiRenderer?.BeforeLayout(gameTime);
+
+                ImGuiViewportPtr viewport = ImGui.GetMainViewport();
+                ImGui.SetNextWindowPos(viewport.Pos);
+                ImGui.SetNextWindowSize(viewport.Size);
+                ImGui.SetNextWindowViewport(viewport.ID);
+
+                ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0.0f);
+                ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0.0f);
+                ImGui.PushStyleColor(ImGuiCol.WindowBg, new System.Numerics.Vector4(0, 0, 0, 0)); // Transparent background
+                ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, System.Numerics.Vector2.Zero);
+
+                ImGuiWindowFlags windowFlags =
+                        ImGuiWindowFlags.NoDocking |
+                        ImGuiWindowFlags.NoTitleBar |
+                        ImGuiWindowFlags.NoCollapse |
+                        ImGuiWindowFlags.NoResize |
+                        ImGuiWindowFlags.NoMove |
+                        ImGuiWindowFlags.NoBringToFrontOnFocus |
+                        ImGuiWindowFlags.NoNavFocus |
+                        ImGuiWindowFlags.NoBackground |
+                        ImGuiWindowFlags.MenuBar;
+
+                ImGui.Begin("DockSpace", windowFlags);
+                Vector2 mouse = ImGui.GetMousePos();
+
+                ImGui.PopStyleVar(3);
+                ImGui.PopStyleColor();
+
+                Vector2 min = viewport.Pos;
+                Vector2 max = viewport.Pos + viewport.Size;
+
+                ImGui.DockSpace(
+                    ImGui.GetID("DockSpace"),
+                    System.Numerics.Vector2.Zero,
+                    ImGuiDockNodeFlags.PassthruCentralNode  // ✅ Let background show through center
+                );
+
+                // Push the Roboto font if available
+                if (_imGuiRenderer?.HasCustomFont == true)
+                {
+                    ImGui.PushFont(_imGuiRenderer._robotoFont);
+                }
+
+                // Render menu bar
+                _windowManager?.RenderMenuBar();
+
+                // Render all windows
+                _windowManager?.RenderAll();
+
+                // Pop the font
+                if (_imGuiRenderer?.HasCustomFont == true)
+                {
+                    ImGui.PopFont();
+                }
+
+                ImGui.End();
+                _imGuiRenderer?.AfterLayout();
             }
-
-            // Render menu bar
-            _windowManager?.RenderMenuBar();
-
-            // Render all windows
-            _windowManager?.RenderAll();
-
-            // Pop the font
-            if (_imGuiRenderer?.HasCustomFont == true)
-            {
-                ImGui.PopFont();
-            }
-
-            ImGui.End();
-            _imGuiRenderer?.AfterLayout();
 
             base.Draw(gameTime);
         }
@@ -221,6 +243,27 @@ namespace EarthEngineEditor
             
             _consoleWindow?.Dispose();
             base.UnloadContent();
+        }
+
+        /// <summary>
+        /// Launches the game with a new window using the runtime
+        /// </summary>
+        public void LaunchGame()
+        {
+            if (!_settings.PlayInEditor)
+            {
+                // Launch new runtime window
+                runtime.Launch();
+            }
+            else
+            {
+                // Play in editor
+                Camera.Main.Reset();
+                EngineContext.Running = true;
+
+                // Reset scene
+                RuntimeManager.Instance.scene = Room.Load(runtime.scene.FilePath);
+            }
         }
     }
 } 

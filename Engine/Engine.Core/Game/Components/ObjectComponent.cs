@@ -124,6 +124,13 @@ namespace Engine.Core.Game.Components
         public float dt => EngineContext.DeltaTime; // Retrieve the delta time from any component
 
         /// <summary>
+        /// Indicates whether the component should be updated in the editor
+        /// </summary>
+        [JsonIgnore]
+        [HideInInspector]
+        public virtual bool UpdateInEditor { get; set; } = false;
+
+        /// <summary>
         /// Initialize the component. This method is called when the component is created and should be used to set up any initial state or resources.
         /// </summary>
         public virtual void Initialize() { }

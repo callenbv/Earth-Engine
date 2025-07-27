@@ -41,6 +41,16 @@ namespace EarthEngineEditor
         public int WindowHeight { get; set; } = 720;
 
         /// <summary>
+        /// Indicates whether the editor window should launch on start.
+        /// </summary>
+        public bool PlayInEditor { get; set; } = true;
+
+        /// <summary>
+        /// Indicates whether the editor should restart the game when the play button is pressed.
+        /// </summary>
+        public bool RestartOnPlay { get; set; } = true;
+
+        /// <summary>
         /// Loads the editor settings from a JSON file.
         /// </summary>
         /// <returns></returns>

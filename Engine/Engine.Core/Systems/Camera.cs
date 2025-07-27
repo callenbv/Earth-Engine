@@ -6,7 +6,6 @@
 /// <Summary>                
 /// -----------------------------------------------------------------------------
 
-using Engine.Core.CustomMath;
 using Engine.Core.Game;
 using Microsoft.Xna.Framework;
 
@@ -51,19 +50,29 @@ namespace Engine.Core
         public static Camera Main => _main ??= new Camera();
 
         /// <summary>
+        /// Reset the camera settings
+        /// </summary>
+        public void Reset()
+        {
+            Target = null;
+            Zoom = 1f;
+            Rotation = 0f;
+        }
+
+        /// <summary>
         /// Update the camera position based on the target GameObject.
         /// </summary>
         /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
         {
+            Math.Clamp(Zoom, 0.1f, 4f);
+
             float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             if (Target != null)
             {
                 Position = Vector2.Lerp(Position, Target.Position, SmoothSpeed * dt);
             }
-
-            Math.Clamp(Zoom, 0.1f, 4f);
         }
 
         /// <summary>
@@ -89,7 +98,6 @@ namespace Engine.Core
                                  Matrix.CreateTranslation(new Vector3(TargetViewportWidth * 0.5f, TargetViewportHeight * 0.5f, 0f));
             
             Matrix scaleTransform = Matrix.CreateScale(scale, scale, 1f);
-            
             return baseTransform * scaleTransform;
         }
 

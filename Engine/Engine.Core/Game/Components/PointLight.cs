@@ -23,6 +23,8 @@ namespace Engine.Core.Game
     public class PointLight : ObjectComponent
     {
         public override string Name => "Point Light";
+        public override bool UpdateInEditor => true;
+
         private Texture2D? softCircleTexture;
         private int diameter = 64;
 
@@ -133,7 +135,7 @@ namespace Engine.Core.Game
         {
             // Apply flicker effect if enabled
             float flickerIntensity = FlickerIntensity * Lighting.Instance.Wind;
-            finalRadius = lightRadius+MathF.Sin(gameTime.TotalGameTime.Milliseconds/100f) * flickerIntensity;
+            finalRadius = lightRadius+MathF.Sin(gameTime.TotalGameTime.Milliseconds * dt) * flickerIntensity;
             finalIntensity = lightIntensity;
 
             // Apply granularity

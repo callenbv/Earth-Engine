@@ -200,7 +200,7 @@ namespace Engine.Core
         public static bool IsButtonDown(VirtualButton button)
         {
             bool val = _currentButtonStates.TryGetValue(button, out var isDown) ? isDown : false;
-            Console.WriteLine($"[INPUT] Button {button}: Current={isDown}, Previous={_previousButtonStates.GetValueOrDefault(button, false)}");
+            // Console.WriteLine($"[INPUT] Button {button}: Current={isDown}, Previous={_previousButtonStates.GetValueOrDefault(button, false)}");
             return val;
         }
 

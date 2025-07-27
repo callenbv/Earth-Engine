@@ -106,7 +106,14 @@ namespace GameRuntime
                 EngineContext.Current.Scene = scene;
             }
 
-            EngineContext.DeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if (EngineContext.Running)
+            {
+                EngineContext.DeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            }
+            else
+            {
+                EngineContext.DeltaTime = 0f; // No delta time when not running
+            }
 
             // Resize lighting and scene render target if needed (only if internal resolution changes)
             if (EngineContext.InternalWidth != _lastWidth || EngineContext.InternalHeight != _lastHeight)

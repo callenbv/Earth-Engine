@@ -46,7 +46,7 @@ namespace EarthEngineEditor.Windows
             if (Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.F5))
             {
                 EditorApp.Instance._windowManager.SaveProject();
-                EditorApp.Instance.runtime.Launch();
+                EditorApp.Instance.LaunchGame();
             }
         }
 
@@ -70,7 +70,9 @@ namespace EarthEngineEditor.Windows
 
             // Play button
             if (ImGuiRenderer.IconButton("play", "\uf04b", Microsoft.Xna.Framework.Color.White))
-                EditorApp.Instance.runtime.Launch();
+            {
+                EditorApp.Instance.LaunchGame();
+            }
 
             ImGui.SameLine();
 

@@ -20,6 +20,7 @@ namespace Engine.Core.Game
     public class Lighting2D : ObjectComponent
     {
         public override string Name => "Lighting 2D";
+        public override bool UpdateInEditor => true;
 
         /// <summary>
         /// The color of the ambient light in the scene. This is used to simulate global illumination.
