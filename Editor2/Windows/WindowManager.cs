@@ -251,6 +251,9 @@ namespace EarthEngineEditor.Windows
                     {
                         openEditorSettings = true;
                     }
+                    if (ImGui.MenuItem("Audio Settings"))
+                    {
+                    }
                     ImGui.EndMenu();
                 }
 
@@ -263,6 +266,7 @@ namespace EarthEngineEditor.Windows
                     ImGui.EndMenu();
                 }
                 
+
                 if (_openSettingsPopup)
                     ImGui.OpenPopup("Game Settings");
 
@@ -282,10 +286,10 @@ namespace EarthEngineEditor.Windows
                         ImGui.SetTooltip("If the editor launches a new instance of the runtime on play");
 
                     bool restartOnPlay = EditorApp.Instance._settings.RestartOnPlay;
-                    if (ImGui.Checkbox("Restart On Play", ref restartOnPlay))
+                    if (ImGui.Checkbox("Live Edit", ref restartOnPlay))
                         EditorApp.Instance._settings.RestartOnPlay = restartOnPlay;
                     if (ImGui.IsItemHovered())
-                        ImGui.SetTooltip("If the scene is re-initialized on play");
+                        ImGui.SetTooltip("[WARNING] Scene will not reset when the game stops, and will save the modified state of the game. Use with caution");
 
                     if (ImGui.Button("Save"))
                     {
