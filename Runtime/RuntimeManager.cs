@@ -18,6 +18,7 @@ using System.Diagnostics;
 using Engine.Core.Graphics;
 using Engine.Core.Rooms;
 using Engine.Core.Scripting;
+using Engine.Core.Audio;
 
 namespace GameRuntime
 {
@@ -26,9 +27,6 @@ namespace GameRuntime
     /// </summary>
     public class RuntimeManager
     {
-        private string assetsRoot;
-        private string roomsDir;
-        private string gameOptionsPath;
         public GameOptions gameOptions;
         public GraphicsDeviceManager graphicsManager;
         private Lighting _lighting;
@@ -36,6 +34,7 @@ namespace GameRuntime
         public ContentManager contentManager;
         private GraphicsDevice _graphicsDevice;
         private TextureLibrary textureLibrary;
+        public AudioManager audioManager = new AudioManager();
         public Room? scene;
         private int _lastWidth, _lastHeight;
         private Game game;
@@ -47,9 +46,6 @@ namespace GameRuntime
         /// <param name="game_"></param>
         public RuntimeManager(Game game_)
         {
-            assetsRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets");
-            roomsDir = Path.Combine(assetsRoot, "Rooms");
-            gameOptionsPath = Path.Combine(assetsRoot, "game_options.json");
             Instance = this;
             game = game_;
             _graphicsDevice = game_.GraphicsDevice;
@@ -85,6 +81,8 @@ namespace GameRuntime
             TextureLibrary textureLibrary = new TextureLibrary();
             textureLibrary.graphicsDevice = _graphicsDevice;
             textureLibrary.LoadTextures();
+
+            audioManager.Initialize();
         }
 
         /// <summary>

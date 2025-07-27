@@ -19,6 +19,7 @@ using Editor.AssetManagement;
 using Engine.Core;
 using Engine.Core.CustomMath;
 using Engine.Core.Rooms;
+using Engine.Core.Audio;
 
 namespace EarthEngineEditor
 {
@@ -116,11 +117,11 @@ namespace EarthEngineEditor
             playingInEditor = (_settings.PlayInEditor && EngineContext.Running);
 
             gameFocused = isInputFree;
-            _windowManager?.Update(gameTime);
             runtime.Update(gameTime);
 
             if (!playingInEditor)
             {
+                _windowManager?.Update(gameTime);
                 editorOverlay.Update(gameTime);
             }
             _windowManager?.UpdatePerformance(gameTime.ElapsedGameTime.TotalMilliseconds);
@@ -143,6 +144,7 @@ namespace EarthEngineEditor
                 {
                     // Stop the game if running
                     EngineContext.Running = false;
+                    Audio.StopAll();
                     Camera.Main.Reset();
                     Console.WriteLine("[EDITOR] Game stopped");
                 }
@@ -262,7 +264,11 @@ namespace EarthEngineEditor
                 EngineContext.Running = true;
 
                 // Reset scene
-                RuntimeManager.Instance.scene = Room.Load(runtime.scene.FilePath);
+                if (_settings.RestartOnPlay)
+                {
+                    RuntimeManager.Instance.scene = Room.Load(runtime.scene.FilePath);
+                }
+                RuntimeManager.Instance.scene.Initialize();
             }
         }
     }

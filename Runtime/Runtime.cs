@@ -30,7 +30,6 @@ namespace GameRuntime
         private SpriteBatch _spriteBatch;
         private RuntimeManager runtimeManager;
         private GameOptions gameOptions;
-        public AudioManager audioManager = new AudioManager();
 
         /// <summary>
         /// Constructs a new Runtime instance with the specified project path.
@@ -78,9 +77,6 @@ namespace GameRuntime
 
             // Load the compiled scripts
             ScriptCompiler.LoadScripts();
-
-            // Set up and load audio
-            audioManager.Initialize();
 
             // Load our default scene
             runtimeManager.scene = Room.Load(gameOptions.StartScene);

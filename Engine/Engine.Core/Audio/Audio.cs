@@ -44,6 +44,14 @@ namespace Engine.Core.Audio
         {
             AudioManager.Instance.MainChannel.setPaused(val);
         }
+
+        /// <summary>
+        /// Stops all audio playing
+        /// </summary>
+        public static void StopAll()
+        {
+            AudioManager.Instance.MainChannel.stop();
+        }
     }
 }
 
