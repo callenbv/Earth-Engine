@@ -12,6 +12,7 @@ using Engine.Core.Data;
 using Engine.Core.Game;
 using Engine.Core.Rooms;
 using Engine.Core.Scripting;
+using Engine.Core.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -101,7 +102,7 @@ namespace GameRuntime
         protected override void Update(GameTime gameTime)
         {
 #if DEBUG
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape) || Input.IsButtonDown(VirtualButton.Start))
                 Exit();
 #endif
             runtimeManager.Update(gameTime);

@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
 using System.Device.Gpio;
 using Engine.Core.Systems;
+using System.Runtime.InteropServices;
 
 namespace Engine.Core
 {
@@ -38,11 +39,7 @@ namespace Engine.Core
         public static Microsoft.Xna.Framework.Game gameInstance;
         public static Microsoft.Xna.Framework.GraphicsDeviceManager? graphicsManager;
 
-#if WINDOWS
-        private static MockGpioController _gpio;
-#else
         private static GpioController _gpio;
-#endif
 
         /// <summary>
         /// Mapping of virtual buttons to GPIO pins.
@@ -90,18 +87,24 @@ namespace Engine.Core
         /// </summary>
         public static void Initialize()
         {
-#if WINDOWS
-            _gpio = new MockGpioController();
-#else
-            _gpio = new GpioController();
-
-            foreach (var kv in _gpioPins)
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                _gpio.OpenPin(kv.Value, PinMode.InputPullUp);
-                _gpioStates[kv.Key] = false;
+                // no GPIO
             }
-            Console.WriteLine("Setup GPIO");
-#endif
+            else
+            {
+                _gpio = new GpioController();
+
+                foreach (var kv in _gpioPins)
+                {
+                    _gpio.OpenPin(kv.Value, PinMode.InputPullUp);
+                    _gpioStates[kv.Key] = false;
+                    Console.WriteLine($"[INPUT] Setup Pin {kv.Key}");
+                    Console.WriteLine($"[INPUT] Pin open: {_gpio.IsPinOpen(kv.Value)}");
+                }
+                Console.WriteLine("[INPUT] Setup GPIO");
+            }
+            Console.WriteLine("[INPUT] Bound Input");
             BindInput();
         }
 
@@ -114,48 +117,48 @@ namespace Engine.Core
             InputAction.Bind(InputID.MoveLeft, new(InputSourceType.Keyboard, Keys.A));
             InputAction.Bind(InputID.MoveLeft, new(InputSourceType.Keyboard, Keys.Left));
             InputAction.Bind(InputID.MoveLeft, new(InputSourceType.GamePadButton, Buttons.DPadLeft));
-            InputAction.Bind(InputID.MoveLeft, new(InputSourceType.Gpio, _gpioPins[VirtualButton.Left]));
+            InputAction.Bind(InputID.MoveLeft, new(InputSourceType.Gpio, VirtualButton.Left));
 
             InputAction.Bind(InputID.MoveRight, new(InputSourceType.Keyboard, Keys.D));
             InputAction.Bind(InputID.MoveRight, new(InputSourceType.Keyboard, Keys.Right));
             InputAction.Bind(InputID.MoveRight, new(InputSourceType.GamePadButton, Buttons.DPadRight));
-            InputAction.Bind(InputID.MoveRight, new(InputSourceType.Gpio, _gpioPins[VirtualButton.Right]));
+            InputAction.Bind(InputID.MoveRight, new(InputSourceType.Gpio, VirtualButton.Right));
 
             InputAction.Bind(InputID.MoveUp, new(InputSourceType.Keyboard, Keys.W));
             InputAction.Bind(InputID.MoveUp, new(InputSourceType.Keyboard, Keys.Up));
             InputAction.Bind(InputID.MoveUp, new(InputSourceType.GamePadButton, Buttons.DPadUp));
-            InputAction.Bind(InputID.MoveUp, new(InputSourceType.Gpio, _gpioPins[VirtualButton.Up]));
+            InputAction.Bind(InputID.MoveUp, new(InputSourceType.Gpio, VirtualButton.Up));
 
             InputAction.Bind(InputID.MoveDown, new(InputSourceType.Keyboard, Keys.S));
             InputAction.Bind(InputID.MoveDown, new(InputSourceType.Keyboard, Keys.Down));
             InputAction.Bind(InputID.MoveDown, new(InputSourceType.GamePadButton, Buttons.DPadDown));
-            InputAction.Bind(InputID.MoveDown, new(InputSourceType.Gpio, _gpioPins[VirtualButton.Down]));
+            InputAction.Bind(InputID.MoveDown, new(InputSourceType.Gpio, VirtualButton.Down));
 
             // --- Action Buttons ---
             InputAction.Bind(InputID.Jump, new(InputSourceType.Keyboard, Keys.Space));
             InputAction.Bind(InputID.Jump, new(InputSourceType.GamePadButton, Buttons.A));
-            InputAction.Bind(InputID.Jump, new(InputSourceType.Gpio, _gpioPins[VirtualButton.A]));
+            InputAction.Bind(InputID.Jump, new(InputSourceType.Gpio, VirtualButton.A));
 
             InputAction.Bind(InputID.Shoot, new(InputSourceType.Keyboard, Keys.LeftControl));
             InputAction.Bind(InputID.Shoot, new(InputSourceType.GamePadButton, Buttons.X));
-            InputAction.Bind(InputID.Shoot, new(InputSourceType.Gpio, _gpioPins[VirtualButton.X]));
+            InputAction.Bind(InputID.Shoot, new(InputSourceType.Gpio, VirtualButton.X));
 
             InputAction.Bind(InputID.Dash, new(InputSourceType.Keyboard, Keys.LeftShift));
             InputAction.Bind(InputID.Dash, new(InputSourceType.GamePadButton, Buttons.B));
-            InputAction.Bind(InputID.Dash, new(InputSourceType.Gpio, _gpioPins[VirtualButton.B]));
+            InputAction.Bind(InputID.Dash, new(InputSourceType.Gpio, VirtualButton.B));
 
             InputAction.Bind(InputID.Interact, new(InputSourceType.Keyboard, Keys.E));
             InputAction.Bind(InputID.Interact, new(InputSourceType.GamePadButton, Buttons.Y));
-            InputAction.Bind(InputID.Interact, new(InputSourceType.Gpio, _gpioPins[VirtualButton.Y]));
+            InputAction.Bind(InputID.Interact, new(InputSourceType.Gpio, VirtualButton.Y));
 
             // --- System ---
             InputAction.Bind(InputID.Start, new(InputSourceType.Keyboard, Keys.Enter));
             InputAction.Bind(InputID.Start, new(InputSourceType.GamePadButton, Buttons.Start));
-            InputAction.Bind(InputID.Start, new(InputSourceType.Gpio, _gpioPins[VirtualButton.Start]));
+            InputAction.Bind(InputID.Start, new(InputSourceType.Gpio, VirtualButton.Start));
 
             InputAction.Bind(InputID.Select, new(InputSourceType.Keyboard, Keys.Tab));
             InputAction.Bind(InputID.Select, new(InputSourceType.GamePadButton, Buttons.Back));
-            InputAction.Bind(InputID.Select, new(InputSourceType.Gpio, _gpioPins[VirtualButton.Select]));
+            InputAction.Bind(InputID.Select, new(InputSourceType.Gpio, VirtualButton.Select));
         }
 
         /// <summary>
@@ -175,7 +178,14 @@ namespace Engine.Core
                 foreach (var kv in _gpioPins)
                 {
                     // GPIO input is pulled up, so pressed = Low (false)
-                    _gpioStates[kv.Key] = !_gpio.Read(kv.Value).Equals(PinValue.High);
+                    bool isPressed = !_gpio.Read(kv.Value).Equals(PinValue.High);
+                    _gpioStates[kv.Key] = isPressed;
+
+                    // Also update the tracked button states
+                    bool wasDown = _currentButtonStates.TryGetValue(kv.Key, out var down) && down;
+                    _previousButtonStates[kv.Key] = wasDown;
+                    _currentButtonStates[kv.Key] = isPressed;
+                    //Console.WriteLine($"[INPUT] Pin {kv.Key} is {(isPressed ? "Pressed" : "Released")} (GPIO: {kv.Value})");
                 }
             }
 
@@ -189,7 +199,9 @@ namespace Engine.Core
         /// <returns></returns>
         public static bool IsButtonDown(VirtualButton button)
         {
-            return _currentButtonStates.TryGetValue(button, out var isDown) ? isDown : false;
+            bool val = _currentButtonStates.TryGetValue(button, out var isDown) ? isDown : false;
+            Console.WriteLine($"[INPUT] Button {button}: Current={isDown}, Previous={_previousButtonStates.GetValueOrDefault(button, false)}");
+            return val;
         }
 
         /// <summary>
