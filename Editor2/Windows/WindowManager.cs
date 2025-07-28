@@ -632,6 +632,12 @@ namespace EarthEngineEditor.Windows
                         }
                         catch (Exception ex)
                         {
+                            MessageBox.Show(
+                                $"Error opening project:\n{ex.Message}",
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error
+                            );
                             Console.WriteLine($"Error opening project: {ex.Message}");
                         }
                     }

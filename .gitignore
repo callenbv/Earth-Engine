@@ -52,3 +52,6 @@
 /Engine/Engine.Core/bin
 Editor2/bin/Debug/net8.0-windows/settings.json
 !Runtime/include/**
+Editor2/bin/Debug/net8.0-windows/imgui.ini
+Editor2/bin/Debug/net8.0-windows/recent_projects.json
+Editor2/bin/Debug/net8.0-windows/settings.json
