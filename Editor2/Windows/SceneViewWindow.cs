@@ -6,16 +6,14 @@
 /// <Summary>                
 /// -----------------------------------------------------------------------------
 
-using Editor.AssetManagement;
 using Editor.Windows.Inspector;
 using Engine.Core;
-using Engine.Core.Data;
 using Engine.Core.Game;
 using Engine.Core.Game.Components;
 using Engine.Core.Rooms;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
-using System.Text;
+using System.Windows.Forms;
 
 namespace EarthEngineEditor.Windows
 {
@@ -77,6 +75,28 @@ namespace EarthEngineEditor.Windows
 
             // Draw the scene root node
             bool root = ImGui.TreeNodeEx("Scene");
+            if (ImGui.BeginDragDropTarget())
+            {
+                unsafe
+                {
+                    if (ImGui.AcceptDragDropPayload("GAMEOBJECT").NativePtr != null)
+                    {
+                        var dragged = _selectedObject;
+
+                        // Prevent making object its own child or parent
+                        if (dragged != null)
+                        {
+                            // Remove from old parent or root
+                            dragged.Parent?.children?.Remove(dragged);
+                            dragged.Parent = null;
+
+                            if (!scene.objects.Contains(dragged))
+                                scene.objects.Add(dragged);
+                        }
+                    }
+                }
+                ImGui.EndDragDropTarget();
+            }
 
             // Get the mouse world coords and select the object
             if (EditorApp.Instance.gameFocused && EditorApp.Instance.selectionMode == EditorSelectionMode.Object)
@@ -169,7 +189,16 @@ namespace EarthEngineEditor.Windows
             {
                 foreach (var obj in scene.objects)
                 {
-                    DrawGameObjectNode(obj);
+                    bool drawNode = DrawGameObjectNode(obj);
+
+                    if (drawNode)
+                    {
+
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
 
                 ImGui.TreePop();
@@ -180,8 +209,10 @@ namespace EarthEngineEditor.Windows
         /// Draw a game object node and its children
         /// </summary>
         /// <param name="obj"></param>
-        private void DrawGameObjectNode(GameObject obj)
+        private bool DrawGameObjectNode(GameObject obj)
         {
+            bool drawNode = true;
+
             ImGui.PushID(obj.Name); // Ensure unique ID
 
             bool hasChildren = (obj.children != null && obj.children.Count > 0);
@@ -242,11 +273,47 @@ namespace EarthEngineEditor.Windows
                 _nodeBeingRenamed = obj;
             }
 
-            // Inspect an item in the scene
-            if (ImGui.IsItemClicked())
+            if (ImGui.BeginDragDropSource())
             {
-                InspectorWindow.Instance.Inspect(new InspectableGameObject(obj));
-                Camera.Main.Position = obj.Position;
+                ImGui.SetDragDropPayload("GAMEOBJECT", IntPtr.Zero, 0); // No payload data needed, use context
+                ImGui.Text(obj.Name);
+                _selectedObject = obj; // Store reference in your editor context
+                ImGui.EndDragDropSource();
+            }
+
+            if (ImGui.BeginDragDropTarget())
+            {
+                unsafe
+                {
+                    if (ImGui.AcceptDragDropPayload("GAMEOBJECT").NativePtr != null)
+                    {
+                        var dragged = _selectedObject;
+
+                        // Prevent making object its own child or parent
+                        if (dragged != null && dragged != obj && !dragged.IsDescendantOf(obj))
+                        {
+                            // Remove from old parent or root
+                            scene.objects.Remove(dragged);
+                            dragged.Parent?.children?.Remove(dragged);
+
+                            // Set new parent
+                            dragged.Parent = obj;
+                            if (obj.children == null)
+                                obj.children = new List<GameObject>();
+                            obj.children.Add(dragged);
+                            _selectedObject = null;
+                            drawNode = false; // Stop further processing
+                        }
+                    }
+                }
+                ImGui.EndDragDropTarget();
+            }
+
+            // Inspect an item in the scene
+            if (ImGui.IsMouseDragging(ImGuiMouseButton.Left))
+            {
+
+                //InspectorWindow.Instance.Inspect(new InspectableGameObject(obj));
             }
 
             if (open && hasChildren && obj.children != null)
@@ -260,6 +327,8 @@ namespace EarthEngineEditor.Windows
             }
 
             ImGui.PopID();
+
+            return drawNode;
         }
 
         public bool IsVisible => _showSceneView;

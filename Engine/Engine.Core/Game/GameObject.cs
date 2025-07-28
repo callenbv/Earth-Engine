@@ -75,6 +75,11 @@ namespace Engine.Core.Game
         public List<GameObject> children = new List<GameObject>();
 
         /// <summary>
+        /// Parent GameObject, if this GameObject is part of a hierarchy.
+        /// </summary>
+        public GameObject? Parent { get; set; } = null!; // Parent GameObject, if any. Initialized to null.
+
+        /// <summary>
         /// List of components attached to this GameObject.
         /// </summary>
 
@@ -324,6 +329,22 @@ namespace Engine.Core.Game
                 Console.WriteLine($"[Instantiate] Error loading prefab '{defName}': {ex.Message}");
                 return new GameObject("Error");
             }
+        }
+
+        /// <summary>
+        /// Check if this GameObject is a descendant of another GameObject
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool IsDescendantOf(GameObject other)
+        {
+            var current = this.Parent;
+            while (current != null)
+            {
+                if (current == other) return true;
+                current = current.Parent;
+            }
+            return false;
         }
 
         /// <summary>

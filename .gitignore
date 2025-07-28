@@ -51,3 +51,4 @@
 /Runtime/publish-linux
 /Engine/Engine.Core/bin
 Editor2/bin/Debug/net8.0-windows/settings.json
+!Runtime/include/**
