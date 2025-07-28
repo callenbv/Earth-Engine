@@ -10,7 +10,6 @@ using Editor.AssetManagement;
 using Editor.Windows.TileEditor;
 using Engine.Core;
 using Engine.Core.Data;
-using Engine.Core.Game;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;
@@ -19,6 +18,9 @@ using System.IO.Compression;
 
 namespace EarthEngineEditor.Windows
 {
+    /// <summary>
+    /// Manages all editor windows and their interactions, including project management, game settings, and build/export functionality.
+    /// </summary>
     public class WindowManager
     {
         private readonly SceneViewWindow _sceneView;
@@ -39,6 +41,11 @@ namespace EarthEngineEditor.Windows
         private static int selectedTargetIndex = 0;
         private static readonly string[] targets = new[] { "linux-arm64", "linux-x64", "win-x64"};
 
+        /// <summary>
+        /// WindowManager constructor initializes all editor windows and sets up the project.
+        /// </summary>
+        /// <param name="game_"></param>
+        /// <param name="console"></param>
         public WindowManager(EditorApp game_, ConsoleWindow console)
         {
             _sceneView = new SceneViewWindow();
@@ -54,6 +61,10 @@ namespace EarthEngineEditor.Windows
             Load();
         }
 
+        /// <summary>
+        /// Update the performance metrics based on the frame time
+        /// </summary>
+        /// <param name="frameTime"></param>
         public void UpdatePerformance(double frameTime)
         {
             _performance.Update(frameTime);
@@ -134,7 +145,6 @@ namespace EarthEngineEditor.Windows
                 File.Copy(filePath, destPath, overwrite: true);
             }
         }
-
 
         /// <summary>
         /// Render the top menu bar (file, etc.)
