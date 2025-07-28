@@ -8,6 +8,7 @@
 
 using Editor.Windows.Inspector;
 using Engine.Core;
+using Engine.Core.Data;
 using Engine.Core.Game;
 using Engine.Core.Game.Components;
 using Engine.Core.Rooms;
@@ -18,6 +19,21 @@ using System.Windows.Forms;
 namespace EarthEngineEditor.Windows
 {
     /// <summary>
+    /// Represents a folder in the scene hierarchy, which can contain other folders or game objects.
+    /// </summary>
+    public class SceneFolder : IInspectable
+    {
+        public string Name;
+        public List<SceneFolder> SubFolders = new();
+        public List<GameObject> GameObjects = new();
+
+        public SceneFolder(string name)
+        {
+            Name = name;
+        }
+    }
+
+    /// <summary>
     /// Represents the Scene View window in the editor, allowing users to view and manipulate game objects in a scene.
     /// </summary>
     public class SceneViewWindow
@@ -25,12 +41,13 @@ namespace EarthEngineEditor.Windows
         public Room? scene;
         private GameObject? _selectedObject;
         private GameObject? previousSelection;
-        private GameObject? _nodeBeingRenamed;
+        private IInspectable? _nodeBeingRenamed;
         public static int gridSize = 16;
         private string _renameBuffer = "";
         private bool _isRenaming = false;
         private bool _showSceneView = true;
         public static SceneViewWindow Instance { get; private set; }
+        public SceneFolder rootFolder = new SceneFolder("Root");
 
         /// <summary>
         /// Singleton instance of the SceneViewWindow
@@ -52,6 +69,7 @@ namespace EarthEngineEditor.Windows
 
             if (_showSceneView)
             {
+                SyncUnfolderedObjects();
                 RenderHierarchy();
             }
 
@@ -72,31 +90,6 @@ namespace EarthEngineEditor.Windows
             // Draw scene title
             ImGui.Text($"{scene.Name}");
             ImGui.Separator();
-
-            // Draw the scene root node
-            bool root = ImGui.TreeNodeEx("Scene");
-            if (ImGui.BeginDragDropTarget())
-            {
-                unsafe
-                {
-                    if (ImGui.AcceptDragDropPayload("GAMEOBJECT").NativePtr != null)
-                    {
-                        var dragged = _selectedObject;
-
-                        // Prevent making object its own child or parent
-                        if (dragged != null)
-                        {
-                            // Remove from old parent or root
-                            dragged.Parent?.children?.Remove(dragged);
-                            dragged.Parent = null;
-
-                            if (!scene.objects.Contains(dragged))
-                                scene.objects.Add(dragged);
-                        }
-                    }
-                }
-                ImGui.EndDragDropTarget();
-            }
 
             // Get the mouse world coords and select the object
             if (EditorApp.Instance.gameFocused && EditorApp.Instance.selectionMode == EditorSelectionMode.Object)
@@ -165,15 +158,27 @@ namespace EarthEngineEditor.Windows
                 _selectedObject = null; // Clear selection
             }
 
-            // Right-click on the "Scene" tree node
-            if (ImGui.BeginPopupContextItem("SceneContext"))
+            // Draw the actual nodes in the tree
+            // We also draw a folder view here for better organization
+            DrawFolderNode(rootFolder);
+        }
+        private bool DrawFolderNode(SceneFolder folder)
+        {
+            bool open = ImGui.TreeNodeEx($"{folder.Name}");
+
+            if (ImGui.BeginPopupContextItem($"FolderContext_{folder.Name}"))
             {
+                if (ImGui.MenuItem("Create Folder"))
+                {
+                    folder.SubFolders.Add(new SceneFolder($"Group{rootFolder.SubFolders.Count}"));
+                }
                 if (ImGui.MenuItem("Create Empty GameObject"))
                 {
                     var newObj = new GameObject($"Empty{scene.objects.Count}");
                     newObj.AddComponent<Transform>();
                     newObj.AddComponent<Sprite2D>();
                     scene.objects.Add(newObj);
+                    folder.GameObjects.Add(newObj);
                 }
                 if (ImGui.MenuItem("Create 2D Lighting"))
                 {
@@ -181,27 +186,131 @@ namespace EarthEngineEditor.Windows
                     newObj.AddComponent<Transform>();
                     newObj.AddComponent<Lighting2D>();
                     scene.objects.Add(newObj);
+                    folder.GameObjects.Add(newObj);
+                }
+                if (ImGui.MenuItem("Rename"))
+                {
+                    _isRenaming = true;
+                    _renameBuffer = folder.Name;
+                    _nodeBeingRenamed = folder;
+                }
+                if (ImGui.MenuItem("Delete"))
+                {
+                    rootFolder.SubFolders.Remove(folder);
+                    return false;
                 }
                 ImGui.EndPopup();
             }
 
-            if (root)
+            // Drop target for GameObjects
+            if (ImGui.BeginDragDropTarget())
             {
-                foreach (var obj in scene.objects)
+                unsafe
                 {
-                    bool drawNode = DrawGameObjectNode(obj);
-
-                    if (drawNode)
+                    if (ImGui.AcceptDragDropPayload("GAMEOBJECT").NativePtr != null)
                     {
-
+                        var dragged = _selectedObject;
+                        if (dragged != null && !folder.GameObjects.Contains(dragged))
+                        {
+                            RemoveFromAllFolders(dragged, rootFolder); // Remove from all folders
+                            folder.GameObjects.Add(dragged);
+                        }
                     }
-                    else
-                    {
+                    ImGui.EndDragDropTarget();
+                }
+            }
+
+            // If currently renaming THIS node, draw InputText instead of label
+            if (_isRenaming && _nodeBeingRenamed == folder)
+            {
+                ImGui.PushItemWidth(200); // prevent layout shifting
+                if (ImGui.InputText("##renameNode", ref _renameBuffer, 256, ImGuiInputTextFlags.EnterReturnsTrue | ImGuiInputTextFlags.AutoSelectAll))
+                {
+                    folder.Name = _renameBuffer.Trim();
+                    _isRenaming = false;
+                    _nodeBeingRenamed = null;
+                }
+
+                // Cancel rename on ESC or click away
+                if (!ImGui.IsItemActive() && (ImGui.IsMouseClicked(0) || ImGui.IsKeyPressed(ImGuiKey.Escape)))
+                {
+                    _isRenaming = false;
+                    _nodeBeingRenamed = null;
+                }
+                ImGui.PopItemWidth();
+            }
+
+            if (open)
+            {
+                foreach (var sub in folder.SubFolders)
+                {
+                    bool success = DrawFolderNode(sub);
+
+                    if (!success)
                         break;
-                    }
+                }
+
+                foreach (var obj in folder.GameObjects)
+                {
+                    bool sucess = DrawGameObjectNode(obj);
+
+                    if (!sucess)
+                        break;
                 }
 
                 ImGui.TreePop();
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Synchronize unfoldered objects to the root folder
+        /// </summary>
+        private void SyncUnfolderedObjects()
+        {
+            foreach (var obj in scene.objects)
+            {
+                if (!IsGroupedInAnyFolder(obj))
+                {
+                    rootFolder.GameObjects.Add(obj);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Check if a game object is grouped in any folder in the hierarchy
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        private bool IsGroupedInAnyFolder(GameObject obj)
+        {
+            bool Check(SceneFolder folder)
+            {
+                if (folder.GameObjects.Contains(obj))
+                    return true;
+
+                foreach (var sub in folder.SubFolders)
+                    if (Check(sub)) return true;
+
+                return false;
+            }
+
+            return Check(rootFolder);
+        }
+
+        /// <summary>
+        /// Remove a game object from all folders in the hierarchy
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="folder"></param>
+        private void RemoveFromAllFolders(GameObject obj, SceneFolder folder)
+        {
+            folder.GameObjects.Remove(obj);
+
+            foreach (var sub in folder.SubFolders)
+            {
+                RemoveFromAllFolders(obj, sub);
             }
         }
 
@@ -222,6 +331,12 @@ namespace EarthEngineEditor.Windows
                 open = ImGui.TreeNodeEx(obj.Name);
             else
                 open = ImGui.TreeNodeEx(obj.Name, ImGuiTreeNodeFlags.Leaf | ImGuiTreeNodeFlags.NoTreePushOnOpen);
+
+            // Inspect an item in the scene
+            if (ImGui.IsItemHovered() && ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+            {
+                InspectorWindow.Instance.Inspect(new InspectableGameObject(obj));
+            }
 
             var nodeId = obj.Name.GetHashCode();
 
@@ -281,41 +396,6 @@ namespace EarthEngineEditor.Windows
                 ImGui.EndDragDropSource();
             }
 
-            if (ImGui.BeginDragDropTarget())
-            {
-                unsafe
-                {
-                    if (ImGui.AcceptDragDropPayload("GAMEOBJECT").NativePtr != null)
-                    {
-                        var dragged = _selectedObject;
-
-                        // Prevent making object its own child or parent
-                        if (dragged != null && dragged != obj && !dragged.IsDescendantOf(obj))
-                        {
-                            // Remove from old parent or root
-                            scene.objects.Remove(dragged);
-                            dragged.Parent?.children?.Remove(dragged);
-
-                            // Set new parent
-                            dragged.Parent = obj;
-                            if (obj.children == null)
-                                obj.children = new List<GameObject>();
-                            obj.children.Add(dragged);
-                            _selectedObject = null;
-                            drawNode = false; // Stop further processing
-                        }
-                    }
-                }
-                ImGui.EndDragDropTarget();
-            }
-
-            // Inspect an item in the scene
-            if (ImGui.IsMouseDragging(ImGuiMouseButton.Left))
-            {
-
-                //InspectorWindow.Instance.Inspect(new InspectableGameObject(obj));
-            }
-
             if (open && hasChildren && obj.children != null)
             {
                 foreach (var child in obj.children)
@@ -327,6 +407,12 @@ namespace EarthEngineEditor.Windows
             }
 
             ImGui.PopID();
+
+            if (obj.IsDestroyed)
+            {
+                RemoveFromAllFolders(obj, rootFolder); // Remove from all folders
+                drawNode = false;
+            }
 
             return drawNode;
         }

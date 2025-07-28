@@ -25,6 +25,7 @@ namespace Editor.AssetManagement
         public AssetType Type = AssetType.Unknown;
         public string Name = string.Empty;
         public string Path = string.Empty;
+        public string FullPath = string.Empty;
         public bool Folder = false;
         private IAssetHandler? _handler;
         public string FileIcon = "\uf15b";
@@ -84,6 +85,8 @@ namespace Editor.AssetManagement
             {
                 AssetType.Prefab => new PrefabHandler(),
                 AssetType.Scene => new SceneHandler(),
+                AssetType.Texture => new TextureHandler(),
+                AssetType.Audio => new AudioHandler(),
                 _ => null
             };
 

@@ -55,7 +55,7 @@ namespace Editor.AssetManagement
         public void Load()
         {
             // Load per project assets
-            EditorApp.Instance.runtime.InitializeSystems();
+            EditorApp.Instance.runtime.LoadAssets();
 
             // Load static tilemaps
             TilemapManager.Load(Path.Combine(ProjectSettings.ProjectDirectory,"Tilemaps","tilemaps.json"));

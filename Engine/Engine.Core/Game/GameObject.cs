@@ -20,7 +20,7 @@ namespace Engine.Core.Game
     /// <summary>
     /// Represents a game object in the scene, which can have multiple components attached to it.
     /// </summary>
-    public class GameObject : IComponentContainer
+    public class GameObject : IComponentContainer, IInspectable
     {
         /// <summary>
         /// Name of the GameObject, used for identification and debugging.
@@ -224,6 +224,11 @@ namespace Engine.Core.Game
                     Console.WriteLine($"Error updating component for {Name}: {e.Message}");
                 }
             }
+
+            foreach (var obj in children)
+            {
+                obj.Update(gameTime);
+            }
         }
 
         /// <summary>
@@ -243,6 +248,11 @@ namespace Engine.Core.Game
                 {
                     Console.WriteLine($"Error drawing script for {Name}: {ex.Message}");
                 }
+            }
+
+            foreach (var obj in children)
+            {
+                obj.Draw(spriteBatch);
             }
         }
 

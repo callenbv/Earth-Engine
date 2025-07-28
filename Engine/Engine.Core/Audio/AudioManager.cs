@@ -7,6 +7,7 @@
 /// -----------------------------------------------------------------------------
 
 using Engine.Core.Data;
+using FMOD;
 
 namespace Engine.Core.Audio
 {
@@ -96,6 +97,44 @@ namespace Engine.Core.Audio
         public void Update(float dt)
         {
             AudioSystem.update();
+        }
+    }
+
+    /// <summary>
+    /// Extensions for FMOD types to simplify common operations
+    /// </summary>
+    public static class FmodExtensions
+    {
+        public static float GetLengthSeconds(this Sound sound)
+        {
+            sound.getLength(out uint ms, TIMEUNIT.MS);
+            return ms / 1000f;
+        }
+
+        public static float GetPositionSeconds(this Channel channel)
+        {
+            channel.getPosition(out uint ms, TIMEUNIT.MS);
+            return ms / 1000f;
+        }
+
+        public static void SetPositionSeconds(this Channel channel, float seconds)
+        {
+            uint ms = (uint)(seconds * 1000f);
+            var result = channel.setPosition(ms, TIMEUNIT.MS);
+            if (result != RESULT.OK)
+                Console.WriteLine($"[FMOD] SetPosition failed: {result}");
+        }
+
+        public static bool IsPlaying(this Channel channel)
+        {
+            channel.isPlaying(out bool playing);
+            return playing;
+        }
+
+        public static void SetVolumeSafe(this Channel? channel, float volume)
+        {
+            if (channel != null)
+                channel.Value.setVolume(volume);
         }
     }
 }

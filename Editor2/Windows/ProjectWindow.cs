@@ -92,6 +92,7 @@ namespace EarthEngineEditor.Windows
                 {
                     Name = Path.GetFileNameWithoutExtension(fileName),
                     Path = ProjectSettings.NormalizePath(relTargetPath),
+                    FullPath = fullFilePath,
                     Type = type,
                     FileIcon = Asset.GetIconForType(type),
                     Folder = false
@@ -228,6 +229,9 @@ namespace EarthEngineEditor.Windows
             foreach (var item in items)
             {
                 // Show only items directly in the current folder
+                if (item.Path.EndsWith(".meta"))
+                    continue;
+
                 bool isSelected = _selectedItem == item;
                 string label = $"{item.Name}##{item.Path}";
                 ImGui.PushID(label);
@@ -528,6 +532,7 @@ namespace EarthEngineEditor.Windows
                             {
                                 Name = _newFolderName,
                                 Path = folderPath,
+                                FullPath = currentFolder,
                                 Folder = true
                             });
                             Console.WriteLine($"Folder created successfully: {folderPath}");

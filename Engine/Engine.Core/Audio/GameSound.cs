@@ -1,11 +1,13 @@
-﻿/// -----------------------------------------------------------------------------
+﻿
+using FMOD;
+
+/// -----------------------------------------------------------------------------
 /// <Project>      Earth Engine 
 /// <File>         GameSound.cs
 /// <Author>       Callen Betts Virott 
 /// <Copyright>    @2025 Callen Betts Virott. All rights reserved.
 /// <Summary>                
 /// -----------------------------------------------------------------------------
-
 namespace Engine.Core.Audio
 {
     /// <summary>
@@ -50,7 +52,7 @@ namespace Engine.Core.Audio
         /// <summary>
         /// Try to play an FMOD sound
         /// </summary>
-        public void Play()
+        public Channel? Play()
         {
             // Enable or disable loop mode
             Sound.setMode(Loop ? FMOD.MODE.LOOP_NORMAL : FMOD.MODE.LOOP_OFF);
@@ -59,11 +61,12 @@ namespace Engine.Core.Audio
             if (result != FMOD.RESULT.OK)
             {
                 Console.WriteLine($"[ERROR] Failed to play sound {Name}: {result}");
-                return;
+                return null;
             }
 
             // Set the channel group to the main channel
             channel.setChannelGroup(AudioManager.Instance.MainChannel);
+            return channel;
         }
     }
 }

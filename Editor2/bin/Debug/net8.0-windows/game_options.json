@@ -1,0 +1,13 @@
+{
+  "StartScene": null,
+  "Title": "",
+  "WindowWidth": 1280,
+  "WindowHeight": 720,
+  "TargetResolutionWidth": 1920,
+  "TargetResolutionHeight": 1080,
+  "TargetFPS": 60,
+  "Fullscreen": true,
+  "VerticalSync": false,
+  "FixedTimestep": false,
+  "CanResizeWindow": false
+}

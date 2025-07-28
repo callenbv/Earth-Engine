@@ -37,7 +37,7 @@ namespace EarthEngineEditor
     /// </summary>
     public class EditorApp : Game
     {
-        private GraphicsDeviceManager _graphics;
+        public GraphicsDeviceManager _graphics;
         public ImGuiRenderer? _imGuiRenderer;
         private ConsoleWindow _consoleWindow;
         public WindowManager _windowManager;
@@ -84,15 +84,12 @@ namespace EarthEngineEditor
             runtime.gameOptions = new GameOptions(); // We use default options until we load per-project
             EngineContext.SpriteBatch = spriteBatch;
 
-            // Load default project for test
+            // Load default project for test\
+            runtime.InitializeSystems();
             _windowManager.OpenProject(_windowManager.GetLastProject());
 
             // Override game options
-            _settings = EditorSettings.Load();
-
-            _graphics.PreferredBackBufferWidth = _settings.WindowWidth;
-            _graphics.PreferredBackBufferHeight = _settings.WindowHeight;
-            _graphics.ApplyChanges();
+            EditorSettings.Load();
 
             // Test console output
             Console.WriteLine("Earth Engine Editor initialized successfully!");

@@ -90,8 +90,15 @@ namespace EarthEngineEditor.Windows
         /// </summary>
         public void Load()
         {
-            var files = File.ReadAllLines(ProjectSettings.RecentProjects).ToList();
-            recentProjects = files;
+            if (!File.Exists(ProjectSettings.RecentProjects))
+            {
+                File.Create(ProjectSettings.RecentProjects);
+            }
+            else
+            {
+                var files = File.ReadAllLines(ProjectSettings.RecentProjects).ToList();
+                recentProjects = files;
+            }
         }
 
         /// <summary>
@@ -289,6 +296,14 @@ namespace EarthEngineEditor.Windows
                 // Change editor settings
                 if (ImGui.BeginPopupModal("Editor Settings", ImGuiWindowFlags.AlwaysAutoResize))
                 {
+                    int width = EditorApp.Instance._settings.WindowWidth;
+                    if (ImGui.InputInt("Window Width", ref width))
+                        EditorApp.Instance._settings.WindowWidth = width;
+
+                    int height = EditorApp.Instance._settings.WindowHeight;
+                    if (ImGui.InputInt("Window Height", ref height))
+                        EditorApp.Instance._settings.WindowHeight = height;
+
                     bool editor = EditorApp.Instance._settings.PlayInEditor;
                     if (ImGui.Checkbox("Play In Editor", ref editor))
                         EditorApp.Instance._settings.PlayInEditor = editor;
@@ -304,6 +319,7 @@ namespace EarthEngineEditor.Windows
                     if (ImGui.Button("Save"))
                     {
                         project.Save();
+                        EditorSettings.Load();
                         ImGui.CloseCurrentPopup();
                         openEditorSettings = false;
                     }
@@ -706,8 +722,11 @@ namespace EarthEngineEditor.Windows
         /// </summary>
         public void SaveProject()
         {
-            _project.Save();
-            project?.Save();
+            if (!EngineContext.Running)
+            {
+                _project.Save();
+                project?.Save();
+            }
         }
 
         public bool GetSceneViewVisible() => _sceneView.IsVisible;

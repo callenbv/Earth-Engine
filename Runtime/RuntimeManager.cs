@@ -63,6 +63,7 @@ namespace GameRuntime
         public void Initialize()
         {
             InitializeSystems();
+            LoadAssets();
         }
 
         /// <summary>
@@ -71,17 +72,21 @@ namespace GameRuntime
         public void InitializeSystems()
         {
             contentManager = new ContentManager(game.Services, EnginePaths.SHARED_CONTENT_PATH);
-
             Input.gameInstance = game;
             Input.graphicsManager = graphicsManager;
             Input.Initialize();
+        }
 
+        /// <summary>
+        /// Load all assets required for the runtime
+        /// </summary>
+        public void LoadAssets()
+        {
             FontLibrary.Main.Initialize(_graphicsDevice, contentManager);
             FontLibrary.Main.LoadFonts();
             TextureLibrary textureLibrary = new TextureLibrary();
             textureLibrary.graphicsDevice = _graphicsDevice;
             textureLibrary.LoadTextures();
-
             audioManager.Initialize();
         }
 

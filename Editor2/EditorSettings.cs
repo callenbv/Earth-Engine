@@ -7,7 +7,9 @@
 /// -----------------------------------------------------------------------------
 
 using Engine.Core.Data;
+using System.Drawing;
 using System.IO;
+using System.Runtime;
 using System.Text.Json;
 
 namespace EarthEngineEditor
@@ -54,7 +56,7 @@ namespace EarthEngineEditor
         /// Loads the editor settings from a JSON file.
         /// </summary>
         /// <returns></returns>
-        public static EditorSettings Load()
+        public static void Load()
         {
             try
             {
@@ -65,21 +67,27 @@ namespace EarthEngineEditor
                     var settings = JsonSerializer.Deserialize<EditorSettings>(json);
                     ProjectSettings.RuntimePath = RuntimePath;
 
-                    return settings;
+                    EditorApp.Instance._settings = settings;
                 }
                 else
                 {
                     File.Create(SettingsPath);
                     File.WriteAllText(SettingsPath, "{}");
-                    return new EditorSettings();
+                    EditorApp.Instance._settings = new EditorSettings();
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Failed to load settings: {ex.Message}");
+                throw (new InvalidOperationException("Failed to load editor settings.", ex));
             }
-            
-            return new EditorSettings();
+
+            if (EditorApp.Instance._settings != null)
+            {
+                EditorApp.Instance._graphics.PreferredBackBufferWidth = EditorApp.Instance._settings.WindowWidth;
+                EditorApp.Instance._graphics.PreferredBackBufferHeight = EditorApp.Instance._settings.WindowHeight;
+                EditorApp.Instance._graphics.ApplyChanges();
+            }
         }
 
         /// <summary>
