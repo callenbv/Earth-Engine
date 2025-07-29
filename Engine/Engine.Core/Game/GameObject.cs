@@ -170,7 +170,16 @@ namespace Engine.Core.Game
         /// <returns></returns>
         public T? GetComponent<T>() where T : ObjectComponent
         {
-            return components.OfType<T>().FirstOrDefault();
+            try
+            {
+                return components.OfType<T>().FirstOrDefault();
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine($"Error getting component {typeof(T).Name} from {Name}: {e.Message}");
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -181,7 +190,7 @@ namespace Engine.Core.Game
         {
             if (component == null)
             {
-                Console.WriteLine($"Tried to add null component");
+                Console.Error.WriteLine($"Tried to add null component");
                 return;
             }
 
@@ -227,7 +236,7 @@ namespace Engine.Core.Game
                 }
                 catch (Exception e) 
                 {
-                    Console.WriteLine($"Error updating component for {Name}: {e.Message}");
+                    Console.Error.WriteLine($"Error updating component for {Name}: {e.Message}");
                 }
             }
 
@@ -252,7 +261,7 @@ namespace Engine.Core.Game
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error drawing script for {Name}: {ex.Message}");
+                    Console.Error.WriteLine($"Error drawing script for {Name}: {ex.Message}");
                 }
             }
 
@@ -277,7 +286,7 @@ namespace Engine.Core.Game
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error drawing UI script for {Name}: {ex.Message}");
+                    Console.Error.WriteLine($"Error drawing UI script for {Name}: {ex.Message}");
                 }
             }
         }
@@ -294,7 +303,7 @@ namespace Engine.Core.Game
             string path = Path.Combine(ProjectSettings.AssetsDirectory, defName);
             if (!File.Exists(path))
             {
-                Console.WriteLine($"[Instantiate] Prefab not found: {path}");
+                Console.Error.WriteLine($"[Instantiate] Prefab not found: {path}");
                 return new GameObject("Missing");
             }
 
@@ -315,7 +324,7 @@ namespace Engine.Core.Game
                 var def = JsonSerializer.Deserialize<GameObjectDefinition>(json, options);
                 if (def == null)
                 {
-                    Console.WriteLine($"[Instantiate] Failed to deserialize prefab: {defName}");
+                    Console.Error.WriteLine($"[Instantiate] Failed to deserialize prefab: {defName}");
                     return new GameObject("Error");
                 }
 
@@ -342,7 +351,7 @@ namespace Engine.Core.Game
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[Instantiate] Error loading prefab '{defName}': {ex.Message}");
+                Console.Error.WriteLine($"[Instantiate] Error loading prefab '{defName}': {ex.Message}");
                 return new GameObject("Error");
             }
         }

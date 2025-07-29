@@ -3,7 +3,7 @@
 /// <File>         ConsoleWindow.cs
 /// <Author>       Callen Betts Virott 
 /// <Copyright>    @2025 Callen Betts Virott. All rights reserved.
-/// <Summary>                
+/// <Summary>      Console window with color-coded output
 /// -----------------------------------------------------------------------------
 
 using System.IO;
@@ -18,7 +18,22 @@ namespace EarthEngineEditor
     /// </summary>
     public class ConsoleWindow
     {
-        private readonly List<string> _logLines = new();
+        /// <summary>
+        /// Represents a single line in the console log with text and color.
+        /// </summary>
+        private struct LogLine
+        {
+            public string Text;
+            public Vector4 Color;
+
+            public LogLine(string text, Vector4 color)
+            {
+                Text = text;
+                Color = color;
+            }
+        }
+
+        private readonly List<LogLine> _logLines = new();
         private readonly StringBuilder _currentLine = new();
         private readonly TextWriter _originalOut;
         private readonly TextWriter _originalError;
@@ -36,27 +51,26 @@ namespace EarthEngineEditor
         {
             _originalOut = Console.Out;
             _originalError = Console.Error;
-            _consoleWriter = new ConsoleWriter(this);
-            
+            _consoleWriter = new ConsoleWriter(this, Vector4.One);
+
             // Redirect console output
             Console.SetOut(_consoleWriter);
-            Console.SetError(_consoleWriter);
+            Console.SetError(new ConsoleWriter(this, new Vector4(1, 0.4f, 0.4f, 1))); // light red for errors
         }
 
         /// <summary>
         /// Adds a line to the console log.
         /// </summary>
-        /// <param name="line"></param>
-        public void AddLine(string line)
+        public void AddLine(string line, Vector4? color = null)
         {
             if (string.IsNullOrEmpty(line)) return;
-            
+
+            var colorValue = color ?? new Vector4(1, 1, 1, 1); // default white
+
             lock (_logLines)
             {
-                // Use string interpolation for better performance
-                _logLines.Add($"[{DateTime.Now:HH:mm:ss}] {line}");
-                
-                // Keep only the last maxLines
+                _logLines.Add(new LogLine($"[{DateTime.Now:HH:mm:ss}] {line}", colorValue));
+
                 if (_logLines.Count > _maxLines)
                 {
                     _logLines.RemoveRange(0, _logLines.Count - _maxLines);
@@ -65,7 +79,7 @@ namespace EarthEngineEditor
         }
 
         /// <summary>
-        /// Render the console
+        /// Render the console.
         /// </summary>
         public void Render()
         {
@@ -78,16 +92,13 @@ namespace EarthEngineEditor
             {
                 if (ImGui.MenuItem("Clear"))
                 {
-                    lock (_logLines)
-                    {
-                        _logLines.Clear();
-                    }
+                    lock (_logLines) _logLines.Clear();
                 }
                 if (ImGui.MenuItem("Copy"))
                 {
                     lock (_logLines)
                     {
-                        string allText = string.Join("\n", _logLines);
+                        string allText = string.Join("\n", _logLines.Select(l => l.Text));
                         ImGui.SetClipboardText(allText);
                     }
                 }
@@ -96,20 +107,21 @@ namespace EarthEngineEditor
 
             // Console content
             ImGui.BeginChild("ConsoleContent", Vector2.Zero, ImGuiChildFlags.None, ImGuiWindowFlags.HorizontalScrollbar);
-            
-            // Copy lines to avoid long lock
-            List<string> linesToRender;
+
+            // Copy lines to avoid holding lock during render
+            List<LogLine> linesToRender;
             lock (_logLines)
             {
-                linesToRender = new List<string>(_logLines);
-            }
-            
-            foreach (string line in linesToRender)
-            {
-                ImGui.TextWrapped(line);
+                linesToRender = new List<LogLine>(_logLines);
             }
 
-            // Auto-scroll to bottom
+            foreach (var line in linesToRender)
+            {
+                ImGui.PushStyleColor(ImGuiCol.Text, line.Color);
+                ImGui.TextWrapped(line.Text);
+                ImGui.PopStyleColor();
+            }
+
             if (_autoScroll && ImGui.GetScrollY() >= ImGui.GetScrollMaxY())
             {
                 ImGui.SetScrollHereY(1.0f);
@@ -124,7 +136,6 @@ namespace EarthEngineEditor
         /// </summary>
         public void Dispose()
         {
-            // Restore original console output
             Console.SetOut(_originalOut);
             Console.SetError(_originalError);
         }
@@ -136,56 +147,37 @@ namespace EarthEngineEditor
         {
             private readonly ConsoleWindow _consoleWindow;
             public override Encoding Encoding => Encoding.UTF8;
+            private readonly Vector4 _color;
 
-            /// <summary>
-            /// Initializes a new instance of the <see cref="ConsoleWriter"/> class.
-            /// </summary>
-            /// <param name="consoleWindow"></param>
-            public ConsoleWriter(ConsoleWindow consoleWindow)
+            public ConsoleWriter(ConsoleWindow consoleWindow, Vector4 color)
             {
                 _consoleWindow = consoleWindow;
+                _color = color;
             }
 
-            /// <summary>
-            /// Writes a character to the console window without adding a new line.
-            /// </summary>
-            /// <param name="value"></param>
             public override void Write(char value)
             {
                 _consoleWindow._currentLine.Append(value);
             }
 
-            /// <summary>
-            /// Writes a string to the console window without adding a new line.
-            /// </summary>
-            /// <param name="value"></param>
             public override void Write(string? value)
             {
                 if (value != null)
-                {
                     _consoleWindow._currentLine.Append(value);
-                }
             }
 
-            /// <summary>
-            /// Writes a line to the console window and clears the current line buffer.
-            /// </summary>
-            /// <param name="value"></param>
             public override void WriteLine(string? value)
             {
                 _consoleWindow._currentLine.Append(value);
-                _consoleWindow.AddLine(_consoleWindow._currentLine.ToString());
+                _consoleWindow.AddLine(_consoleWindow._currentLine.ToString(), _color);
                 _consoleWindow._currentLine.Clear();
             }
 
-            /// <summary>
-            /// Writes a new line to the console window and clears the current line buffer.
-            /// </summary>
             public override void WriteLine()
             {
-                _consoleWindow.AddLine(_consoleWindow._currentLine.ToString());
+                _consoleWindow.AddLine(_consoleWindow._currentLine.ToString(), _color);
                 _consoleWindow._currentLine.Clear();
             }
         }
     }
-} 
+}
