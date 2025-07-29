@@ -15,6 +15,7 @@ using Engine.Core.Game.Components;
 using System.Text.Json.Serialization;
 using MonoGame.Extended.Serialization.Json;
 using Engine.Core.Data;
+using System.Reflection;
 
 namespace Engine.Core.Rooms
 {
@@ -112,9 +113,7 @@ namespace Engine.Core.Rooms
         /// <param name="path"></param>
         public static Room Load(string path)
         {
-            // Deserialize our scene
-            string fullPath = EnginePaths.AssetsBase;
-            fullPath = Path.Combine(fullPath, path);
+            string fullPath = Path.Combine(EnginePaths.AssetsBase, path);
             Console.WriteLine($"Loading scene from: {fullPath}");
 
             Room scene = new Room();
@@ -127,19 +126,22 @@ namespace Engine.Core.Rooms
                 var options = new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true,
-                    Converters = { new ComponentListJsonConverter() },
                     IncludeFields = true,
+                    Converters =
+            {
+                new ComponentListJsonConverter(),
+                new Vector2JsonConverter(),
+                new ColorJsonConverter()
+            }
                 };
-                options.Converters.Add(new Vector2JsonConverter());
-                options.Converters.Add(new ColorJsonConverter());
 
-                // Deserialize, and then assign if successful
                 var sceneData = JsonSerializer.Deserialize<Room>(json, options);
 
                 if (sceneData != null)
                 {
                     scene = sceneData;
-                    Console.WriteLine($"Loaded scene: {scene.Name}");
+                    scene.Name = name;
+
                     foreach (var obj in scene.objects)
                     {
                         foreach (var component in obj.components)
@@ -151,7 +153,10 @@ namespace Engine.Core.Rooms
                             }
                         }
                     }
-                    scene.Name = name;
+
+                    GameReferenceResolver.Resolve(scene.objects);
+
+                    scene.Initialize(); // Call Create on all components
                 }
             }
             catch (Exception ex)

@@ -16,6 +16,43 @@ using Engine.Core;
 namespace Editor.AssetManagement
 {
     /// <summary>
+    /// Handles resolving references to GameObjects by their unique IDs during deserialization.
+    /// </summary>
+    public static class GameReferenceResolver
+    {
+        private static readonly List<(object Target, FieldInfo Field, Guid ID)> _pending = new();
+
+        /// <summary>
+        /// Registers a pending reference to a GameObject by its ID.
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="field"></param>
+        /// <param name="id"></param>
+        public static void Register(object target, FieldInfo field, Guid id)
+        {
+            _pending.Add((target, field, id));
+        }
+
+        /// <summary>
+        /// Resolves all pending GameObject references by matching IDs with actual GameObjects in the scene.
+        /// </summary>
+        /// <param name="objects"></param>
+        public static void Resolve(List<GameObject> objects)
+        {
+            foreach (var (target, field, id) in _pending)
+            {
+                var match = objects.FirstOrDefault(o => o.ID == id);
+                if (match != null)
+                    field.SetValue(target, match);
+                else
+                    Console.WriteLine($"[ReferenceResolver] GameObject ID {id} not found for {target.GetType().Name}.{field.Name}");
+            }
+
+            _pending.Clear();
+        }
+    }
+
+    /// <summary>
     /// Custom JSON converter for serializing and deserializing lists of IComponent.
     /// </summary>
     public class ComponentListJsonConverter : JsonConverter<List<IComponent>>
@@ -35,7 +72,10 @@ namespace Editor.AssetManagement
             foreach (var element in doc.RootElement.EnumerateArray())
             {
                 if (!element.TryGetProperty("type", out var typeProp))
+                {
                     Console.WriteLine("Component missing 'type' field");
+                    continue;
+                }
 
                 var typeName = typeProp.GetString();
                 if (!ComponentRegistry.Components.TryGetValue(typeName, out var info))
@@ -43,35 +83,58 @@ namespace Editor.AssetManagement
                     Console.WriteLine($"Unknown component type: {typeName}");
                     continue;
                 }
+
                 var concreteType = info.Type;
-
-                var json = element.GetRawText();
                 var component = Activator.CreateInstance(concreteType);
-                var fields = concreteType.GetFields(BindingFlags.Public | BindingFlags.Instance);
 
-                foreach (var field in fields)
+                // Deserialize public fields
+                foreach (var field in concreteType.GetFields(BindingFlags.Public | BindingFlags.Instance))
                 {
                     if (element.TryGetProperty(field.Name, out var fieldElement))
                     {
                         try
                         {
-                            object? value = null;
-
                             if (field.FieldType == typeof(GameObject))
                             {
-                                var id = Guid.Parse(fieldElement.GetString() ?? string.Empty);
-                                value = EngineContext.Current.Scene?.objects.FirstOrDefault(o => o.ID == id);
+                                if (Guid.TryParse(fieldElement.GetString(), out Guid id))
+                                {
+                                    GameReferenceResolver.Register(component, field, id);
+                                }
                             }
                             else
                             {
-                                value = JsonSerializer.Deserialize(fieldElement.GetRawText(), field.FieldType, options);
+                                object? value = JsonSerializer.Deserialize(fieldElement.GetRawText(), field.FieldType, options);
+                                field.SetValue(component, value);
                             }
-
-                            field.SetValue(component, value);
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine($"[Deserializer] Failed to load {field.Name} on {concreteType.Name}: {ex.Message}");
+                            Console.WriteLine($"[Deserializer] Failed to load field {field.Name} on {concreteType.Name}: {ex.Message}");
+                        }
+                    }
+                }
+
+                // Deserialize public properties with both getter and setter
+                foreach (var prop in concreteType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                {
+                    if (!prop.CanRead || !prop.CanWrite) continue;
+                    if (prop.GetIndexParameters().Length > 0) continue;
+                    if (prop.GetCustomAttribute<JsonIgnoreAttribute>() != null) continue;
+
+                    if (element.TryGetProperty(prop.Name, out var propElement))
+                    {
+                        try
+                        {
+                            object? value = prop.PropertyType == typeof(GameObject)
+                                ? EngineContext.Current.Scene?.objects.FirstOrDefault(o =>
+                                    o.ID == Guid.Parse(propElement.GetString() ?? string.Empty))
+                                : JsonSerializer.Deserialize(propElement.GetRawText(), prop.PropertyType, options);
+
+                            prop.SetValue(component, value);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"[Deserializer] Failed to load property {prop.Name} on {concreteType.Name}: {ex.Message}");
                         }
                     }
                 }
@@ -79,6 +142,7 @@ namespace Editor.AssetManagement
                 if (component is IComponent comp)
                 {
                     components.Add(comp);
+                    Console.WriteLine($"[Deserialize] Added component {comp.GetType().Name} (Hash: {comp.GetHashCode()})");
                 }
             }
 

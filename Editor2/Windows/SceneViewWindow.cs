@@ -67,7 +67,7 @@ namespace EarthEngineEditor.Windows
                 EditorApp.Instance.selectionMode = EditorSelectionMode.Object;
             }
 
-            if (_showSceneView)
+            if (_showSceneView && scene != null)
             {
                 SyncUnfolderedObjects();
                 RenderHierarchy();

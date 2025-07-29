@@ -22,6 +22,7 @@ using Engine.Core.Rooms;
 using Engine.Core.Audio;
 using Engine.Core.Scripting;
 using Engine.Core.Data;
+using System.IO;
 
 namespace EarthEngineEditor
 {
@@ -76,6 +77,9 @@ namespace EarthEngineEditor
             _imGuiRenderer = new ImGuiRenderer(this);
             _windowManager = new WindowManager(this,_consoleWindow);
             editorOverlay = new EditorOverlay(GraphicsDevice);
+            string binDir = AppContext.BaseDirectory;
+            string projectRoot = Path.GetFullPath(Path.Combine(binDir, "..", "..", "..", ".."));
+            EnginePaths.SHARED_CONTENT_PATH = Path.Combine(projectRoot, "Content", "bin");
 
             // Enable docking
             var io = ImGui.GetIO();
@@ -169,7 +173,7 @@ namespace EarthEngineEditor
         {
             GraphicsDevice.Clear(XnaColor.CornflowerBlue);
 
-            runtime.Draw(spriteBatch); // Render the game
+            runtime.Draw(spriteBatch);
 
             if (!playingInEditor)
             {

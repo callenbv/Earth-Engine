@@ -22,7 +22,6 @@ namespace Engine.Core.Graphics
         private static FontLibrary? _main;
         private GraphicsDevice? graphicsDevice = null;
         private ContentManager? contentManager = null;
-
         public static FontLibrary Main => _main ??= new FontLibrary();
 
         /// <summary>
@@ -62,7 +61,7 @@ namespace Engine.Core.Graphics
                     {
                         Console.WriteLine($"[FontLibrary] Attempting to load font: {fontName}");
 
-                        var font = contentManager.Load<SpriteFont>(Path.Combine("Assets", "Fonts", fontName));
+                        var font = contentManager.Load<SpriteFont>(fontName);
                         fonts[fontName] = font;
                         Console.WriteLine($"[FontLibrary] Successfully loaded font: {fontName}");
                     }

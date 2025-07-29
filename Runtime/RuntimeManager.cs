@@ -136,24 +136,24 @@ namespace GameRuntime
         /// <param name="spriteBatch"></param>
         public void Draw(SpriteBatch spriteBatch)
         {
+            if (scene == null)
+                return;
+
             var viewport = _graphicsDevice.Viewport;
 
             // Draw scene to render target (high internal resolution for smooth subpixel movement)
             _graphicsDevice.SetRenderTarget(_sceneRenderTarget);
             _graphicsDevice.Clear(Microsoft.Xna.Framework.Color.CornflowerBlue);
 
-            if (scene != null)
-            {
-                // Draw the tilemaps deferred
-                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.Main.GetViewMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight));
-                TilemapManager.Render(spriteBatch);
-                spriteBatch.End();
+            // Draw the tilemaps deferred
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.Main.GetViewMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight));
+            TilemapManager.Render(spriteBatch);
+            spriteBatch.End();
 
-                // Draw the sprites depth sorted
-                spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.Main.GetViewMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight));
-                scene.Render(spriteBatch);
-                spriteBatch.End();
-            }
+            // Draw the sprites depth sorted
+            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.Main.GetViewMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight));
+            scene.Render(spriteBatch);
+            spriteBatch.End();
 
             // Update the lightmap
             _lighting.Draw(scene,spriteBatch);
