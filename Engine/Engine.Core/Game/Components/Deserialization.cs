@@ -10,6 +10,8 @@ using Engine.Core.Game.Components;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Reflection;
+using Engine.Core.Game;
+using Engine.Core;
 
 namespace Editor.AssetManagement
 {
@@ -44,7 +46,35 @@ namespace Editor.AssetManagement
                 var concreteType = info.Type;
 
                 var json = element.GetRawText();
-                var component = JsonSerializer.Deserialize(json, concreteType, options);
+                var component = Activator.CreateInstance(concreteType);
+                var fields = concreteType.GetFields(BindingFlags.Public | BindingFlags.Instance);
+
+                foreach (var field in fields)
+                {
+                    if (element.TryGetProperty(field.Name, out var fieldElement))
+                    {
+                        try
+                        {
+                            object? value = null;
+
+                            if (field.FieldType == typeof(GameObject))
+                            {
+                                var id = Guid.Parse(fieldElement.GetString() ?? string.Empty);
+                                value = EngineContext.Current.Scene?.objects.FirstOrDefault(o => o.ID == id);
+                            }
+                            else
+                            {
+                                value = JsonSerializer.Deserialize(fieldElement.GetRawText(), field.FieldType, options);
+                            }
+
+                            field.SetValue(component, value);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"[Deserializer] Failed to load {field.Name} on {concreteType.Name}: {ex.Message}");
+                        }
+                    }
+                }
 
                 if (component is IComponent comp)
                 {
@@ -64,9 +94,43 @@ namespace Editor.AssetManagement
         public override void Write(Utf8JsonWriter writer, List<IComponent> value, JsonSerializerOptions options)
         {
             writer.WriteStartArray();
+
             foreach (var component in value)
             {
-                JsonSerializer.Serialize(writer, component, component.GetType(), options);
+                writer.WriteStartObject();
+                writer.WriteString("type", component.GetType().Name);
+
+                Type type = component.GetType();
+
+                // Serialize public instance fields
+                foreach (var field in type.GetFields(BindingFlags.Public | BindingFlags.Instance))
+                {
+                    writer.WritePropertyName(field.Name);
+                    var fieldValue = field.GetValue(component);
+
+                    if (fieldValue is GameObject go)
+                        writer.WriteStringValue(go.ID.ToString());
+                    else
+                        JsonSerializer.Serialize(writer, fieldValue, field.FieldType, options);
+                }
+
+                // Serialize public instance properties with getters & setters
+                foreach (var prop in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                {
+                    if (!prop.CanRead || !prop.CanWrite) continue;
+                    if (prop.GetIndexParameters().Length > 0) continue; // skip indexers
+                    if (prop.GetCustomAttribute<JsonIgnoreAttribute>() != null) continue;
+
+                    writer.WritePropertyName(prop.Name);
+                    var propValue = prop.GetValue(component);
+
+                    if (propValue is GameObject go)
+                        writer.WriteStringValue(go.ID.ToString());
+                    else
+                        JsonSerializer.Serialize(writer, propValue, prop.PropertyType, options);
+                }
+
+                writer.WriteEndObject();
             }
             writer.WriteEndArray();
         }

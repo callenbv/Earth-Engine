@@ -43,9 +43,16 @@ namespace Engine.Core.Rooms
         /// </summary>
         public void Render(SpriteBatch spriteBatch)
         {
-            foreach (var obj in objects)
+            try
             {
-                obj.Draw(spriteBatch);
+                foreach (var obj in objects)
+                {
+                    obj.Draw(spriteBatch);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error rendering scene: {ex.Message}");
             }
         }
 
@@ -55,9 +62,16 @@ namespace Engine.Core.Rooms
         /// <param name="spriteBatch"></param>
         public void RenderUI(SpriteBatch spriteBatch)
         {
-            foreach (var obj in objects)
+            try
             {
-                obj.DrawUI(spriteBatch);
+                foreach (var obj in objects)
+                {
+                    obj.DrawUI(spriteBatch);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error rendering scene: {ex.Message}");
             }
         }
 
@@ -69,19 +83,26 @@ namespace Engine.Core.Rooms
         {
             List<GameObject> destroyedObjects = new List<GameObject>();
 
-            foreach (var obj in objects)
+            try
             {
-                // Destroyed objects defer their destruction
-                if (obj.IsDestroyed)
-                    destroyedObjects.Add(obj);
+                foreach (var obj in objects)
+                {
+                    // Destroyed objects defer their destruction
+                    if (obj.IsDestroyed)
+                        destroyedObjects.Add(obj);
 
-                obj.Update(gameTime);
+                    obj.Update(gameTime);
+                }
+
+                // Remove destroyed objects
+                foreach (GameObject obj in destroyedObjects)
+                {
+                    objects.Remove(obj);
+                }
             }
-
-            // Remove destroyed objects
-            foreach (GameObject obj in destroyedObjects)
+            catch (Exception ex)
             {
-                objects.Remove(obj);
+                Console.WriteLine($"Error updating scene: {ex.Message}");
             }
         }
 
@@ -108,7 +129,6 @@ namespace Engine.Core.Rooms
                     PropertyNameCaseInsensitive = true,
                     Converters = { new ComponentListJsonConverter() },
                     IncludeFields = true,
-                    ReferenceHandler = ReferenceHandler.Preserve,
                 };
                 options.Converters.Add(new Vector2JsonConverter());
                 options.Converters.Add(new ColorJsonConverter());

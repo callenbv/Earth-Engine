@@ -92,9 +92,9 @@ namespace Engine.Core.Game.Components
         /// </summary>
         [JsonIgnore]
         [HideInInspector]
-        public float Scale
+        public Vector2 Scale
         {
-            get => Owner?.GetComponent<Transform>()?.Scale ?? 1f;
+            get => Owner?.GetComponent<Transform>()?.Scale ?? Vector2.One;
             set
             {
                 var transform = Owner?.GetComponent<Transform>();

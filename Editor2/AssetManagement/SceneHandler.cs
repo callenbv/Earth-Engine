@@ -8,6 +8,7 @@
 
 using EarthEngineEditor.Windows;
 using Engine.Core.Data;
+using Engine.Core.Game;
 using Engine.Core.Rooms;
 using GameRuntime;
 using MonoGame.Extended.Serialization.Json;
@@ -73,7 +74,6 @@ namespace Editor.AssetManagement
                     WriteIndented = true,
                     IncludeFields = true,
                     Converters = { new ComponentListJsonConverter() },
-                    ReferenceHandler = ReferenceHandler.Preserve
                 };
                 options.Converters.Add(new Vector2JsonConverter());
                 options.Converters.Add(new ColorJsonConverter());

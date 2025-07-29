@@ -14,6 +14,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Engine.Core.Data;
 using MonoGame.Extended.Serialization.Json;
+using Engine.Core.CustomMath;
 
 namespace Engine.Core.Game
 {
@@ -58,9 +59,9 @@ namespace Engine.Core.Game
         /// <summary>
         /// Scale of the GameObject, affecting its size in the game world.
         /// </summary>
-        public float Scale
+        public Vector2 Scale
         {
-            get => GetComponent<Transform>()?.Scale ?? 1f;
+            get => GetComponent<Transform>()?.Scale ?? Vector2.One;
             set
             {
                 var transform = GetComponent<Transform>();
@@ -73,6 +74,11 @@ namespace Engine.Core.Game
         /// List of child GameObjects that are part of this GameObject's hierarchy.
         /// </summary>
         public List<GameObject> children = new List<GameObject>();
+
+        /// <summary>
+        /// Unique identifier for the GameObject, used for serialization and identification.
+        /// </summary>
+        public Guid ID { get; set; } = Guid.NewGuid();
 
         /// <summary>
         /// Parent GameObject, if this GameObject is part of a hierarchy.

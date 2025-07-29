@@ -88,6 +88,11 @@ namespace Engine.Core.Game.Components
         public float depth = 0;
 
         /// <summary>
+        /// Indicates if this sprite will be drawn in UI coordinates
+        /// </summary>
+        public bool IsUI { get; set; } = false;
+
+        /// <summary>
         /// The sprite effects applied to the sprite, such as flipping or mirroring.
         /// </summary>
         [HideInInspector]
@@ -194,7 +199,22 @@ namespace Engine.Core.Game.Components
         /// <param name="scale"></param>
         public override void Draw(SpriteBatch spriteBatch)
         {
-            if (texture == null)
+            if (texture == null || IsUI)
+                return;
+
+            frame = Math.Clamp(frame, 0, frameCount - 1);
+            depth = GetDepth();
+            origin = new Vector2(frameWidth / 2, frameHeight / 2);
+            spriteBatch.Draw(texture, Position, spriteBox, Tint, Rotation, origin, Scale, spriteEffect, depth);
+        }
+
+        /// <summary>
+        /// Draw the sprite in UI coordinates
+        /// </summary>
+        /// <param name="spriteBatch"></param>
+        public override void DrawUI(SpriteBatch spriteBatch)
+        {
+            if (texture == null || !IsUI)
                 return;
 
             frame = Math.Clamp(frame, 0, frameCount - 1);

@@ -67,13 +67,22 @@ namespace Engine.Core.Scripting
 
             var parseOptions = new CSharpParseOptions(LanguageVersion.Latest);
 
+            var defaultUsings = string.Join("\n", new[]
+            {
+                "using System;"
+            }) + "\n\n";
+
             var syntaxTrees = scriptFiles.Select(file =>
-                CSharpSyntaxTree.ParseText(
-                    File.ReadAllText(file),
+            {
+                string userCode = File.ReadAllText(file);
+                string fullCode = defaultUsings + userCode;
+
+                return CSharpSyntaxTree.ParseText(
+                    fullCode,
                     parseOptions,
                     path: file
-                )
-            ).ToList();
+                );
+            }).ToList();
 
             var references = ResolveReferences();
 

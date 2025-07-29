@@ -7,6 +7,7 @@
 /// -----------------------------------------------------------------------------
 
 using EarthEngineEditor;
+using EarthEngineEditor.Windows;
 using Engine.Core.CustomMath;
 using Engine.Core.Data;
 using Engine.Core.Game;
@@ -18,6 +19,7 @@ using MonoGame.Extended.Serialization.Json;
 using System.IO;
 using System.Numerics;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -242,9 +244,20 @@ namespace Editor.AssetManagement
             else if (value is Microsoft.Xna.Framework.Vector2 v)
             {
                 System.Numerics.Vector2 input = v.ToNumerics();
-                if (ImGui.InputFloat2($"##{name}", ref input))
+
+                if (sliderAttr != null)
                 {
-                    setValue(input.ToXna());
+                    if (ImGui.SliderFloat2($"##{name}", ref input,0f,20f))
+                    {
+                        setValue(input.ToXna());
+                    }
+                }
+                else
+                {
+                    if (ImGui.InputFloat2($"##{name}", ref input))
+                    {
+                        setValue(input.ToXna());
+                    }
                 }
             }
             else if (value is Microsoft.Xna.Framework.Color color)
@@ -310,6 +323,56 @@ namespace Editor.AssetManagement
 
                     IntPtr imImage = ImGuiRenderer.Instance.BindTexture(imTex);
                     ImGui.Image(imImage, targetSize);
+                }
+            }
+            else if (expectedType == typeof(GameObject))
+            {
+                GameObject obj = (GameObject)value;
+                string label = obj != null ? obj.Name : "None";
+
+                if (ImGui.Button(label))
+                {
+                    ImGui.OpenPopup("SelectGameObject");
+                }
+
+                if (ImGui.BeginPopup("SelectGameObject"))
+                {
+                    foreach (var sceneObj in SceneViewWindow.Instance.scene.objects)
+                    {
+                        if (ImGui.Selectable(sceneObj.Name))
+                        {
+                            Console.WriteLine($"Ref is {sceneObj.Name}, instance: {sceneObj.GetHashCode()}");
+                            setValue(sceneObj); // update your serialized field
+                        }
+                    }
+
+                    ImGui.EndPopup();
+                }
+
+                if (ImGui.BeginDragDropSource())
+                {
+                    unsafe
+                    {
+                        GCHandle handle = GCHandle.Alloc(obj);
+                        ImGui.SetDragDropPayload("GAMEOBJECT_REF", (IntPtr)handle, sizeof(uint));
+                        ImGui.Text(obj.Name);
+                        ImGui.EndDragDropSource();
+                    }
+                }
+
+                if (ImGui.BeginDragDropTarget())
+                {
+                    unsafe
+                    {
+                        var payload = ImGui.AcceptDragDropPayload("GAMEOBJECT_REF");
+                        if (payload.NativePtr != null)
+                        {
+                            var handle = GCHandle.FromIntPtr(payload.Data);
+                            value = (GameObject)handle.Target;
+                            handle.Free();
+                        }
+                        ImGui.EndDragDropTarget();
+                    }
                 }
             }
             else
