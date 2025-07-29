@@ -21,6 +21,7 @@ namespace Engine.Core.Game.Components
     public class Sprite2D : ObjectComponent
     {
         public override string Name => "Sprite 2D";
+        public override bool UpdateInEditor => true;
 
         /// <summary>
         /// The texture used for the sprite. If set, it will automatically update the texturePath, frameWidth, frameHeight, and spriteBox properties.

@@ -143,11 +143,16 @@ namespace EarthEngineEditor
                     EngineContext.Running = false;
                     Audio.StopAll();
                     Camera.Main.Reset();
+
                     // Reset scene
                     if (_settings.RestartOnPlay)
                     {
-                        RuntimeManager.Instance.scene = Room.Load(runtime.scene.FilePath);
+                        Room scene = Room.Load(runtime.scene.FilePath);
+                        runtime.scene = scene;
+                        SceneViewWindow.Instance.scene = scene;
+                        SceneViewWindow.Instance.scene.FilePath = scene.FilePath;
                     }
+
                     Console.WriteLine("[EDITOR] Game stopped");
                 }
             }
@@ -254,6 +259,8 @@ namespace EarthEngineEditor
         /// </summary>
         public void LaunchGame()
         {
+            _windowManager.SaveProject();
+
             if (!_settings.PlayInEditor)
             {
                 // Launch new runtime window
