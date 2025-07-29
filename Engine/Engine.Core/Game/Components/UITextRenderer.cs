@@ -20,9 +20,9 @@ namespace Engine.Core.Game.Components
         /// <summary>
         /// If this is tethered to the object or not
         /// </summary>
-        public bool Tethered = true;
-        public Vector2 UIPosition;
+        new public Vector2 Position;
         public override string Name => "UI Text Renderer";
+        public override bool UpdateInEditor => true;
 
         /// <summary>
         /// Does not inherit draw from text renderer in world
@@ -42,17 +42,10 @@ namespace Engine.Core.Game.Components
             if (!Visible || string.IsNullOrEmpty(Text) || currentFont == null || Owner == null)
                 return;
 
-            Vector2 position = Owner.Position + Offset;
-
-            if (!Tethered)
-            {
-                position = UIPosition;
-            }
-            
             if (Centered)
             {
                 // Center the text around the object's position
-                position -= textSize * Scale * 0.5f;
+                Position -= textSize * Scale * 0.5f;
             }
 
             // Use UI transform matrix for screen-space rendering
@@ -64,7 +57,7 @@ namespace Engine.Core.Game.Components
             spriteBatch.DrawString(
                 currentFont,
                 Text,
-                position,
+                Position,
                 Color,
                 Rotation,
                 Origin,

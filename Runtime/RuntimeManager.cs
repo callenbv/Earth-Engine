@@ -183,9 +183,10 @@ namespace GameRuntime
             spriteBatch.Draw(_lighting.GetLightmap(), new Vector2(offsetX, offsetY), null, Microsoft.Xna.Framework.Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
             spriteBatch.End();
 
-            //// Draw UI elements directly to screen (no separate render target for now)
-            //spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.LinearClamp, null, null, null, Camera.Main.GetUIViewMatrix(viewport.Width, viewport.Height));
-            //spriteBatch.End();
+            // Draw UI elements directly to screen (no separate render target for now)
+            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.LinearClamp, null, null, null, Camera.Main.GetUIViewMatrix(viewport.Width, viewport.Height));
+            scene.RenderUI(spriteBatch);
+            spriteBatch.End();
         }
 
         /// <summary>

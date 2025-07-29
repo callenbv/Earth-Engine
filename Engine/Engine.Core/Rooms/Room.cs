@@ -50,6 +50,18 @@ namespace Engine.Core.Rooms
         }
 
         /// <summary>
+        /// Render UI elements in the scene
+        /// </summary>
+        /// <param name="spriteBatch"></param>
+        public void RenderUI(SpriteBatch spriteBatch)
+        {
+            foreach (var obj in objects)
+            {
+                obj.DrawUI(spriteBatch);
+            }
+        }
+
+        /// <summary>
         /// Update a scene
         /// </summary>
         /// <param name="gameTime"></param>

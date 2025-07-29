@@ -144,14 +144,13 @@ namespace EarthEngineEditor
                     Audio.StopAll();
                     Camera.Main.Reset();
 
-                    // Reset scene
-                    if (_settings.RestartOnPlay)
-                    {
-                        Room scene = Room.Load(runtime.scene.FilePath);
-                        runtime.scene = scene;
-                        SceneViewWindow.Instance.scene = scene;
-                        SceneViewWindow.Instance.scene.FilePath = scene.FilePath;
-                    }
+                    // Reset scene to what it was before play
+                    Room scene = Room.Load(runtime.scene.FilePath);
+                    Asset room = Asset.Get(scene.Name);
+                    runtime.scene = scene;
+                    SceneViewWindow.Instance.scene = scene;
+                    SceneViewWindow.Instance.scene.FilePath = scene.FilePath;
+                    room.Open();
 
                     Console.WriteLine("[EDITOR] Game stopped");
                 }

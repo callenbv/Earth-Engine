@@ -20,6 +20,7 @@ namespace Engine.Core.Game.Components
     public class TextRenderer : ObjectComponent
     {
         public override string Name => "Text Renderer";
+        public override bool UpdateInEditor => true;
         public string Text { get; set; } = "";
         public Color Color { get; set; } = Color.White;
         new public float Scale { get; set; } = 1.0f;
@@ -38,7 +39,7 @@ namespace Engine.Core.Game.Components
         /// <summary>
         /// Initialize the text renderer component.
         /// </summary>
-        public override void Create()
+        public override void Initialize()
         {
             if (currentFont == null)
             {
@@ -83,7 +84,6 @@ namespace Engine.Core.Game.Components
         public void SetText(string text)
         {
             Text = text;
-            UpdateTextSize();
         }
 
         /// <summary>
@@ -94,7 +94,6 @@ namespace Engine.Core.Game.Components
         {
             FontName = fontName;
             LoadFont();
-            UpdateTextSize();
         }
 
         /// <summary>
@@ -113,7 +112,6 @@ namespace Engine.Core.Game.Components
         public void SetScale(float scale)
         {
             Scale = scale;
-            UpdateTextSize();
         }
 
         /// <summary>
@@ -141,7 +139,7 @@ namespace Engine.Core.Game.Components
         /// <summary>
         /// Update the cached text size
         /// </summary>
-        private void UpdateTextSize()
+        public override void Update(GameTime gameTime)
         {
             if (currentFont != null && !string.IsNullOrEmpty(Text))
             {
