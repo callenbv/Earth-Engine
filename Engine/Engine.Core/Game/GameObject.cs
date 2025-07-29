@@ -14,8 +14,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Engine.Core.Data;
 using MonoGame.Extended.Serialization.Json;
-using Engine.Core.CustomMath;
-using Engine.Core.Graphics;
 
 namespace Engine.Core.Game
 {

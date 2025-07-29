@@ -34,7 +34,6 @@ namespace Engine.Core.Game
         /// <summary>
         /// The scale of the GameObject. This is used to scale the object in the world.
         /// </summary>
-        [SliderEditor(0f, 100f)]
         new public Vector2 Scale { get; set; } = Vector2.One;
     }
 }

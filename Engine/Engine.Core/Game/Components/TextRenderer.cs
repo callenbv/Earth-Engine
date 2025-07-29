@@ -33,13 +33,12 @@ namespace Engine.Core.Game.Components
         private string text_ = string.Empty;
 
         public Color Color { get; set; } = Color.White;
-        new public float Scale { get; set; } = 1.0f;
-        new public float Rotation { get; set; } = 0.0f;
+        public float TextScale { get; set; } = 1.0f;
         public float Depth { get; set; } = 1.0f;
         public bool Visible { get; set; } = true;
         public bool Centered { get; set; } = false;
 
-        public string FontName = "Default";
+        public string FontName = "UI";
         public Vector2 Origin = Vector2.Zero;
         public SpriteEffects Effects = SpriteEffects.None;
         public Vector2 Offset = Vector2.Zero;
@@ -81,7 +80,7 @@ namespace Engine.Core.Game.Components
                 Color,
                 Rotation,
                 Origin,
-                Scale,
+                TextScale,
                 Effects,
                 Depth
             );
@@ -121,7 +120,7 @@ namespace Engine.Core.Game.Components
         /// <param name="scale">Scale factor</param>
         public void SetScale(float scale)
         {
-            Scale = scale;
+            TextScale = scale;
         }
 
         /// <summary>
