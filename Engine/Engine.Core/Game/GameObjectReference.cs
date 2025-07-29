@@ -1,4 +1,12 @@
-﻿
+﻿/// -----------------------------------------------------------------------------
+/// <Project>      Earth Engine 
+/// <File>         GameObjectReference.cs
+/// <Author>       Callen Betts Virott 
+/// <Copyright>    @2025 Callen Betts Virott. All rights reserved.
+/// <Summary>                
+/// -----------------------------------------------------------------------------
+
+
 namespace Engine.Core.Game
 {
     using System.Text.Json;
@@ -23,3 +31,4 @@ namespace Engine.Core.Game
     }
 
 }
+
