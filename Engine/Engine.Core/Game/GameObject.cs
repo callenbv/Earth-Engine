@@ -408,33 +408,44 @@ namespace Engine.Core.Game
         public Rectangle GetBoundingBox()
         {
             Vector2 pos = Position;
+            Rectangle? bounds = null;
 
-            // Check for a Sprite2D
+            // Sprite2D bounds
             var sprite = GetComponent<Sprite2D>();
             if (sprite != null)
             {
-                return new Rectangle(
+                Rectangle spriteBox = new Rectangle(
                     (int)(pos.X - sprite.origin.X),
                     (int)(pos.Y - sprite.origin.Y),
                     sprite.spriteBox.Width,
                     sprite.spriteBox.Height
                 );
+
+                bounds = spriteBox;
             }
 
-            // Check for a TextLabel
+            // UITextRenderer bounds
             var text = GetComponent<UITextRenderer>();
             if (text != null)
             {
                 Vector2 size = text.GetTextSize();
-                return new Rectangle(
-                    (int)(pos.X),
-                    (int)(pos.Y),
-                    (int)size.X,
+                Rectangle textBox = new Rectangle(
+                    (int)pos.X,
+                    (int)pos.Y,
+                    (int)(size.X * text.Text.Length), // or precomputed text size
                     (int)size.Y
                 );
+
+                bounds = bounds.HasValue ? Rectangle.Union(bounds.Value, textBox) : textBox;
             }
 
-            return new Rectangle((int)Position.X, (int)Position.Y, 16,16);
+            // Default fallback
+            if (!bounds.HasValue)
+            {
+                bounds = new Rectangle((int)pos.X, (int)pos.Y, 16, 16);
+            }
+
+            return bounds.Value;
         }
     }
 } 
