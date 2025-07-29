@@ -10,6 +10,8 @@ using Editor.AssetManagement;
 using Editor.Windows.TileEditor;
 using Engine.Core;
 using Engine.Core.Data;
+using Engine.Core.Scripting;
+using GameRuntime;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;

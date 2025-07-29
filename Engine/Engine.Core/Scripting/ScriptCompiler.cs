@@ -65,8 +65,14 @@ namespace Engine.Core.Scripting
                 return result;
             }
 
+            var parseOptions = new CSharpParseOptions(LanguageVersion.Latest);
+
             var syntaxTrees = scriptFiles.Select(file =>
-                CSharpSyntaxTree.ParseText(File.ReadAllText(file), path: file)
+                CSharpSyntaxTree.ParseText(
+                    File.ReadAllText(file),
+                    parseOptions,
+                    path: file
+                )
             ).ToList();
 
             var references = ResolveReferences();
@@ -110,11 +116,11 @@ namespace Engine.Core.Scripting
             string? tpa = AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES") as string;
             if (!string.IsNullOrWhiteSpace(tpa))
             {
+                Console.WriteLine($"TRUSTED_PLATFORM_ASSEMBLIES = {tpa}");
+
                 foreach (var path in tpa.Split(Path.PathSeparator))
                 {
-                    // Only add relevant system/standard assemblies
-                    if (path.Contains("System.") || path.Contains("Microsoft.") || path.Contains("netstandard"))
-                        refs.Add(MetadataReference.CreateFromFile(path));
+                    refs.Add(MetadataReference.CreateFromFile(path));
                 }
             }
 

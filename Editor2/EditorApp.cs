@@ -20,6 +20,8 @@ using Engine.Core;
 using Engine.Core.CustomMath;
 using Engine.Core.Rooms;
 using Engine.Core.Audio;
+using Engine.Core.Scripting;
+using Engine.Core.Data;
 
 namespace EarthEngineEditor
 {
@@ -268,9 +270,15 @@ namespace EarthEngineEditor
             else
             {
                 // Play in editor
+                ScriptManager scriptManager;
+                ScriptCompiler.CompileAndLoadScripts(ProjectSettings.AbsoluteProjectPath, out scriptManager);
                 Camera.Main.Reset();
                 EngineContext.Running = true;
-                RuntimeManager.Instance.scene.Initialize();
+
+                Room scene = Room.Load(runtime.scene.FilePath);
+                Asset room = Asset.Get(scene.Name);
+                runtime.scene = scene;
+                runtime.scene.Initialize();
             }
         }
     }
