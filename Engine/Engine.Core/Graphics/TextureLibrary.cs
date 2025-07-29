@@ -6,16 +6,8 @@
 /// <Summary>                
 /// -----------------------------------------------------------------------------
 
-using Engine.Core.Game.Components;
-using Engine.Core.Game;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Engine.Core.Data;
-using System.ComponentModel;
 using Microsoft.Xna.Framework;
 
 namespace Engine.Core.Graphics
@@ -26,6 +18,7 @@ namespace Engine.Core.Graphics
         public GraphicsDevice? graphicsDevice = null;
         public static TextureLibrary Instance; 
         private Texture2D defaultTexture;
+        public Texture2D PixelTexture;
 
         public TextureLibrary()
         {
@@ -71,6 +64,13 @@ namespace Engine.Core.Graphics
                 pixels[i] = Color.White;
 
             defaultTexture.SetData(pixels);
+
+            PixelTexture = new Texture2D(graphicsDevice, 1, 1);
+            pixels = new Color[1];
+            for (int i = 0; i < pixels.Length; i++)
+                pixels[i] = Color.White;
+
+            PixelTexture.SetData(pixels);
         }
 
         /// <summary>

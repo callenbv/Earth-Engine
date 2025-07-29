@@ -98,16 +98,7 @@ namespace EarthEngineEditor.Windows
                 {
                     foreach (var obj in scene.objects)
                     {
-                        Sprite2D? sprite = obj.GetComponent<Sprite2D>();
-                        if (sprite == null) continue;
-
-                        Vector2 pos = obj.Position;
-                        Microsoft.Xna.Framework.Rectangle rect = new Microsoft.Xna.Framework.Rectangle(
-                            (int)(pos.X - sprite.origin.X),
-                            (int)(pos.Y - sprite.origin.Y),
-                            sprite.spriteBox.Width,
-                            sprite.spriteBox.Height
-                            );
+                        Microsoft.Xna.Framework.Rectangle rect = obj.GetBoundingBox();
 
                         if (Input.MouseHover(rect))
                         {

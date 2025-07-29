@@ -7,7 +7,9 @@
 /// -----------------------------------------------------------------------------
 
 using Engine.Core.Game;
+using Engine.Core.Graphics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Engine.Core
 {
@@ -45,6 +47,10 @@ namespace Engine.Core
         public int ViewportHeight { get; set; } = 180;
         public int TargetViewportHeight { get; set; } = 180;
         public int TargetViewportWidth { get; set; } = 320;
+        public int UIWidth { get; set; } = 1280;
+        public int UIHeight { get; set; } = 720;
+        public Vector2 EditorPositon = Vector2.Zero;
+        public float UIEditorZoom = 0.5f;
 
         private static Camera? _main;
         public static Camera Main => _main ??= new Camera();
@@ -107,9 +113,30 @@ namespace Engine.Core
         /// <param name="viewportWidth"></param>
         /// <param name="viewportHeight"></param>
         /// <returns></returns>
-        public Matrix GetUIViewMatrix(int viewportWidth, int viewportHeight)
+        public Matrix GetUIViewMatrix(int viewportWidth, int viewportHeight, bool forEditor = false)
         {
-            return Matrix.Identity;
+            forEditor = !EngineContext.Running;
+            if (!forEditor)
+            {
+                return GetUIScreenFitMatrix(viewportWidth, viewportHeight); // In-game UI
+            }
+
+            return GetViewMatrix(viewportWidth,viewportHeight);
+        }
+
+        /// <summary>
+        /// Get a matrix that fits the UI to the screen size, maintaining aspect ratio.
+        /// </summary>
+        /// <param name="viewportWidth"></param>
+        /// <param name="viewportHeight"></param>
+        /// <returns></returns>
+        public Matrix GetUIScreenFitMatrix(int viewportWidth, int viewportHeight)
+        {
+            float scaleX = (float)viewportWidth / UIWidth;
+            float scaleY = (float)viewportHeight / UIHeight;
+            float scale = Math.Min(scaleX, scaleY);
+
+            return Matrix.CreateScale(scale, scale, 1f);
         }
 
         /// <summary>
@@ -152,6 +179,34 @@ namespace Engine.Core
         {
             ViewportWidth = viewportWidth;
             ViewportHeight = viewportHeight;
+        }
+
+        /// <summary>
+        /// Draw the camera view preview. Used for knowing the UI speed
+        /// </summary>
+        /// <param name="spriteBatch"></param>
+        public void DrawUI(SpriteBatch spriteBatch)
+        {
+            if (EngineContext.Running)
+                return;
+
+            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, GetUIViewMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight,true));
+
+            Texture2D pixel = TextureLibrary.Instance.PixelTexture;
+            Rectangle border = new Rectangle(0, 0, UIWidth, UIHeight);
+            Color color = Color.White;
+            int thickness = 2; // Thickness of the outline
+
+            // Top
+            spriteBatch.Draw(pixel, new Rectangle(border.X, border.Y, border.Width, thickness), color);
+            // Bottom
+            spriteBatch.Draw(pixel, new Rectangle(border.X, border.Y + border.Height - thickness, border.Width, thickness), color);
+            // Left
+            spriteBatch.Draw(pixel, new Rectangle(border.X, border.Y, thickness, border.Height), color);
+            // Right
+            spriteBatch.Draw(pixel, new Rectangle(border.X + border.Width - thickness, border.Y, thickness, border.Height), color);
+
+            spriteBatch.End();
         }
     }
 } 

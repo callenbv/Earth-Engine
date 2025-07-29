@@ -184,7 +184,7 @@ namespace GameRuntime
             spriteBatch.End();
 
             // Draw UI elements directly to screen (no separate render target for now)
-            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.LinearClamp, null, null, null, Camera.Main.GetUIViewMatrix(viewport.Width, viewport.Height));
+            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.Main.GetUIViewMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight));
             scene.RenderUI(spriteBatch);
             spriteBatch.End();
         }

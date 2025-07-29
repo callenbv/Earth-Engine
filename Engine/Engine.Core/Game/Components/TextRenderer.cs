@@ -21,7 +21,17 @@ namespace Engine.Core.Game.Components
     {
         public override string Name => "Text Renderer";
         public override bool UpdateInEditor => true;
-        public string Text { get; set; } = "";
+        public string Text
+        {
+            get => text_;
+            set
+            {
+                text_ = (value == null) ? string.Empty : value;
+            }
+        }
+
+        private string text_ = string.Empty;
+
         public Color Color { get; set; } = Color.White;
         new public float Scale { get; set; } = 1.0f;
         new public float Rotation { get; set; } = 0.0f;

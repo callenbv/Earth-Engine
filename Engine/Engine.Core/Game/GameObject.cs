@@ -15,6 +15,7 @@ using System.Text.Json.Serialization;
 using Engine.Core.Data;
 using MonoGame.Extended.Serialization.Json;
 using Engine.Core.CustomMath;
+using Engine.Core.Graphics;
 
 namespace Engine.Core.Game
 {
@@ -236,7 +237,7 @@ namespace Engine.Core.Game
                 }
                 catch (Exception e) 
                 {
-                    Console.Error.WriteLine($"Error updating component for {Name}: {e.Message}");
+                    Console.Error.WriteLine($"Error updating {component.Name} in {Name}: {e.Message}");
                 }
             }
 
@@ -398,6 +399,42 @@ namespace Engine.Core.Game
             }
 
             return gameObject;
+        }
+
+        /// <summary>
+        /// Get the bounding box of the GameObject based on its components
+        /// </summary>
+        /// <returns></returns>
+        public Rectangle GetBoundingBox()
+        {
+            Vector2 pos = Position;
+
+            // Check for a Sprite2D
+            var sprite = GetComponent<Sprite2D>();
+            if (sprite != null)
+            {
+                return new Rectangle(
+                    (int)(pos.X - sprite.origin.X),
+                    (int)(pos.Y - sprite.origin.Y),
+                    sprite.spriteBox.Width,
+                    sprite.spriteBox.Height
+                );
+            }
+
+            // Check for a TextLabel
+            var text = GetComponent<UITextRenderer>();
+            if (text != null)
+            {
+                Vector2 size = text.GetTextSize();
+                return new Rectangle(
+                    (int)(pos.X),
+                    (int)(pos.Y),
+                    (int)size.X,
+                    (int)size.Y
+                );
+            }
+
+            return new Rectangle((int)Position.X, (int)Position.Y, 16,16);
         }
     }
 } 
