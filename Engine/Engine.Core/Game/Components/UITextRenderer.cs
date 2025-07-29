@@ -35,7 +35,7 @@ namespace Engine.Core.Game.Components
         /// <param name="spriteBatch"></param>
         public override void DrawUI(SpriteBatch spriteBatch)
         {
-            if (!Visible || string.IsNullOrEmpty(Text) || currentFont == null || Owner == null)
+            if (!Visible || string.IsNullOrEmpty(Text) || bitFont == null || Owner == null)
                 return;
 
             Vector2 finalPos = Position;
