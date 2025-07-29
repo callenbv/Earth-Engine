@@ -199,13 +199,13 @@ namespace GameRuntime
 
             if (!File.Exists(runtimeExePath))
             {
-                Console.WriteLine($"[RuntimeManager] Cannot find runtime exe at: {runtimeExePath}");
+                Console.Error.WriteLine($"[RuntimeManager] Cannot find runtime exe at: {runtimeExePath}");
                 return;
             }
 
             if (!Directory.Exists(projectPath))
             {
-                Console.WriteLine($"[RuntimeManager] Project path does not exist: {projectPath}");
+                Console.Error.WriteLine($"[RuntimeManager] Project path does not exist: {projectPath}");
                 return;
             }
 

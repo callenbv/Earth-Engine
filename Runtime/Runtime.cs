@@ -74,6 +74,7 @@ namespace GameRuntime
             _graphics.PreferMultiSampling = false;
             _graphics.PreferredBackBufferWidth = gameOptions.WindowWidth;
             _graphics.PreferredBackBufferHeight = gameOptions.WindowHeight;
+            _graphics.HardwareModeSwitch = false;
 
             // Load the compiled scripts
             ScriptCompiler.LoadScripts();

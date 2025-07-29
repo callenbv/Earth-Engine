@@ -354,7 +354,7 @@ namespace Engine.Core
             }
 
             // Fullscreen toggle (F11 or Alt+Enter)
-            if (IsKeyPressed(Keys.F11) || (IsKeyPressed(Keys.Enter) && (IsKeyDown(Keys.LeftAlt) || IsKeyDown(Keys.RightAlt))))
+            if (IsKeyPressed(Keys.F11))
             {
                 ToggleFullscreen();
             }
@@ -365,11 +365,8 @@ namespace Engine.Core
         /// </summary>
         public static void ToggleFullscreen()
         {
-            if (graphicsManager != null)
-            {
-                graphicsManager.IsFullScreen = !graphicsManager.IsFullScreen;
-                graphicsManager.ApplyChanges();
-            }
+            graphicsManager.IsFullScreen = !graphicsManager.IsFullScreen;
+            graphicsManager.ApplyChanges();
         }
 
         /// <summary>
