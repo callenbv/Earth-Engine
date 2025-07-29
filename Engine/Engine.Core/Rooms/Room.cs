@@ -155,8 +155,6 @@ namespace Engine.Core.Rooms
                     }
 
                     GameReferenceResolver.Resolve(scene.objects);
-
-                    scene.Initialize(); // Call Create on all components
                 }
             }
             catch (Exception ex)
