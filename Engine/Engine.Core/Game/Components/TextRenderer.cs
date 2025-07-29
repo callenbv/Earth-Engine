@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Engine.Core.Graphics;
 using Engine.Core.Data;
+using MonoGame.Extended.BitmapFonts;
 
 namespace Engine.Core.Game.Components
 {
@@ -38,11 +39,12 @@ namespace Engine.Core.Game.Components
         public bool Visible { get; set; } = true;
         public bool Centered { get; set; } = false;
 
-        public string FontName = "UI";
+        private string FontName = "PixelFont";
         public Vector2 Origin = Vector2.Zero;
         public SpriteEffects Effects = SpriteEffects.None;
         public Vector2 Offset = Vector2.Zero;
         protected SpriteFont? currentFont;
+        protected BitmapFont? bitFont;
         protected Vector2 textSize;
 
         /// <summary>
@@ -74,7 +76,7 @@ namespace Engine.Core.Game.Components
             }
 
             spriteBatch.DrawString(
-                currentFont,
+                bitFont,
                 Text,
                 position,
                 Color,
@@ -138,7 +140,9 @@ namespace Engine.Core.Game.Components
         private void LoadFont()
         {
             currentFont = FontLibrary.Main.Get(FontName);
-            if (currentFont == null)
+            bitFont = FontLibrary.Main.GetBitmapFont(FontName);
+
+            if (bitFont == null)
             {
                 Console.WriteLine($"[TextRenderer] Font '{FontName}' not found, using fallback");
                 currentFont = FontLibrary.Main.Get("Default");

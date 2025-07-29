@@ -9,6 +9,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Engine.Core.Data;
+using MonoGame.Extended.BitmapFonts;
 
 namespace Engine.Core.Game.Components
 {
@@ -46,7 +47,7 @@ namespace Engine.Core.Game.Components
             }
 
             spriteBatch.DrawString(
-                currentFont,
+                bitFont,
                 Text,
                 finalPos,
                 Color,

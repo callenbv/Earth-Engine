@@ -13,12 +13,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Engine.Core.Data;
+using MonoGame.Extended.BitmapFonts;
 
 namespace Engine.Core.Graphics
 {
     public class FontLibrary
     {
         public Dictionary<string, SpriteFont> fonts = new Dictionary<string, SpriteFont>();
+        public Dictionary<string, BitmapFont> bitmapFonts = new Dictionary<string, BitmapFont>();
         private static FontLibrary? _main;
         private GraphicsDevice? graphicsDevice = null;
         private ContentManager? contentManager = null;
@@ -54,6 +56,23 @@ namespace Engine.Core.Graphics
 
                 // Load fonts from the centralized Content directory
                 var fontNames = new[] { "Default", "UI" };
+                var pixelFonts = new[] { "PixelFont" };
+
+                foreach (var fontName in pixelFonts)
+                {
+                    try
+                    {
+                        Console.WriteLine($"[FontLibrary] Attempting to load font: {fontName}");
+                        string relativeFontPath = Path.Combine("PixelFont.fnt");
+                        var font = BitmapFont.FromFile(graphicsDevice, relativeFontPath);
+                        bitmapFonts[fontName] = font;
+                        Console.WriteLine($"[FontLibrary] Successfully loaded font: {fontName}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.Error.WriteLine($"[FontLibrary] Failed to load font {fontName}: {ex.Message}");
+                    }
+                }
 
                 foreach (var fontName in fontNames)
                 {
@@ -67,7 +86,7 @@ namespace Engine.Core.Graphics
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"[FontLibrary] Failed to load font {fontName}: {ex.Message}");
+                        Console.Error.WriteLine($"[FontLibrary] Failed to load font {fontName}: {ex.Message}");
                     }
                 }
             }
@@ -114,7 +133,21 @@ namespace Engine.Core.Graphics
             if (fonts.TryGetValue(name, out var font))
                 return font;
 
-            Console.WriteLine($"[FontLibrary] Font '{name}' not found. Make sure LoadFonts() was called and the font exists.");
+            Console.Error.WriteLine($"[FontLibrary] Font '{name}' not found. Make sure LoadFonts() was called and the font exists.");
+            return null;
+        }
+
+        /// <summary>
+        /// Get a bitmap font by name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public BitmapFont? GetBitmapFont(string name)
+        {
+            if (bitmapFonts.TryGetValue(name, out var font))
+                return font;
+
+            Console.Error.WriteLine($"[FontLibrary] Font '{name}' not found. Make sure LoadFonts() was called and the font exists.");
             return null;
         }
 
