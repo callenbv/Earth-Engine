@@ -139,13 +139,11 @@ namespace Engine.Core.Game.Components
         /// </summary>
         private void LoadFont()
         {
-            currentFont = FontLibrary.Main.Get(FontName);
             bitFont = FontLibrary.Main.GetBitmapFont(FontName);
 
             if (bitFont == null)
             {
                 Console.WriteLine($"[TextRenderer] Font '{FontName}' not found, using fallback");
-                currentFont = FontLibrary.Main.Get("Default");
             }
         }
 
@@ -154,9 +152,9 @@ namespace Engine.Core.Game.Components
         /// </summary>
         public override void Update(GameTime gameTime)
         {
-            if (currentFont != null && !string.IsNullOrEmpty(Text))
+            if (bitFont != null && !string.IsNullOrEmpty(Text))
             {
-                textSize = currentFont.MeasureString(Text);
+                textSize = bitFont.MeasureString(Text);
             }
             else
             {

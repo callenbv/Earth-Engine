@@ -14,6 +14,8 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Engine.Core.Data;
 using MonoGame.Extended.Serialization.Json;
+using Engine.Core.CustomMath;
+using Engine.Core.Graphics;
 
 namespace Engine.Core.Game
 {
@@ -406,44 +408,33 @@ namespace Engine.Core.Game
         public Rectangle GetBoundingBox()
         {
             Vector2 pos = Position;
-            Rectangle? bounds = null;
 
-            // Sprite2D bounds
+            // Check for a Sprite2D
             var sprite = GetComponent<Sprite2D>();
             if (sprite != null)
             {
-                Rectangle spriteBox = new Rectangle(
+                return new Rectangle(
                     (int)(pos.X - sprite.origin.X),
                     (int)(pos.Y - sprite.origin.Y),
                     sprite.spriteBox.Width,
                     sprite.spriteBox.Height
                 );
-
-                bounds = spriteBox;
             }
 
-            // UITextRenderer bounds
+            // Check for a TextLabel
             var text = GetComponent<UITextRenderer>();
             if (text != null)
             {
                 Vector2 size = text.GetTextSize();
-                Rectangle textBox = new Rectangle(
-                    (int)pos.X,
-                    (int)pos.Y,
-                    (int)(size.X * text.Text.Length), // or precomputed text size
+                return new Rectangle(
+                    (int)(pos.X),
+                    (int)(pos.Y),
+                    (int)size.X*text.Text.Length,
                     (int)size.Y
                 );
-
-                bounds = bounds.HasValue ? Rectangle.Union(bounds.Value, textBox) : textBox;
             }
 
-            // Default fallback
-            if (!bounds.HasValue)
-            {
-                bounds = new Rectangle((int)pos.X, (int)pos.Y, 16, 16);
-            }
-
-            return bounds.Value;
+            return new Rectangle((int)Position.X, (int)Position.Y, 16,16);
         }
     }
 } 

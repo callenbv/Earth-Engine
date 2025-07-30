@@ -38,6 +38,8 @@ namespace Engine.Core
         /// </summary>
         public GameObject? Target { get; set; } = null;
 
+        public GraphicsDevice graphicsDevice { get; set; } = null;
+
         /// <summary>
         /// The speed at which the camera smoothly follows the target. Higher values result in faster following.
         /// </summary>
@@ -47,8 +49,8 @@ namespace Engine.Core
         public int ViewportHeight { get; set; } = 180;
         public int TargetViewportHeight { get; set; } = 180;
         public int TargetViewportWidth { get; set; } = 320;
-        public int UIWidth { get; set; } = 1280;
-        public int UIHeight { get; set; } = 720;
+        public int UIWidth { get; set; } = 320;
+        public int UIHeight { get; set; } = 180;
         public Vector2 EditorPositon = Vector2.Zero;
         public float UIEditorZoom = 0.5f;
 
@@ -118,7 +120,7 @@ namespace Engine.Core
             forEditor = !EngineContext.Running;
             if (!forEditor)
             {
-                return GetUIScreenFitMatrix(viewportWidth, viewportHeight); // In-game UI
+                return GetUIScreenFitMatrix(ViewportWidth, ViewportHeight); // In-game UI
             }
 
             return GetViewMatrix(viewportWidth,viewportHeight);
@@ -136,7 +138,11 @@ namespace Engine.Core
             float scaleY = (float)viewportHeight / UIHeight;
             float scale = Math.Min(scaleX, scaleY);
 
-            return Matrix.CreateScale(scale, scale, 1f);
+            float offsetX = (viewportWidth - UIWidth * scale) * 0.5f;
+            float offsetY = (viewportHeight - UIHeight * scale) * 0.5f;
+
+            return Matrix.CreateTranslation(offsetX, offsetY, 0f) *
+                   Matrix.CreateScale(scale, scale, 1f);
         }
 
         /// <summary>
@@ -190,7 +196,7 @@ namespace Engine.Core
             if (EngineContext.Running)
                 return;
 
-            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, GetUIViewMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight,true));
+            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, GetUIViewMatrix(ViewportWidth, ViewportHeight, true));
 
             Texture2D pixel = TextureLibrary.Instance.PixelTexture;
             Rectangle border = new Rectangle(0, 0, UIWidth, UIHeight);

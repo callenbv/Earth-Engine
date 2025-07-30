@@ -102,6 +102,7 @@ namespace GameRuntime
 
             Camera.Main.ViewportHeight = graphicsManager.GraphicsDevice.Viewport.Height;
             Camera.Main.ViewportWidth = graphicsManager.GraphicsDevice.Viewport.Width;
+            Camera.Main.graphicsDevice = _graphicsDevice;
 
             if (scene != null)
             {

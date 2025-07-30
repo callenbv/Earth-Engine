@@ -95,7 +95,20 @@ namespace Editor.Windows
         {
             if (showGrid)
             {
+                if (Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.OemCloseBrackets))
+                {
+                    SceneViewWindow.gridSize += 4;
+                }
+                if (Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.OemOpenBrackets))
+                {
+                    SceneViewWindow.gridSize -= 4;
+                }
+                SceneViewWindow.gridSize = Math.Clamp(SceneViewWindow.gridSize, 1, 64); // Clamp grid size to a reasonable range
                 gridSize = SceneViewWindow.gridSize;
+
+                if (gridSize <= 1)
+                    return;
+
                 Microsoft.Xna.Framework.Color gridColor = new Microsoft.Xna.Framework.Color(255, 255, 255, 50);
                 float zoom = Camera.Main.Zoom;
                 Vector2 camPos = Camera.Main.Position; // Use the actual camera position

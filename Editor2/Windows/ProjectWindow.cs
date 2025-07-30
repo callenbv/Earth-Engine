@@ -415,6 +415,12 @@ namespace EarthEngineEditor.Windows
                             item.Open();
                             InspectorWindow.Instance.Inspect(item);
                         }
+                        else if (ImGui.IsMouseDoubleClicked(0))
+                        {
+                            _selectedItem = item;
+                            item.Open();
+                            InspectorWindow.Instance.Inspect(item);
+                        }
                     }
                 }
             }
