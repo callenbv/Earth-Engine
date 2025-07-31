@@ -73,6 +73,7 @@ namespace Engine.Core.Rooms.Tiles
         public string TexturePath { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
+        public int FloorLevel { get; set; }
         public float Depth { get; set; }
         public Vector2 Offset { get; set; }
         public int[][] TileIndices { get; set; } 
@@ -117,7 +118,7 @@ namespace Engine.Core.Rooms.Tiles
 
                     if (tile == null)
                     {
-                        indices[x, y] = -1;
+                        indices[x, y] = -2;
                         continue;
                     }
 
@@ -135,6 +136,7 @@ namespace Engine.Core.Rooms.Tiles
                 Width = w,
                 Height = h,
                 Depth = renderer.Depth,
+                FloorLevel = renderer.FloorLevel,
                 TileIndices = TileArrayUtils.ToJagged(indices),
                 Collision = TileArrayUtils.ToJagged(solid),
                 Stair = TileArrayUtils.ToJagged(stair),
@@ -158,6 +160,7 @@ namespace Engine.Core.Rooms.Tiles
             renderer.Height = data.Height;
             renderer.Offset = data.Offset;
             renderer.Depth = data.Depth;
+            renderer.FloorLevel = data.FloorLevel;
 
             int[,] indices = TileArrayUtils.To2D(data.TileIndices);
             bool[,] collision = TileArrayUtils.To2D(data.Collision);
@@ -169,7 +172,7 @@ namespace Engine.Core.Rooms.Tiles
             {
                 for (int y = 0; y < renderer.Height; y++)
                 {
-                    if (indices[x, y] < 0)
+                    if (indices[x, y] <= -2)
                     {
                         continue;
                     }

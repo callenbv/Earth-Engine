@@ -189,6 +189,7 @@ namespace Engine.Core.Game.Components
                     Tiles[x, y] = new Tile(-1);
 
                 Tiles[x, y].IsStair = stair;
+                Tiles[x, y].IsCollidable = false;
             }
         }
 
@@ -269,7 +270,7 @@ namespace Engine.Core.Game.Components
                         }
                         else
                         {
-                            if (tile.IsCollidable && tile.TileIndex < 0)
+                            if (tile.TileIndex < 0)
                                 continue;
                         }
 
