@@ -12,6 +12,7 @@ using Engine.Core.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Tiled;
+using System;
 
 namespace Engine.Core.Game.Components.Collision
 {
@@ -73,11 +74,12 @@ namespace Engine.Core.Game.Components.Collision
     public class Collider2D : ObjectComponent
     {
         public override string Name => "Collider 2D";
+        public TilemapRenderer Tilemap { get; set; } = null!;
 
         /// <summary>
         /// Size of the collider.
         /// </summary>
-        public Vector2 Size = new Vector2(32, 32);
+        public Vector2 Size = new Vector2(16, 16);
 
         /// <summary>
         /// Offset of the collider from the owner's position.
@@ -154,9 +156,12 @@ namespace Engine.Core.Game.Components.Collision
         /// <summary>
         /// Called when this collider collides with a tile in a tilemap.
         /// </summary>
-        public virtual void OnTileCollision()
+        public virtual void OnTileCollision(TilemapRenderer tilemap)
         {
-            Console.WriteLine("Tile Colliding");
+            if (IsCollidingWithTiles())
+            {
+                Position = OldPosition;
+            }
         }
 
         /// <summary>
@@ -165,6 +170,9 @@ namespace Engine.Core.Game.Components.Collision
         /// <param name="spriteBatch"></param>
         public override void Draw(SpriteBatch spriteBatch)
         {
+            if (!EngineContext.Debug)
+                return;
+
             var bounds = Bounds;
             var rect = new Rectangle((int)bounds.X, (int)bounds.Y, (int)bounds.Width, (int)bounds.Height);
             spriteBatch.Draw(TextureLibrary.Instance.PixelTexture, rect, IsTrigger ? Color.Green * 0.5f : Color.Red * 0.5f);
@@ -177,6 +185,13 @@ namespace Engine.Core.Game.Components.Collision
         /// <returns></returns>
         public bool CollidesWithTiles(TilemapRenderer tilemap)
         {
+            if (tilemap == null)
+                return false;
+
+            // Only collide on same layer
+            if (tilemap.FloorLevel != Owner.Height)
+                return false;
+
             var bounds = this.Bounds;
 
             // Convert bounding box to tile coordinates
@@ -194,6 +209,41 @@ namespace Engine.Core.Game.Components.Collision
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        /// Checks if this collider is colliding with any solid tiles in the tilemaps at the owner's height.
+        /// </summary>
+        /// <returns></returns>
+        private bool IsCollidingWithTiles()
+        {
+            foreach (var tilemap in TilemapManager.GetTilemapsAtFloor(Owner.Height))
+            {
+                if (!IsTrigger && CollidesWithTiles(tilemap))
+                    return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Updates the collider each frame. This can be used to check for tile collisions or other logic.
+        /// </summary>
+        /// <param name="gameTime"></param>
+        public override void Update(GameTime gameTime)
+        {
+            if (Owner == null)
+                return;
+
+            var tilemaps = TilemapManager.GetTilemapsAtFloor(Owner.Height);
+
+            foreach (var map in tilemaps)
+            {
+                if (!IsTrigger && CollidesWithTiles(map))
+                {
+                    OnTileCollision(map); 
+                    break;
+                }
+            }
         }
     }
 }

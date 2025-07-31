@@ -125,8 +125,6 @@ namespace Engine.Core.Scripting
             string? tpa = AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES") as string;
             if (!string.IsNullOrWhiteSpace(tpa))
             {
-                Console.WriteLine($"TRUSTED_PLATFORM_ASSEMBLIES = {tpa}");
-
                 foreach (var path in tpa.Split(Path.PathSeparator))
                 {
                     refs.Add(MetadataReference.CreateFromFile(path));

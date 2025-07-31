@@ -22,6 +22,7 @@ namespace Engine.Core.Game.Components
     {
         string Name { get; }
         virtual void Update(GameTime gameTime) { }
+        virtual void BeginUpdate(GameTime gameTime) { }
         virtual void Draw(SpriteBatch spriteBatch) { }
         virtual void DrawUI(SpriteBatch spriteBatch) { }
         virtual void Create() { }
@@ -69,6 +70,16 @@ namespace Engine.Core.Game.Components
                 if (transform != null)
                     transform.Position = value;
             }
+        }
+
+        /// <summary>
+        /// Old position of the object in the world. This is used to store the previous position of the object for various purposes, such as animations or physics calculations.
+        /// </summary>
+        [JsonIgnore]
+        [HideInInspector]
+        public Vector2 OldPosition
+        {
+            get => Owner?.GetComponent<Transform>()?.OldPosition ?? Vector2.Zero;
         }
 
         /// <summary>
@@ -145,6 +156,12 @@ namespace Engine.Core.Game.Components
         /// </summary>
         /// <param name="gameTime"></param>
         public virtual void Update(GameTime gameTime) { }
+
+        /// <summary>
+        /// BeginUpdate is called at the start of the update cycle. This method can be used to perform any setup or preparation before the main update logic is executed.
+        /// </summary>
+        /// <param name="gameTime"></param>
+        public virtual void BeginUpdate(GameTime gameTime) { }
 
         /// <summary>
         /// Draw the component. This method is called every frame and should be used to render the component to the screen.

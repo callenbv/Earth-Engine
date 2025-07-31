@@ -16,7 +16,6 @@ namespace Engine.Core.Systems
     public static class CollisionSystem
     {
         private static readonly List<Collider2D> colliders = new();
-        public static TilemapRenderer Tilemap { get; set; } = null!;
 
         /// <summary>
         /// Initialize the collision system. This should be called once at the start of the game.
@@ -57,11 +56,6 @@ namespace Engine.Core.Systems
 
                     if (a.Owner == null || b.Owner == null)
                         continue;
-
-                    if (Tilemap != null && !a.IsTrigger && a.CollidesWithTiles(Tilemap))
-                    {
-                        a.OnTileCollision();
-                    }
 
                     if (a.Intersects(b))
                     {

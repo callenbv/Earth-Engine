@@ -33,6 +33,11 @@ namespace Engine.Core.Game.Components
         public int Height = 100;
 
         /// <summary>
+        /// Floor level of the tilemap, used for rendering order. Default is 100.
+        /// </summary>
+        public int FloorLevel = 1;
+
+        /// <summary>
         /// Path to the texture used for the tilemap. This is set automatically when the texture is assigned.
         /// </summary>
         public string TexturePath = string.Empty;
@@ -99,6 +104,11 @@ namespace Engine.Core.Game.Components
         public IntPtr TexturePtr { get; set; }
 
         /// <summary>
+        /// Tint color applied to the tilemap when rendering. This can be used to change the color of the tiles without modifying the texture.
+        /// </summary>
+        public Color Tint { get; set; } = Color.White;
+
+        /// <summary>
         /// Offset for the tilemap position, used to adjust the rendering position of the tilemap in the world.
         /// </summary>
         public System.Numerics.Vector2 Offset = System.Numerics.Vector2.Zero;
@@ -134,14 +144,34 @@ namespace Engine.Core.Game.Components
         /// <param name="index"></param>
         public void SetTile(int x, int y, int index)
         {
-            if (index < 0)
+            if (index < -1)
             {
                 Tiles[x, y] = null;
             }
             else
             {
                 if (x >= 0 && x < Width && y >= 0 && y < Height)
-                    Tiles[x, y] = new Tile(index);
+                {
+                    Tile tile = new Tile(index);
+                    Tiles[x, y] = tile;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Set the collision property of the tile at the specified position.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="collidable"></param>
+        public void SetCollision(int x, int y, bool collidable)
+        {
+            if (x >= 0 && x < Width && y >= 0 && y < Height)
+            {
+                if (Tiles[x, y] == null)
+                    Tiles[x, y] = new Tile(-1);
+
+                Tiles[x, y].IsCollidable = collidable;
             }
         }
 
@@ -196,11 +226,19 @@ namespace Engine.Core.Game.Components
                             TileSize,
                             TileSize);
 
+                        if (tile.IsCollidable && !EngineContext.Running)
+                            Tint = Color.Red;
+                        else
+                            Tint = Color.White;
+
+                        if (EngineContext.Running && tile.IsCollidable && tile.TileIndex < 0)
+                            continue; 
+
                         spriteBatch.Draw(
                             Texture,
                             Position + Offset + new System.Numerics.Vector2(x * TileSize, y * TileSize),
                             source,
-                            Color.White,
+                            Tint,
                             0f,
                             Microsoft.Xna.Framework.Vector2.Zero,
                             1f,
@@ -220,8 +258,9 @@ namespace Engine.Core.Game.Components
         /// <returns></returns>
         public bool IsSolidAtTile(int x, int y)
         {
-            if (x < 0 || y < 0 || x >= Width || y >= Height)
+            if (x < 0 || y < 0 || x >= Width || y >= Height || Tiles[x,y] == null)
                 return false;
+
             return Tiles[x, y].IsCollidable;
         }
 

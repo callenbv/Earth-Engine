@@ -142,7 +142,7 @@ namespace Editor.AssetManagement
                 if (component is IComponent comp)
                 {
                     components.Add(comp);
-                    Console.WriteLine($"[Deserialize] Added component {comp.GetType().Name} (Hash: {comp.GetHashCode()})");
+                    //Console.WriteLine($"[Deserialize] Added component {comp.GetType().Name} (Hash: {comp.GetHashCode()})");
                 }
             }
 

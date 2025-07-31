@@ -24,6 +24,7 @@ namespace Editor.Windows.TileEditor
     {
         Paint,
         Erase,
+        Collision,
         Select
     }
 
@@ -55,6 +56,10 @@ namespace Editor.Windows.TileEditor
             else if (Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.E))
             {
                 mode = TileEditorMode.Erase;
+            }
+            else if (Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.C))
+            {
+                mode = TileEditorMode.Collision;
             }
 
             // Control keybinds
@@ -110,10 +115,8 @@ namespace Editor.Windows.TileEditor
                         if (ImGui.InputText("Name", ref title, 16))
                             layer.Title = title;
 
-                        ImGui.SliderInt("Width", ref layer.Width, 50,200);
-                        ImGui.SliderInt("Height", ref layer.Height, 50,200);
+                        ImGui.InputInt("Floor Level", ref layer.FloorLevel);
                         ImGui.InputFloat2("Offset", ref layer.Offset);
-                        ImGui.Checkbox("Collision", ref layer.CollisionEnabled);
 
                         var member = typeof(TilemapRenderer).GetMember("Texture", BindingFlags.Public | BindingFlags.Instance).FirstOrDefault();
                         PrefabHandler.DrawField(
@@ -163,6 +166,12 @@ namespace Editor.Windows.TileEditor
                 Microsoft.Xna.Framework.Color eraseColor = mode == TileEditorMode.Erase ? Microsoft.Xna.Framework.Color.Blue : Microsoft.Xna.Framework.Color.White;
                 if (ImGuiRenderer.IconButton("Eraser", ImGuiRenderer.EraserIcon, eraseColor, 16, 8, 1f, 0))
                     mode = TileEditorMode.Erase;
+
+                ImGui.SameLine();
+
+                Microsoft.Xna.Framework.Color collideColor = mode == TileEditorMode.Collision ? Microsoft.Xna.Framework.Color.Blue : Microsoft.Xna.Framework.Color.White;
+                if (ImGuiRenderer.IconButton("Collision", ImGuiRenderer.CollisionIcon, collideColor, 16, 8, 1f, 0))
+                    mode = TileEditorMode.Collision;
 
                 ImGui.SliderInt("Brush Size", ref BrushSize, 1, 10);
 
@@ -251,7 +260,11 @@ namespace Editor.Windows.TileEditor
                                         }
                                         else if (mode == TileEditorMode.Erase)
                                         {
-                                            selectedLayer.SetTile(px, py, -1);
+                                            selectedLayer.SetTile(px, py, -4);
+                                        }
+                                        else if (mode == TileEditorMode.Collision)
+                                        {
+                                            selectedLayer.SetCollision(px, py, true);
                                         }
                                     }
                                 }

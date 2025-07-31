@@ -30,6 +30,16 @@ public static class TilemapManager
     }
 
     /// <summary>
+    /// Get all tilemaps at a specific floor level. This is useful for rendering only the tilemaps that are relevant to the current floor in a multi-floor environment.
+    /// </summary>
+    /// <param name="floorLevel"></param>
+    /// <returns></returns>
+    public static IEnumerable<TilemapRenderer> GetTilemapsAtFloor(int floorLevel)
+    {
+        return layers.Where(l => l.FloorLevel == floorLevel);
+    }
+
+    /// <summary>
     /// Save the static tilemaps per project
     /// </summary>
     public static void Save()

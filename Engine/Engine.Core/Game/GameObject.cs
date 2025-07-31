@@ -109,6 +109,11 @@ namespace Engine.Core.Game
         }
 
         /// <summary>
+        /// Height of the GameObject, used for collision detection and rendering.
+        /// </summary>
+        public int Height { get; set; } = 1;
+
+        /// <summary>
         /// Default constructor for GameObject, initializes with an empty name.
         /// </summary>
         public GameObject()
@@ -147,7 +152,6 @@ namespace Engine.Core.Game
 
             components.Add(component);
             component.Initialize();
-            Console.WriteLine($"Added component {component.Name}");
 
             return component;
         }
@@ -233,6 +237,7 @@ namespace Engine.Core.Game
                         }
                     }
 
+                    component.BeginUpdate(gameTime);
                     component.Update(gameTime);
                 }
                 catch (Exception e) 

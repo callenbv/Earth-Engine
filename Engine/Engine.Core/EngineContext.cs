@@ -32,6 +32,7 @@ namespace Engine.Core
         public static int InternalWidth = 1920;
         public static int InternalHeight = 1080;
         public static bool Running = false;
+        public static bool Debug = true;
         public static float DeltaTime = 0f;
         // Add more as needed
 
