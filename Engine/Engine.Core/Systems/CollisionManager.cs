@@ -6,17 +6,25 @@
 /// <Summary>      Global system for managing 2D colliders and detecting collisions
 /// -----------------------------------------------------------------------------
 
-using Engine.Core.Game;
 using Engine.Core.Game.Components;
 using Engine.Core.Game.Components.Collision;
 using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+using MonoGame.Extended.Tiled;
 
 namespace Engine.Core.Systems
 {
     public static class CollisionSystem
     {
         private static readonly List<Collider2D> colliders = new();
+        public static TilemapRenderer Tilemap { get; set; } = null!;
+
+        /// <summary>
+        /// Initialize the collision system. This should be called once at the start of the game.
+        /// </summary>
+        public static void Initialize()
+        {
+            Clear();
+        }
 
         /// <summary>
         /// Register a collider with the system.
@@ -49,6 +57,11 @@ namespace Engine.Core.Systems
 
                     if (a.Owner == null || b.Owner == null)
                         continue;
+
+                    if (Tilemap != null && !a.IsTrigger && a.CollidesWithTiles(Tilemap))
+                    {
+                        a.OnTileCollision();
+                    }
 
                     if (a.Intersects(b))
                     {

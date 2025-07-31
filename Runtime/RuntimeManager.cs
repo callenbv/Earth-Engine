@@ -76,6 +76,7 @@ namespace GameRuntime
             Input.gameInstance = game;
             Input.graphicsManager = graphicsManager;
             Input.Initialize();
+            CollisionSystem.Initialize();
         }
 
         /// <summary>
@@ -113,6 +114,7 @@ namespace GameRuntime
 
             if (EngineContext.Running)
             {
+                CollisionSystem.Update(gameTime);
                 EngineContext.DeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             }
             else
@@ -131,7 +133,6 @@ namespace GameRuntime
                 Console.WriteLine($"Resized to {_lastWidth},{_lastHeight}");
             }
 
-            CollisionSystem.Update(gameTime);
         }
 
         /// <summary>

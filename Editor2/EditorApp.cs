@@ -23,6 +23,7 @@ using Engine.Core.Audio;
 using Engine.Core.Scripting;
 using Engine.Core.Data;
 using System.IO;
+using Engine.Core.Systems;
 
 namespace EarthEngineEditor
 {
@@ -275,12 +276,11 @@ namespace EarthEngineEditor
             }
             else
             {
-                // Play in editor
                 ScriptManager scriptManager;
                 ScriptCompiler.CompileAndLoadScripts(ProjectSettings.AbsoluteProjectPath, out scriptManager);
                 Camera.Main.Reset();
                 EngineContext.Running = true;
-
+                CollisionSystem.Initialize();
                 Room scene = Room.Load(runtime.scene.FilePath);
                 Asset room = Asset.Get(scene.Name);
                 runtime.scene = scene;

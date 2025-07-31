@@ -211,5 +211,30 @@ namespace Engine.Core.Game.Components
                 }
             }
         }
+
+        /// <summary>
+        /// Check if a tile at the specified coordinates is solid (collidable).
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        public bool IsSolidAtTile(int x, int y)
+        {
+            if (x < 0 || y < 0 || x >= Width || y >= Height)
+                return false;
+            return Tiles[x, y].IsCollidable;
+        }
+
+        /// <summary>
+        /// Check if a tile at the specified world position is solid (collidable).
+        /// </summary>
+        /// <param name="worldPos"></param>
+        /// <returns></returns>
+        public bool IsSolidAtWorld(Vector2 worldPos)
+        {
+            int x = (int)(worldPos.X / TileSize);
+            int y = (int)(worldPos.Y / TileSize);
+            return IsSolidAtTile(x, y);
+        }
     }
 }

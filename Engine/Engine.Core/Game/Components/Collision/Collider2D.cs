@@ -7,8 +7,11 @@
 /// -----------------------------------------------------------------------------
 
 using Engine.Core.Data;
+using Engine.Core.Graphics;
 using Engine.Core.Systems;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended.Tiled;
 
 namespace Engine.Core.Game.Components.Collision
 {
@@ -136,7 +139,7 @@ namespace Engine.Core.Game.Components.Collision
         /// <param name="other"></param>
         public virtual void OnCollisionEnter(Collider2D other)
         {
-
+            Console.WriteLine("Colliding");
         }
 
         /// <summary>
@@ -145,7 +148,52 @@ namespace Engine.Core.Game.Components.Collision
         /// <param name="other"></param>
         public virtual void OnTriggerEnter(Collider2D other)
         {
+            Console.WriteLine("Triggered");
+        }
 
+        /// <summary>
+        /// Called when this collider collides with a tile in a tilemap.
+        /// </summary>
+        public virtual void OnTileCollision()
+        {
+            Console.WriteLine("Tile Colliding");
+        }
+
+        /// <summary>
+        /// Updates the collider each frame. This can be used to update the position or size dynamically.
+        /// </summary>
+        /// <param name="spriteBatch"></param>
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            var bounds = Bounds;
+            var rect = new Rectangle((int)bounds.X, (int)bounds.Y, (int)bounds.Width, (int)bounds.Height);
+            spriteBatch.Draw(TextureLibrary.Instance.PixelTexture, rect, IsTrigger ? Color.Green * 0.5f : Color.Red * 0.5f);
+        }
+
+        /// <summary>
+        /// Checks if this collider collides with any solid tiles in the given tilemap.
+        /// </summary>
+        /// <param name="tilemap"></param>
+        /// <returns></returns>
+        public bool CollidesWithTiles(TilemapRenderer tilemap)
+        {
+            var bounds = this.Bounds;
+
+            // Convert bounding box to tile coordinates
+            int xStart = (int)(bounds.Left / tilemap.TileSize);
+            int yStart = (int)(bounds.Top / tilemap.TileSize);
+            int xEnd = (int)(bounds.Right / tilemap.TileSize);
+            int yEnd = (int)(bounds.Bottom / tilemap.TileSize);
+
+            for (int y = yStart; y <= yEnd; y++)
+            {
+                for (int x = xStart; x <= xEnd; x++)
+                {
+                    if (tilemap.IsSolidAtTile(x, y))
+                        return true;
+                }
+            }
+            return false;
         }
     }
 }
