@@ -50,6 +50,7 @@ namespace EarthEngineEditor
         public static string EraserIcon => "\uf12d"; // Font Awesome Trash Icon
         public static string PaintIcon => "\uf1fc"; // Font Awesome Trash Icon
         public static string CollisionIcon => "\uf0c8"; // Font Awesome Trash Icon
+        public static string StairIcon => "\uf005"; // Font Awesome Trash Icon
 
         private byte[]? _robotoFontData;
         private GCHandle _robotoFontHandle;

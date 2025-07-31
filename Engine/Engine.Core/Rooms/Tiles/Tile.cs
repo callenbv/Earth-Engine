@@ -18,6 +18,7 @@ namespace Engine.Core
         public int TileIndex { get; set; } // Index in the tileset
         public bool IsCollidable { get; set; }
         public int Height { get; set; } = 0;
+        public bool IsStair { get; set; } = false; // Indicates if the tile is a stair tile
 
         /// <summary>
         /// Create a new Tile with a specified tile index.

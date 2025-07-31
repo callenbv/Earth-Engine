@@ -176,6 +176,34 @@ namespace Engine.Core.Game.Components
         }
 
         /// <summary>
+        /// Set the stair property of the tile at the specified position. If collidable is true, the tile will be treated as a stair tile.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="collidable"></param>
+        public void SetStair(int x, int y, bool stair)
+        {
+            if (x >= 0 && x < Width && y >= 0 && y < Height)
+            {
+                if (Tiles[x, y] == null)
+                    Tiles[x, y] = new Tile(-1);
+
+                Tiles[x, y].IsStair = stair;
+            }
+        }
+
+        /// <summary>
+        /// Check if the specified tile coordinates are valid within the tilemap dimensions.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        public bool IsValidTile(int x, int y)
+        {
+            return x >= 0 && y >= 0 && x < Width && y < Height;
+        }
+
+        /// <summary>
         /// Get the tile at the specified position.
         /// </summary>
         /// <param name="x"></param>
@@ -226,13 +254,24 @@ namespace Engine.Core.Game.Components
                             TileSize,
                             TileSize);
 
-                        if (tile.IsCollidable && !EngineContext.Running)
-                            Tint = Color.Red;
+                        Tint = Color.White;
+                        
+                        if (!EngineContext.Running)
+                        {
+                            if (tile.IsCollidable)
+                            {
+                                Tint = Color.Red;
+                            }
+                            else if (tile.IsStair)
+                            {
+                                Tint = Color.Blue;
+                            }
+                        }
                         else
-                            Tint = Color.White;
-
-                        if (EngineContext.Running && tile.IsCollidable && tile.TileIndex < 0)
-                            continue; 
+                        {
+                            if (tile.IsCollidable && tile.TileIndex < 0)
+                                continue;
+                        }
 
                         spriteBatch.Draw(
                             Texture,

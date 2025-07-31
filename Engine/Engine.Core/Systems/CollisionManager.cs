@@ -7,7 +7,6 @@
 /// -----------------------------------------------------------------------------
 
 using Engine.Core.Game.Components;
-using Engine.Core.Game.Components.Collision;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended.Tiled;
 

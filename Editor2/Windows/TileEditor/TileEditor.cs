@@ -25,6 +25,7 @@ namespace Editor.Windows.TileEditor
         Paint,
         Erase,
         Collision,
+        Stair,
         Select
     }
 
@@ -155,7 +156,8 @@ namespace Editor.Windows.TileEditor
             if (selectedLayer != null && EditorApp.Instance.selectionMode == EditorSelectionMode.Tile)
             {
                 // Draw data for each tileset
-                ImGui.Text(selectedLayer.Title);
+                ImGui.Text(selectedLayer.Title + $"(Level {selectedLayer.FloorLevel})");
+                ImGui.SliderInt("Brush Size", ref BrushSize, 1, 10);
 
                 Microsoft.Xna.Framework.Color paintColor = mode == TileEditorMode.Paint ? Microsoft.Xna.Framework.Color.Blue : Microsoft.Xna.Framework.Color.White;
                 if (ImGuiRenderer.IconButton("Paint", ImGuiRenderer.PaintIcon, paintColor, 16, 8, 1f, 0))
@@ -173,7 +175,11 @@ namespace Editor.Windows.TileEditor
                 if (ImGuiRenderer.IconButton("Collision", ImGuiRenderer.CollisionIcon, collideColor, 16, 8, 1f, 0))
                     mode = TileEditorMode.Collision;
 
-                ImGui.SliderInt("Brush Size", ref BrushSize, 1, 10);
+                ImGui.SameLine();
+
+                Microsoft.Xna.Framework.Color stairColor = mode == TileEditorMode.Stair ? Microsoft.Xna.Framework.Color.Blue : Microsoft.Xna.Framework.Color.White;
+                if (ImGuiRenderer.IconButton("Stair", ImGuiRenderer.StairIcon, stairColor, 16, 8, 1f, 0))
+                    mode = TileEditorMode.Stair;
 
                 // Tileset preview
                 if (selectedLayer.Texture != null)
@@ -265,6 +271,10 @@ namespace Editor.Windows.TileEditor
                                         else if (mode == TileEditorMode.Collision)
                                         {
                                             selectedLayer.SetCollision(px, py, true);
+                                        }
+                                        else if (mode == TileEditorMode.Stair)
+                                        {
+                                            selectedLayer.SetStair(px, py, true);
                                         }
                                     }
                                 }

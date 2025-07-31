@@ -150,6 +150,22 @@ namespace Engine.Core.Scripting
         /// <returns></returns>
         public static bool CompileAndLoadScripts(string projectPath, out ScriptManager? scriptManager)
         {
+#if DEBUG
+            string engineCorePath = Path.Combine(AppContext.BaseDirectory, "Engine.Core.dll");
+            string buildPath = Path.Combine(ProjectSettings.ProjectDirectory, "Build");
+            string destPath = Path.Combine(buildPath, "Engine.Core.dll");
+
+            if (File.Exists(engineCorePath))
+            {
+                Directory.CreateDirectory(buildPath); // Ensure Build exists
+                File.Copy(engineCorePath, destPath, overwrite: true);
+                Console.WriteLine($"[Launcher] Copied Engine.Core.dll to {destPath}");
+            }
+            else
+            {
+                Console.WriteLine("[Launcher] Engine.Core.dll not found at: " + engineCorePath);
+            }
+#endif
             scriptManager = null;
 
             string outputDll = Path.Combine(projectPath, "Build", "CompiledScripts.dll");

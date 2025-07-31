@@ -42,6 +42,19 @@ namespace Engine.Core.Game
                     transform.Position = value;
             }
         }
+        /// <summary>
+        /// Old position of the GameObject, used for tracking movement and animations.
+        /// </summary>
+        public Vector2 OldPosition
+        {
+            get => GetComponent<Transform>()?.OldPosition ?? Vector2.Zero;
+            set
+            {
+                var transform = GetComponent<Transform>();
+                if (transform != null)
+                    transform.OldPosition = value;
+            }
+        }
 
         /// <summary>
         /// Rotation of the GameObject in radians, affecting its orientation in the game world.
@@ -220,6 +233,8 @@ namespace Engine.Core.Game
         /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
         {
+            OldPosition = Position;
+
             foreach (var component in components)
             {
                 try
@@ -237,10 +252,28 @@ namespace Engine.Core.Game
                         }
                     }
 
-                    component.BeginUpdate(gameTime);
                     component.Update(gameTime);
                 }
                 catch (Exception e) 
+                {
+                    Console.Error.WriteLine($"Error updating {component.Name} in {Name}: {e.Message}");
+                }
+            }
+
+            foreach (var component in components)
+            {
+                try
+                {
+                    // Check for no owner
+                    if (component is Collider2D objComp)
+                    {
+                        if (objComp.Owner == null)
+                            continue;
+
+                        objComp.Update(gameTime);
+                    }
+                }
+                catch (Exception e)
                 {
                     Console.Error.WriteLine($"Error updating {component.Name} in {Name}: {e.Message}");
                 }

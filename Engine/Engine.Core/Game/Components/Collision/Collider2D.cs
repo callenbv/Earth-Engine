@@ -14,7 +14,7 @@ using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Tiled;
 using System;
 
-namespace Engine.Core.Game.Components.Collision
+namespace Engine.Core.Game.Components
 {
     /// <summary>
     /// Represents a rectangle in 2D space with floating-point precision.
@@ -156,12 +156,10 @@ namespace Engine.Core.Game.Components.Collision
         /// <summary>
         /// Called when this collider collides with a tile in a tilemap.
         /// </summary>
-        public virtual void OnTileCollision(TilemapRenderer tilemap)
+        public void OnTileCollision()
         {
-            if (IsCollidingWithTiles())
-            {
-                Position = OldPosition;
-            }
+            Console.WriteLine($"{OldPosition},{Position}");
+            Position = OldPosition;
         }
 
         /// <summary>
@@ -215,7 +213,7 @@ namespace Engine.Core.Game.Components.Collision
         /// Checks if this collider is colliding with any solid tiles in the tilemaps at the owner's height.
         /// </summary>
         /// <returns></returns>
-        private bool IsCollidingWithTiles()
+        public bool IsCollidingWithTiles()
         {
             foreach (var tilemap in TilemapManager.GetTilemapsAtFloor(Owner.Height))
             {
@@ -223,6 +221,74 @@ namespace Engine.Core.Game.Components.Collision
                     return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Gets all tiles this collider is currently overlapping across all tilemaps at the owner's height.
+        /// </summary>
+        public List<(int X, int Y, TilemapRenderer Map)> GetOverlappingTiles()
+        {
+            List<(int X, int Y, TilemapRenderer Map)> overlappingTiles = new();
+
+            var bounds = this.Bounds;
+            int floor = Owner.Height;
+
+            foreach (var tilemap in TilemapManager.GetTilemapsAtFloor(floor))
+            {
+                if (tilemap.TileSize <= 0) continue;
+
+                int xStart = (int)(bounds.Left / tilemap.TileSize);
+                int yStart = (int)(bounds.Top / tilemap.TileSize);
+                int xEnd = (int)(bounds.Right / tilemap.TileSize);
+                int yEnd = (int)(bounds.Bottom / tilemap.TileSize);
+
+                for (int y = yStart; y <= yEnd; y++)
+                {
+                    for (int x = xStart; x <= xEnd; x++)
+                    {
+                        if (tilemap.IsValidTile(x, y))
+                        {
+                            overlappingTiles.Add((x, y, tilemap));
+                        }
+                    }
+                }
+            }
+
+            return overlappingTiles;
+        }
+
+        /// <summary>
+        /// Gets all tiles this collider is currently overlapping across all tilemaps (ignores floor level).
+        /// </summary>
+        public List<(int X, int Y, TilemapRenderer Map)> GetOverlappingTilesAllFloors()
+        {
+            List<(int X, int Y, TilemapRenderer Map)> overlappingTiles = new();
+
+
+            var bounds = this.Bounds;
+
+            foreach (var tilemap in TilemapManager.layers) // Don't filter by floor
+            {
+                if (tilemap.TileSize <= 0) continue;
+
+                int xStart = (int)(bounds.Left / tilemap.TileSize);
+                int yStart = (int)(bounds.Top / tilemap.TileSize);
+                int xEnd = (int)(bounds.Right / tilemap.TileSize);
+                int yEnd = (int)(bounds.Bottom / tilemap.TileSize);
+
+                for (int y = yStart; y <= yEnd; y++)
+                {
+                    for (int x = xStart; x <= xEnd; x++)
+                    {
+                        if (tilemap.IsValidTile(x, y))
+                        {
+                            overlappingTiles.Add((x, y, tilemap));
+                        }
+                    }
+                }
+            }
+
+            return overlappingTiles;
         }
 
         /// <summary>
@@ -234,15 +300,9 @@ namespace Engine.Core.Game.Components.Collision
             if (Owner == null)
                 return;
 
-            var tilemaps = TilemapManager.GetTilemapsAtFloor(Owner.Height);
-
-            foreach (var map in tilemaps)
+            if (!IsTrigger && IsCollidingWithTiles())
             {
-                if (!IsTrigger && CollidesWithTiles(map))
-                {
-                    OnTileCollision(map); 
-                    break;
-                }
+                OnTileCollision();
             }
         }
     }

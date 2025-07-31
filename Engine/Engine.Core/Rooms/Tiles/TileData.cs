@@ -25,6 +25,9 @@ namespace Engine.Core.Rooms.Tiles
         /// <returns></returns>
         public static T[][] ToJagged<T>(T[,] array)
         {
+            if (array == null)
+                return null;
+
             int width = array.GetLength(0);
             int height = array.GetLength(1);
 
@@ -46,6 +49,9 @@ namespace Engine.Core.Rooms.Tiles
         /// <returns></returns>
         public static T[,] To2D<T>(T[][] jagged)
         {
+            if (jagged == null)
+                return null;
+
             int width = jagged.Length;
             int height = jagged[0].Length;
 
@@ -71,6 +77,7 @@ namespace Engine.Core.Rooms.Tiles
         public Vector2 Offset { get; set; }
         public int[][] TileIndices { get; set; } 
         public bool[][] Collision { get; set; }
+        public bool[][] Stair { get; set; }
         public int[][] HeightMap { get; set; }
     }
 
@@ -100,6 +107,7 @@ namespace Engine.Core.Rooms.Tiles
             var indices = new int[w, h];
             var solid = new bool[w, h];
             var height = new int[w, h];
+            var stair = new bool[w, h];
 
             for (int x = 0; x < w; x++)
             {
@@ -115,6 +123,7 @@ namespace Engine.Core.Rooms.Tiles
 
                     indices[x, y] = tile.TileIndex;
                     solid[x, y] = tile.IsCollidable;
+                    stair[x, y] = tile.IsStair;
                     height[x, y] = tile.Height;
                 }
             }
@@ -128,6 +137,7 @@ namespace Engine.Core.Rooms.Tiles
                 Depth = renderer.Depth,
                 TileIndices = TileArrayUtils.ToJagged(indices),
                 Collision = TileArrayUtils.ToJagged(solid),
+                Stair = TileArrayUtils.ToJagged(stair),
                 HeightMap = TileArrayUtils.ToJagged(height),
                 Offset = renderer.Offset
             };
@@ -140,6 +150,7 @@ namespace Engine.Core.Rooms.Tiles
         /// <param name="data"></param>
         public static void ApplyData(this TilemapRenderer renderer, TilemapLayerData data)
         {
+
             renderer.Title = data.Title;
             renderer.TexturePath = data.TexturePath;
             renderer.Texture = TextureLibrary.Instance.Get(renderer.TexturePath);
@@ -151,6 +162,7 @@ namespace Engine.Core.Rooms.Tiles
             int[,] indices = TileArrayUtils.To2D(data.TileIndices);
             bool[,] collision = TileArrayUtils.To2D(data.Collision);
             int[,] height = TileArrayUtils.To2D(data.HeightMap);
+            bool[,] stair = TileArrayUtils.To2D(data.Stair);
 
             renderer.Tiles = new Tile[renderer.Width, renderer.Height];
             for (int x = 0; x < renderer.Width; x++)
@@ -162,12 +174,21 @@ namespace Engine.Core.Rooms.Tiles
                         continue;
                     }
 
-                    renderer.Tiles[x, y] = new Tile
+                    try
                     {
-                        TileIndex = indices[x, y],
-                        IsCollidable = collision[x, y],
-                        Height = height[x, y]
-                    };
+                        renderer.Tiles[x, y] = new Tile
+                        {
+                            TileIndex = indices[x, y],
+                            IsCollidable = collision[x, y],
+                            IsStair = stair[x, y],
+                            Height = height[x, y]
+                        };
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[TilemapRenderer] Error applying data: {ex.Message}");
+                        return;
+                    }
                 }
             }
         }
