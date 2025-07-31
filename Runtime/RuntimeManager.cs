@@ -144,7 +144,7 @@ namespace GameRuntime
 
             // Draw scene to render target (high internal resolution for smooth subpixel movement)
             _graphicsDevice.SetRenderTarget(_sceneRenderTarget);
-            _graphicsDevice.Clear(Microsoft.Xna.Framework.Color.CornflowerBlue);
+            _graphicsDevice.Clear(Microsoft.Xna.Framework.Color.Black);
 
             // Draw the tilemaps deferred
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.Main.GetViewMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight));

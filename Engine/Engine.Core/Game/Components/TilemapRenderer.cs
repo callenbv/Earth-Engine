@@ -53,6 +53,11 @@ namespace Engine.Core.Game.Components
         public float Depth = 0;
 
         /// <summary>
+        /// Visibility of the tilemap layer. If false, the layer will not be rendered.
+        /// </summary>
+        public bool Visible = true;
+
+        /// <summary>
         /// Array of tiles in the tilemap. Each tile is represented by a Tile object, which contains its index in the tileset and other properties.
         /// </summary>
         [JsonIgnore]
@@ -150,11 +155,22 @@ namespace Engine.Core.Game.Components
         }
 
         /// <summary>
+        /// Toggle the visibility of the tilemap layer. If the layer is currently visible, it will be hidden, and vice versa.
+        /// </summary>
+        public void ToggleVisibility()
+        {
+            Visible = !Visible;
+        }
+
+        /// <summary>
         /// Render the tilemap layer using the provided SpriteBatch. This method draws each tile in the layer based on its index in the tileset texture.
         /// </summary>
         /// <param name="spriteBatch"></param>
         public override void Draw(SpriteBatch spriteBatch)
         {
+            if (!Visible)
+                return;
+
             for (int y = 0; y < Height; y++)
             {
                 for (int x = 0; x < Width; x++)
@@ -186,7 +202,6 @@ namespace Engine.Core.Game.Components
                             SpriteEffects.None,
                             Depth
                             );
-
                     }
                 }
             }

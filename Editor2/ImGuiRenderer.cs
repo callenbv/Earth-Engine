@@ -15,6 +15,7 @@ using XnaKeys = Microsoft.Xna.Framework.Input.Keys;
 using XnaButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using XnaColor = Microsoft.Xna.Framework.Color;
 using System.IO;
+using System.Numerics;
 
 namespace EarthEngineEditor
 {
@@ -42,6 +43,12 @@ namespace EarthEngineEditor
         private KeyboardState _lastKeyboard;
         private MouseState _lastMouse;
         private static Dictionary<Texture2D, IntPtr> _bindings = new();
+
+        public static string TrashIcon => "\uf1f8"; // Font Awesome Trash Icon
+        public static string EyeIcon => "\uf06e"; // Font Awesome Trash Icon
+        public static string EyeSlashIcon => "\uf070"; // Font Awesome Trash Icon
+        public static string EraserIcon => "\uf12d"; // Font Awesome Trash Icon
+        public static string PaintIcon => "\uf1fc"; // Font Awesome Trash Icon
 
         private byte[]? _robotoFontData;
         private GCHandle _robotoFontHandle;
@@ -111,11 +118,10 @@ namespace EarthEngineEditor
         /// <param name="padding"></param>
         /// <param name="spacing"></param>
         /// <returns></returns>
-        public static bool IconButton(string id, string icon, Microsoft.Xna.Framework.Color color, float padding = 16f, float spacing = 6f)
+        public static bool IconButton(string id, string icon, Microsoft.Xna.Framework.Color color, float padding = 16f, float spacing = 6f, float scale = 1f, float yoffset=0)
         {
             ImGui.PushID(id);
-            float fontSize = ImGui.GetFontSize();
-            var textSize = ImGui.CalcTextSize(icon)/2;
+            var textSize = scale * (ImGui.CalcTextSize(icon) / 2);
 
             // Make the button square
             float boxSize = MathF.Max(textSize.X, textSize.Y) + padding * 2;
@@ -139,7 +145,7 @@ namespace EarthEngineEditor
 
             var textPos = new System.Numerics.Vector2(
                 pos.X + (boxSize - textSize.X) * 0.5f,
-                pos.Y + (boxSize - textSize.Y + 4) * 0.5f
+                pos.Y + yoffset + (boxSize - textSize.Y + 4) * 0.5f
             );
 
             // Convert XNA color to ImGui color

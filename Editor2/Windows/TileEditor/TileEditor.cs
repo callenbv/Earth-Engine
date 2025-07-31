@@ -14,6 +14,7 @@ using Engine.Core.CustomMath;
 using Engine.Core.Game.Components;
 using ImGuiNET;
 using Microsoft.Xna.Framework.Graphics;
+using SharpDX.Direct2D1.Effects;
 using System.Numerics;
 using System.Reflection;
 
@@ -41,7 +42,32 @@ namespace Editor.Windows.TileEditor
         private TilemapRenderer? selectedLayer;
         public int TileSize = 16;
         public int BrushSize = 1;
+        private bool selected = false;
+
         TileEditorMode mode = TileEditorMode.Paint;
+
+        /// <summary>
+        /// Handles the hotkeys
+        /// </summary>
+        private void HandleHotkeys()
+        {
+            // Toggle paint mode
+            if (Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.P))
+            {
+                mode = TileEditorMode.Paint;
+            }
+            // Toggle erase mode
+            else if (Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.E))
+            {
+                mode = TileEditorMode.Erase;
+            }
+
+            // Control keybinds
+            if (Input.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.LeftControl))
+            {
+
+            }
+        }
 
         /// <summary>
         /// Renders the tile editor panel
@@ -49,6 +75,8 @@ namespace Editor.Windows.TileEditor
         public void Render()
         {
             if (!show) return;
+
+            HandleHotkeys();
 
             if(ImGui.Begin("Tile Editor", ref show))
                 EditorApp.Instance.selectionMode = EditorSelectionMode.Tile;
@@ -61,18 +89,40 @@ namespace Editor.Windows.TileEditor
                 open = true;
                 foreach (var layer in TilemapManager.layers)
                 {
-                    if (ImGui.TreeNodeEx(layer.Title))
+                    ImGui.PushID(layer.ID); // isolate ImGui ID space
+
+                    // Start horizontal layout
+                    ImGui.BeginGroup();
+
+                    // Visibility toggle button
+                    if (ImGuiRenderer.IconButton($"##Visibility{layer.ID}", layer.Visible ? ImGuiRenderer.EyeIcon : ImGuiRenderer.EyeSlashIcon, Microsoft.Xna.Framework.Color.White,16,8,1f,-6))
+                        layer.ToggleVisibility();
+
+                    ImGui.SameLine();
+
+                    // Collapsing header with no overlap
+                    bool isOpen = ImGui.CollapsingHeader($"##{layer.ID}");
+                    ImGui.SameLine();
+                    ImGui.Text(layer.Title);
+
+                    ImGui.EndGroup();
+                    ImGui.PopID();
+
+                    if (isOpen)
                     {
+                        selectedLayer = layer;
+
                         // Draw the editable fields
-                        selectedLayer = layer; // Set the selected layer for painting
+                        string title = layer.Title;
+                        if (ImGui.InputText("Name", ref title, 16))
+                            layer.Title = title;
+
                         ImGui.SliderInt("Width", ref layer.Width, 50,200);
                         ImGui.SliderInt("Height", ref layer.Height, 50,200);
-                        if (ImGui.SliderInt("Grid Size", ref SceneViewWindow.gridSize, 4, 64))
-                        {
-                            SceneViewWindow.gridSize = (int)Rounding.RoundToNearest(SceneViewWindow.gridSize, 4);
-                        }
                         ImGui.InputFloat2("Offset", ref layer.Offset);
-                        ImGui.InputFloat("Depth", ref layer.Depth);
+                        if (ImGui.InputFloat("Depth", ref layer.Depth, 0, 255))
+                            layer.Depth = Microsoft.Xna.Framework.MathHelper.Clamp(layer.Depth/255f, 0, 255);
+
                         var member = typeof(TilemapRenderer).GetMember("Texture", BindingFlags.Public | BindingFlags.Instance).FirstOrDefault();
                         PrefabHandler.DrawField(
                             "Texture",
@@ -81,8 +131,16 @@ namespace Editor.Windows.TileEditor
                             newVal => layer.Texture = (Texture2D)newVal,
                             member
                         );
-
-                        ImGui.TreePop();
+                        if (ImGuiRenderer.IconButton("Delete Layer", ImGuiRenderer.TrashIcon,Microsoft.Xna.Framework.Color.Red))
+                        {
+                            // Remove the layer
+                            if (selectedLayer == layer)
+                            {
+                                TilemapManager.layers.Remove(layer);
+                                selectedLayer = null; // Clear selection if deleted
+                                break;
+                            }
+                        }
                     }
                 }
                 ImGui.TreePop();
@@ -104,14 +162,15 @@ namespace Editor.Windows.TileEditor
                 // Draw data for each tileset
                 ImGui.Text(selectedLayer.Title);
 
-                bool clicked;
-
-                CircularSelectable("tile", "T", TileEditorMode.Paint, mode, out clicked);
-                if (clicked) mode = TileEditorMode.Paint;
+                Microsoft.Xna.Framework.Color paintColor = mode == TileEditorMode.Paint ? Microsoft.Xna.Framework.Color.Blue : Microsoft.Xna.Framework.Color.White;
+                if (ImGuiRenderer.IconButton("Paint", ImGuiRenderer.PaintIcon, paintColor, 16, 8, 1f, 0))
+                    mode = TileEditorMode.Paint;
 
                 ImGui.SameLine();
-                CircularSelectable("erase", "X", TileEditorMode.Erase, mode, out clicked);
-                if (clicked) mode = TileEditorMode.Erase;
+
+                Microsoft.Xna.Framework.Color eraseColor = mode == TileEditorMode.Erase ? Microsoft.Xna.Framework.Color.Blue : Microsoft.Xna.Framework.Color.White;
+                if (ImGuiRenderer.IconButton("Eraser", ImGuiRenderer.EraserIcon, eraseColor, 16, 8, 1f, 0))
+                    mode = TileEditorMode.Erase;
 
                 ImGui.SliderInt("Brush Size", ref BrushSize, 1, 10);
 
