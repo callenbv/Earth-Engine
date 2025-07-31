@@ -7,14 +7,11 @@
 /// -----------------------------------------------------------------------------
 
 using EarthEngineEditor;
-using EarthEngineEditor.Windows;
 using Editor.AssetManagement;
 using Engine.Core;
-using Engine.Core.CustomMath;
 using Engine.Core.Game.Components;
 using ImGuiNET;
 using Microsoft.Xna.Framework.Graphics;
-using SharpDX.Direct2D1.Effects;
 using System.Numerics;
 using System.Reflection;
 
@@ -36,13 +33,11 @@ namespace Editor.Windows.TileEditor
     public class TileEditorWindow
     {
         private bool show = true;
-        private bool open = false;
         private float previewScale = 1;
         private int selectedTileIndex = 1;
         private TilemapRenderer? selectedLayer;
         public int TileSize = 16;
         public int BrushSize = 1;
-        private bool selected = false;
 
         TileEditorMode mode = TileEditorMode.Paint;
 
@@ -82,11 +77,9 @@ namespace Editor.Windows.TileEditor
                 EditorApp.Instance.selectionMode = EditorSelectionMode.Tile;
 
             bool tree = ImGui.TreeNodeEx("Tile Layers", ImGuiTreeNodeFlags.DefaultOpen);
-            open = false;
 
             if (tree)
             {
-                open = true;
                 foreach (var layer in TilemapManager.layers)
                 {
                     ImGui.PushID(layer.ID); // isolate ImGui ID space
@@ -120,8 +113,7 @@ namespace Editor.Windows.TileEditor
                         ImGui.SliderInt("Width", ref layer.Width, 50,200);
                         ImGui.SliderInt("Height", ref layer.Height, 50,200);
                         ImGui.InputFloat2("Offset", ref layer.Offset);
-                        if (ImGui.InputFloat("Depth", ref layer.Depth, 0, 255))
-                            layer.Depth = Microsoft.Xna.Framework.MathHelper.Clamp(layer.Depth/255f, 0, 255);
+                        ImGui.Checkbox("Collision", ref layer.CollisionEnabled);
 
                         var member = typeof(TilemapRenderer).GetMember("Texture", BindingFlags.Public | BindingFlags.Instance).FirstOrDefault();
                         PrefabHandler.DrawField(

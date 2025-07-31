@@ -58,6 +58,11 @@ namespace Engine.Core.Game.Components
         public bool Visible = true;
 
         /// <summary>
+        /// CollisionEnabled indicates whether the tilemap layer should handle collisions. If true, the layer will check for collisions with tiles.
+        /// </summary>
+        public bool CollisionEnabled = false;
+
+        /// <summary>
         /// Array of tiles in the tilemap. Each tile is represented by a Tile object, which contains its index in the tileset and other properties.
         /// </summary>
         [JsonIgnore]

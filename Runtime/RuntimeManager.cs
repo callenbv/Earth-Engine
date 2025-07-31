@@ -19,6 +19,7 @@ using Engine.Core.Graphics;
 using Engine.Core.Rooms;
 using Engine.Core.Scripting;
 using Engine.Core.Audio;
+using Engine.Core.Systems;
 
 namespace GameRuntime
 {
@@ -129,6 +130,8 @@ namespace GameRuntime
                 _lastHeight = EngineContext.InternalHeight;
                 Console.WriteLine($"Resized to {_lastWidth},{_lastHeight}");
             }
+
+            CollisionSystem.Update(gameTime);
         }
 
         /// <summary>
