@@ -274,6 +274,8 @@ namespace Engine.Core.Game.Components
                                 continue;
                         }
 
+                        float depth = (FloorLevel * 10000f) / 100000f;
+
                         spriteBatch.Draw(
                             Texture,
                             Position + Offset + new System.Numerics.Vector2(x * TileSize, y * TileSize),
@@ -283,7 +285,7 @@ namespace Engine.Core.Game.Components
                             Microsoft.Xna.Framework.Vector2.Zero,
                             1f,
                             SpriteEffects.None,
-                            Depth
+                            depth
                             );
                     }
                 }

@@ -22,7 +22,6 @@ namespace Engine.Core.Game.Components
     public struct RectangleF
     {
         public float X, Y, Width, Height;
-
         public float Left => X;
         public float Right => X + Width;
         public float Top => Y;
@@ -158,7 +157,6 @@ namespace Engine.Core.Game.Components
         /// </summary>
         public void OnTileCollision()
         {
-            Console.WriteLine($"{OldPosition},{Position}");
             Position = OldPosition;
         }
 

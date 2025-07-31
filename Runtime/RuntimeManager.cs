@@ -150,13 +150,9 @@ namespace GameRuntime
             _graphicsDevice.SetRenderTarget(_sceneRenderTarget);
             _graphicsDevice.Clear(Microsoft.Xna.Framework.Color.Black);
 
-            // Draw the tilemaps deferred
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.Main.GetViewMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight));
-            TilemapManager.Render(spriteBatch);
-            spriteBatch.End();
-
             // Draw the sprites depth sorted
             spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.Main.GetViewMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight));
+            TilemapManager.Render(spriteBatch);
             scene.Render(spriteBatch);
             spriteBatch.End();
 

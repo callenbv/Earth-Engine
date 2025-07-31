@@ -116,6 +116,7 @@ namespace Editor.Windows.TileEditor
                         if (ImGui.InputText("Name", ref title, 16))
                             layer.Title = title;
 
+                        ImGui.InputFloat("Depth", ref layer.Depth);
                         ImGui.InputInt("Floor Level", ref layer.FloorLevel);
                         ImGui.InputFloat2("Offset", ref layer.Offset);
 

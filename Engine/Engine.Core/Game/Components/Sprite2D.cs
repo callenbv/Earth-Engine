@@ -164,14 +164,12 @@ namespace Engine.Core.Game.Components
             if (texture == null)
                 return 0f;
 
-            // Calculate the bottom Y position (feet) of the sprite
             float feetY = Position.Y + frameHeight / 2;
-            feetY /= 1000f;
 
-            // Ensure doesn't go over bounds
-            feetY = Math.Clamp(feetY, 0f, 1f);
+            // Incorporate height into depth sorting
+            float depth = (Owner.Height * 10000f + feetY) / 100000f; // Adjust divisor to fit your world
 
-            return feetY; 
+            return Math.Clamp(depth, 0f, 1f);
         }
 
         /// <summary>
