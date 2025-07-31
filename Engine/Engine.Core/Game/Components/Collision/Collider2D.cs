@@ -290,6 +290,22 @@ namespace Engine.Core.Game.Components
         }
 
         /// <summary>
+        /// Gets the tilemap at a specific floor level. This is useful for multi-floor environments where each floor has its own tilemap.
+        /// </summary>
+        /// <param name="floor"></param>
+        /// <returns></returns>
+        public TilemapRenderer GetTilemapAtFloor(int floor)
+        {
+            foreach (var tilemap in TilemapManager.layers)
+            {
+                if (tilemap.FloorLevel == floor)
+                    return tilemap;
+            }
+
+            return null; // Not found
+        }
+
+        /// <summary>
         /// Updates the collider each frame. This can be used to check for tile collisions or other logic.
         /// </summary>
         /// <param name="gameTime"></param>
