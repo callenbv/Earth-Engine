@@ -262,7 +262,6 @@ namespace Engine.Core.Game.Components
         {
             List<(int X, int Y, TilemapRenderer Map)> overlappingTiles = new();
 
-
             var bounds = this.Bounds;
 
             foreach (var tilemap in TilemapManager.layers) // Don't filter by floor
@@ -321,4 +320,3 @@ namespace Engine.Core.Game.Components
         }
     }
 }
-

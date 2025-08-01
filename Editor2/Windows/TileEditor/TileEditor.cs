@@ -7,6 +7,7 @@
 /// -----------------------------------------------------------------------------
 
 using EarthEngineEditor;
+using EarthEngineEditor.Windows;
 using Editor.AssetManagement;
 using Engine.Core;
 using Engine.Core.Game.Components;
@@ -38,6 +39,7 @@ namespace Editor.Windows.TileEditor
         private float previewScale = 1;
         private int selectedTileIndex = 1;
         private TilemapRenderer? selectedLayer;
+        public TilemapHandler? tilemapHandler;
         public int TileSize = 16;
         public int BrushSize = 1;
 
@@ -100,45 +102,20 @@ namespace Editor.Windows.TileEditor
                     ImGui.SameLine();
 
                     // Collapsing header with no overlap
-                    bool isOpen = ImGui.CollapsingHeader($"##{layer.ID}");
+                    bool isOpen = (selectedLayer == layer);
+
+                    if (ImGui.Selectable($"##{layer.ID}", isOpen))
+                    {
+                        selectedLayer = layer;
+                        tilemapHandler = new TilemapHandler(selectedLayer);
+                        InspectorWindow.Instance.Inspect(tilemapHandler);
+                    }
+
                     ImGui.SameLine();
                     ImGui.Text(layer.Title);
 
                     ImGui.EndGroup();
                     ImGui.PopID();
-
-                    if (isOpen)
-                    {
-                        selectedLayer = layer;
-
-                        // Draw the editable fields
-                        string title = layer.Title;
-                        if (ImGui.InputText("Name", ref title, 16))
-                            layer.Title = title;
-
-                        ImGui.InputFloat("Depth", ref layer.Depth);
-                        ImGui.InputInt("Floor Level", ref layer.FloorLevel);
-                        ImGui.InputFloat2("Offset", ref layer.Offset);
-
-                        var member = typeof(TilemapRenderer).GetMember("Texture", BindingFlags.Public | BindingFlags.Instance).FirstOrDefault();
-                        PrefabHandler.DrawField(
-                            "Texture",
-                            layer.Texture,
-                            typeof(Texture2D),
-                            newVal => layer.Texture = (Texture2D)newVal,
-                            member
-                        );
-                        if (ImGuiRenderer.IconButton("Delete Layer", ImGuiRenderer.TrashIcon,Microsoft.Xna.Framework.Color.Red))
-                        {
-                            // Remove the layer
-                            if (selectedLayer == layer)
-                            {
-                                TilemapManager.layers.Remove(layer);
-                                selectedLayer = null; // Clear selection if deleted
-                                break;
-                            }
-                        }
-                    }
                 }
                 ImGui.TreePop();
             }
@@ -157,7 +134,7 @@ namespace Editor.Windows.TileEditor
             if (selectedLayer != null && EditorApp.Instance.selectionMode == EditorSelectionMode.Tile)
             {
                 // Draw data for each tileset
-                ImGui.Text(selectedLayer.Title + $"(Level {selectedLayer.FloorLevel})");
+                ImGui.Text(selectedLayer.Title + $" (Level {selectedLayer.FloorLevel})");
                 ImGui.SliderInt("Brush Size", ref BrushSize, 1, 10);
 
                 Microsoft.Xna.Framework.Color paintColor = mode == TileEditorMode.Paint ? Microsoft.Xna.Framework.Color.Blue : Microsoft.Xna.Framework.Color.White;

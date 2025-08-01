@@ -11,6 +11,7 @@ using Engine.Core.Data;
 using ImGuiNET;
 using Editor.Windows.Inspector;
 using Engine.Core;
+using Engine.Core.Game.Components;
 
 namespace EarthEngineEditor.Windows
 {
@@ -100,6 +101,11 @@ namespace EarthEngineEditor.Windows
             if (item is InspectableGameObject gameObject)
             {
                 Title = gameObject.Name;
+            }
+
+            if (item is TilemapHandler tilemap)
+            {
+                Title = tilemap.layer.Title;
             }
         }
     }

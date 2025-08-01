@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Engine.Core.Game;
 using GameRuntime;
 using Engine.Core.Rooms;
+using Engine.Core.Game.Components;
 
 namespace Engine.Core
 {
@@ -25,6 +26,7 @@ namespace Engine.Core
         public GraphicsDevice? GraphicsDevice { get; set; }
         public ScriptManager? ScriptManager { get; set; }
         public static SpriteBatch? SpriteBatch { get; set; }
+        public static TilemapRenderer? CurrentTilemap { get; set; }
         public Room? Scene { get; set; }
         public string? AssetsRoot { get; set; }
         public string? RoomsDir { get; set; }

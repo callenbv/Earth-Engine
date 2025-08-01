@@ -171,7 +171,9 @@ namespace Engine.Core.Game.Components
                 if (Tiles[x, y] == null)
                     Tiles[x, y] = new Tile(-1);
 
-                Tiles[x, y].IsCollidable = collidable;
+                Tile tile = Tiles[x, y];
+
+                tile.IsCollidable = collidable;
             }
         }
 
@@ -188,7 +190,9 @@ namespace Engine.Core.Game.Components
                 if (Tiles[x, y] == null)
                     Tiles[x, y] = new Tile(-1);
 
-                Tiles[x, y].IsStair = stair;
+                Tile tile = Tiles[x, y];
+
+                tile.IsStair = stair;
                 Tiles[x, y].IsCollidable = false;
             }
         }
@@ -256,37 +260,55 @@ namespace Engine.Core.Game.Components
                             TileSize);
 
                         Tint = Color.White;
-                        
-                        if (!EngineContext.Running)
-                        {
-                            if (tile.IsCollidable)
-                            {
-                                Tint = Color.Red;
-                            }
-                            else if (tile.IsStair)
-                            {
-                                Tint = Color.Blue;
-                            }
-                        }
-                        else
-                        {
-                            if (tile.TileIndex < 0)
-                                continue;
-                        }
 
                         float depth = (FloorLevel * 10000f) / 100000f;
 
-                        spriteBatch.Draw(
-                            Texture,
-                            Position + Offset + new System.Numerics.Vector2(x * TileSize, y * TileSize),
-                            source,
-                            Tint,
-                            0f,
-                            Microsoft.Xna.Framework.Vector2.Zero,
-                            1f,
-                            SpriteEffects.None,
-                            depth
+                        if (tile.TileIndex > -1)
+                        {
+                            spriteBatch.Draw(
+                                Texture,
+                                Position + Offset + new System.Numerics.Vector2(x * TileSize, y * TileSize),
+                                source,
+                                Tint,
+                                0f,
+                                Microsoft.Xna.Framework.Vector2.Zero,
+                                1f,
+                                SpriteEffects.None,
+                                depth
                             );
+                        }
+
+                        if (!EngineContext.Running && FloorLevel == EngineContext.CurrentTilemap?.FloorLevel)
+                        {
+                            if (tile.IsCollidable)
+                            {
+                                spriteBatch.Draw(
+                                    Texture,
+                                    Position + Offset + new System.Numerics.Vector2(x * TileSize, y * TileSize),
+                                    source,
+                                    Color.Red,
+                                    0f,
+                                    Microsoft.Xna.Framework.Vector2.Zero,
+                                    1f,
+                                    SpriteEffects.None,
+                                    1f
+                                );
+                            }
+                            if (tile.IsStair)
+                            {
+                                spriteBatch.Draw(
+                                    Texture,
+                                    Position + Offset + new System.Numerics.Vector2(x * TileSize, y * TileSize),
+                                    source,
+                                    Color.CadetBlue,
+                                    0f,
+                                    Microsoft.Xna.Framework.Vector2.Zero,
+                                    1f,
+                                    SpriteEffects.None,
+                                    1f
+                                );
+                            }
+                        }
                     }
                 }
             }
