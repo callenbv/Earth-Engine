@@ -77,6 +77,8 @@ namespace GameRuntime
             Input.graphicsManager = graphicsManager;
             Input.Initialize();
             CollisionSystem.Initialize();
+            GraphicsLibrary.graphicsDevice = _graphicsDevice;
+            GraphicsLibrary.Initialize();
         }
 
         /// <summary>

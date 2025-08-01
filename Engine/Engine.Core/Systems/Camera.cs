@@ -198,14 +198,14 @@ namespace Engine.Core
 
             spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, GetUIViewMatrix(ViewportWidth, ViewportHeight, true));
 
-            Texture2D pixel = TextureLibrary.Instance.PixelTexture;
+            Texture2D pixel = GraphicsLibrary.PixelTexture;
             Rectangle border = new Rectangle(0, 0, UIWidth, UIHeight);
             Color color = Color.White;
             int thickness = 2; // Thickness of the outline
 
             // Top
             spriteBatch.Draw(pixel, new Rectangle(border.X, border.Y, border.Width, thickness), color);
-            // Bottom
+            // Bottom,
             spriteBatch.Draw(pixel, new Rectangle(border.X, border.Y + border.Height - thickness, border.Width, thickness), color);
             // Left
             spriteBatch.Draw(pixel, new Rectangle(border.X, border.Y, thickness, border.Height), color);

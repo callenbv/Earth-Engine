@@ -171,7 +171,7 @@ namespace Engine.Core.Game.Components
 
             var bounds = Bounds;
             var rect = new Rectangle((int)bounds.X, (int)bounds.Y, (int)bounds.Width, (int)bounds.Height);
-            spriteBatch.Draw(TextureLibrary.Instance.PixelTexture, rect, IsTrigger ? Color.Green * 0.5f : Color.Red * 0.5f);
+            spriteBatch.Draw(GraphicsLibrary.PixelTexture, rect, IsTrigger ? Color.Green * 0.5f : Color.Red * 0.5f);
         }
 
         /// <summary>

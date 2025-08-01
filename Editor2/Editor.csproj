@@ -31,5 +31,11 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup>
+    <Content Remove="C:\Users\calle\Desktop\Earth-Engine\Content\bin\Default.xnb" />
+    <Content Remove="C:\Users\calle\Desktop\Earth-Engine\Content\bin\UI.xnb" />
+    <Content Remove="C:\Users\calle\Desktop\Earth-Engine\Content\bin\Windows\Default.xnb" />
+    <Content Remove="C:\Users\calle\Desktop\Earth-Engine\Content\bin\Windows\UI.xnb" />
+  </ItemGroup>
 
 </Project>

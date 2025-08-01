@@ -91,7 +91,7 @@ namespace EarthEngineEditor
             runtime.gameOptions = new GameOptions(); // We use default options until we load per-project
             EngineContext.SpriteBatch = spriteBatch;
 
-            // Load default project for test\
+            // Load default project for test
             runtime.InitializeSystems();
             _windowManager.OpenProject(_windowManager.GetLastProject());
             _graphics.HardwareModeSwitch = false;
