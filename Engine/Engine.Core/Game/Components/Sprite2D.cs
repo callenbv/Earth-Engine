@@ -45,8 +45,14 @@ namespace Engine.Core.Game.Components
             }
         }
 
+        /// <summary>
+        /// The position of the sprite in world coordinates. This is where the sprite will be drawn in the game world.
+        /// </summary>
         public Vector2 Offset;
 
+        /// <summary>
+        /// The position of the sprite in world coordinates. This is where the sprite will be drawn in the game world.
+        /// </summary>
         [SliderEditor(1f, 10f)]
         public Vector2 SpriteScale;
 
@@ -202,9 +208,6 @@ namespace Engine.Core.Game.Components
         /// Draw the sprite if valid
         /// </summary>
         /// <param name="spriteBatch"></param>
-        /// <param name="position"></param>
-        /// <param name="rotation"></param>
-        /// <param name="scale"></param>
         public override void Draw(SpriteBatch spriteBatch)
         {
             if (texture == null || IsUI)

@@ -8,11 +8,22 @@
 
 using Engine.Core.CustomMath;
 using Engine.Core.Data;
+using Engine.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Engine.Core.Game.Components
 {
+    /// <summary>
+    /// Represents the shape of a particle. This can be extended to include different shapes like Circle, Square, etc.
+    /// </summary>
+    public enum ParticleShape
+    {
+        Square, // Default square shape
+        Circle, // Circle shape
+        Disc    // Disc shape with fading alpha
+    }
+
     /// <summary>
     /// Represents a 2D particle emitter that emits particles in a specified direction with a defined velocity and lifetime.
     /// </summary>
@@ -25,66 +36,111 @@ namespace Engine.Core.Game.Components
         /// <summary>
         /// Whether to emit particles in a burst mode. If true, particles will be emitted immediately upon creation.
         /// </summary>
-        public bool Burst { get; set; } = false; // If true, emit particles immediately on creation
+        public bool Burst { get; set; } = false;
 
         /// <summary>
         /// Number of particles to emit in burst mode. This is only used if Burst is true.
         /// </summary>
-        public int BurstCount { get; set; } = 10; // Number of particles to emit in burst
+        public int BurstCount { get; set; } = 10;
 
         /// <summary>
         /// Properties for controlling the particle emission rate, lifetime, speed, direction, color, offset, and size.
         /// </summary>
         [SliderEditor(0, 100)]
-        public float SpawnRate { get; set; } = 1f; // Particles per second
+        public float SpawnRate { get; set; } = 1f;
 
         /// <summary>
-        /// Lifetime of the particlle
+        /// Lifetime of the particle in miliseconds.
         /// </summary>
-        [SliderEditor(0, 60)]
-        public float Lifetime { get; set; } = 2f; // Lifetime of each particle in seconds
+        [SliderEditor(0, 300)]
+        public float Lifetime { get; set; } = 2f;
 
         /// <summary>
         /// Speed and direction of the particles emitted by this emitter.
         /// </summary>
         [SliderEditor(0, 100)]
-        public float Speed { get; set; } = 100f; // Speed of particles in pixels per second
+        public float Speed { get; set; } = 100f;
 
         /// <summary>
         /// Direction of emission in degrees.
         /// </summary>
         [SliderEditor(0, 360)]
-        public float Direction { get; set; } = 0f; // Angle of emission in degrees
-        public float DirectionWiggle { get; set; } = 0f; // Angle of emission wiggle in degrees, can be used to add randomness to the direction
+        public float Direction { get; set; } = 0f;
+
+        /// <summary>
+        /// Direction wiggle in degrees. This adds randomness to the direction of emitted particles.
+        /// </summary>
+        [SliderEditor(0, 180)]
+        public float DirectionWiggle { get; set; } = 0f;
+
+        /// <summary>
+        /// The shape of the particle, which determines its texture and appearance.
+        /// </summary>
+        public ParticleShape Shape
+        {
+            get => shape_;
+            set
+            {
+                shape_ = value;
+                switch (shape_)
+                {
+                    case ParticleShape.Square:
+                        texture = GraphicsLibrary.SquareTexture;
+                        break;
+                    case ParticleShape.Circle:
+                        texture = GraphicsLibrary.CircleTexture;
+                        break;
+                    case ParticleShape.Disc:
+                        texture = GraphicsLibrary.DiscTexture;
+                        break;
+                    default:
+                        texture = GraphicsLibrary.PixelTexture; // Default to pixel if unknown shape
+                        break;
+                }
+            }
+        }
+        private ParticleShape shape_;
+
+        /// <summary>
+        /// Texture used for rendering the particles. This is set based on the ParticleShape and can be changed dynamically.
+        /// </summary>
+        private Texture2D texture = GraphicsLibrary.SquareTexture;
 
         /// <summary>
         /// Color of the particles emitted by this emitter.
         /// </summary>
-        public Color Color { get; set; } = Color.White; // Color of emitted particles
+        public Color Color { get; set; } = Color.White;
 
         /// <summary>
         /// Offset from the emitter position where particles will be emitted.
         /// </summary>
-        public Vector2 Offset { get; set; } = Vector2.Zero; // Offset from emitter position
+        public Vector2 Offset { get; set; } = Vector2.Zero;
 
         /// <summary>
-        /// Size of the particles emitted by this emitter.
+        /// Size of the particles emitted by this emitter. This is used to define the size of the particle texture.
         /// </summary>
-        [SliderEditor(1,10)]
-        public float ParticleSize { get; set; } = 1f; // Scale of emitted particles
+        [SliderEditor(0, 32)]
+        public float ParticleSize { get; set; } = 1f; 
 
         /// <summary>
         /// Whether the emitter is enabled or not. If false, no particles will be emitted.
         /// </summary>
-        public bool Enabled { get; set; } = true; // Whether the emitter is enabled or not
+        public bool Enabled { get; set; } = true;
 
         /// <summary>
         /// Size of the emitter area from which particles will be emitted. This defines the rectangular area in which particles can spawn.
         /// </summary>
-        public Vector2 EmitterSize { get; set; } = new Vector2(32, 32); // Size of the emitter area
+        public Vector2 EmitterSize { get; set; } = new Vector2(32, 32); 
 
-        private List<Particle> particles = new List<Particle>(); // List of particles currently emitted by this emitter
-        private float ElapsedTime = 0f; // Time elapsed since last particle emission
+        /// <summary>
+        /// List of particles currently emitted by this emitter. This will hold all active particles that are being updated and drawn.
+        /// </summary>
+        private List<Particle> particles = new List<Particle>();
+
+        /// <summary>
+        /// Elapsed time since the last particle emission. This is used to control the emission rate based on SpawnRate.
+        /// </summary>
+        private float ElapsedTime = 0f;
 
         /// <summary>
         /// Update the particle emitter.
@@ -137,6 +193,7 @@ namespace Engine.Core.Game.Components
                                                 ERandom.Range(0, EmitterSize.Y));
 
             float finalDirection = Direction + ERandom.Range(-DirectionWiggle, DirectionWiggle);
+            float scaleFalloff = ParticleSize / texture.Width;
 
             Particle particle = new Particle
             {
@@ -146,9 +203,9 @@ namespace Engine.Core.Game.Components
                 Lifetime = Lifetime,
                 Age = 0f,
                 Color = Color, // Default color
-                Scale = ParticleSize, // Default scale
+                Scale = scaleFalloff, // Default scale
                 Depth = 1f,
-                Texture = null // Assign a texture if needed
+                Texture = texture // Assign a texture if needed
             };
             particles.Add(particle);
         }

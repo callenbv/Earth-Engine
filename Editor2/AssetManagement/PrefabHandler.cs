@@ -195,6 +195,19 @@ namespace Editor.AssetManagement
                 name = char.ToUpper(name[0]) + name.Substring(1);
             }
             ImGui.Text(name);
+
+            // Use the parsed XML comments as an ImGui tooltip
+            // Note: I really like this
+            if (ImGui.IsItemHovered())
+            {
+                string memberKey = Comments.GetXmlDocMemberKey(memberInfo);
+
+                if (memberKey != null && Comments.propertyTooltips.TryGetValue(memberKey, out string tooltip))
+                {
+                    ImGui.SetTooltip(tooltip);
+                }
+            }
+
             ImGui.NextColumn();
 
             // Set input field to fill remaining width
@@ -247,7 +260,7 @@ namespace Editor.AssetManagement
 
                 if (sliderAttr != null)
                 {
-                    if (ImGui.SliderFloat2($"##{name}", ref input,0f,20f))
+                    if (ImGui.SliderFloat2($"##{name}", ref input, 0f, 20f))
                     {
                         setValue(input.ToXna());
                     }
@@ -308,7 +321,7 @@ namespace Editor.AssetManagement
                 {
                     Texture2D imTex = (Texture2D)value;
                     float maxSize = 128f;
-                    Vector2 originalSize = new(imTex.Width*4, imTex.Height * 4);
+                    Vector2 originalSize = new(imTex.Width * 4, imTex.Height * 4);
                     Vector2 targetSize = originalSize;
 
                     // Scale down if larger than maxSize
@@ -373,6 +386,40 @@ namespace Editor.AssetManagement
                         }
                         ImGui.EndDragDropTarget();
                     }
+                }
+            }
+            else if (value != null && value.GetType().IsEnum)
+            {
+                var enumType = value.GetType();
+                var names = Enum.GetNames(enumType);
+                var values = Enum.GetValues(enumType);
+
+                int currentIndex = -1;
+                i = 0;
+
+                foreach (var enumVal in values)
+                {
+                    if (Equals(enumVal, value))
+                    {
+                        currentIndex = i;
+                        break;
+                    }
+                    i++;
+                }
+
+                string currentLabel = currentIndex >= 0 ? names[currentIndex] : $"Unknown ({Convert.ToInt32(value)})";
+
+                if (ImGui.BeginCombo($"##{name}", currentLabel))
+                {
+                    for (int j = 0; j < names.Length; j++)
+                    {
+                        bool isSelected = j == currentIndex;
+                        if (ImGui.Selectable(names[j], isSelected))
+                        {
+                            setValue(Enum.Parse(enumType, names[j]));
+                        }
+                    }
+                    ImGui.EndCombo();
                 }
             }
             else

@@ -97,7 +97,9 @@ namespace Engine.Core
             float scale = Math.Min(scaleX, scaleY);
             
             // Apply pixel snapping at the base resolution, then scale up
-            Vector3 Translation = new Vector3(-Position.X, -Position.Y, 0f);
+            float snappedX = (float)Math.Round(Position.X * scale) / scale;
+            float snappedY = (float)Math.Round(Position.Y * scale) / scale;
+            Vector3 Translation = new Vector3(-snappedX, -snappedY, 0f);
 
             // Create transform at base resolution, then scale to internal resolution
             Matrix baseTransform = Matrix.CreateTranslation(Translation) *

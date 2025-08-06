@@ -1,0 +1,1987 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Engine.Core</name>
+    </assembly>
+    <members>
+        <member name="T:Engine.Core.Audio.AudioType">
+            <summary>
+            Define type of audio (Sound, Music)
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Audio.Audio">
+            <summary>
+            Audio provides methods to play sounds and manage audio in the game engine.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Audio.Audio.Play(System.String,System.Boolean)">
+            <summary>
+            Extended play audio method
+            </summary>
+            <param name="sound"></param>
+            <param name="loop"></param>
+        </member>
+        <member name="M:Engine.Core.Audio.Audio.PauseAll(System.Boolean)">
+            <summary>
+            Stops all audio playing
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Audio.Audio.StopAll">
+            <summary>
+            Stops all audio playing
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Audio.AudioManager">
+            <summary>
+            Manages audio playback using FMOD
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Audio.AudioManager.#ctor">
+            <summary>
+            Singleton instance of AudioManager
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Audio.AudioManager.Initialize">
+            <summary>
+            Initialze the audio system and load all sounds
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Audio.AudioManager.Update(System.Single)">
+            <summary>
+            Update the audio system each frame
+            </summary>
+            <param name="dt"></param>
+        </member>
+        <member name="T:Engine.Core.Audio.FmodExtensions">
+            <summary>
+            Extensions for FMOD types to simplify common operations
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Audio.GameSound">
+            <summary>
+            Represents a sound in the game, encapsulating its name, FMOD sound object, and type (Sound or Music).
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Audio.GameSound.Name">
+            <summary>
+            Name of the sound. This is used to identify the sound in the editor and in the game.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Audio.GameSound.Sound">
+            <summary>
+            Name of the sound. This is used to identify the sound in the editor and in the game.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Audio.GameSound.Type">
+            <summary>
+            Type of audio this sound represents, either Sound or Music.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Audio.GameSound.Loop">
+            <summary>
+            Indicates whether the sound should loop when played. Default is false.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Audio.GameSound.#ctor(System.String,FMOD.Sound,Engine.Core.Audio.AudioType)">
+            <summary>
+            Create a new GameSound instance
+            </summary>
+            <param name="name"></param>
+            <param name="sound"></param>
+            <param name="type"></param>
+        </member>
+        <member name="M:Engine.Core.Audio.GameSound.Play">
+            <summary>
+            Try to play an FMOD sound
+            </summary>
+        </member>
+        <member name="M:Engine.Core.CustomMath.ERandom.NextFloat">
+            <summary>
+            Returns a float between 0.0 (inclusive) and 1.0 (exclusive).
+            </summary>
+        </member>
+        <member name="M:Engine.Core.CustomMath.ERandom.Range(System.Single,System.Single)">
+            <summary>
+            Returns a float between min (inclusive) and max (exclusive).
+            </summary>
+        </member>
+        <member name="M:Engine.Core.CustomMath.ERandom.Range(System.Int32,System.Int32)">
+            <summary>
+            Returns an int in the range [min, max).
+            </summary>
+        </member>
+        <member name="M:Engine.Core.CustomMath.ERandom.Chance(System.Single)">
+            <summary>
+            Returns true with the given probability (0.0 to 1.0).
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Data.IInspectable">
+            <summary>
+            Interface for any asset that can be inspected in the editor.
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Data.IAssetHandler">
+            <summary>
+            Interface for handling assets in the editor.
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Data.HideInInspectorAttribute">
+            <summary>
+            Attribute to mark a property or field as editable in the editor.
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Data.ComponentCategoryAttribute">
+            <summary>
+            Attribute to mark a class as a component category for organization in the editor.
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Data.EditorOnlyAttribute">
+            <summary>
+            Attribute to mark a method as editor-only, meaning it should not be called in the final build of the game.
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Data.SliderEditorAttribute">
+            <summary>
+            Attribute to mark a property or field as editable in the editor with a slider.
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Data.Comments">
+            <summary>
+            A static class that provides functionality to load and manage XML comments for properties and methods.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Data.Comments.propertyTooltips">
+            <summary>
+            A dictionary that maps property names to their XML comments.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Data.Comments.Initialize">
+            <summary>
+            Initializes the Comments class by loading XML comments from a specified file path.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Data.Comments.LoadXmlComments(System.String)">
+            <summary>
+            Loads XML comments from a specified file path and returns a dictionary mapping property names to their comments.
+            </summary>
+            <param name="filePath"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Data.Comments.GetXmlDocMemberKey(System.Reflection.MemberInfo)">
+            <summary>
+            Gets the XML documentation member key for a given member (property, method, or type).
+            </summary>
+            <param name="member"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Engine.Core.Data.EnginePaths">
+            <summary>
+            Static class to hold paths for the Earth Engine project and assets.
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Data.IComponentContainer">
+            <summary>
+            Interface for a component container, which can hold multiple components.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Data.IComponentContainer.AddComponent(Engine.Core.Game.Components.ObjectComponent)">
+            <summary>
+            Adds a component to the container.
+            </summary>
+            <param name="component"></param>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="T:Engine.Core.Data.GameObjectDefinition">
+            <summary>
+            Represents a game object definition that can hold multiple components.
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Game.Components.RectangleF">
+            <summary>
+            Represents a rectangle in 2D space with floating-point precision.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.RectangleF.#ctor(System.Single,System.Single,System.Single,System.Single)">
+            <summary>
+            Creates a new rectangle with the specified position and size.
+            </summary>
+            <param name="x"></param>
+            <param name="y"></param>
+            <param name="width"></param>
+            <param name="height"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.RectangleF.Contains(Microsoft.Xna.Framework.Vector2)">
+            <summary>
+            Checks if this rectangle contains a point in world space.
+            </summary>
+            <param name="point"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Game.Components.RectangleF.Intersects(Engine.Core.Game.Components.RectangleF)">
+            <summary>
+            Checks if this rectangle intersects with another rectangle.
+            </summary>
+            <param name="other"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Engine.Core.Game.Components.Collider2D">
+            <summary>
+            Represents a point light component that can be attached to a GameObject.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.Collider2D.Size">
+            <summary>
+            Size of the collider.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.Collider2D.Offset">
+            <summary>
+            Offset of the collider from the owner's position.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.Collider2D.IsTrigger">
+            <summary>
+            Whether this collider is a trigger (doesn't block, but detects).
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.Collider2D.Bounds">
+            <summary>
+            Gets the world-space bounding box of the collider.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.Collider2D.Intersects(Engine.Core.Game.Components.Collider2D)">
+            <summary>
+            Checks if this collider intersects another.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.Collider2D.Contains(Microsoft.Xna.Framework.Vector2)">
+            <summary>
+            Checks if this collider contains a point in world space.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.Collider2D.Create">
+            <summary>
+            Registers this collider with the global collision system.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.Collider2D.Destroy">
+            <summary>
+            Unregisters this collider from the global collision system.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.Collider2D.OnCollisionEnter(Engine.Core.Game.Components.Collider2D)">
+            <summary>
+            Called when this collider collides with another collider.
+            </summary>
+            <param name="other"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.Collider2D.OnTriggerEnter(Engine.Core.Game.Components.Collider2D)">
+            <summary>
+            Called when this collider enters a trigger with another collider.
+            </summary>
+            <param name="other"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.Collider2D.OnTileCollision">
+            <summary>
+            Called when this collider collides with a tile in a tilemap.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.Collider2D.Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
+            <summary>
+            Updates the collider each frame. This can be used to update the position or size dynamically.
+            </summary>
+            <param name="spriteBatch"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.Collider2D.CollidesWithTiles(Engine.Core.Game.Components.TilemapRenderer)">
+            <summary>
+            Checks if this collider collides with any solid tiles in the given tilemap.
+            </summary>
+            <param name="tilemap"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Game.Components.Collider2D.IsCollidingWithTiles">
+            <summary>
+            Checks if this collider is colliding with any solid tiles in the tilemaps at the owner's height.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Game.Components.Collider2D.GetOverlappingTiles">
+            <summary>
+            Gets all tiles this collider is currently overlapping across all tilemaps at the owner's height.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.Collider2D.GetOverlappingTilesAllFloors">
+            <summary>
+            Gets all tiles this collider is currently overlapping across all tilemaps (ignores floor level).
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.Collider2D.GetTilemapAtFloor(System.Int32)">
+            <summary>
+            Gets the tilemap at a specific floor level. This is useful for multi-floor environments where each floor has its own tilemap.
+            </summary>
+            <param name="floor"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Game.Components.Collider2D.Update(Microsoft.Xna.Framework.GameTime)">
+            <summary>
+            Updates the collider each frame. This can be used to check for tile collisions or other logic.
+            </summary>
+            <param name="gameTime"></param>
+        </member>
+        <member name="T:Engine.Core.Game.Components.IComponent">
+            <summary>
+            Base interface for all components in the game engine.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.IComponent.GetID">
+            <summary>
+            Get the unique identifier for the component.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:Engine.Core.Game.Components.ObjectComponent.Name">
+            <summary>
+            Name of the component. This is used to identify the component in the editor and in the game.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.ObjectComponent.ID">
+            <summary>
+            Unique identifier for the component. This is used to identify the component in the editor and in the game
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.ObjectComponent.type">
+            <summary>
+            Type of the component. This is used to identify the component in the editor and in the game.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.ObjectComponent.Position">
+            <summary>
+            Position of the object in the world. This is used to position the object in the world.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.ObjectComponent.OldPosition">
+            <summary>
+            Old position of the object in the world. This is used to store the previous position of the object for various purposes, such as animations or physics calculations.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.ObjectComponent.Rotation">
+            <summary>
+            Rotation of the object in degrees. This is used to rotate the object in the world.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.ObjectComponent.Scale">
+            <summary>
+            Scale of the object. This is used to scale the object in the world.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.ObjectComponent.Owner">
+            <summary>
+            The GameObject that this component is attached to. This is used to access the GameObject's properties and methods.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.ObjectComponent.GraphicsDevice">
+            <summary>
+            Graphics device used for rendering. This is used to access the graphics device for rendering.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.ObjectComponent.dt">
+            <summary>
+            Delta time since the last frame.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.ObjectComponent.UpdateInEditor">
+            <summary>
+            Indicates whether the component should be updated in the editor
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.ObjectComponent.Initialize">
+            <summary>
+            Initialize the component. This method is called when the component is created and should be used to set up any initial state or resources.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.ObjectComponent.Create">
+            <summary>
+            Create the component. This method is called when the component is added to a GameObject and should be used to set up any initial state or resources.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.ObjectComponent.Update(Microsoft.Xna.Framework.GameTime)">
+            <summary>
+            Update the component. This method is called every frame and should be used to update the component's state.
+            </summary>
+            <param name="gameTime"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.ObjectComponent.BeginUpdate(Microsoft.Xna.Framework.GameTime)">
+            <summary>
+            BeginUpdate is called at the start of the update cycle. This method can be used to perform any setup or preparation before the main update logic is executed.
+            </summary>
+            <param name="gameTime"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.ObjectComponent.Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
+            <summary>
+            Draw the component. This method is called every frame and should be used to render the component to the screen.
+            </summary>
+            <param name="spriteBatch"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.ObjectComponent.DrawUI(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
+            <summary>
+            Draw the component's UI. This method is called every frame and should be used to render the component's UI to the screen.
+            </summary>
+            <param name="spriteBatch"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.ObjectComponent.OnClick">
+            <summary>
+            Handle the click event for the component. This method is called when the component is clicked.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.ObjectComponent.Destroy">
+            <summary>
+            Destroy the component. This method is called when the component is removed from a GameObject.
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Game.Components.Particle">
+            <summary>
+            Represents a single particle in the game, with properties for position, velocity, rotation, lifetime, color, scale, and texture.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.Particle.Update(Microsoft.Xna.Framework.GameTime)">
+            <summary>
+            Represents a single particle in the game, with properties for position, velocity, lifetime, and texture.
+            </summary>
+            <param name="gameTime"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.Particle.Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
+            <summary>
+            Draws the particle using the provided SpriteBatch.
+            </summary>
+            <param name="spriteBatch"></param>
+        </member>
+        <member name="T:Engine.Core.Game.Components.ParticleShape">
+            <summary>
+            Represents the shape of a particle. This can be extended to include different shapes like Circle, Square, etc.
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Game.Components.ParticleEmitter">
+            <summary>
+            Represents a 2D particle emitter that emits particles in a specified direction with a defined velocity and lifetime.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.ParticleEmitter.Burst">
+            <summary>
+            Whether to emit particles in a burst mode. If true, particles will be emitted immediately upon creation.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.ParticleEmitter.BurstCount">
+            <summary>
+            Number of particles to emit in burst mode. This is only used if Burst is true.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.ParticleEmitter.SpawnRate">
+            <summary>
+            Properties for controlling the particle emission rate, lifetime, speed, direction, color, offset, and size.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.ParticleEmitter.Lifetime">
+            <summary>
+            Lifetime of the particle in miliseconds.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.ParticleEmitter.Speed">
+            <summary>
+            Speed and direction of the particles emitted by this emitter.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.ParticleEmitter.Direction">
+            <summary>
+            Direction of emission in degrees.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.ParticleEmitter.DirectionWiggle">
+            <summary>
+            Direction wiggle in degrees. This adds randomness to the direction of emitted particles.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.ParticleEmitter.Shape">
+            <summary>
+            The shape of the particle, which determines its texture and appearance.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.ParticleEmitter.texture">
+            <summary>
+            Texture used for rendering the particles. This is set based on the ParticleShape and can be changed dynamically.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.ParticleEmitter.Color">
+            <summary>
+            Color of the particles emitted by this emitter.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.ParticleEmitter.Offset">
+            <summary>
+            Offset from the emitter position where particles will be emitted.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.ParticleEmitter.ParticleSize">
+            <summary>
+            Size of the particles emitted by this emitter. This is used to define the size of the particle texture.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.ParticleEmitter.Enabled">
+            <summary>
+            Whether the emitter is enabled or not. If false, no particles will be emitted.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.ParticleEmitter.EmitterSize">
+            <summary>
+            Size of the emitter area from which particles will be emitted. This defines the rectangular area in which particles can spawn.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.ParticleEmitter.particles">
+            <summary>
+            List of particles currently emitted by this emitter. This will hold all active particles that are being updated and drawn.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.ParticleEmitter.ElapsedTime">
+            <summary>
+            Elapsed time since the last particle emission. This is used to control the emission rate based on SpawnRate.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.ParticleEmitter.Update(Microsoft.Xna.Framework.GameTime)">
+            <summary>
+            Update the particle emitter.
+            </summary>
+            <param name="gameTime"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.ParticleEmitter.EmitParticle">
+            <summary>
+            Emit a new particle from the emitter.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.ParticleEmitter.Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
+            <summary>
+            Draw the particle emitter and its particles using the provided SpriteBatch.
+            </summary>
+            <param name="spriteBatch"></param>
+        </member>
+        <member name="T:Engine.Core.Game.Components.Sprite2D">
+            <summary>
+            A 2D sprite component that can be attached to a GameObject.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.Sprite2D.texture">
+            <summary>
+            The texture used for the sprite. If set, it will automatically update the texturePath, frameWidth, frameHeight, and spriteBox properties.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.Sprite2D.Offset">
+            <summary>
+            The position of the sprite in world coordinates. This is where the sprite will be drawn in the game world.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.Sprite2D.SpriteScale">
+            <summary>
+            The position of the sprite in world coordinates. This is where the sprite will be drawn in the game world.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.Sprite2D.position">
+            <summary>
+            The position of the sprite in world coordinates. This is where the sprite will be drawn in the game world.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.Sprite2D._texture">
+            <summary>
+            The texture used for the sprite. If set, it will automatically update the texturePath, frameWidth, frameHeight, and spriteBox properties.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.Sprite2D.texturePath">
+            <summary>
+            The path to the texture file used for the sprite. This is set automatically when the texture is assigned.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.Sprite2D.frameWidth">
+            <summary>
+            The width and height of each frame in the sprite sheet.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.Sprite2D.frameHeight">
+            <summary>
+            The height of each frame in the sprite sheet.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.Sprite2D.frameCount">
+            <summary>
+            The number of frames in the sprite sheet. If greater than 1, the sprite is considered animated.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.Sprite2D.frameSpeed">
+            <summary>
+            The speed at which the frames are animated. Higher values result in faster animations.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.Sprite2D.animated">
+            <summary>
+            Indicates whether the sprite is animated. If true, the sprite will cycle through frames based on frameSpeed.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.Sprite2D.depth">
+            <summary>
+            The depth of the sprite in the scene. This is used for rendering order.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.Sprite2D.IsUI">
+            <summary>
+            Indicates if this sprite will be drawn in UI coordinates
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.Sprite2D.spriteEffect">
+            <summary>
+            The sprite effects applied to the sprite, such as flipping or mirroring.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.Sprite2D.origin">
+            <summary>
+            The origin point of the sprite, used for rotation and scaling. This is typically the center of the sprite.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.Sprite2D.Tint">
+            <summary>
+            The scale of the sprite. This allows for resizing the sprite when drawn.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.Sprite2D.spriteBox">
+            <summary>
+            The bounding box of the sprite, used for collision detection and rendering.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.Sprite2D.frame">
+            <summary>
+            The current frame of the sprite. This is used to determine which part of the sprite sheet to draw.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.Sprite2D.Initialize">
+            <summary>
+            Initialize sprite with a texture if possible
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.Sprite2D.GetDepth">
+            <summary>
+            Get the depth of the sprite based on its position
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Game.Components.Sprite2D.Set(System.String)">
+            <summary>
+            Swap the texture
+            </summary>
+            <param name="textureName"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.Sprite2D.Set(System.String,System.Int32,System.Int32)">
+            <summary>
+            Swap the texture
+            </summary>
+            <param name="textureName"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.Sprite2D.Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
+            <summary>
+            Draw the sprite if valid
+            </summary>
+            <param name="spriteBatch"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.Sprite2D.DrawUI(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
+            <summary>
+            Draw the sprite in UI coordinates
+            </summary>
+            <param name="spriteBatch"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.Sprite2D.Update(Microsoft.Xna.Framework.GameTime)">
+            <summary>
+            Advance the animation
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.Sprite2D.Animate(Microsoft.Xna.Framework.GameTime)">
+            <summary>
+            Animates the sprite
+            </summary>
+            <param name="gameTime"></param>
+        </member>
+        <member name="T:Engine.Core.Game.Components.TextRenderer">
+            <summary>
+            A component for rendering text in the game world.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.TextRenderer.Initialize">
+            <summary>
+            Initialize the text renderer component.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.TextRenderer.Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
+            <summary>
+            Update the text size based on the current font and text content.
+            </summary>
+            <param name="spriteBatch"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.TextRenderer.SetText(System.String)">
+            <summary>
+            Set the text content and update size calculations
+            </summary>
+            <param name="text">Text to display</param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.TextRenderer.SetFont(System.String)">
+            <summary>
+            Set the font to use
+            </summary>
+            <param name="fontName">Name of the font</param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.TextRenderer.SetColor(Microsoft.Xna.Framework.Color)">
+            <summary>
+            Set text color
+            </summary>
+            <param name="color">Color to use</param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.TextRenderer.SetScale(System.Single)">
+            <summary>
+            Set text scale
+            </summary>
+            <param name="scale">Scale factor</param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.TextRenderer.GetTextSize">
+            <summary>
+            Get the current text size
+            </summary>
+            <returns>Size of the text</returns>
+        </member>
+        <member name="M:Engine.Core.Game.Components.TextRenderer.LoadFont">
+            <summary>
+            Load the current font
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.TextRenderer.Update(Microsoft.Xna.Framework.GameTime)">
+            <summary>
+            Update the cached text size
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.TextRenderer.CenterOrigin">
+            <summary>
+            Center the text origin
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.TextRenderer.SetCentered(System.Boolean)">
+            <summary>
+            Set the text to be centered around the object's position
+            </summary>
+            <param name="centered">Whether to center the text</param>
+        </member>
+        <member name="T:Engine.Core.Game.Components.TilemapRenderer">
+            <summary>
+            Represents a tilemap renderer component that can be attached to a GameObject.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.TilemapRenderer.Width">
+            <summary>
+            Width of the tilemap in tiles. Default is 100x100 tiles.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.TilemapRenderer.Height">
+            <summary>
+            Height of the tilemap in tiles. Default is 100x100 tiles.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.TilemapRenderer.FloorLevel">
+            <summary>
+            Floor level of the tilemap, used for rendering order. Default is 100.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.TilemapRenderer.TexturePath">
+            <summary>
+            Path to the texture used for the tilemap. This is set automatically when the texture is assigned.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.TilemapRenderer.Title">
+            <summary>
+            Title of the tilemap layer, used for identification in the editor.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.TilemapRenderer.TileSize">
+            <summary>
+            Size of each tile in pixels. Default is 16x16 pixels.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.TilemapRenderer.Depth">
+            <summary>
+            Depth of the tilemap layer, used for rendering order. Default is 0.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.TilemapRenderer.Visible">
+            <summary>
+            Visibility of the tilemap layer. If false, the layer will not be rendered.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.TilemapRenderer.CollisionEnabled">
+            <summary>
+            CollisionEnabled indicates whether the tilemap layer should handle collisions. If true, the layer will check for collisions with tiles.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.TilemapRenderer.Tiles">
+            <summary>
+            Array of tiles in the tilemap. Each tile is represented by a Tile object, which contains its index in the tileset and other properties.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.TilemapRenderer.Texture">
+            <summary>
+            Texture used for the tilemap. This is set automatically when the texture is assigned.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.TilemapRenderer.texture_">
+            <summary>
+            Real texture
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.TilemapRenderer.TexturePtr">
+            <summary>
+            Pointer to the texture used for the tilemap. This is used for rendering the tileset preview in the editor.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.TilemapRenderer.Tint">
+            <summary>
+            Tint color applied to the tilemap when rendering. This can be used to change the color of the tiles without modifying the texture.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.TilemapRenderer.Offset">
+            <summary>
+            Offset for the tilemap position, used to adjust the rendering position of the tilemap in the world.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.TilemapRenderer.#ctor">
+            <summary>
+            Default constructor for TilemapRenderer, initializes with default values.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.TilemapRenderer.#ctor(System.Int32,System.Int32,System.String)">
+            <summary>
+            Create a new TilemapRenderer with specified width, height, and texture path.
+            </summary>
+            <param name="width"></param>
+            <param name="height"></param>
+            <param name="texture"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.TilemapRenderer.SetTile(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Set the tile at the specified position to the given index.
+            </summary>
+            <param name="x"></param>
+            <param name="y"></param>
+            <param name="index"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.TilemapRenderer.SetCollision(System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            Set the collision property of the tile at the specified position.
+            </summary>
+            <param name="x"></param>
+            <param name="y"></param>
+            <param name="collidable"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.TilemapRenderer.SetStair(System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            Set the stair property of the tile at the specified position. If collidable is true, the tile will be treated as a stair tile.
+            </summary>
+            <param name="x"></param>
+            <param name="y"></param>
+            <param name="collidable"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.TilemapRenderer.IsValidTile(System.Int32,System.Int32)">
+            <summary>
+            Check if the specified tile coordinates are valid within the tilemap dimensions.
+            </summary>
+            <param name="x"></param>
+            <param name="y"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Game.Components.TilemapRenderer.GetTile(System.Int32,System.Int32)">
+            <summary>
+            Get the tile at the specified position.
+            </summary>
+            <param name="x"></param>
+            <param name="y"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Game.Components.TilemapRenderer.ToggleVisibility">
+            <summary>
+            Toggle the visibility of the tilemap layer. If the layer is currently visible, it will be hidden, and vice versa.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.TilemapRenderer.Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
+            <summary>
+            Render the tilemap layer using the provided SpriteBatch. This method draws each tile in the layer based on its index in the tileset texture.
+            </summary>
+            <param name="spriteBatch"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.TilemapRenderer.IsSolidAtTile(System.Int32,System.Int32)">
+            <summary>
+            Check if a tile at the specified coordinates is solid (collidable).
+            </summary>
+            <param name="x"></param>
+            <param name="y"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Game.Components.TilemapRenderer.IsSolidAtWorld(Microsoft.Xna.Framework.Vector2)">
+            <summary>
+            Check if a tile at the specified world position is solid (collidable).
+            </summary>
+            <param name="worldPos"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Game.Components.UITextRenderer.Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
+            <summary>
+            Does not inherit draw from text renderer in world
+            </summary>
+            <param name="spriteBatch"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.UITextRenderer.DrawUI(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
+            <summary>
+            Draw our text in the UI
+            </summary>
+            <param name="spriteBatch"></param>
+        </member>
+        <member name="T:Engine.Core.Game.Lighting2D">
+            <summary>
+            Represents a point light component that can be attached to a GameObject.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Lighting2D.AmbientLightColor">
+            <summary>
+            The color of the ambient light in the scene. This is used to simulate global illumination.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Lighting2D.Enabled">
+            <summary>
+            Indicates whether the lighting system is enabled. If false, no lighting effects will be applied.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Lighting2D.Granularity">
+            <summary>
+            The grain size for the lighting system. This can be used to control the blockiness of the lighting effects.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Lighting2D.Wind">
+            <summary>
+            The wind effect on the lighting system. This can be used to simulate dynamic lighting changes, such as flickering lights.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Lighting2D.Update(Microsoft.Xna.Framework.GameTime)">
+            <summary>
+            Update method that is called every frame to update the lighting settings.
+            </summary>
+            <param name="gameTime"></param>
+        </member>
+        <member name="T:Engine.Core.Game.PointLight">
+            <summary>
+            Represents a point light component that can be attached to a GameObject.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.PointLight.lightRadius">
+            <summary>
+            The radius of the light in pixels. This determines how far the light will reach.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.PointLight.lightIntensity">
+            <summary>
+            The intensity of the light. This determines how bright the light will be.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.PointLight.lightColor">
+            <summary>
+            The color of the light. This determines the color of the light emitted by the point light.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.PointLight.Offset">
+            <summary>
+            Offset of the light from the GameObject's position.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.PointLight.FlickerIntensity">
+            <summary>
+            The intensity of the flicker effect. This determines how much the light's intensity will vary when flickering is enabled.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.PointLight.Granularity">
+            <summary>
+            The granularity of the light effect. This controls how blocky the light appears, with higher values resulting in smoother transitions.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.PointLight.Initialize">
+            <summary>
+            Initializes the point light component, creating a soft circle texture for the light effect.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.PointLight.SetLight(System.Single,System.Single,Microsoft.Xna.Framework.Color)">
+            <summary>
+            Sets the light properties for the point light.
+            </summary>
+            <param name="radius"></param>
+            <param name="intensity"></param>
+            <param name="color"></param>
+        </member>
+        <member name="M:Engine.Core.Game.PointLight.SetLightIntensity(System.Single)">
+            <summary>
+            Sets the light radius for the point light.
+            </summary>
+            <param name="intensity"></param>
+        </member>
+        <member name="M:Engine.Core.Game.PointLight.Update(Microsoft.Xna.Framework.GameTime)">
+            <summary>
+            Updates the point light component. This can be used to update the light's properties or behavior, such as flickering.
+            </summary>
+            <param name="gameTime"></param>
+        </member>
+        <member name="M:Engine.Core.Game.PointLight.DrawLight(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
+            <summary>
+            Draws the point light to the screen using a soft circle texture.
+            </summary>
+            <param name="spriteBatch"></param>
+        </member>
+        <member name="T:Engine.Core.Game.Transform">
+            <summary>
+            Represents a transform component that can be attached to a GameObject.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Transform.Position">
+            <summary>
+            The position of the GameObject in the world. This is used to position the object in the world.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Transform.OldPosition">
+            <summary>
+            The old position of the GameObject in the world. This is used to track the previous position of the object for movement calculations.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Transform.Rotation">
+            <summary>
+            The rotation of the GameObject in degrees. This is used to rotate the object in the world.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Transform.Scale">
+            <summary>
+            The scale of the GameObject. This is used to scale the object in the world.
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Game.GameObject">
+            <summary>
+            Represents a game object in the scene, which can have multiple components attached to it.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.GameObject.Name">
+            <summary>
+            Name of the GameObject, used for identification and debugging.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.GameObject.Position">
+            <summary>
+            Position of the GameObject in the game world.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.GameObject.OldPosition">
+            <summary>
+            Old position of the GameObject, used for tracking movement and animations.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.GameObject.Rotation">
+            <summary>
+            Rotation of the GameObject in radians, affecting its orientation in the game world.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.GameObject.Scale">
+            <summary>
+            Scale of the GameObject, affecting its size in the game world.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.GameObject.children">
+            <summary>
+            List of child GameObjects that are part of this GameObject's hierarchy.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.GameObject.ID">
+            <summary>
+            Unique identifier for the GameObject, used for serialization and identification.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.GameObject.Parent">
+            <summary>
+            Parent GameObject, if this GameObject is part of a hierarchy.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.GameObject.components">
+            <summary>
+            List of components attached to this GameObject.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.GameObject.IsDestroyed">
+            <summary>
+            Indicates whether the GameObject has been destroyed.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.GameObject.Sprite">
+            <summary>
+            Gets the Sprite2D component if it exists, otherwise returns null.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.GameObject.Height">
+            <summary>
+            Height of the GameObject, used for collision detection and rendering.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.GameObject.#ctor">
+            <summary>
+            Default constructor for GameObject, initializes with an empty name.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.GameObject.#ctor(System.String)">
+            <summary>
+            Constructor for GameObject with a specified name.
+            </summary>
+            <param name="name"></param>
+        </member>
+        <member name="M:Engine.Core.Game.GameObject.OnCreate">
+            <summary>
+            Called when the GameObject is created.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.GameObject.AddComponent``1">
+            <summary>
+            Creates a new component and attaches it
+            </summary>
+            <param name="component"></param>
+        </member>
+        <member name="M:Engine.Core.Game.GameObject.AddComponent(Engine.Core.Game.Components.IComponent)">
+            <summary>
+            Add an Icomponent
+            </summary>
+            <param name="component"></param>
+        </member>
+        <member name="M:Engine.Core.Game.GameObject.GetComponent``1">
+            <summary>
+            Gets a component if possible
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Game.GameObject.AddComponent(Engine.Core.Game.Components.ObjectComponent)">
+            <summary>
+            Add an already existing component 
+            </summary>
+            <param name="comp"></param>
+        </member>
+        <member name="M:Engine.Core.Game.GameObject.Destroy">
+            <summary>
+            Destroy method, accessible via scripts
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.GameObject.Update(Microsoft.Xna.Framework.GameTime)">
+            <summary>
+            Update object
+            </summary>
+            <param name="gameTime"></param>
+        </member>
+        <member name="M:Engine.Core.Game.GameObject.Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
+            <summary>
+            Draw the object and its attached scripts
+            </summary>
+            <param name="spriteBatch"></param>
+        </member>
+        <member name="M:Engine.Core.Game.GameObject.DrawUI(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
+            <summary>
+            Draw the object and its attached scripts
+            </summary>
+            <param name="spriteBatch"></param>
+        </member>
+        <member name="M:Engine.Core.Game.GameObject.Instantiate(System.String,Microsoft.Xna.Framework.Vector2)">
+            <summary>
+            Instantiate game object from definition
+            </summary>
+            <param name="defName">Name of the object definition to instantiate</param>
+            <param name="position">Position to place the GameObject</param>
+            <returns>Instantiated GameObject</returns>
+        </member>
+        <member name="M:Engine.Core.Game.GameObject.IsDescendantOf(Engine.Core.Game.GameObject)">
+            <summary>
+            Check if this GameObject is a descendant of another GameObject
+            </summary>
+            <param name="other"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Game.GameObject.Deserialize(System.String)">
+            <summary>
+            Deserialize a game object
+            </summary>
+            <param name="json"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Game.GameObject.GetBoundingBox">
+            <summary>
+            Get the bounding box of the GameObject based on its components
+            </summary>
+            <returns></returns>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:Engine.Core.Game.GameObjectRegistry.LoadAll(System.String)" -->
+        <member name="M:Engine.Core.Game.GameObjectRegistry.Get(System.String)">
+            <summary>
+            Get the definition by its key (e.g. "Player" or "Enemies/Goblin").
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.GameObjectRegistry.AllKeys">
+            <summary>
+            All loaded keys (for editor UIs, autocomplete, etc).
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Game.GameOptions">
+            <summary>
+            Represents the game options for the Earth Engine game engine.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.GameOptions.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Engine.Core.Game.GameOptions"/> class.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.GameOptions.Load(System.String)">
+            <summary>
+            Loads the game options from a JSON file located at the specified path.
+            </summary>
+            <param name="path"></param>
+        </member>
+        <member name="M:Engine.Core.Graphics.FontLibrary.Initialize(Microsoft.Xna.Framework.Graphics.GraphicsDevice,Microsoft.Xna.Framework.Content.ContentManager)">
+            <summary>
+            Initialize the font library with graphics device and content manager
+            </summary>
+            <param name="graphicsDevice_">Graphics device for font rendering</param>
+            <param name="contentManager_">Content manager for loading fonts</param>
+        </member>
+        <member name="M:Engine.Core.Graphics.FontLibrary.LoadFonts(System.String)">
+            <summary>
+            Loads all fonts from the Fonts directory
+            </summary>
+            <param name="searchPattern">File pattern to search for (default: "*.spritefont")</param>
+            <exception cref="T:System.IO.DirectoryNotFoundException"></exception>
+        </member>
+        <member name="M:Engine.Core.Graphics.FontLibrary.LoadFont(System.String)">
+            <summary>
+            Load a specific font by name
+            </summary>
+            <param name="fontName">Name of the font to load</param>
+            <returns>True if font was loaded successfully</returns>
+        </member>
+        <member name="M:Engine.Core.Graphics.FontLibrary.Get(System.String)">
+            <summary>
+            Get a font by name
+            </summary>
+            <param name="name">Name of the font</param>
+            <returns>The SpriteFont, or null if not found</returns>
+        </member>
+        <member name="M:Engine.Core.Graphics.FontLibrary.GetBitmapFont(System.String)">
+            <summary>
+            Get a bitmap font by name
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Graphics.FontLibrary.Get(System.String,System.String)">
+            <summary>
+            Get a font by name, with fallback to default
+            </summary>
+            <param name="name">Name of the font</param>
+            <param name="fallbackName">Fallback font name</param>
+            <returns>The SpriteFont, or fallback font</returns>
+        </member>
+        <member name="M:Engine.Core.Graphics.FontLibrary.CreateDefaultFont">
+            <summary>
+            Create a default font if no fonts are available
+            </summary>
+            <returns>A basic SpriteFont</returns>
+        </member>
+        <member name="M:Engine.Core.Graphics.FontLibrary.HasFont(System.String)">
+            <summary>
+            Check if a font exists
+            </summary>
+            <param name="name">Name of the font</param>
+            <returns>True if font exists</returns>
+        </member>
+        <member name="M:Engine.Core.Graphics.FontLibrary.GetFontNames">
+            <summary>
+            Get all loaded font names
+            </summary>
+            <returns>List of font names</returns>
+        </member>
+        <member name="T:Engine.Core.Graphics.GraphicsLibrary">
+            <summary>
+            A static class that provides graphics-related functionality, such as creating a pixel texture.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Graphics.GraphicsLibrary.Initialize">
+            <summary>
+            Initializes the graphics library, creating a 1x1 pixel texture.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Graphics.GraphicsLibrary.LoadTextures">
+            <summary>
+            Loads the textures used in the graphics library, including primitives
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Graphics.Lighting.MultiplyBlend">
+            <summary>
+            Blend state for soft circle lights (additive blending).
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Graphics.Lighting.AlphaAdditiveBlend">
+            <summary>
+            Blend state for glowing additive effects (e.g., lights, particles).
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Graphics.Lighting.AdditiveBlend">
+            <summary>
+            Blend state for additive blending, useful for effects like fire or explosions.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Graphics.Lighting.#ctor(Microsoft.Xna.Framework.Graphics.GraphicsDevice,System.Int32,System.Int32)">
+            <summary>
+            Initialize the lighting system with a graphics device and dimensions for the lightmap.
+            </summary>
+            <param name="gd"></param>
+            <param name="width"></param>
+            <param name="height"></param>
+        </member>
+        <member name="M:Engine.Core.Graphics.Lighting.Resize(System.Int32,System.Int32)">
+            <summary>
+            Resize the lightmap to new dimensions.
+            </summary>
+            <param name="width"></param>
+            <param name="height"></param>
+        </member>
+        <member name="M:Engine.Core.Graphics.Lighting.Draw(Engine.Core.Rooms.Room,Microsoft.Xna.Framework.Graphics.SpriteBatch)">
+            <summary>
+            Draw the lighting layer
+            </summary>
+            <param name="spriteBatch"></param>
+        </member>
+        <member name="M:Engine.Core.Graphics.Lighting.GetLightmap">
+            <summary>
+            Get lightmap to draw it
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Graphics.TextureLibrary.LoadTextures(System.String)">
+            <summary>
+            Loads all textures within project
+            </summary>
+            <param name="graphicsDevice_"></param>
+            <param name="searchPattern"></param>
+            <exception cref="T:System.IO.DirectoryNotFoundException"></exception>
+        </member>
+        <member name="M:Engine.Core.Graphics.TextureLibrary.Get(System.String)">
+            <summary>
+            Retrieve a previously loaded texture by name (file name without extension).
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Rooms.Room">
+            <summary>
+            Represents a room or scene in the game, containing GameObjects and their components.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Rooms.Room.Name">
+            <summary>
+            Name of the room. This is used to identify the room in the editor and in the game.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Rooms.Room.FilePath">
+            <summary>
+            File path of the room. This is used to load the room from disk.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Rooms.Room.objects">
+            <summary>
+            List of GameObjects in the room. Each GameObject can have multiple components.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Rooms.Room.Render(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
+            <summary>
+            Render a scene
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Rooms.Room.RenderUI(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
+            <summary>
+            Render UI elements in the scene
+            </summary>
+            <param name="spriteBatch"></param>
+        </member>
+        <member name="M:Engine.Core.Rooms.Room.Update(Microsoft.Xna.Framework.GameTime)">
+            <summary>
+            Update a scene
+            </summary>
+            <param name="gameTime"></param>
+        </member>
+        <member name="M:Engine.Core.Rooms.Room.Load(System.String)">
+            <summary>
+            Creates a room given a path
+            </summary>
+            <param name="path"></param>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:Engine.Core.Rooms.Room.Initialize" -->
+        <member name="M:Engine.Core.Rooms.Room.FindByName(System.String)">
+            <summary>
+            Find a GameObject by name
+            </summary>
+            <param name="name">Name to search for</param>
+            <returns>The GameObject if found, null otherwise</returns>
+        </member>
+        <member name="T:Engine.Core.Rooms.Tiles.TileArrayUtils">
+            <summary>
+            Utility class for converting between jagged arrays and 2D arrays for tile data.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.TileArrayUtils.ToJagged``1(``0[0:,0:])">
+            <summary>
+            Converts a 2D array to a jagged array.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="array"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.TileArrayUtils.To2D``1(``0[][])">
+            <summary>
+            Converts a jagged array to a 2D array.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="jagged"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Engine.Core.Rooms.Tiles.TilemapLayerData">
+            <summary>
+            Serializable data for a single tilemap layer.
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Rooms.Tiles.TilemapSaveData">
+            <summary>
+            Serializable data for a tilemap, containing multiple layers.
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Rooms.Tiles.TilemapRendererExtensions">
+            <summary>
+            Extensions for TilemapRenderer to convert to and from TilemapLayerData.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.TilemapRendererExtensions.ToData(Engine.Core.Game.Components.TilemapRenderer)">
+            <summary>
+            Converts the TilemapRenderer to TilemapLayerData, extracting its properties and tiles.
+            </summary>
+            <param name="renderer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.TilemapRendererExtensions.ApplyData(Engine.Core.Game.Components.TilemapRenderer,Engine.Core.Rooms.Tiles.TilemapLayerData)">
+            <summary>
+            Applies the given TilemapLayerData to the TilemapRenderer, updating its properties and tiles.
+            </summary>
+            <param name="renderer"></param>
+            <param name="data"></param>
+        </member>
+        <member name="T:Engine.Core.Tile">
+            <summary>
+            Represents a single tile in a tile layer, including its index in the tileset, collision properties, and height.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Tile.#ctor(System.Int32)">
+            <summary>
+            Create a new Tile with a specified tile index.
+            </summary>
+            <param name="tileIndex"></param>
+        </member>
+        <member name="M:Engine.Core.Tile.#ctor">
+            <summary>
+            Default constructor for Tile, initializes with default values.
+            </summary>
+        </member>
+        <member name="T:Engine.Core.TileLayer">
+            <summary>
+            Represents a layer of tiles in a tilemap, including the name, tile dimensions, visibility, and an array of tiles.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.TileLayer.#ctor(System.Int32,System.Int32)">
+            <summary>
+            Create a new TileLayer with specified width and height.
+            </summary>
+            <param name="width"></param>
+            <param name="height"></param>
+        </member>
+        <member name="T:Engine.Core.GameScript">
+            <summary>
+            Base class for game scripts that can be attached to game objects.
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Scripting.CompilationResult">
+            <summary>
+            Represents the result of a script compilation process.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Scripting.CompilationResult.Success">
+            <summary>
+            Indicates whether the compilation was successful or not.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Scripting.CompilationResult.Errors">
+            <summary>
+            A list of errors encountered during the compilation process.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Scripting.CompilationResult.CompiledAssembly">
+            <summary>
+            The compiled assembly as a byte array. This can be used to load the assembly into the application.
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Scripting.ScriptCompiler">
+            <summary>
+            Compiles C# scripts found in the Assets directory of the project.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Scripting.ScriptCompiler.CompileAllScriptsInAssets(System.String,System.String)">
+            <summary>
+            Compiles all C# scripts found in the Assets directory of the specified project.
+            </summary>
+            <param name="projectDir"></param>
+            <param name="outputDllPath"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Scripting.ScriptCompiler.ResolveReferences">
+            <summary>
+            Resolves references to necessary assemblies for script compilation.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Scripting.ScriptCompiler.CompileAndLoadScripts(System.String,GameRuntime.ScriptManager@)">
+            <summary>
+            Compiles and loads scripts 
+            </summary>
+            <param name="projectPath"></param>
+            <param name="scriptManager"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Scripting.ScriptCompiler.LoadScripts">
+            <summary>
+            Reads the compiled scripts from the Build directory and updates the ComponentRegistry.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Engine.Core.Camera">
+            <summary>
+            Represents the camera in the game, handling position, zoom, rotation, and target tracking.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Camera.Position">
+            <summary>
+            The position of the camera in world space.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Camera.Zoom">
+            <summary>
+            The zoom level of the camera, where 1f is normal size.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Camera.Rotation">
+            <summary>
+            The rotation of the camera in radians. 0f means no rotation.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Camera.Target">
+            <summary>
+            The target GameObject that the camera will follow. If null, the camera does not follow any object.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Camera.SmoothSpeed">
+            <summary>
+            The speed at which the camera smoothly follows the target. Higher values result in faster following.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Camera.Reset">
+            <summary>
+            Reset the camera settings
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Camera.Update(Microsoft.Xna.Framework.GameTime)">
+            <summary>
+            Update the camera position based on the target GameObject.
+            </summary>
+            <param name="gameTime"></param>
+        </member>
+        <member name="M:Engine.Core.Camera.GetViewMatrix(System.Int32,System.Int32)">
+            <summary>
+            Get the view matrix for rendering, taking into account zoom, rotation, and position.
+            </summary>
+            <param name="viewportWidth"></param>
+            <param name="viewportHeight"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Camera.GetUIViewMatrix(System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            Get the UI view matrix, which is typically an identity matrix since UI is not affected by camera transformations.
+            </summary>
+            <param name="viewportWidth"></param>
+            <param name="viewportHeight"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Camera.GetUIScreenFitMatrix(System.Int32,System.Int32)">
+            <summary>
+            Get a matrix that fits the UI to the screen size, maintaining aspect ratio.
+            </summary>
+            <param name="viewportWidth"></param>
+            <param name="viewportHeight"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Camera.ScreenToWorld(Microsoft.Xna.Framework.Point)">
+            <summary>
+            Convert a screen position to world coordinates.
+            </summary>
+            <param name="screenPos"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Camera.SetViewportSize(System.Int32,System.Int32)">
+            <summary>
+            Set the viewport size for rendering.
+            </summary>
+            <param name="viewportWidth"></param>
+            <param name="viewportHeight"></param>
+        </member>
+        <member name="M:Engine.Core.Camera.DrawUI(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
+            <summary>
+            Draw the camera view preview. Used for knowing the UI speed
+            </summary>
+            <param name="spriteBatch"></param>
+        </member>
+        <member name="M:Engine.Core.Systems.CollisionSystem.Initialize">
+            <summary>
+            Initialize the collision system. This should be called once at the start of the game.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Systems.CollisionSystem.Register(Engine.Core.Game.Components.Collider2D)">
+            <summary>
+            Register a collider with the system.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Systems.CollisionSystem.Unregister(Engine.Core.Game.Components.Collider2D)">
+            <summary>
+            Unregister a collider from the system.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Systems.CollisionSystem.Update(Microsoft.Xna.Framework.GameTime)">
+            <summary>
+            Call this once per frame to check for collisions.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Systems.CollisionSystem.Clear">
+            <summary>
+            Optional: Clear all registered colliders.
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Systems.InputSourceType">
+            <summary>
+            Defines the type of input source for an action binding.
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Systems.VirtualButton">
+            <summary>
+            Each virtual button is mapped to a GPIO pin button
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Systems.Button">
+            <summary>
+            Enumeration for mouse buttons.
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Systems.InputBinding">
+            <summary>
+            Represents a binding between an input action and a specific input source.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Systems.InputBinding.#ctor(Engine.Core.Systems.InputSourceType,System.Object)">
+            <summary>
+            Creates a new input binding for a specific input source type and code.
+            </summary>
+            <param name="sourceType"></param>
+            <param name="code"></param>
+        </member>
+        <member name="T:Engine.Core.Systems.InputID">
+            <summary>
+            Represents a unique identifier for an input action.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Systems.InputID.#ctor(System.String)">
+            <summary>
+            Private constructor to create a new input action ID.
+            </summary>
+            <param name="name"></param>
+        </member>
+        <member name="M:Engine.Core.Systems.InputID.Get(System.String)">
+            <summary>
+            Registers a new input action ID.
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException"></exception>
+        </member>
+        <member name="T:Engine.Core.Systems.InputAction">
+            <summary>
+            Manages input actions and their bindings.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Systems.InputAction.Bind(Engine.Core.Systems.InputID,Engine.Core.Systems.InputBinding)">
+            <summary>
+            Binds an input action to a specific input source.
+            </summary>
+            <param name="action"></param>
+            <param name="binding"></param>
+        </member>
+        <member name="M:Engine.Core.Systems.InputAction.IsDown(Engine.Core.Systems.InputID)">
+            <summary>
+            Checks if an input action is currently pressed based on its bindings.
+            </summary>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Systems.InputAction.Pressed(Engine.Core.Systems.InputID)">
+            <summary>
+            Checks if an input action is currently pressed based on its bindings.
+            </summary>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Systems.InputAction.Released(Engine.Core.Systems.InputID)">
+            <summary>
+            Checks if an input action is currently pressed based on its bindings.
+            </summary>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Engine.Core.MockGpioController">
+            <summary>
+            Mock GpioController for platforms without GPIO support (e.g., Windows).
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Input">
+            <summary>
+            Handles input from keyboard and mouse, including hotkeys and fullscreen toggling.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Input._gpioPins">
+            <summary>
+            Mapping of virtual buttons to GPIO pins.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Input.ScrollDelta">
+            <summary>
+            Scroll delta value (positive for scroll up, negative for scroll down).
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Input.ScrolledUp">
+            <summary>
+            Indicates if the mouse was scrolled up (positive delta).
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Input.ScrolledDown">
+            <summary>
+            Indicates if the mouse was scrolled down (negative delta).
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Input.MousePosition">
+            <summary>
+            Get the current mouse position in screen coordinates.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Input.Initialize">
+            <summary>
+            Initializes the Input system, setting up keyboard and mouse states, and GPIO pins if available.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Input.BindInput">
+            <summary>
+            Binds input actions to virtual buttons and initializes the current button states.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Input.Update">
+            <summary>
+            Initializes the Input system with the game instance and graphics manager.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Input.IsButtonDown(Engine.Core.Systems.VirtualButton)">
+            <summary>
+            Check if a specific virtual button is currently pressed, released, or just pressed/released.
+            </summary>
+            <param name="button"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Input.IsButtonPressed(Engine.Core.Systems.VirtualButton)">
+            <summary>
+            Check if a specific virtual button is currently released (not pressed).
+            </summary>
+            <param name="button"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Input.IsButtonReleased(Engine.Core.Systems.VirtualButton)">
+            <summary>
+            Check if a specific virtual button was just released (transition from down to up).
+            </summary>
+            <param name="button"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Input.IsKeyDown(Microsoft.Xna.Framework.Input.Keys)">
+            <summary>
+            Check if a specific key is currently pressed, released, or just pressed/released.
+            </summary>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Input.IsKeyUp(Microsoft.Xna.Framework.Input.Keys)">
+            <summary>
+            Check if a specific key is currently released (not pressed).
+            </summary>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys)">
+            <summary>
+            Check if a specific key was just pressed (transition from up to down).
+            </summary>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Input.IsKeyReleased(Microsoft.Xna.Framework.Input.Keys)">
+            <summary>
+            Check if a specific key was just released (transition from down to up).
+            </summary>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Input.IsMouseDown(Engine.Core.Systems.Button)">
+            <summary>
+            Check if a specific mouse button is currently pressed, released, or just pressed/released.
+            </summary>
+            <param name="button"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Input.IsMouseUp(Engine.Core.Systems.Button)">
+            <summary>
+            Check if a specific mouse button is currently released (not pressed).
+            </summary>
+            <param name="button"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Input.IsMousePressed(Engine.Core.Systems.Button)">
+            <summary>
+            Check if a specific mouse button was just pressed (transition from up to down).
+            </summary>
+            <param name="button"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Input.IsMouseReleased(Engine.Core.Systems.Button)">
+            <summary>
+            Check if a specific mouse button was just released (transition from down to up).
+            </summary>
+            <param name="button"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Input.GetMouseWorldPosition">
+            <summary>
+            Returns the mouse position in world coordinates
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Input.MouseHover(Microsoft.Xna.Framework.Rectangle)">
+            <summary>
+            Check if hovering over a recangle
+            </summary>
+            <param name="rectangle"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Input.HandleHotkeys">
+            <summary>
+            Handle hotkey pressing
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Input.ToggleFullscreen">
+            <summary>
+            Toggle between fullscreen and windowed mode
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Input.SetFullscreen(System.Boolean)">
+            <summary>
+            Set the fullscreen mode directly
+            </summary>
+            <param name="val"></param>
+        </member>
+        <member name="T:Editor.AssetManagement.GameReferenceResolver">
+            <summary>
+            Handles resolving references to GameObjects by their unique IDs during deserialization.
+            </summary>
+        </member>
+        <member name="M:Editor.AssetManagement.GameReferenceResolver.Register(System.Object,System.Reflection.FieldInfo,System.Guid)">
+            <summary>
+            Registers a pending reference to a GameObject by its ID.
+            </summary>
+            <param name="target"></param>
+            <param name="field"></param>
+            <param name="id"></param>
+        </member>
+        <member name="M:Editor.AssetManagement.GameReferenceResolver.Resolve(System.Collections.Generic.List{Engine.Core.Game.GameObject})">
+            <summary>
+            Resolves all pending GameObject references by matching IDs with actual GameObjects in the scene.
+            </summary>
+            <param name="objects"></param>
+        </member>
+        <member name="T:Editor.AssetManagement.ComponentListJsonConverter">
+            <summary>
+            Custom JSON converter for serializing and deserializing lists of IComponent.
+            </summary>
+        </member>
+        <member name="M:Editor.AssetManagement.ComponentListJsonConverter.Read(System.Text.Json.Utf8JsonReader@,System.Type,System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            Reads a JSON array and converts it to a list of IComponent.
+            </summary>
+            <param name="reader"></param>
+            <param name="typeToConvert"></param>
+            <param name="options"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Editor.AssetManagement.ComponentListJsonConverter.Write(System.Text.Json.Utf8JsonWriter,System.Collections.Generic.List{Engine.Core.Game.Components.IComponent},System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            Writes a list of IComponent to JSON.
+            </summary>
+            <param name="writer"></param>
+            <param name="value"></param>
+            <param name="options"></param>
+        </member>
+        <member name="M:Editor.AssetManagement.ComponentListJsonConverter.ApplyComponentProperties(System.Object,System.Text.Json.JsonElement)">
+            <summary>
+            Checks if the converter can convert the specified type.
+            </summary>
+            <param name="component"></param>
+            <param name="props"></param>
+        </member>
+        <member name="M:TilemapManager.Render(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
+            <summary>
+            Render all tilemaps in the manager. Users can add their own, 
+            </summary>
+        </member>
+        <member name="M:TilemapManager.GetTilemapsAtFloor(System.Int32)">
+            <summary>
+            Get all tilemaps at a specific floor level. This is useful for rendering only the tilemaps that are relevant to the current floor in a multi-floor environment.
+            </summary>
+            <param name="floorLevel"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilemapManager.Save">
+            <summary>
+            Save the static tilemaps per project
+            </summary>
+        </member>
+        <member name="M:GameRuntime.ScriptManager.CreateComponentInstanceByName(System.String)">
+            <summary>
+            Creates an instance of an ObjectComponent by its type name.
+            </summary>
+            <param name="typeName"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

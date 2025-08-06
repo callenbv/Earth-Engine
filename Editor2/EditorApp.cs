@@ -99,10 +99,11 @@ namespace EarthEngineEditor
             // Override game options
             EditorSettings.Load();
 
+            // Load XAML documentation
+            Comments.Initialize();
+
             // Test console output
             Console.WriteLine("Earth Engine Editor initialized successfully!");
-            Console.WriteLine($"Graphics Device: {GraphicsDevice.Adapter.Description}");
-            Console.WriteLine($"Window Size: {_graphics.PreferredBackBufferWidth}x{_graphics.PreferredBackBufferHeight}");
 
             base.Initialize();
         }

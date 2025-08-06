@@ -28,12 +28,13 @@ namespace Engine.Core.Game
         /// <summary>
         /// The old position of the GameObject in the world. This is used to track the previous position of the object for movement calculations.
         /// </summary>
-        private Vector2 _oldPosition;
+        [HideInInspector]
         new public Vector2 OldPosition
         {
             get => _oldPosition;
             set => _oldPosition = value;
         }
+        private Vector2 _oldPosition;
 
         /// <summary>
         /// The rotation of the GameObject in degrees. This is used to rotate the object in the world.

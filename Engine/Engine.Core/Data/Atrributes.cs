@@ -3,7 +3,7 @@
 /// <File>         Atrributes.cs
 /// <Author>       Callen Betts Virott 
 /// <Copyright>    @2025 Callen Betts Virott. All rights reserved.
-/// <Summary>                
+/// <Summary>      Define attributes for serialization and editor inputs          
 /// -----------------------------------------------------------------------------
 
 namespace Engine.Core.Data

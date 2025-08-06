@@ -6,6 +6,7 @@
 /// <Summary>                
 /// -----------------------------------------------------------------------------
 
+using Engine.Core.CustomMath;
 using Engine.Core.Data;
 using Engine.Core.Graphics;
 using Microsoft.Xna.Framework;
@@ -259,25 +260,25 @@ namespace Engine.Core.Game.Components
                             TileSize,
                             TileSize);
 
-                        Tint = Color.White;
-
                         float depth = (FloorLevel * 10000f) / 100000f;
+                        Vector2 FinalPosition = Position+Offset + new System.Numerics.Vector2(x * TileSize, y * TileSize);
 
                         if (tile.TileIndex > -1)
                         {
                             spriteBatch.Draw(
                                 Texture,
-                                Position + Offset + new System.Numerics.Vector2(x * TileSize, y * TileSize),
+                                FinalPosition,
                                 source,
                                 Tint,
                                 0f,
-                                Microsoft.Xna.Framework.Vector2.Zero,
+                                Vector2.Zero,
                                 1f,
                                 SpriteEffects.None,
                                 depth
                             );
                         }
 
+                        /* DEBUG EDITOR */
                         if (!EngineContext.Running && FloorLevel == EngineContext.CurrentTilemap?.FloorLevel)
                         {
                             if (tile.IsCollidable)
