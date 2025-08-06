@@ -111,7 +111,6 @@ namespace Engine.Core.Game.Components
         /// <summary>
         /// The sprite effects applied to the sprite, such as flipping or mirroring.
         /// </summary>
-        [HideInInspector]
         public SpriteEffects spriteEffect = SpriteEffects.None;
 
         /// <summary>
@@ -239,7 +238,7 @@ namespace Engine.Core.Game.Components
         /// </summary>
         public override void Update(GameTime gameTime)
         {
-            if (texture == null || frameCount <= 0)
+            if (texture == null || frameCount <= 1)
                 return;
 
             if (animated)

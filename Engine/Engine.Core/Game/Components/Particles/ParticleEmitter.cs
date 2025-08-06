@@ -52,8 +52,8 @@ namespace Engine.Core.Game.Components
         /// <summary>
         /// Lifetime of the particle in miliseconds.
         /// </summary>
-        [SliderEditor(0, 300)]
-        public float Lifetime { get; set; } = 2f;
+        [SliderEditor(0, 600)]
+        public float Lifetime { get; set; } = 60f;
 
         /// <summary>
         /// Speed and direction of the particles emitted by this emitter.

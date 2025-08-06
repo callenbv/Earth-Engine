@@ -140,7 +140,6 @@ namespace Engine.Core.Game.Components
         /// <param name="other"></param>
         public virtual void OnCollisionEnter(Collider2D other)
         {
-            Console.WriteLine("Colliding");
         }
 
         /// <summary>
@@ -149,7 +148,6 @@ namespace Engine.Core.Game.Components
         /// <param name="other"></param>
         public virtual void OnTriggerEnter(Collider2D other)
         {
-            Console.WriteLine("Triggered");
         }
 
         /// <summary>
@@ -169,9 +167,9 @@ namespace Engine.Core.Game.Components
             if (!EngineContext.Debug)
                 return;
 
-            var bounds = Bounds;
-            var rect = new Rectangle((int)bounds.X, (int)bounds.Y, (int)bounds.Width, (int)bounds.Height);
-            spriteBatch.Draw(GraphicsLibrary.PixelTexture, rect, IsTrigger ? Color.Green * 0.5f : Color.Red * 0.5f);
+            //var bounds = Bounds;
+            //var rect = new Rectangle((int)bounds.X, (int)bounds.Y, (int)bounds.Width, (int)bounds.Height);
+            //spriteBatch.Draw(GraphicsLibrary.PixelTexture, rect, IsTrigger ? Color.Green * 0.5f : Color.Red * 0.5f);
         }
 
         /// <summary>
