@@ -22,6 +22,10 @@ namespace Engine.Core.Game.Components
     {
         public override string Name => "Text Renderer";
         public override bool UpdateInEditor => true;
+
+        /// <summary>
+        /// The text to render. If null, it will default to an empty string.
+        /// </summary>
         public string Text
         {
             get => text_;
@@ -33,16 +37,47 @@ namespace Engine.Core.Game.Components
 
         private string text_ = string.Empty;
 
+        /// <summary>
+        /// The rotation of the text in radians. This is applied around the origin point.
+        /// </summary>
         public Color Color { get; set; } = Color.White;
+
+        /// <summary>
+        /// The rotation of the text in radians. This is applied around the origin point.
+        /// </summary>
         public float TextScale { get; set; } = 1.0f;
+
+        /// <summary>
+        /// The rotation of the text in radians. This is applied around the origin point.
+        /// </summary>
         public float Depth { get; set; } = 1.0f;
+
+        /// <summary>
+        /// The rotation of the text in radians. This is applied around the origin point.
+        /// </summary>
         public bool Visible { get; set; } = true;
+
+        /// <summary>
+        /// Whether the text should be centered around the object's position.
+        /// </summary>
         public bool Centered { get; set; } = false;
 
-        private string FontName = "PixelFont";
-        public Vector2 Origin = Vector2.Zero;
+        /// <summary>
+        /// The rotation of the text in radians. This is applied around the origin point.
+        /// </summary>
         public SpriteEffects Effects = SpriteEffects.None;
+
+        /// <summary>
+        /// The rotation of the text in radians. This is applied around the origin point.
+        /// </summary>
         public Vector2 Offset = Vector2.Zero;
+
+        /// <summary>
+        /// The rotation of the text in radians. This is applied around the origin point.
+        /// </summary>
+        public Vector2 Origin = Vector2.Zero;
+
+        private string FontName = "PixelFont";
         protected SpriteFont? currentFont;
         protected BitmapFont? bitFont;
         protected Vector2 textSize;

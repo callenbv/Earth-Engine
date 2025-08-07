@@ -176,8 +176,8 @@ namespace Editor.Windows.TileEditor
 
                     if (selectedLayer.TexturePtr == IntPtr.Zero)
                         selectedLayer.TexturePtr = ImGuiRenderer.Instance.BindTexture(selectedLayer.Texture);
-
-                    // Preview in editor
+                    
+                    // Draw the preview
                     ImGui.Image(selectedLayer.TexturePtr, imageSize);
 
                     // Draw overlay grid of invisible buttons
@@ -258,6 +258,18 @@ namespace Editor.Windows.TileEditor
                                 }
                             }
                         }
+                    }
+                }
+                else
+                {
+                    // Handle scrolling in and out of preview
+                    if (Input.ScrollDelta > 0)
+                    {
+                        previewScale = Math.Min(previewScale * 1.1f, 4.0f); // zoom in
+                    }
+                    else if (Input.ScrollDelta < 0)
+                    {
+                        previewScale = Math.Max(previewScale * 0.9f, 0.25f); // zoom out
                     }
                 }
             }
