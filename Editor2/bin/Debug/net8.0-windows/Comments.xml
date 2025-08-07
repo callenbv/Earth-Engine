@@ -244,6 +244,11 @@
             Whether this collider is a trigger (doesn't block, but detects).
             </summary>
         </member>
+        <member name="P:Engine.Core.Game.Components.Collider2D.Tags">
+            <summary>
+            Tags for collision. Useful for colliding only with certain objects
+            </summary>
+        </member>
         <member name="P:Engine.Core.Game.Components.Collider2D.Bounds">
             <summary>
             Gets the world-space bounding box of the collider.
@@ -259,7 +264,7 @@
             Checks if this collider contains a point in world space.
             </summary>
         </member>
-        <member name="M:Engine.Core.Game.Components.Collider2D.Create">
+        <member name="M:Engine.Core.Game.Components.Collider2D.Initialize">
             <summary>
             Registers this collider with the global collision system.
             </summary>
@@ -280,6 +285,13 @@
             Called when this collider enters a trigger with another collider.
             </summary>
             <param name="other"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.Collider2D.IsTagged(System.String)">
+            <summary>
+            If we are tagged with this tag
+            </summary>
+            <param name="tag"></param>
+            <returns></returns>
         </member>
         <member name="M:Engine.Core.Game.Components.Collider2D.OnTileCollision">
             <summary>
@@ -438,6 +450,18 @@
             Destroy the component. This method is called when the component is removed from a GameObject.
             </summary>
         </member>
+        <member name="M:Engine.Core.Game.Components.ObjectComponent.OnCollision(Engine.Core.Game.Components.Collider2D)">
+            <summary>
+            Called when this collider collides with another collider.
+            </summary>
+            <param name="other"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.ObjectComponent.OnCollisionTrigger(Engine.Core.Game.Components.Collider2D)">
+            <summary>
+            Called when this collider enters a trigger with another collider.
+            </summary>
+            <param name="other"></param>
+        </member>
         <member name="T:Engine.Core.Game.Components.Particle">
             <summary>
             Represents a single particle in the game, with properties for position, velocity, rotation, lifetime, color, scale, and texture.
@@ -530,6 +554,11 @@
             Whether the emitter is enabled or not. If false, no particles will be emitted.
             </summary>
         </member>
+        <member name="P:Engine.Core.Game.Components.ParticleEmitter.ShowBounds">
+            <summary>
+            Whether or not to show the emitter's bounds
+            </summary>
+        </member>
         <member name="P:Engine.Core.Game.Components.ParticleEmitter.EmitterSize">
             <summary>
             Size of the emitter area from which particles will be emitted. This defines the rectangular area in which particles can spawn.
@@ -559,6 +588,18 @@
         <member name="M:Engine.Core.Game.Components.ParticleEmitter.Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
             <summary>
             Draw the particle emitter and its particles using the provided SpriteBatch.
+            </summary>
+            <param name="spriteBatch"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.ParticleEmitter.DrawUI(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
+            <summary>
+            Draw bounds in the UI
+            </summary>
+            <param name="spriteBatch"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.ParticleEmitter.DebugDraw(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
+            <summary>
+            Draw debug bounds
             </summary>
             <param name="spriteBatch"></param>
         </member>
@@ -706,6 +747,51 @@
         <member name="T:Engine.Core.Game.Components.TextRenderer">
             <summary>
             A component for rendering text in the game world.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.TextRenderer.Text">
+            <summary>
+            The text to render. If null, it will default to an empty string.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.TextRenderer.Color">
+            <summary>
+            The rotation of the text in radians. This is applied around the origin point.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.TextRenderer.TextScale">
+            <summary>
+            The rotation of the text in radians. This is applied around the origin point.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.TextRenderer.Depth">
+            <summary>
+            The rotation of the text in radians. This is applied around the origin point.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.TextRenderer.Visible">
+            <summary>
+            The rotation of the text in radians. This is applied around the origin point.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.TextRenderer.Centered">
+            <summary>
+            Whether the text should be centered around the object's position.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.TextRenderer.Effects">
+            <summary>
+            The rotation of the text in radians. This is applied around the origin point.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.TextRenderer.Offset">
+            <summary>
+            The rotation of the text in radians. This is applied around the origin point.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.TextRenderer.Origin">
+            <summary>
+            The rotation of the text in radians. This is applied around the origin point.
             </summary>
         </member>
         <member name="M:Engine.Core.Game.Components.TextRenderer.Initialize">
@@ -1192,9 +1278,14 @@
             </summary>
             <param name="spriteBatch"></param>
         </member>
+        <member name="M:Engine.Core.Game.GameObject.OnClick">
+            <summary>
+            Called when an object is clicked
+            </summary>
+        </member>
         <member name="M:Engine.Core.Game.GameObject.Instantiate(System.String,Microsoft.Xna.Framework.Vector2)">
             <summary>
-            Instantiate game object from definition
+            Instantiate game object from object name
             </summary>
             <param name="defName">Name of the object definition to instantiate</param>
             <param name="position">Position to place the GameObject</param>

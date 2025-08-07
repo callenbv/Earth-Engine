@@ -46,6 +46,9 @@ namespace Engine.Core.Systems
         /// </summary>
         public static void Update(GameTime gameTime)
         {
+            if (!EngineContext.Running)
+                return;
+
             for (int i = 0; i < colliders.Count; i++)
             {
                 for (int j = i + 1; j < colliders.Count; j++)

@@ -191,7 +191,6 @@ namespace Engine.Core.Scripting
                 scriptManager = new ScriptManager(scriptAssembly);
                 EngineContext.Current.ScriptManager = scriptManager;
 
-                ComponentRegistry.RefreshAll();
                 foreach (var type in scriptAssembly.GetTypes())
                 {
                     if (!type.IsAbstract && typeof(ObjectComponent).IsAssignableFrom(type))
@@ -201,12 +200,14 @@ namespace Engine.Core.Scripting
                     }
                 }
 
+                ComponentRegistry.RefreshAll();
+
                 Console.WriteLine("[ScriptLoader] ScriptManager initialized.");
                 return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ScriptLoader] Failed to load scripts: {ex.Message}");
+                Console.Error.WriteLine($"[ScriptLoader] Failed to load scripts: {ex.Message}");
                 return false;
             }
         }

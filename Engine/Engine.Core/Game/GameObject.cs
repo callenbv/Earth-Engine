@@ -157,7 +157,7 @@ namespace Engine.Core.Game
         /// </summary>
         /// <param name="component"></param>
         public T AddComponent<T>() where T : ObjectComponent, new()
-        { 
+        {
             var component = new T
             {
                 Owner = this
@@ -223,7 +223,12 @@ namespace Engine.Core.Game
         public void Destroy()
         {
             if (IsDestroyed) return;
-            
+
+            foreach (var component in components)
+            {
+                component.Destroy();
+            }
+
             IsDestroyed = true;
         }
 
@@ -233,8 +238,17 @@ namespace Engine.Core.Game
         /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
         {
+            // Update old position
             OldPosition = Position;
 
+            // Check for clicks
+            Rectangle rect = GetBoundingBox();
+            if (EngineContext.Running && Input.IsMousePressed() && Input.MouseHover(rect))
+            {
+                OnClick();
+            }
+
+            // Update all normal components
             foreach (var component in components)
             {
                 try
@@ -254,12 +268,14 @@ namespace Engine.Core.Game
 
                     component.Update(gameTime);
                 }
-                catch (Exception e) 
+                catch (Exception e)
                 {
                     Console.Error.WriteLine($"Error updating {component.Name} in {Name}: {e.Message}");
                 }
             }
 
+            // Order component updates
+            // NOTE: This will be replaced by priority queue later
             foreach (var component in components)
             {
                 try
@@ -279,6 +295,7 @@ namespace Engine.Core.Game
                 }
             }
 
+            // Update any children as well
             foreach (var obj in children)
             {
                 obj.Update(gameTime);
@@ -331,7 +348,18 @@ namespace Engine.Core.Game
         }
 
         /// <summary>
-        /// Instantiate game object from definition
+        /// Called when an object is clicked
+        /// </summary>
+        public void OnClick()
+        {
+            foreach (ObjectComponent component in components)
+            {
+                component.OnClick();
+            }
+        }
+
+        /// <summary>
+        /// Instantiate game object from object name
         /// </summary>
         /// <param name="defName">Name of the object definition to instantiate</param>
         /// <param name="position">Position to place the GameObject</param>
@@ -339,7 +367,14 @@ namespace Engine.Core.Game
         public static GameObject Instantiate(string defName, Vector2 position)
         {
             // Check that the prefab exists
-            string path = Path.Combine(ProjectSettings.AssetsDirectory, defName);
+            string extension = Path.GetExtension(defName);
+            string fullPath = defName;
+            if (extension == string.Empty || extension == null)
+            {
+                fullPath += ".eo";
+            }
+            string path = Path.Combine(ProjectSettings.AssetsDirectory, fullPath);
+
             if (!File.Exists(path))
             {
                 Console.Error.WriteLine($"[Instantiate] Prefab not found: {path}");
@@ -377,10 +412,11 @@ namespace Engine.Core.Game
                 if (transform != null)
                     transform.Position = position;
 
-                // Give an empty visual
-                var sprite = obj.GetComponent<Sprite2D>();
-                if (sprite != null)
-                    sprite.Initialize();
+                foreach (var component in  def.components)
+                {
+                    component.Initialize();
+                    component.Create();
+                }
 
                 // Add to the scene
                 string objectName = Path.GetFileNameWithoutExtension(defName);

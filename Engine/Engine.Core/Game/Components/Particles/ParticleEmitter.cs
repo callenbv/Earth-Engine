@@ -120,7 +120,7 @@ namespace Engine.Core.Game.Components
         /// Size of the particles emitted by this emitter. This is used to define the size of the particle texture.
         /// </summary>
         [SliderEditor(0, 32)]
-        public float ParticleSize { get; set; } = 1f; 
+        public float ParticleSize { get; set; } = 1f;
 
         /// <summary>
         /// Whether the emitter is enabled or not. If false, no particles will be emitted.
@@ -128,9 +128,14 @@ namespace Engine.Core.Game.Components
         public bool Enabled { get; set; } = true;
 
         /// <summary>
+        /// Whether or not to show the emitter's bounds
+        /// </summary>
+        public bool ShowBounds { get; set; } = true;
+
+        /// <summary>
         /// Size of the emitter area from which particles will be emitted. This defines the rectangular area in which particles can spawn.
         /// </summary>
-        public Vector2 EmitterSize { get; set; } = new Vector2(32, 32); 
+        public Vector2 EmitterSize { get; set; } = new Vector2(32, 32);
 
         /// <summary>
         /// List of particles currently emitted by this emitter. This will hold all active particles that are being updated and drawn.
@@ -173,7 +178,7 @@ namespace Engine.Core.Game.Components
                 float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
                 ElapsedTime += dt;
 
-                if (ElapsedTime > (60f/SpawnRate)*dt)
+                if (ElapsedTime > (60f / SpawnRate) * dt)
                 {
                     for (int i = 0; i < 1; i++)
                     {
@@ -217,12 +222,44 @@ namespace Engine.Core.Game.Components
         public override void Draw(SpriteBatch spriteBatch)
         {
             if (!Enabled)
-                return; // If the emitter is not enabled, skip updating
+                return;
 
+            // Draw the particles
             foreach (var particle in particles)
             {
                 particle.Draw(spriteBatch);
             }
+        }
+
+        /// <summary>
+        /// Draw bounds in the UI
+        /// </summary>
+        /// <param name="spriteBatch"></param>
+        public override void DrawUI(SpriteBatch spriteBatch)
+        {
+            // Draw the bounding box of the emitter as an outline
+            DebugDraw(spriteBatch);
+        }
+
+        /// <summary>
+        /// Draw debug bounds
+        /// </summary>
+        /// <param name="spriteBatch"></param>
+        private void DebugDraw(SpriteBatch spriteBatch)
+        {
+            if (!ShowBounds || EngineContext.Running)
+                return;
+
+            Vector2 topLeft = Position + Offset;
+            Vector2 bottomRight = Position + Offset;
+            Rectangle boundingBox = new Rectangle((int)topLeft.X, (int)topLeft.Y, (int)EmitterSize.X, (int)EmitterSize.Y);
+            Color yellow = Color.FromNonPremultiplied(255, 255, 0, 100);
+
+            // Draw a rectangle outline of the bounds, NOT a pure rectangle
+            spriteBatch.Draw(GraphicsLibrary.PixelTexture, new Rectangle(boundingBox.X, boundingBox.Y, boundingBox.Width, 1), yellow); // Top
+            spriteBatch.Draw(GraphicsLibrary.PixelTexture, new Rectangle(boundingBox.X, boundingBox.Y + boundingBox.Height - 1, boundingBox.Width, 1), yellow); // Bottom
+            spriteBatch.Draw(GraphicsLibrary.PixelTexture, new Rectangle(boundingBox.X, boundingBox.Y, 1, boundingBox.Height), yellow); // Left
+            spriteBatch.Draw(GraphicsLibrary.PixelTexture, new Rectangle(boundingBox.X + boundingBox.Width - 1, boundingBox.Y, 1, boundingBox.Height), yellow); // Right
         }
     }
 } 

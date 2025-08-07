@@ -91,6 +91,11 @@ namespace Engine.Core.Game.Components
         public bool IsTrigger = false;
 
         /// <summary>
+        /// Tags for collision. Useful for colliding only with certain objects
+        /// </summary>
+        public List<string> Tags = new List<string>();
+
+        /// <summary>
         /// Gets the world-space bounding box of the collider.
         /// </summary>
         public RectangleF Bounds
@@ -121,7 +126,7 @@ namespace Engine.Core.Game.Components
         /// <summary>
         /// Registers this collider with the global collision system.
         /// </summary>
-        public override void Create()
+        public override void Initialize()
         {
             CollisionSystem.Register(this);
         }
@@ -140,6 +145,10 @@ namespace Engine.Core.Game.Components
         /// <param name="other"></param>
         public virtual void OnCollisionEnter(Collider2D other)
         {
+            foreach (ObjectComponent component in Owner.components)
+            {
+                component.OnCollision(other);
+            }
         }
 
         /// <summary>
@@ -148,6 +157,27 @@ namespace Engine.Core.Game.Components
         /// <param name="other"></param>
         public virtual void OnTriggerEnter(Collider2D other)
         {
+            try
+            {
+                foreach (ObjectComponent component in Owner.components)
+                {
+                    component.OnCollisionTrigger(other);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine(e);
+            }
+        }
+
+        /// <summary>
+        /// If we are tagged with this tag
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <returns></returns>
+        public bool IsTagged(string tag)
+        {
+            return Tags.Contains(tag);
         }
 
         /// <summary>

@@ -25,6 +25,7 @@ namespace Engine.Core.Game.Components
         virtual void BeginUpdate(GameTime gameTime) { }
         virtual void Draw(SpriteBatch spriteBatch) { }
         virtual void DrawUI(SpriteBatch spriteBatch) { }
+        virtual void Destroy() { }
         virtual void Create() { }
 
         [EditorOnlyAttribute]
@@ -184,6 +185,22 @@ namespace Engine.Core.Game.Components
         /// Destroy the component. This method is called when the component is removed from a GameObject.
         /// </summary>
         public virtual void Destroy() { }
+
+        /// <summary>
+        /// Called when this collider collides with another collider.
+        /// </summary>
+        /// <param name="other"></param>
+        public virtual void OnCollision(Collider2D other)
+        {
+        }
+
+        /// <summary>
+        /// Called when this collider enters a trigger with another collider.
+        /// </summary>
+        /// <param name="other"></param>
+        public virtual void OnCollisionTrigger(Collider2D other)
+        {
+        }
     }
 }
 

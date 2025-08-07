@@ -33,6 +33,7 @@ namespace Editor.AssetManagement
     {
         private GameObjectDefinition? _prefab;
         public static string filter = string.Empty;
+        private static string newStringItem = string.Empty;
 
         /// <summary>
         /// Loads a prefab from a JSON file.
@@ -387,6 +388,60 @@ namespace Editor.AssetManagement
                         ImGui.EndDragDropTarget();
                     }
                 }
+            }
+            else if (typeof(IComponent).IsAssignableFrom(expectedType))
+            {
+                ObjectComponent comp = (ObjectComponent)value;
+                string label = comp != null ? comp.Name : "None";
+
+                if (ImGui.Button(label))
+                {
+                }
+            }
+            else if (typeof(List<string>) == expectedType)
+            {
+                var list = value as List<string>;
+                if (list == null)
+                {
+                    list = new List<string>();
+                }
+
+                ImGui.Text("List (String):");
+                int indexToRemove = -1;
+
+                for (i = 0; i < list.Count; i++)
+                {
+                    ImGui.PushID(i);
+
+                    ImGui.Text($"[{i}] {list[i]}");
+                    ImGui.SameLine();
+                    if (ImGui.Button("Remove"))
+                    {
+                        indexToRemove = i;
+                    }
+
+                    ImGui.PopID();
+                }
+
+                if (indexToRemove >= 0)
+                {
+                    list.RemoveAt(indexToRemove);
+                }
+
+                // Add new item
+                ImGui.InputText("New Item", ref newStringItem, 128);
+                if (ImGui.Button("Add"))
+                {
+                    if (!string.IsNullOrWhiteSpace(newStringItem))
+                    {
+                        list.Add(newStringItem);
+                        newStringItem = string.Empty;
+                    }
+                }
+
+                // Optional: assign back if needed
+                if (value != list)
+                    value = list;
             }
             else if (value != null && value.GetType().IsEnum)
             {

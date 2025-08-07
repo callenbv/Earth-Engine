@@ -16,6 +16,7 @@ using System.Text.Json.Serialization;
 using MonoGame.Extended.Serialization.Json;
 using Engine.Core.Data;
 using System.Reflection;
+using Engine.Core.Systems;
 
 namespace Engine.Core.Rooms
 {
@@ -94,6 +95,8 @@ namespace Engine.Core.Rooms
 
                     obj.Update(gameTime);
                 }
+
+                CollisionSystem.Update(gameTime);
 
                 // Remove destroyed objects
                 foreach (GameObject obj in destroyedObjects)
