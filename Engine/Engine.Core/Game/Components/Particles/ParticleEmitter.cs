@@ -128,6 +128,11 @@ namespace Engine.Core.Game.Components
         public bool Enabled { get; set; } = true;
 
         /// <summary>
+        /// Determines depth based on tilemaps
+        /// </summary>
+        public int Height { get; set; } = 0;
+
+        /// <summary>
         /// Whether or not to show the emitter's bounds
         /// </summary>
         public bool ShowBounds { get; set; } = true;
@@ -200,6 +205,13 @@ namespace Engine.Core.Game.Components
             float finalDirection = Direction + ERandom.Range(-DirectionWiggle, DirectionWiggle);
             float scaleFalloff = ParticleSize / texture.Width;
 
+            float depth = Height;
+
+            if (Owner.GetComponent<Sprite2D>() != null)
+            {
+                depth += Owner.GetComponent<Sprite2D>().Height;
+            }
+
             Particle particle = new Particle
             {
                 Position = FinalPosition,
@@ -209,7 +221,7 @@ namespace Engine.Core.Game.Components
                 Age = 0f,
                 Color = Color, // Default color
                 Scale = scaleFalloff, // Default scale
-                Depth = 1f,
+                Depth = ((Owner.Height+0.01f + depth) * 10000f)/100000f,
                 Texture = texture // Assign a texture if needed
             };
             particles.Add(particle);

@@ -113,6 +113,7 @@ namespace GameRuntime
                 scene.Update(gameTime);
                 EngineContext.Current.Scene = scene;
             }
+            CollisionSystem.Update(gameTime);
 
             EngineContext.DeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 

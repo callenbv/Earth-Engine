@@ -151,9 +151,10 @@ namespace Engine.Core.Game
         /// <param name="spriteBatch"></param>
         public void DrawLight(SpriteBatch spriteBatch)
         {
-            spriteBatch.Begin(SpriteSortMode.Immediate, Lighting.AlphaAdditiveBlend, SamplerState.PointClamp, null, null, null, Camera.Main.GetViewMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight));
+            float depth = ((Owner.Height) * 10000f) / 100000f; // Adjust divisor to fit your world
+
             spriteBatch.Draw(
-                softCircleTexture,
+                GraphicsLibrary.DiscTexture,
                 Position + Offset,
                 null,
                 lightColor * finalIntensity,
@@ -161,8 +162,7 @@ namespace Engine.Core.Game
                 new Vector2(diameter / 2, diameter / 2),
                 finalRadius / diameter,
                 SpriteEffects.None,
-                0f);
-            spriteBatch.End();
+                depth);
         }
     }
 }

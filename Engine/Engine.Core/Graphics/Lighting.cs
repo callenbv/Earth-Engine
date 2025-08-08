@@ -117,6 +117,7 @@ namespace Engine.Core.Graphics
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
             spriteBatch.Draw(whitePixel, new Rectangle(0, 0, width, height), AmbientLightColor);
             spriteBatch.End();
+            spriteBatch.Begin(SpriteSortMode.FrontToBack, Lighting.AlphaAdditiveBlend, SamplerState.PointClamp, null, null, null, Camera.Main.GetViewMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight));
 
             // Draw all lights as soft circles (additive blending)
             if (Enabled)
@@ -135,6 +136,7 @@ namespace Engine.Core.Graphics
                     }
                 }
             }
+            spriteBatch.End();
 
             graphicsDevice.SetRenderTarget(null);
         }

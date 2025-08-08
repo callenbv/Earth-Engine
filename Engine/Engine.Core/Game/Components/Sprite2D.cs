@@ -57,6 +57,11 @@ namespace Engine.Core.Game.Components
         public Vector2 SpriteScale;
 
         /// <summary>
+        /// Height in terms of layers, used for tilemap depth ordering
+        /// </summary>
+        public int Height { get; set; } = 0;
+
+        /// <summary>
         /// The position of the sprite in world coordinates. This is where the sprite will be drawn in the game world.
         /// </summary>
         private Vector2 position;
@@ -101,6 +106,8 @@ namespace Engine.Core.Game.Components
         /// <summary>
         /// The depth of the sprite in the scene. This is used for rendering order.
         /// </summary>
+        [HideInInspector]
+        [JsonIgnore]
         public float depth = 0;
 
         /// <summary>
@@ -172,7 +179,7 @@ namespace Engine.Core.Game.Components
             float feetY = Position.Y + frameHeight / 2;
 
             // Incorporate height into depth sorting
-            float depth = (Owner.Height * 10000f + feetY) / 100000f; // Adjust divisor to fit your world
+            float depth = ((Owner.Height+Height) * 10000f + feetY) / 100000f; // Adjust divisor to fit your world
 
             return Math.Clamp(depth, 0f, 1f);
         }
@@ -187,9 +194,11 @@ namespace Engine.Core.Game.Components
         }
 
         /// <summary>
-        /// Swap the texture
+        /// Set a texture with custom frame size
         /// </summary>
         /// <param name="textureName"></param>
+        /// <param name="frameWidth"></param>
+        /// <param name="frameHeight"></param>
         public void Set(string textureName, int frameWidth, int frameHeight)
         {
             if (texturePath != textureName)
