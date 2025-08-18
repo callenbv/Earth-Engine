@@ -176,7 +176,7 @@ namespace Engine.Core.Game.Components
             if (texture == null)
                 return 0f;
 
-            float feetY = Position.Y + frameHeight / 2;
+            float feetY = Math.Abs(Position.Y) + frameHeight / 2;
 
             // Incorporate height into depth sorting
             float depth = ((Owner.Height+Height) * 10000f + feetY) / 100000f; // Adjust divisor to fit your world
@@ -252,7 +252,7 @@ namespace Engine.Core.Game.Components
 
             if (animated)
             {
-                Animate(gameTime);
+                Animate();
             }
             else
             {
@@ -268,8 +268,7 @@ namespace Engine.Core.Game.Components
         /// <summary>
         /// Animates the sprite
         /// </summary>
-        /// <param name="gameTime"></param>
-        public void Animate(GameTime gameTime)
+        public void Animate()
         {
             if (frameCount > 1)
             {

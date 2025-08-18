@@ -191,6 +191,13 @@
             <param name="component"></param>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
+        <member name="M:Engine.Core.Data.IComponentContainer.GetComponent``1">
+            <summary>
+            Retrieve a component
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
         <member name="T:Engine.Core.Data.GameObjectDefinition">
             <summary>
             Represents a game object definition that can hold multiple components.
@@ -339,6 +346,28 @@
             Updates the collider each frame. This can be used to check for tile collisions or other logic.
             </summary>
             <param name="gameTime"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.ComponentRegistry.Register(System.String,System.Type)">
+            <summary>
+            Register a new component
+            </summary>
+            <param name="name"></param>
+            <param name="type"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.ComponentRegistry.ClearScriptComponentsOnly">
+            <summary>
+            Clear the scripts only from the registry
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.ComponentRegistry.RegisterAllComponents">
+            <summary>
+            Register all components (scripts as components, assembly classes)
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.ComponentRegistry.RefreshAll">
+            <summary>
+            Refresh registry upon compilation
+            </summary>
         </member>
         <member name="T:Engine.Core.Game.Components.IComponent">
             <summary>
@@ -750,11 +779,10 @@
             Advance the animation
             </summary>
         </member>
-        <member name="M:Engine.Core.Game.Components.Sprite2D.Animate(Microsoft.Xna.Framework.GameTime)">
+        <member name="M:Engine.Core.Game.Components.Sprite2D.Animate">
             <summary>
             Animates the sprite
             </summary>
-            <param name="gameTime"></param>
         </member>
         <member name="T:Engine.Core.Game.Components.TextRenderer">
             <summary>

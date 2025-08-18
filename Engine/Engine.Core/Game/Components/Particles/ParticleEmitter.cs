@@ -205,11 +205,11 @@ namespace Engine.Core.Game.Components
             float finalDirection = Direction + ERandom.Range(-DirectionWiggle, DirectionWiggle);
             float scaleFalloff = ParticleSize / texture.Width;
 
-            float depth = Height;
+            float depth = Height + Owner.Height;
 
             if (Owner.GetComponent<Sprite2D>() != null)
             {
-                depth += Owner.GetComponent<Sprite2D>().Height;
+                depth = Owner.GetComponent<Sprite2D>().depth;
             }
 
             Particle particle = new Particle
@@ -221,7 +221,7 @@ namespace Engine.Core.Game.Components
                 Age = 0f,
                 Color = Color, // Default color
                 Scale = scaleFalloff, // Default scale
-                Depth = ((Owner.Height+0.01f + depth) * 10000f)/100000f,
+                Depth = depth,
                 Texture = texture // Assign a texture if needed
             };
             particles.Add(particle);

@@ -7,11 +7,6 @@
 /// -----------------------------------------------------------------------------
 
 using Engine.Core.Data;
-using Engine.Core.Scripting;
-using GameRuntime;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 namespace Engine.Core.Game.Components
@@ -34,6 +29,11 @@ namespace Engine.Core.Game.Components
             RegisterAllComponents();
         }
 
+        /// <summary>
+        /// Register a new component
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="type"></param>
         public static void Register(string name, Type type)
         {
             var attr = type.GetCustomAttribute<ComponentCategoryAttribute>();
@@ -61,6 +61,9 @@ namespace Engine.Core.Game.Components
             };
         }
 
+        /// <summary>
+        /// Clear the scripts only from the registry
+        /// </summary>
         public static void ClearScriptComponentsOnly()
         {
             var keysToRemove = new List<string>();
@@ -76,6 +79,9 @@ namespace Engine.Core.Game.Components
                 _components.Remove(key);
         }
 
+        /// <summary>
+        /// Register all components (scripts as components, assembly classes)
+        /// </summary>
         public static void RegisterAllComponents()
         {
             ClearScriptComponentsOnly();
@@ -96,6 +102,9 @@ namespace Engine.Core.Game.Components
             }
         }
 
+        /// <summary>
+        /// Refresh registry upon compilation
+        /// </summary>
         public static void RefreshAll()
         {
             _components.Clear();

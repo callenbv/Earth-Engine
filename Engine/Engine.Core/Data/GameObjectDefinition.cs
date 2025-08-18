@@ -41,6 +41,25 @@ namespace Engine.Core.Data
             component.Initialize();
             components.Add(component);
         }
+
+        /// <summary>
+        /// Retrieve a component
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T? GetComponent<T>() where T : ObjectComponent
+        {
+            try
+            {
+                return components.OfType<T>().FirstOrDefault();
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine($"Error getting component {typeof(T).Name} from {Name}: {e.Message}");
+            }
+
+            return null;
+        }
     }
 
     /// <summary>

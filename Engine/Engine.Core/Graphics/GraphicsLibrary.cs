@@ -23,6 +23,11 @@ namespace Engine.Core.Graphics
         public static GraphicsDevice graphicsDevice = null!;
 
         /// <summary>
+        /// Current color used for draw calls
+        /// </summary>
+        public static Color DrawColor = Color.White;
+
+        /// <summary>
         /// Initializes the graphics library, creating a 1x1 pixel texture.
         /// </summary>
         public static void Initialize()
@@ -93,6 +98,67 @@ namespace Engine.Core.Graphics
             }
 
             DiscTexture.SetData(discPixels);
+        }
+
+        /// <summary>
+        /// Set the color to draw
+        /// </summary>
+        /// <param name="color"></param>
+        public static void SetDrawColor(Color color)
+        {
+            DrawColor = color;
+        }
+
+        /// <summary>
+        /// Resets the draw properties to default
+        /// </summary>
+        public static void ResetDraw()
+        {
+            DrawColor = Color.White;
+        }
+
+        /// <summary>
+        /// Draw a rectangle given a size
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="outlined"></param>
+        public static void DrawRectangle(int width, int height, bool outlined = false)
+        {
+            SpriteBatch? spriteBatch = EngineContext.SpriteBatch;
+
+            if (spriteBatch == null) return;
+
+            if (outlined)
+            {
+                // Simple rectangle
+                spriteBatch.Draw(PixelTexture, new Rectangle(0, 0, width, height), DrawColor);
+            }
+            else
+            {
+                // Top line
+                spriteBatch.Draw(PixelTexture, new Rectangle(0, 0, width, 0), DrawColor);
+                // Right line
+                spriteBatch.Draw(PixelTexture, new Rectangle(width, 0, width+1, height), DrawColor);
+                // Bottom line
+                spriteBatch.Draw(PixelTexture, new Rectangle(0, height, width, height+1), DrawColor);
+                // Left line
+                spriteBatch.Draw(PixelTexture, new Rectangle(0, 0, 1, height), DrawColor);
+            }
+        }
+
+        /// <summary>
+        /// Draw an ellipse with a radius and size
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        public static void DrawEllipse(float width, float height)
+        {
+            SpriteBatch? spriteBatch = EngineContext.SpriteBatch;
+
+            if (spriteBatch == null) return;
+
+            spriteBatch.Draw(CircleTexture, new Rectangle(0,0,(int)width/2,(int)height/2), DrawColor);
         }
     }
 }

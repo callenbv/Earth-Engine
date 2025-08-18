@@ -17,7 +17,6 @@ using Engine.Core.Game;
 using Editor.Windows;
 using Editor.AssetManagement;
 using Engine.Core;
-using Engine.Core.CustomMath;
 using Engine.Core.Rooms;
 using Engine.Core.Audio;
 using Engine.Core.Scripting;
@@ -160,6 +159,7 @@ namespace EarthEngineEditor
                     SceneViewWindow.Instance.scene = scene;
                     SceneViewWindow.Instance.scene.FilePath = scene.FilePath;
                     room.Open();
+                    InspectorWindow.Instance.selectedItem = null;
 
                     Console.WriteLine("[EDITOR] Game stopped");
                 }

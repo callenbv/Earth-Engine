@@ -163,7 +163,7 @@ namespace Engine.Core.Scripting
             }
             else
             {
-                Console.WriteLine("[Launcher] Engine.Core.dll not found at: " + engineCorePath);
+                Console.Error.WriteLine("[Launcher] Engine.Core.dll not found at: " + engineCorePath);
             }
 #endif
             scriptManager = null;
@@ -174,13 +174,10 @@ namespace Engine.Core.Scripting
             var compileResult = CompileAllScriptsInAssets(projectPath, outputDll);
             if (!compileResult.Success)
             {
-                Console.WriteLine("[ScriptCompiler] Compilation failed!");
+                Console.Error.WriteLine("[ScriptCompiler] SCRIPT COMPILATION ERRORS");
                 foreach (var error in compileResult.Errors)
-                    Console.WriteLine($"  - {error}");
-                return false;
+                    Console.Error.WriteLine($"  - {error}");
             }
-
-            Console.WriteLine("[ScriptCompiler] Compilation succeeded.");
 
             // Load the assembly
             try
@@ -193,16 +190,23 @@ namespace Engine.Core.Scripting
 
                 foreach (var type in scriptAssembly.GetTypes())
                 {
-                    if (!type.IsAbstract && typeof(ObjectComponent).IsAssignableFrom(type))
+                    try
                     {
-                        ComponentRegistry.Register(type.Name, type);
-                        Console.WriteLine($"[ComponentRegistry] Registered: {type.Name}");
+                        if (!type.IsAbstract && typeof(ObjectComponent).IsAssignableFrom(type))
+                        {
+                            ComponentRegistry.Register(type.Name, type);
+                            Console.WriteLine($"[ComponentRegistry] Registered: {type.Name}");
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.Error.WriteLine($"Failed to load script {type.Name}");
                     }
                 }
 
                 ComponentRegistry.RefreshAll();
 
-                Console.WriteLine("[ScriptLoader] ScriptManager initialized.");
+                Console.WriteLine("[ScriptCompiler] Compilation succeeded.");
                 return true;
             }
             catch (Exception ex)

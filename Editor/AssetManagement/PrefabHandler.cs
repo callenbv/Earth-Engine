@@ -43,6 +43,11 @@ namespace Editor.AssetManagement
         {
             string json = File.ReadAllText(path);
             _prefab = GameObject.Deserialize(json);
+
+            foreach (ObjectComponent comp in _prefab.components)
+            {
+                comp.Initialize();
+            }
         }
 
         /// <summary>
@@ -95,7 +100,7 @@ namespace Editor.AssetManagement
                     foreach (var field in fields)
                     {
                         var value = field.GetValue(comp);
-                        DrawField(field.Name, value, field.FieldType, newValue => field.SetValue(comp, newValue),field);
+                        DrawField(field.Name, value, field.FieldType, newValue => field.SetValue(comp, newValue),field, _prefab);
                     }
 
                     // Draw properties (optional)
@@ -104,7 +109,7 @@ namespace Editor.AssetManagement
                         if (!prop.CanRead || !prop.CanWrite) continue;
                         var value = prop.GetValue(comp);
 
-                        DrawField(prop.Name, value, prop.PropertyType, newValue => prop.SetValue(comp, newValue),prop);
+                        DrawField(prop.Name, value, prop.PropertyType, newValue => prop.SetValue(comp, newValue),prop, _prefab);
                     }
 
                     ImGui.TreePop();
@@ -173,7 +178,7 @@ namespace Editor.AssetManagement
         /// <param name="expectedType"></param>
         /// <param name="setValue"></param>
         /// <param name="memberInfo"></param>
-        public static void DrawField(string name, object? value, Type expectedType, Action<object> setValue, MemberInfo memberInfo)
+        public static void DrawField(string name, object? value, Type expectedType, Action<object> setValue, MemberInfo memberInfo, IComponentContainer? componentContainer = null)
         {
             // Check for custom attribute tag
             if (memberInfo.GetCustomAttribute<HideInInspectorAttribute>() != null)
@@ -327,6 +332,26 @@ namespace Editor.AssetManagement
 
                     // Scale down if larger than maxSize
                     float scale = 1f;
+
+                    IntPtr imImage = ImGuiRenderer.Instance.BindTexture(imTex);
+                    Vector2 uv_1 = Vector2.Zero;
+                    Vector2 uv_2 = Vector2.One;
+
+                    // If there is an animation display
+                    Sprite2D? sprite = componentContainer?.GetComponent<Sprite2D>();
+
+                    if (sprite != null && sprite.texture != null)
+                    {
+                        sprite.Animate();
+                        float ratio = sprite.frameWidth / (float)sprite.texture.Width;
+                        float ux = sprite.frame * ratio;
+                        uv_1.X = ux;
+                        uv_2.X = ux + (ratio);
+                        targetSize.X = sprite.frameWidth*4;
+                        targetSize.Y = sprite.frameHeight*4;
+                        originalSize = targetSize;
+                    }
+
                     if (originalSize.X > maxSize || originalSize.Y > maxSize)
                     {
                         float scaleX = maxSize / originalSize.X;
@@ -335,8 +360,7 @@ namespace Editor.AssetManagement
                         targetSize *= scale;
                     }
 
-                    IntPtr imImage = ImGuiRenderer.Instance.BindTexture(imTex);
-                    ImGui.Image(imImage, targetSize);
+                    ImGui.Image(imImage, targetSize, uv_1, uv_2);
                 }
             }
             else if (expectedType == typeof(GameObject))
