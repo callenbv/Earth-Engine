@@ -1,6 +1,6 @@
 {
   "WindowWidth": 1280,
   "WindowHeight": 720,
-  "PlayInEditor": false,
+  "PlayInEditor": true,
   "RestartOnPlay": false
 }

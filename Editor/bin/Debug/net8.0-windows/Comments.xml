@@ -1135,7 +1135,7 @@
         </member>
         <member name="M:Engine.Core.Game.PointLight.Initialize">
             <summary>
-            Initializes the point light component, creating a soft circle texture for the light effect.
+            Initializes the point light component
             </summary>
         </member>
         <member name="M:Engine.Core.Game.PointLight.SetLight(System.Single,System.Single,Microsoft.Xna.Framework.Color)">
@@ -1445,6 +1445,11 @@
             A static class that provides graphics-related functionality, such as creating a pixel texture.
             </summary>
         </member>
+        <member name="F:Engine.Core.Graphics.GraphicsLibrary.DrawColor">
+            <summary>
+            Current color used for draw calls
+            </summary>
+        </member>
         <member name="M:Engine.Core.Graphics.GraphicsLibrary.Initialize">
             <summary>
             Initializes the graphics library, creating a 1x1 pixel texture.
@@ -1454,6 +1459,32 @@
             <summary>
             Loads the textures used in the graphics library, including primitives
             </summary>
+        </member>
+        <member name="M:Engine.Core.Graphics.GraphicsLibrary.SetDrawColor(Microsoft.Xna.Framework.Color)">
+            <summary>
+            Set the color to draw
+            </summary>
+            <param name="color"></param>
+        </member>
+        <member name="M:Engine.Core.Graphics.GraphicsLibrary.ResetDraw">
+            <summary>
+            Resets the draw properties to default
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Graphics.GraphicsLibrary.DrawRectangle(System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            Draw a rectangle given a size
+            </summary>
+            <param name="width"></param>
+            <param name="height"></param>
+            <param name="outlined"></param>
+        </member>
+        <member name="M:Engine.Core.Graphics.GraphicsLibrary.DrawEllipse(System.Single,System.Single)">
+            <summary>
+            Draw an ellipse with a radius and size
+            </summary>
+            <param name="width"></param>
+            <param name="height"></param>
         </member>
         <member name="F:Engine.Core.Graphics.Lighting.MultiplyBlend">
             <summary>

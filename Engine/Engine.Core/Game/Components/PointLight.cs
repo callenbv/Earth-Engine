@@ -6,13 +6,11 @@
 /// <Summary>                
 /// -----------------------------------------------------------------------------
 
-using Engine.Core.CustomMath;
 using Engine.Core.Data;
 using Engine.Core.Game.Components;
 using Engine.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Text.Json.Serialization;
 
 namespace Engine.Core.Game
 {
@@ -25,7 +23,6 @@ namespace Engine.Core.Game
         public override string Name => "Point Light";
         public override bool UpdateInEditor => true;
 
-        private Texture2D? softCircleTexture;
         private int diameter = 64;
 
         /// <summary>
@@ -75,34 +72,10 @@ namespace Engine.Core.Game
         private int granularity_ = 10;
 
         /// <summary>
-        /// Initializes the point light component, creating a soft circle texture for the light effect.
+        /// Initializes the point light component
         /// </summary>
         public override void Initialize()
         {
-            softCircleTexture = new Texture2D(GraphicsDevice, diameter, diameter);
-            Color[] data = new Color[diameter * diameter];
-
-            float r = diameter / 2f;
-
-            int steps = granularity_;
-
-            for (int y = 0; y < diameter; y++)
-            {
-                for (int x = 0; x < diameter; x++)
-                {
-                    float dx = x - r + 0.5f;
-                    float dy = y - r + 0.5f;
-                    float dist = (float)Math.Sqrt(dx * dx + dy * dy) / r;
-
-                    // Snap to blocky levels
-                    float stepped = (float)Math.Floor(dist * steps) / steps;
-                    float alpha = 1f - MathHelper.Clamp(stepped, 0f, 1f);
-
-                    data[y * diameter + x] = new Color(1f, 1f, 1f, alpha * alpha);
-                }
-            }
-
-            softCircleTexture.SetData(data);
         }
 
         /// <summary>
