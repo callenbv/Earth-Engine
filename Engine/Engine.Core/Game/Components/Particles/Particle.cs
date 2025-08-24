@@ -62,21 +62,21 @@ namespace Engine.Core.Game.Components
         }
 
         /// <summary>
-        /// Draws the particle in 3D space using BasicEffect
+        /// Draws the particle in 3D space using AlphaTestEffect
         /// </summary>
         /// <param name="graphicsDevice"></param>
         /// <param name="view"></param>
         /// <param name="projection"></param>
         /// <param name="effect"></param>
-        public void Draw3D(GraphicsDevice graphicsDevice, Matrix view, Matrix projection, BasicEffect effect)
+        public void Draw3D(GraphicsDevice graphicsDevice, Matrix view, Matrix projection, Effect effect)
         {
             if (Texture == null) return;
 
-            // Convert position to 3D world coordinates
+            // Convert position to 3D world coordinates (same as sprites)
             Vector3 worldPos = new Vector3(
                 Position.X / Engine.Core.EngineContext.UnitsPerPixel,
                 -Position.Y / Engine.Core.EngineContext.UnitsPerPixel,
-                Position.Z / Engine.Core.EngineContext.UnitsPerPixel
+                Position.Z / Engine.Core.EngineContext.UnitsPerPixel // Use actual Z position, not depth
             );
 
             // Calculate particle size in world units
@@ -103,20 +103,26 @@ namespace Engine.Core.Game.Components
                 }
             }
 
-            // Create world matrix
-            Matrix world = Matrix.CreateTranslation(worldPos);
+            // Create billboard matrix to make particles face the camera
+            // Extract camera position from view matrix
+            Matrix invView = Matrix.Invert(view);
+            Vector3 cameraPos = new Vector3(invView.M41, invView.M42, invView.M43);
+            
+            // Create billboard matrix that faces the camera
+            Matrix billboardMatrix = Matrix.CreateBillboard(worldPos, cameraPos, Vector3.Up, null);
+            
+            // Create world matrix: use billboard matrix directly (it already includes position)
+            Matrix world = billboardMatrix;
 
-            // Set effect properties
-            effect.Texture = Texture;
-            effect.World = world;
-            effect.View = view;
-            effect.Projection = projection;
-            effect.TextureEnabled = true;
-            effect.VertexColorEnabled = true;
-            effect.LightingEnabled = false;
+            // Set effect properties for AlphaTestEffect
+            var alphaEffect = (AlphaTestEffect)effect;
+            alphaEffect.Texture = Texture;
+            alphaEffect.World = world;
+            alphaEffect.View = view;
+            alphaEffect.Projection = projection;
 
             // Render the particle
-            foreach (EffectPass pass in effect.CurrentTechnique.Passes)
+            foreach (EffectPass pass in alphaEffect.CurrentTechnique.Passes)
             {
                 pass.Apply();
                 graphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertices, 0, 4, indices, 0, 2);

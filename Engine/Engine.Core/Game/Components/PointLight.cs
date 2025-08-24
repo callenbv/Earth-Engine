@@ -52,7 +52,7 @@ namespace Engine.Core.Game
         /// <summary>
         /// Offset of the light from the GameObject's position.
         /// </summary>
-        public Vector2 Offset { get; set; } = Vector2.Zero;
+        public Vector3 Offset { get; set; } = Vector3.Zero;
 
         /// <summary>
         /// The intensity of the flicker effect. This determines how much the light's intensity will vary when flickering is enabled.
@@ -155,7 +155,7 @@ namespace Engine.Core.Game
 
             spriteBatch.Draw(
                 GraphicsLibrary.DiscTexture,
-                Position + Offset,
+                new Vector2(Position.X, Position.Y) + new Vector2(Offset.X, Offset.Y),
                 null,
                 lightColor * finalIntensity,
                 0f,

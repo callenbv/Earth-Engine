@@ -102,12 +102,12 @@ namespace Engine.Core.Game.Components
             if (!Visible || string.IsNullOrEmpty(Text) || bitFont == null || Owner == null)
                 return;
 
-            Vector2 position = Owner.Position + Offset;
+            Vector2 position = new Vector2(Owner.Position.X, Owner.Position.Y) + Offset;
             
             if (Centered)
             {
                 // Center the text around the object's position
-                position -= textSize * Scale * 0.5f;
+                position -= textSize * new Vector2(Scale.X, Scale.Y) * 0.5f;
             }
 
             spriteBatch.DrawString(
@@ -166,7 +166,7 @@ namespace Engine.Core.Game.Components
         /// <returns>Size of the text</returns>
         public Vector2 GetTextSize()
         {
-            return textSize * Scale;
+            return textSize * new Vector2(Scale.X, Scale.Y);
         }
 
         /// <summary>

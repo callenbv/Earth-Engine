@@ -32,35 +32,35 @@ namespace Engine.Core.Game
         /// <summary>
         /// Position of the GameObject in the game world.
         /// </summary>
-        public Vector2 Position
+        public Vector3 Position
         {
             get
             {
                 var pos = GetComponent<Transform>()?.Position ?? Vector3.Zero;
-                return new Vector2(pos.X, pos.Y);
+                return pos;
             }
             set
             {
                 var transform = GetComponent<Transform>();
                 if (transform != null)
-                    transform.Position = new Vector3(value.X, value.Y, transform.Position.Z);
+                    transform.Position = value;
             }
         }
         /// <summary>
         /// Old position of the GameObject, used for tracking movement and animations.
         /// </summary>
-        public Vector2 OldPosition
+        public Vector3 OldPosition
         {
             get
             {
                 var pos = GetComponent<Transform>()?.OldPosition ?? Vector3.Zero;
-                return new Vector2(pos.X, pos.Y);
+                return pos;
             }
             set
             {
                 var transform = GetComponent<Transform>();
                 if (transform != null)
-                    transform.OldPosition = new Vector3(value.X, value.Y, transform.OldPosition.Z);
+                    transform.OldPosition = value;
             }
         }
 
@@ -81,18 +81,18 @@ namespace Engine.Core.Game
         /// <summary>
         /// Scale of the GameObject, affecting its size in the game world.
         /// </summary>
-        public Vector2 Scale
+        public Vector3 Scale
         {
             get
             {
                 var scale = GetComponent<Transform>()?.Scale ?? Vector3.One;
-                return new Vector2(scale.X, scale.Y);
+                return scale;
             }
             set
             {
                 var transform = GetComponent<Transform>();
                 if (transform != null)
-                    transform.Scale = new Vector3(value.X, value.Y, transform.Scale.Z);
+                    transform.Scale = value;
             }
         }
 
@@ -495,7 +495,7 @@ namespace Engine.Core.Game
         /// <returns></returns>
         public Rectangle GetBoundingBox()
         {
-            Vector2 pos = Position;
+            Vector2 pos = new Vector2(Position.X, Position.Y);
 
             // Check for a Sprite2D
             var sprite = GetComponent<Sprite2D>();
@@ -522,7 +522,7 @@ namespace Engine.Core.Game
                 );
             }
 
-            return new Rectangle((int)Position.X, (int)Position.Y, 16,16);
+            return new Rectangle((int)pos.X, (int)pos.Y, 16,16);
         }
     }
 } 

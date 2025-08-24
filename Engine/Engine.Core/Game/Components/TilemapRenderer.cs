@@ -41,6 +41,7 @@ namespace Engine.Core.Game.Components
         /// <summary>
         /// Path to the texture used for the tilemap. This is set automatically when the texture is assigned.
         /// </summary>
+        [HideInInspector]
         public string TexturePath = string.Empty;
 
         /// <summary>
@@ -261,7 +262,7 @@ namespace Engine.Core.Game.Components
                             TileSize);
 
                         float depth = (FloorLevel * 10000f) / 100000f;
-                        Vector2 FinalPosition = Position+Offset + new System.Numerics.Vector2(x * TileSize, y * TileSize);
+                        Vector2 FinalPosition = new Vector2(Position.X, Position.Y) + Offset + new System.Numerics.Vector2(x * TileSize, y * TileSize);
 
                         if (tile.TileIndex > -1)
                         {
@@ -285,7 +286,7 @@ namespace Engine.Core.Game.Components
                             {
                                 spriteBatch.Draw(
                                     Texture,
-                                    Position + Offset + new System.Numerics.Vector2(x * TileSize, y * TileSize),
+                                    new Vector2(Position.X, Position.Y) + Offset + new System.Numerics.Vector2(x * TileSize, y * TileSize),
                                     source,
                                     Color.Red,
                                     0f,
@@ -299,7 +300,7 @@ namespace Engine.Core.Game.Components
                             {
                                 spriteBatch.Draw(
                                     Texture,
-                                    Position + Offset + new System.Numerics.Vector2(x * TileSize, y * TileSize),
+                                    new Vector2(Position.X, Position.Y) + Offset + new System.Numerics.Vector2(x * TileSize, y * TileSize),
                                     source,
                                     Color.CadetBlue,
                                     0f,

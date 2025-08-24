@@ -47,25 +47,26 @@ namespace Engine.Core.Game.Components
         /// </summary>
         public Vector3 Scale3D { get; set; } = Vector3.One;
 
-
-
-
-
         private VertexBuffer? _vertexBuffer;
         private IndexBuffer? _indexBuffer;
         private int _indexCount = 0;
         private BasicEffect? _effect;
         private bool _buffersBuilt = false;
         private HashSet<string> _loggedMeshes = new HashSet<string>();
+        private string _lastMaterialName = string.Empty; // Track material changes
 
         public override void Initialize()
         {
             BuildBuffers();
+            // Subscribe to material reload events
+            MeshLibrary.MaterialReloaded += OnMaterialReloaded;
         }
 
         public override void Destroy()
         {
             base.Destroy();
+            // Unsubscribe from material reload events
+            MeshLibrary.MaterialReloaded -= OnMaterialReloaded;
             _vertexBuffer?.Dispose();
             _indexBuffer?.Dispose();
             _vertexBuffer = null;
@@ -74,25 +75,37 @@ namespace Engine.Core.Game.Components
             _effect = null;
         }
 
+        /// <summary>
+        /// Called when a material is reloaded in the MeshLibrary
+        /// </summary>
+        private void OnMaterialReloaded(string materialName)
+        {
+            // Only reload if this is our material
+            if (materialName == Material)
+            {
+                ReloadMaterial();
+            }
+        }
+
         private void BuildBuffers()
         {
             var gd = GraphicsDevice;
             if (gd == null) 
             {
-                Console.WriteLine($"[MeshRenderer] GraphicsDevice is null for {Name}");
+                Console.Error.WriteLine($"[MeshRenderer] GraphicsDevice is null for {Name}");
                 return;
             }
 
             var meshData = MeshLibrary.GetMesh(Mesh);
             if (meshData == null)
             {
-                Console.WriteLine($"[MeshRenderer] Mesh '{Mesh}' not found in MeshLibrary");
+                Console.Error.WriteLine($"[MeshRenderer] Mesh '{Mesh}' not found in MeshLibrary");
                 return;
             }
             
             if (meshData.Positions == null || meshData.Indices == null)
             {
-                Console.WriteLine($"[MeshRenderer] Mesh '{Mesh}' has null positions or indices");
+                Console.Error.WriteLine($"[MeshRenderer] Mesh '{Mesh}' has null positions or indices");
                 return;
             }
 
@@ -160,24 +173,118 @@ namespace Engine.Core.Game.Components
                             materialData.AlbedoColor[2]);
                     }
 
-                    // TODO: Load and apply textures when texture system is ready
-                    // if (!string.IsNullOrEmpty(materialData.AlbedoTexture))
-                    // {
-                    //     var texture = TextureLibrary.Instance.Get(Path.GetFileNameWithoutExtension(materialData.AlbedoTexture));
-                    //     if (texture != null)
-                    //     {
-                    //         _effect.Texture = texture;
-                    //         _effect.TextureEnabled = true;
-                    //     }
-                    // }
+                    // Load and apply textures
+                    if (!string.IsNullOrEmpty(materialData.AlbedoTexture))
+                    {
+                        var textureName = Path.GetFileNameWithoutExtension(materialData.AlbedoTexture);
+                        var texture = TextureLibrary.Instance.Get(textureName);
+                        if (texture != null)
+                        {
+                            _effect.Texture = texture;
+                            _effect.TextureEnabled = true;
+                            
+                            // Apply UV tiling if specified
+                            if (materialData.AlbedoTilingX != 1f || materialData.AlbedoTilingY != 1f)
+                            {
+                                // Note: BasicEffect doesn't support UV tiling directly
+                                // This would need to be implemented in the vertex shader or by modifying UVs
+                                // For now, we'll log that tiling is set but not yet implemented
+                                Console.WriteLine($"[MeshRenderer] UV tiling set for '{Material}': X={materialData.AlbedoTilingX}, Y={materialData.AlbedoTilingY} (not yet implemented in renderer)");
+                            }
+                        }
+                        else
+                        {
+                            Console.Error.WriteLine($"[MeshRenderer] Texture '{textureName}' not found for material '{Material}'");
+                        }
+                    }
+                    else
+                    {
+                        // Disable texture if no albedo texture is set
+                        _effect.TextureEnabled = false;
+                    }
                 }
                 else
                 {
-                    Console.WriteLine($"[MeshRenderer] Material '{Material}' not found in MeshLibrary");
+                    Console.Error.WriteLine($"[MeshRenderer] Material '{Material}' not found in MeshLibrary");
                 }
             }
 
             _buffersBuilt = true;
+            _lastMaterialName = Material;
+        }
+
+        /// <summary>
+        /// Reloads the material data and reapplies it to the effect
+        /// </summary>
+        private void ReloadMaterial()
+        {
+            if (_effect == null) return;
+
+            // Reload the material from disk if it has changed
+            if (!string.IsNullOrEmpty(Material))
+            {
+                MeshLibrary.ReloadMaterial(Material);
+            }
+
+            // Try to load material if specified
+            if (!string.IsNullOrEmpty(Material))
+            {
+                var materialData = MeshLibrary.GetMaterial(Material);
+                if (materialData != null)
+                {
+                    if (materialData.AlbedoColor != null && materialData.AlbedoColor.Length >= 3)
+                    {
+                        _effect.DiffuseColor = new Vector3(
+                            materialData.AlbedoColor[0], 
+                            materialData.AlbedoColor[1], 
+                            materialData.AlbedoColor[2]);
+                    }
+
+                    // Load and apply textures
+                    if (!string.IsNullOrEmpty(materialData.AlbedoTexture))
+                    {
+                        var textureName = Path.GetFileNameWithoutExtension(materialData.AlbedoTexture);
+                        var texture = TextureLibrary.Instance.Get(textureName);
+                        if (texture != null)
+                        {
+                            _effect.Texture = texture;
+                            _effect.TextureEnabled = true;
+                            
+                            // Apply UV tiling if specified
+                            if (materialData.AlbedoTilingX != 1f || materialData.AlbedoTilingY != 1f)
+                            {
+                                // Note: BasicEffect doesn't support UV tiling directly
+                                // This would need to be implemented in the vertex shader or by modifying UVs
+                                // For now, we'll log that tiling is set but not yet implemented
+                                Console.WriteLine($"[MeshRenderer] UV tiling set for '{Material}': X={materialData.AlbedoTilingX}, Y={materialData.AlbedoTilingY} (not yet implemented in renderer)");
+                            }
+                        }
+                        else
+                        {
+                            Console.Error.WriteLine($"[MeshRenderer] Texture '{textureName}' not found for material '{Material}'");
+                        }
+                    }
+                    else
+                    {
+                        // Disable texture if no albedo texture is set
+                        _effect.TextureEnabled = false;
+                    }
+                }
+                else
+                {
+                    Console.Error.WriteLine($"[MeshRenderer] Material '{Material}' not found in MeshLibrary");
+                }
+            }
+
+            _lastMaterialName = Material;
+        }
+
+        /// <summary>
+        /// Forces a reload of the material data. Call this when you know the material has been modified.
+        /// </summary>
+        public void ForceMaterialReload()
+        {
+            // No longer needed as material reload is event-driven
         }
 
         public void Draw3D(GraphicsDevice gd, Matrix view, Matrix projection)
@@ -186,8 +293,15 @@ namespace Engine.Core.Game.Components
             if (_vertexBuffer == null || _indexBuffer == null || _effect == null) 
             {
                 if (!_buffersBuilt)
-                    Console.WriteLine($"[MeshRenderer] Buffers not built for {Name}");
+                    Console.Error.WriteLine($"[MeshRenderer] Buffers not built for {Name}");
                 return;
+            }
+
+            // Check if material has changed and reload if necessary (fallback check)
+            if (_lastMaterialName != Material)
+            {
+                Console.Error.WriteLine($"[MeshRenderer] Material name changed from '{_lastMaterialName}' to '{Material}', reloading...");
+                ReloadMaterial();
             }
 
             // Get Transform component for position, rotation, scale
@@ -223,10 +337,27 @@ namespace Engine.Core.Game.Components
             if (_effect.LightingEnabled)
             {
                 _effect.EnableDefaultLighting();
+                
+                // Configure main light (DirectionalLight0)
                 _effect.DirectionalLight0.Enabled = true;
                 _effect.DirectionalLight0.DiffuseColor = Vector3.One;
                 _effect.DirectionalLight0.Direction = Vector3.Normalize(new Vector3(-0.5f, -1f, -0.5f));
-                _effect.DirectionalLight0.SpecularColor = Vector3.One * 0.5f;
+                
+                // Get material specular value or use 0 if no material
+                float specularIntensity = 0f;
+                if (!string.IsNullOrEmpty(Material))
+                {
+                    var materialData = MeshLibrary.GetMaterial(Material);
+                    if (materialData != null)
+                    {
+                        specularIntensity = materialData.Specular;
+                    }
+                }
+                _effect.DirectionalLight0.SpecularColor = Vector3.One * specularIntensity;
+                
+                // Disable specular on the other default lights to prevent global specular
+                _effect.DirectionalLight1.SpecularColor = Vector3.Zero;
+                _effect.DirectionalLight2.SpecularColor = Vector3.Zero;
             }
 
             gd.SetVertexBuffer(_vertexBuffer);
@@ -255,7 +386,7 @@ namespace Engine.Core.Game.Components
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[MeshRenderer] Error drawing mesh '{Mesh}': {ex.Message}");
+                Console.Error.WriteLine($"[MeshRenderer] Error drawing mesh '{Mesh}': {ex.Message}");
             }
             finally
             {

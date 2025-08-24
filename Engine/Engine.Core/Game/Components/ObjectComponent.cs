@@ -62,18 +62,18 @@ namespace Engine.Core.Game.Components
         /// </summary>
         [JsonIgnore]
         [HideInInspector]
-        public Vector2 Position
+        public Vector3 Position
         {
             get
             {
                 var pos = Owner?.GetComponent<Transform>()?.Position ?? Vector3.Zero;
-                return new Vector2(pos.X, pos.Y);
+                return pos;
             }
             set
             {
                 var transform = Owner?.GetComponent<Transform>();
                 if (transform != null)
-                    transform.Position = new Vector3(value.X, value.Y, transform.Position.Z);
+                    transform.Position = value;
             }
         }
 
@@ -82,12 +82,18 @@ namespace Engine.Core.Game.Components
         /// </summary>
         [JsonIgnore]
         [HideInInspector]
-        public Vector2 OldPosition
+        public Vector3 OldPosition
         {
             get
             {
                 var pos = Owner?.GetComponent<Transform>()?.OldPosition ?? Vector3.Zero;
-                return new Vector2(pos.X, pos.Y);
+                return pos;
+            }
+            set
+            {
+                var transform = Owner?.GetComponent<Transform>();
+                if (transform != null)
+                    transform.OldPosition = value;
             }
         }
 
@@ -112,18 +118,18 @@ namespace Engine.Core.Game.Components
         /// </summary>
         [JsonIgnore]
         [HideInInspector]
-        public Vector2 Scale
+        public Vector3 Scale
         {
             get
             {
                 var scale = Owner?.GetComponent<Transform>()?.Scale ?? Vector3.One;
-                return new Vector2(scale.X, scale.Y);
+                return scale;
             }
             set
             {
                 var transform = Owner?.GetComponent<Transform>();
                 if (transform != null)
-                    transform.Scale = new Vector3(value.X, value.Y, transform.Scale.Z);
+                    transform.Scale = value;
             }
         }
 

@@ -15,6 +15,10 @@ namespace Engine.Core.Graphics
     {
         public static readonly Dictionary<string, MeshData> Meshes = new();
         public static readonly Dictionary<string, MaterialData> Materials = new();
+        private static readonly Dictionary<string, DateTime> MaterialLastModified = new(); // Track when materials were last modified
+        
+        // Event to notify when a material is reloaded
+        public static event Action<string>? MaterialReloaded;
 
         public static void LoadAll()
         {
@@ -38,12 +42,16 @@ namespace Engine.Core.Graphics
                     var name = Path.GetFileNameWithoutExtension(file);
                     var json = File.ReadAllText(file);
                     var data = JsonSerializer.Deserialize<MaterialData>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    if (data != null) Materials[name] = data;
+                    if (data != null) 
+                    {
+                        Materials[name] = data;
+                        MaterialLastModified[name] = File.GetLastWriteTimeUtc(file);
+                    }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[MeshLibrary] {ex.Message}");
+                Console.Error.WriteLine($"[MeshLibrary] {ex.Message}");
             }
 
             // Log what was loaded for debugging
@@ -58,6 +66,107 @@ namespace Engine.Core.Graphics
         public static MaterialData? GetMaterial(string name)
         {
             Materials.TryGetValue(name, out var m); return m;
+        }
+
+        /// <summary>
+        /// Reloads a specific material from disk
+        /// </summary>
+        public static void ReloadMaterial(string name)
+        {
+            try
+            {
+                string root = EnginePaths.AssetsBase;
+                string materialPath = Path.Combine(root, name + ".mat");
+                
+                if (File.Exists(materialPath))
+                {
+                    var json = File.ReadAllText(materialPath);
+                    var data = JsonSerializer.Deserialize<MaterialData>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (data != null)
+                    {
+                        Materials[name] = data;
+                        MaterialLastModified[name] = DateTime.UtcNow; // Update the modification timestamp
+                        MaterialReloaded?.Invoke(name); // Notify listeners
+                    }
+                    else
+                    {
+                        Console.Error.WriteLine($"[MeshLibrary] Failed to deserialize material '{name}'");
+                    }
+                }
+                else
+                {
+                    Console.Error.WriteLine($"[MeshLibrary] Material file not found: {materialPath}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"[MeshLibrary] Error reloading material '{name}': {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Updates a material directly in memory without reloading from disk
+        /// </summary>
+        public static void UpdateMaterial(string name, MaterialData newData)
+        {
+            if (Materials.ContainsKey(name))
+            {
+                Materials[name] = newData;
+                MaterialLastModified[name] = DateTime.UtcNow;
+                MaterialReloaded?.Invoke(name); // Notify listeners
+            }
+            else
+            {
+                // Add the material to memory if it doesn't exist
+                Materials[name] = newData;
+                MaterialLastModified[name] = DateTime.UtcNow;
+                Console.WriteLine($"[MeshLibrary] Added new material '{name}' to memory");
+                MaterialReloaded?.Invoke(name); // Notify listeners
+            }
+        }
+
+        /// <summary>
+        /// Loads a specific material from disk and adds it to memory
+        /// </summary>
+        public static void LoadMaterial(string name)
+        {
+            try
+            {
+                string root = EnginePaths.AssetsBase;
+                string materialPath = Path.Combine(root, name + ".mat");
+                
+                if (File.Exists(materialPath))
+                {
+                    var json = File.ReadAllText(materialPath);
+                    var data = JsonSerializer.Deserialize<MaterialData>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (data != null)
+                    {
+                        Materials[name] = data;
+                        MaterialLastModified[name] = File.GetLastWriteTimeUtc(materialPath);
+                        Console.WriteLine($"[MeshLibrary] Loaded material '{name}' from disk");
+                    }
+                    else
+                    {
+                        Console.Error.WriteLine($"[MeshLibrary] Failed to deserialize material '{name}'");
+                    }
+                }
+                else
+                {
+                    Console.Error.WriteLine($"[MeshLibrary] Material file not found: {materialPath}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"[MeshLibrary] Error loading material '{name}': {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Gets the last modification time of a material
+        /// </summary>
+        public static DateTime GetMaterialLastModified(string name)
+        {
+            return MaterialLastModified.TryGetValue(name, out var time) ? time : DateTime.MinValue;
         }
 
         /// <summary>

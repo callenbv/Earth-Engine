@@ -48,13 +48,13 @@ namespace Engine.Core.Game.Components
         /// <summary>
         /// The position of the sprite in world coordinates. This is where the sprite will be drawn in the game world.
         /// </summary>
-        public Vector2 Offset;
+        public Vector3 Offset;
 
         /// <summary>
         /// The position of the sprite in world coordinates. This is where the sprite will be drawn in the game world.
         /// </summary>
         [SliderEditor(1f, 10f)]
-        public Vector2 SpriteScale;
+        public Vector3 SpriteScale;
 
         /// <summary>
         /// Height in terms of layers, used for tilemap depth ordering
@@ -64,7 +64,7 @@ namespace Engine.Core.Game.Components
         /// <summary>
         /// The position of the sprite in world coordinates. This is where the sprite will be drawn in the game world.
         /// </summary>
-        private Vector2 position;
+        private Vector3 position;
 
         /// <summary>
         /// The texture used for the sprite. If set, it will automatically update the texturePath, frameWidth, frameHeight, and spriteBox properties.
@@ -229,7 +229,7 @@ namespace Engine.Core.Game.Components
             frame = Math.Clamp(frame, 0, frameCount - 1);
             depth = GetDepth();
             origin = new Vector2(frameWidth / 2, frameHeight / 2);
-            spriteBatch.Draw(texture, Position+ Offset, spriteBox, Tint, Rotation, origin, Scale+ SpriteScale, spriteEffect, depth);
+            spriteBatch.Draw(texture, new Vector2(Position.X, Position.Y) + new Vector2(Offset.X, Offset.Y), spriteBox, Tint, Rotation, origin, new Vector2(Scale.X, Scale.Y) + new Vector2(SpriteScale.X, SpriteScale.Y), spriteEffect, depth);
         }
 
         /// <summary>
@@ -244,7 +244,7 @@ namespace Engine.Core.Game.Components
             frame = Math.Clamp(frame, 0, frameCount - 1);
             depth = GetDepth();
             origin = new Vector2(frameWidth / 2, frameHeight / 2);
-            spriteBatch.Draw(texture, Position+ Offset, spriteBox, Tint, Rotation, origin, Scale+SpriteScale, spriteEffect, depth);
+            spriteBatch.Draw(texture, new Vector2(Position.X, Position.Y) + new Vector2(Offset.X, Offset.Y), spriteBox, Tint, Rotation, origin, new Vector2(Scale.X, Scale.Y) + new Vector2(SpriteScale.X, SpriteScale.Y), spriteEffect, depth);
         }
 
         /// <summary>

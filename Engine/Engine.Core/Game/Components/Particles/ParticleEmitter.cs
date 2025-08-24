@@ -124,6 +124,7 @@ namespace Engine.Core.Game.Components
         /// <summary>
         /// Texture path to store reference to texture
         /// </summary>
+        [HideInInspector]
         public string TexturePath { get; set; } = string.Empty;
 
         /// <summary>
@@ -178,10 +179,10 @@ namespace Engine.Core.Game.Components
         private float ElapsedTime = 0f;
 
         /// <summary>
-        /// BasicEffect for 3D particle rendering
+        /// Effect for 3D particle rendering
         /// </summary>
         [JsonIgnore]
-        private BasicEffect? _particleEffect;
+        private Effect? _particleEffect;
 
         /// <summary>
         /// Set the texture
@@ -260,7 +261,7 @@ namespace Engine.Core.Game.Components
 
             // Get Transform component for 3D positioning
             var transform = Owner.GetComponent<Transform>();
-            Vector3 emitterPos = transform?.Position ?? new Vector3(Position.X, Position.Y, 0f);
+            Vector3 emitterPos = transform?.Position ?? new Vector3(Position.X, Position.Y, Position.Z);
 
             // Calculate the center of the emitter box and randomize within the box
             Vector3 boxCenter = emitterPos + Offset;
@@ -321,11 +322,11 @@ namespace Engine.Core.Game.Components
             // Initialize effect if needed
             if (_particleEffect == null)
             {
-                _particleEffect = new BasicEffect(graphicsDevice)
+                _particleEffect = new AlphaTestEffect(graphicsDevice)
                 {
-                    TextureEnabled = true,
                     VertexColorEnabled = true,
-                    LightingEnabled = false
+                    AlphaFunction = CompareFunction.Greater,
+                    ReferenceAlpha = 1 // Only discard completely transparent pixels (alpha = 0)
                 };
             }
 
@@ -337,11 +338,14 @@ namespace Engine.Core.Game.Components
             try
             {
                 graphicsDevice.BlendState = BlendState.AlphaBlend; // Add colors together for proper particle blending
-                graphicsDevice.DepthStencilState = DepthStencilState.DepthRead; // Read depth but don't write it
+                graphicsDevice.DepthStencilState = DepthStencilState.Default; // Use default depth testing for proper ordering
                 graphicsDevice.RasterizerState = RasterizerState.CullNone;
 
+                // Sort particles by depth (back to front) for proper alpha blending
+                var sortedParticles = particles.OrderByDescending(p => p.Depth).ToList();
+
                 // Draw all particles using the shared effect
-                foreach (var particle in particles)
+                foreach (var particle in sortedParticles)
                 {
                     particle.Draw3D(graphicsDevice, view, projection, _particleEffect);
                 }

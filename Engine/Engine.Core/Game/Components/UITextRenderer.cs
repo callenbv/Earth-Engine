@@ -38,12 +38,12 @@ namespace Engine.Core.Game.Components
             if (!Visible || string.IsNullOrEmpty(Text) || bitFont == null || Owner == null)
                 return;
 
-            Vector2 finalPos = Position;
+            Vector2 finalPos = new Vector2(Position.X, Position.Y);
 
             if (Centered)
             {
                 // Center the text around the object's position
-                finalPos -= textSize * Scale * 0.5f;
+                finalPos -= textSize * new Vector2(Scale.X, Scale.Y) * 0.5f;
             }
 
             spriteBatch.DrawString(
@@ -53,7 +53,7 @@ namespace Engine.Core.Game.Components
                 Color,
                 Rotation,
                 Origin,
-                Scale,
+                new Vector2(Scale.X, Scale.Y),
                 Effects,
                 Depth
             );

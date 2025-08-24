@@ -205,6 +205,7 @@ namespace Editor.AssetManagement
                 AssetType.Prefab => "{\n  \"name\": \"NewPrefab\",\n  \"components\": []\n}",
                 AssetType.Scene => "{\n  \"entities\": []\n}",
                 AssetType.Data => "{\n  \"key\": \"value\"\n}",
+                AssetType.Material => "{\n  \"Name\": \"" + assetName + "\",\n  \"AlbedoColor\": [1.0, 1.0, 1.0, 1.0],\n  \"Metallic\": 0.0,\n  \"Roughness\": 1.0,\n  \"Specular\": 0.5,\n  \"EmissiveIntensity\": 0.0,\n  \"Shader\": \"Standard\",\n  \"AlbedoTilingX\": 1.0,\n  \"AlbedoTilingY\": 1.0,\n  \"NormalTilingX\": 1.0,\n  \"NormalTilingY\": 1.0,\n  \"MetallicRoughnessTilingX\": 1.0,\n  \"MetallicRoughnessTilingY\": 1.0\n}",
                 _ => ""
             };
         }

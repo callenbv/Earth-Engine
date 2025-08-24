@@ -132,7 +132,10 @@ namespace EarthEngineEditor.Windows
                         // Text
                         drawList.AddText(min + new System.Numerics.Vector2(padding, padding), ImGui.ColorConvertFloat4ToU32(new System.Numerics.Vector4(1, 1, 1, 1)), text);
 
-                        _selectedObject.Position = Vector2.Floor(new Vector2(Input.mouseWorldPosition.X, Input.mouseWorldPosition.Y) / gridSize) * gridSize;
+                        _selectedObject.Position = new Vector3(
+                            Vector2.Floor(new Vector2(Input.mouseWorldPosition.X, Input.mouseWorldPosition.Y) / gridSize) * gridSize,
+                            0f
+                        );
                     }
                 }
 

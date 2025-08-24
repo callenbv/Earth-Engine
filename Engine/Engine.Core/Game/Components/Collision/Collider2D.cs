@@ -96,13 +96,13 @@ namespace Engine.Core.Game.Components
         public List<string> Tags = new List<string>();
 
         /// <summary>
-        /// Gets the world-space bounding box of the collider.
+        /// Gets the bounds of the collider in world space.
         /// </summary>
         public RectangleF Bounds
         {
             get
             {
-                var pos = Owner.Position + Offset;
+                var pos = new Vector2(Owner.Position.X, Owner.Position.Y) + Offset;
                 return new RectangleF(pos.X, pos.Y, Size.X, Size.Y);
             }
         }

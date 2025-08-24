@@ -79,7 +79,7 @@ namespace Engine.Core
 
             if (Target != null)
             {
-                Position = Vector2.Lerp(Position, Target.Position, SmoothSpeed * dt);
+                Position = Vector2.Lerp(Position, new Vector2(Target.Position.X, Target.Position.Y), SmoothSpeed * dt);
             }
         }
 

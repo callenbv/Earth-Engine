@@ -264,7 +264,7 @@
         </member>
         <member name="P:Engine.Core.Game.Components.Collider2D.Bounds">
             <summary>
-            Gets the world-space bounding box of the collider.
+            Gets the bounds of the collider in world space.
             </summary>
         </member>
         <member name="M:Engine.Core.Game.Components.Collider2D.Intersects(Engine.Core.Game.Components.Collider2D)">
@@ -388,6 +388,21 @@
         <member name="P:Engine.Core.Game.Components.MeshRenderer.Scale3D">
             <summary>
             3D scale multiplier (applied on top of Transform.Scale).
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.MeshRenderer.OnMaterialReloaded(System.String)">
+            <summary>
+            Called when a material is reloaded in the MeshLibrary
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.MeshRenderer.ReloadMaterial">
+            <summary>
+            Reloads the material data and reapplies it to the effect
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.MeshRenderer.ForceMaterialReload">
+            <summary>
+            Forces a reload of the material data. Call this when you know the material has been modified.
             </summary>
         </member>
         <member name="T:Engine.Core.Game.Components.IComponent">
@@ -529,9 +544,9 @@
             </summary>
             <param name="spriteBatch"></param>
         </member>
-        <member name="M:Engine.Core.Game.Components.Particle.Draw3D(Microsoft.Xna.Framework.Graphics.GraphicsDevice,Microsoft.Xna.Framework.Matrix,Microsoft.Xna.Framework.Matrix,Microsoft.Xna.Framework.Graphics.BasicEffect)">
+        <member name="M:Engine.Core.Game.Components.Particle.Draw3D(Microsoft.Xna.Framework.Graphics.GraphicsDevice,Microsoft.Xna.Framework.Matrix,Microsoft.Xna.Framework.Matrix,Microsoft.Xna.Framework.Graphics.Effect)">
             <summary>
-            Draws the particle in 3D space using BasicEffect
+            Draws the particle in 3D space using AlphaTestEffect
             </summary>
             <param name="graphicsDevice"></param>
             <param name="view"></param>
@@ -650,7 +665,7 @@
         </member>
         <member name="F:Engine.Core.Game.Components.ParticleEmitter._particleEffect">
             <summary>
-            BasicEffect for 3D particle rendering
+            Effect for 3D particle rendering
             </summary>
         </member>
         <member name="M:Engine.Core.Game.Components.ParticleEmitter.Initialize">
@@ -1646,6 +1661,26 @@
             Get lightmap to draw it
             </summary>
             <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Graphics.MeshLibrary.ReloadMaterial(System.String)">
+            <summary>
+            Reloads a specific material from disk
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Graphics.MeshLibrary.UpdateMaterial(System.String,Engine.Core.Data.MaterialData)">
+            <summary>
+            Updates a material directly in memory without reloading from disk
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Graphics.MeshLibrary.LoadMaterial(System.String)">
+            <summary>
+            Loads a specific material from disk and adds it to memory
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Graphics.MeshLibrary.GetMaterialLastModified(System.String)">
+            <summary>
+            Gets the last modification time of a material
+            </summary>
         </member>
         <member name="M:Engine.Core.Graphics.MeshLibrary.LogLoadedAssets">
             <summary>
