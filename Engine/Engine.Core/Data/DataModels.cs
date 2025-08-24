@@ -25,5 +25,53 @@ namespace Engine.Core.Data
         public List<string> components { get; set; } = new List<string>();
         public Dictionary<string, Dictionary<string, object>> componentProperties { get; set; } = new();
     }
+
+    /// <summary>
+    /// Serializable mesh container for runtime consumption.
+    /// Tangents/bitangents optional for now.
+    /// </summary>
+    public class MeshData
+    {
+        public string Name { get; set; } = string.Empty;
+        public float[] Positions { get; set; } = Array.Empty<float>(); // xyz per vertex
+        public float[] Normals { get; set; } = Array.Empty<float>();   // xyz per vertex
+        public float[] UV0 { get; set; } = Array.Empty<float>();       // uv per vertex
+        public int[] Indices { get; set; } = Array.Empty<int>();       // triangle indices
+        public BoundingBox? Bounds { get; set; }
+        public List<MeshSubmesh> Submeshes { get; set; } = new();
+        public string? MaterialPath { get; set; }
+    }
+
+    public class MeshSubmesh
+    {
+        public string Name { get; set; } = string.Empty;
+        public int StartIndex { get; set; }
+        public int IndexCount { get; set; }
+        public string? MaterialPath { get; set; }
+    }
+
+    public class MaterialData
+    {
+        public string Name { get; set; } = "Material";
+        public string? AlbedoTexture { get; set; }
+        public string? NormalTexture { get; set; }
+        public string? MetallicRoughnessTexture { get; set; }
+        public float[] AlbedoColor { get; set; } = new float[] { 1f, 1f, 1f, 1f };
+        public float Metallic { get; set; } = 0f;
+        public float Roughness { get; set; } = 1f;
+        public float Specular { get; set; } = 0.5f;
+        public float EmissiveIntensity { get; set; } = 0f;
+        public string Shader { get; set; } = "Standard";
+    }
+
+    public struct BoundingBox
+    {
+        public float MinX { get; set; }
+        public float MinY { get; set; }
+        public float MinZ { get; set; }
+        public float MaxX { get; set; }
+        public float MaxY { get; set; }
+        public float MaxZ { get; set; }
+    }
 }
 

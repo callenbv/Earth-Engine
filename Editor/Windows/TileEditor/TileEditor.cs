@@ -219,7 +219,7 @@ namespace Editor.Windows.TileEditor
                     int offy = (int)selectedLayer.Offset.Y;
                     int gridSize = selectedLayer.TileSize;
 
-                    Microsoft.Xna.Framework.Vector2 mousePos = Input.mouseWorldPosition;
+                    Microsoft.Xna.Framework.Vector2 mousePos = new Vector2(Input.mouseWorldPosition.X, Input.mouseWorldPosition.Y);
                     int tileX = (int)((mousePos.X - offx) / gridSize);
                     int tileY = (int)((mousePos.Y - offy) / gridSize);
 
@@ -307,7 +307,7 @@ namespace Editor.Windows.TileEditor
             int offx = (int)selectedLayer.Offset.X;
             int offy = (int)selectedLayer.Offset.Y;
 
-            Microsoft.Xna.Framework.Vector2 mousePos = Input.mouseWorldPosition;
+            Microsoft.Xna.Framework.Vector2 mousePos = new Vector2(Input.mouseWorldPosition.X, Input.mouseWorldPosition.Y);
             int centerX = (int)((mousePos.X - offx) / tileSize);
             int centerY = (int)((mousePos.Y - offy) / tileSize);
 

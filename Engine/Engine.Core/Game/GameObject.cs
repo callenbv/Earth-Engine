@@ -34,12 +34,16 @@ namespace Engine.Core.Game
         /// </summary>
         public Vector2 Position
         {
-            get => GetComponent<Transform>()?.Position ?? Vector2.Zero;
+            get
+            {
+                var pos = GetComponent<Transform>()?.Position ?? Vector3.Zero;
+                return new Vector2(pos.X, pos.Y);
+            }
             set
             {
                 var transform = GetComponent<Transform>();
                 if (transform != null)
-                    transform.Position = value;
+                    transform.Position = new Vector3(value.X, value.Y, transform.Position.Z);
             }
         }
         /// <summary>
@@ -47,12 +51,16 @@ namespace Engine.Core.Game
         /// </summary>
         public Vector2 OldPosition
         {
-            get => GetComponent<Transform>()?.OldPosition ?? Vector2.Zero;
+            get
+            {
+                var pos = GetComponent<Transform>()?.OldPosition ?? Vector3.Zero;
+                return new Vector2(pos.X, pos.Y);
+            }
             set
             {
                 var transform = GetComponent<Transform>();
                 if (transform != null)
-                    transform.OldPosition = value;
+                    transform.OldPosition = new Vector3(value.X, value.Y, transform.OldPosition.Z);
             }
         }
 
@@ -75,12 +83,16 @@ namespace Engine.Core.Game
         /// </summary>
         public Vector2 Scale
         {
-            get => GetComponent<Transform>()?.Scale ?? Vector2.One;
+            get
+            {
+                var scale = GetComponent<Transform>()?.Scale ?? Vector3.One;
+                return new Vector2(scale.X, scale.Y);
+            }
             set
             {
                 var transform = GetComponent<Transform>();
                 if (transform != null)
-                    transform.Scale = value;
+                    transform.Scale = new Vector3(value.X, value.Y, transform.Scale.Z);
             }
         }
 
@@ -259,11 +271,11 @@ namespace Engine.Core.Game
                         if (objComp.Owner == null)
                             continue;
 
-                        // Do not update scripts if the engine is paused
+                        // Always update Camera3DController to allow camera navigation in editor and play
+                        bool isCam3D = objComp is Camera3DController;
+                        // Do not update other scripts if the engine is paused
                         if (!EngineContext.Running && !objComp.UpdateInEditor)
-                        {
                             continue;
-                        }
                     }
 
                     component.Update(gameTime);
@@ -364,7 +376,7 @@ namespace Engine.Core.Game
         /// <param name="defName">Name of the object definition to instantiate</param>
         /// <param name="position">Position to place the GameObject</param>
         /// <returns>Instantiated GameObject</returns>
-        public static GameObject Instantiate(string defName, Vector2 position)
+        public static GameObject Instantiate(string defName, Vector3 position)
         {
             // Check that the prefab exists
             string extension = Path.GetExtension(defName);
@@ -393,6 +405,7 @@ namespace Engine.Core.Game
                 };
 
                 options.Converters.Add(new Vector2JsonConverter());
+                options.Converters.Add(new Vector3JsonConverter());
                 options.Converters.Add(new ColorJsonConverter());
 
                 var def = JsonSerializer.Deserialize<GameObjectDefinition>(json, options);
@@ -462,6 +475,7 @@ namespace Engine.Core.Game
             };
             options.Converters.Add(new ComponentListJsonConverter());
             options.Converters.Add(new Vector2JsonConverter());
+            options.Converters.Add(new Vector3JsonConverter());
             options.Converters.Add(new ColorJsonConverter());
 
             GameObjectDefinition gameObject = new GameObjectDefinition();

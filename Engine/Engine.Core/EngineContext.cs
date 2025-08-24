@@ -36,6 +36,8 @@ namespace Engine.Core
         public static bool Running = false;
         public static bool Debug = true;
         public static float DeltaTime = 0f;
+        public static bool Wireframe = false;
+        public static float UnitsPerPixel = 1f;
         // Add more as needed
 
         private EngineContext() { }

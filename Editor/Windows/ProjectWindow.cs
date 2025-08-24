@@ -465,7 +465,7 @@ namespace EarthEngineEditor.Windows
                 {
                     using var dialog = new OpenFileDialog();
                     dialog.Title = "Select Assets to Import";
-                    dialog.Filter = "All Files (*.*)|*.*";
+                    dialog.Filter = "All Supported|*.png;*.jpg;*.jpeg;*.obj;*.prefab;*.eo;*.room;*.wav;*.ogg;*.mp3|Models|*.obj|Textures|*.png;*.jpg;*.jpeg|Audio|*.wav;*.ogg;*.mp3|All Files|*.*";
                     dialog.Multiselect = true;
 
                     if (dialog.ShowDialog() == DialogResult.OK)
@@ -476,9 +476,19 @@ namespace EarthEngineEditor.Windows
                         {
                             if (File.Exists(selectedPath))
                             {
-                                string destPath = Path.Combine(currentFolder, Path.GetFileName(selectedPath));
-                                File.Copy(selectedPath, destPath, overwrite: true);
-                                Console.WriteLine($"[Import] Imported: {destPath}");
+                                // Auto-convert .obj into .mesh/.mat without copying the .obj file
+                                if (Path.GetExtension(selectedPath).Equals(".obj", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    ObjImporter.ConvertObjToMeshAndMaterial(selectedPath, currentFolder);
+                                    Console.WriteLine($"[Import] Converted OBJ: {selectedPath} -> .mesh/.mat files in {currentFolder}");
+                                }
+                                else
+                                {
+                                    // Copy other file types normally
+                                    string destPath = Path.Combine(currentFolder, Path.GetFileName(selectedPath));
+                                    File.Copy(selectedPath, destPath, overwrite: true);
+                                    Console.WriteLine($"[Import] Imported: {destPath}");
+                                }
                             }
                         }
 

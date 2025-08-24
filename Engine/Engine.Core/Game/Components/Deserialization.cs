@@ -39,13 +39,23 @@ namespace Editor.AssetManagement
         /// <param name="objects"></param>
         public static void Resolve(List<GameObject> objects)
         {
+            Console.WriteLine($"[ReferenceResolver] Resolving {_pending.Count} references with {objects.Count} objects");
+            
             foreach (var (target, field, id) in _pending)
             {
+                Console.WriteLine($"[ReferenceResolver] Looking for ID: {id} for {target.GetType().Name}.{field.Name}");
+                
                 var match = objects.FirstOrDefault(o => o.ID == id);
                 if (match != null)
+                {
                     field.SetValue(target, match);
+                    Console.WriteLine($"[ReferenceResolver] Successfully resolved {target.GetType().Name}.{field.Name} to {match.Name}");
+                }
                 else
+                {
                     Console.WriteLine($"[ReferenceResolver] GameObject ID {id} not found for {target.GetType().Name}.{field.Name}");
+                    Console.WriteLine($"[ReferenceResolver] Available IDs: {string.Join(", ", objects.Select(o => o.ID))}");
+                }
             }
 
             _pending.Clear();
@@ -68,24 +78,33 @@ namespace Editor.AssetManagement
         {
             var components = new List<IComponent>();
 
-            using var doc = JsonDocument.ParseValue(ref reader);
-            foreach (var element in doc.RootElement.EnumerateArray())
+            try
             {
-                if (!element.TryGetProperty("type", out var typeProp))
+                using var doc = JsonDocument.ParseValue(ref reader);
+                Console.WriteLine($"[ComponentListJsonConverter] Parsing {doc.RootElement.GetArrayLength()} components");
+                
+                foreach (var element in doc.RootElement.EnumerateArray())
                 {
-                    Console.WriteLine("Component missing 'type' field");
-                    continue;
-                }
+                    try
+                    {
+                        if (!element.TryGetProperty("type", out var typeProp))
+                        {
+                            Console.WriteLine("[ComponentListJsonConverter] Component missing 'type' field");
+                            continue;
+                        }
 
-                var typeName = typeProp.GetString();
-                if (!ComponentRegistry.Components.TryGetValue(typeName, out var info))
-                {
-                    Console.WriteLine($"Unknown component type: {typeName}");
-                    continue;
-                }
+                        var typeName = typeProp.GetString();
+                        Console.WriteLine($"[ComponentListJsonConverter] Processing component type: {typeName}");
+                        
+                        if (!ComponentRegistry.Components.TryGetValue(typeName, out var info))
+                        {
+                            Console.WriteLine($"[ComponentListJsonConverter] Unknown component type: {typeName}");
+                            continue;
+                        }
 
-                var concreteType = info.Type;
-                var component = Activator.CreateInstance(concreteType);
+                        var concreteType = info.Type;
+                        var component = Activator.CreateInstance(concreteType);
+                        Console.WriteLine($"[ComponentListJsonConverter] Created instance of {concreteType.Name}");
 
                 // Deserialize public fields
                 foreach (var field in concreteType.GetFields(BindingFlags.Public | BindingFlags.Instance))
@@ -139,13 +158,26 @@ namespace Editor.AssetManagement
                     }
                 }
 
-                if (component is IComponent comp)
-                {
-                    components.Add(comp);
-                    //Console.WriteLine($"[Deserialize] Added component {comp.GetType().Name} (Hash: {comp.GetHashCode()})");
+                        if (component is IComponent comp)
+                        {
+                            components.Add(comp);
+                            Console.WriteLine($"[ComponentListJsonConverter] Successfully added component {comp.GetType().Name}");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[ComponentListJsonConverter] Error processing component: {ex.Message}");
+                        Console.WriteLine($"[ComponentListJsonConverter] Stack trace: {ex.StackTrace}");
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ComponentListJsonConverter] Fatal error: {ex.Message}");
+                Console.WriteLine($"[ComponentListJsonConverter] Stack trace: {ex.StackTrace}");
+            }
 
+            Console.WriteLine($"[ComponentListJsonConverter] Returning {components.Count} components");
             return components;
         }
 
@@ -223,6 +255,105 @@ namespace Editor.AssetManagement
                     Console.WriteLine($"[Deserializer] Failed to set {type.Name}.{prop.Name}: {ex.Message}");
                 }
             }
+        }
+    }
+
+    /// <summary>
+    /// Custom JSON converter for Microsoft.Xna.Framework.Vector3
+    /// </summary>
+    public class Vector3JsonConverter : JsonConverter<Microsoft.Xna.Framework.Vector3>
+    {
+        public override Microsoft.Xna.Framework.Vector3 Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            try
+            {
+                // Handle string format (e.g., "1,2,3" or "1 2 3" or "1,2" for Vector2 compatibility)
+                if (reader.TokenType == JsonTokenType.String)
+                {
+                    string value = reader.GetString() ?? "";
+                    Console.WriteLine($"[Vector3JsonConverter] Parsing string: '{value}'");
+                    
+                    var parts = value.Split(new char[] { ',', ' ', ';' }, StringSplitOptions.RemoveEmptyEntries);
+                    
+                    if (parts.Length >= 2)
+                    {
+                        if (float.TryParse(parts[0], out float x) &&
+                            float.TryParse(parts[1], out float y))
+                        {
+                            // Default Z to 0 if not provided (Vector2 compatibility)
+                            float z = 0f;
+                            if (parts.Length >= 3 && float.TryParse(parts[2], out float parsedZ))
+                            {
+                                z = parsedZ;
+                            }
+                            
+                            Console.WriteLine($"[Vector3JsonConverter] Successfully parsed: ({x}, {y}, {z})");
+                            return new Microsoft.Xna.Framework.Vector3(x, y, z);
+                        }
+                    }
+                    
+                    Console.WriteLine($"[Vector3JsonConverter] Failed to parse string: '{value}'");
+                    return Microsoft.Xna.Framework.Vector3.Zero; // Return zero instead of throwing
+                }
+                
+                // Handle object format (e.g., {"X": 1, "Y": 2, "Z": 3})
+                if (reader.TokenType == JsonTokenType.StartObject)
+                {
+                    float x = 0, y = 0, z = 0;
+
+                    while (reader.Read())
+                    {
+                        if (reader.TokenType == JsonTokenType.EndObject)
+                            break;
+
+                        if (reader.TokenType == JsonTokenType.PropertyName)
+                        {
+                            string propertyName = reader.GetString() ?? "";
+                            reader.Read();
+
+                            switch (propertyName.ToLowerInvariant())
+                            {
+                                case "x":
+                                    x = reader.GetSingle();
+                                    break;
+                                case "y":
+                                    y = reader.GetSingle();
+                                    break;
+                                case "z":
+                                    z = reader.GetSingle();
+                                    break;
+                            }
+                        }
+                    }
+
+                    Console.WriteLine($"[Vector3JsonConverter] Successfully parsed object: ({x}, {y}, {z})");
+                    return new Microsoft.Xna.Framework.Vector3(x, y, z);
+                }
+
+                // Handle null or unexpected tokens
+                if (reader.TokenType == JsonTokenType.Null)
+                {
+                    Console.WriteLine("[Vector3JsonConverter] Received null, returning Vector3.Zero");
+                    return Microsoft.Xna.Framework.Vector3.Zero;
+                }
+
+                Console.WriteLine($"[Vector3JsonConverter] Unexpected token type: {reader.TokenType}, returning Vector3.Zero");
+                return Microsoft.Xna.Framework.Vector3.Zero; // Return zero instead of throwing
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Vector3JsonConverter] Exception: {ex.Message}");
+                return Microsoft.Xna.Framework.Vector3.Zero; // Return zero instead of throwing
+            }
+        }
+
+        public override void Write(Utf8JsonWriter writer, Microsoft.Xna.Framework.Vector3 value, JsonSerializerOptions options)
+        {
+            writer.WriteStartObject();
+            writer.WriteNumber("X", value.X);
+            writer.WriteNumber("Y", value.Y);
+            writer.WriteNumber("Z", value.Z);
+            writer.WriteEndObject();
         }
     }
 }

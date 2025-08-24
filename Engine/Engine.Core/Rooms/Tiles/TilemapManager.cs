@@ -6,6 +6,7 @@
 /// <Summary>                
 /// -----------------------------------------------------------------------------
 
+using Editor.AssetManagement;
 using Engine.Core.Data;
 using Engine.Core.Game.Components;
 using Engine.Core.Graphics;
@@ -59,6 +60,7 @@ public static class TilemapManager
             IncludeFields = true
         };
         options.Converters.Add(new Vector2JsonConverter());
+        options.Converters.Add(new Vector3JsonConverter());
 
         var json = JsonSerializer.Serialize(saveData, options);
         File.WriteAllText(path, json);
@@ -77,6 +79,7 @@ public static class TilemapManager
             IncludeFields = true
         };
         options.Converters.Add(new Vector2JsonConverter());
+        options.Converters.Add(new Vector3JsonConverter());
         var saveData = JsonSerializer.Deserialize<TilemapSaveData>(json, options);
 
         if (saveData == null) return;

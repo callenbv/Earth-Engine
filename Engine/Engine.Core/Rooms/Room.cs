@@ -17,6 +17,7 @@ using MonoGame.Extended.Serialization.Json;
 using Engine.Core.Data;
 using System.Reflection;
 using Engine.Core.Systems;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Engine.Core.Rooms
 {
@@ -55,6 +56,45 @@ namespace Engine.Core.Rooms
             catch (Exception ex)
             {
                 Console.WriteLine($"Error rendering scene: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Render 3D components before the 2D sprite batch.
+        /// </summary>
+        public void Render3D(GraphicsDevice graphicsDevice, Matrix view, Matrix projection)
+        {
+            try
+            {
+                foreach (var obj in objects)
+                {
+                    // Render 3D meshes
+                    var mr = obj.GetComponent<MeshRenderer>();
+                    if (mr != null)
+                    {
+                        mr.Draw3D(graphicsDevice, view, projection);
+                    }
+
+                    // Render 2D sprites in 3D space
+                    var sprite = obj.GetComponent<Sprite2D>();
+                    if (sprite != null)
+                    {
+                        sprite.Draw3D(graphicsDevice, view, projection);
+                    }
+
+                    // Render particle emitters in 3D space
+                    var particleEmitter = obj.GetComponent<ParticleEmitter>();
+                    if (particleEmitter != null)
+                    {
+                        particleEmitter.Draw3D(graphicsDevice, view, projection);
+                        // Draw 3D bounds for particle emitters
+                        particleEmitter.Draw3DBounds(graphicsDevice, view, projection);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error rendering 3D scene: {ex.Message}");
             }
         }
 
@@ -134,6 +174,7 @@ namespace Engine.Core.Rooms
             {
                 new ComponentListJsonConverter(),
                 new Vector2JsonConverter(),
+                new Vector3JsonConverter(),
                 new ColorJsonConverter()
             }
                 };
@@ -145,18 +186,31 @@ namespace Engine.Core.Rooms
                     scene = sceneData;
                     scene.Name = name;
 
+                    Console.WriteLine($"[Room.Load] Setting up {scene.objects.Count} objects");
                     foreach (var obj in scene.objects)
                     {
+                        Console.WriteLine($"[Room.Load] Setting up object: {obj.Name} with {obj.components.Count} components");
                         foreach (var component in obj.components)
                         {
-                            if (component is ObjectComponent comp)
+                            try
                             {
-                                comp.Owner = obj;
-                                comp.Initialize();
+                                if (component is ObjectComponent comp)
+                                {
+                                    Console.WriteLine($"[Room.Load] Setting Owner for {component.GetType().Name} on {obj.Name}");
+                                    comp.Owner = obj;
+                                    Console.WriteLine($"[Room.Load] Initializing {component.GetType().Name} on {obj.Name}");
+                                    comp.Initialize();
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"[Room.Load] Error setting up component {component.GetType().Name} on {obj.Name}: {ex.Message}");
+                                Console.WriteLine($"[Room.Load] Stack trace: {ex.StackTrace}");
                             }
                         }
                     }
 
+                    Console.WriteLine($"[Room.Load] Resolving references");
                     GameReferenceResolver.Resolve(scene.objects);
                 }
             }

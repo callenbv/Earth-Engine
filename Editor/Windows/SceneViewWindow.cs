@@ -42,7 +42,7 @@ namespace EarthEngineEditor.Windows
         private GameObject? _selectedObject;
         private GameObject? previousSelection;
         private IInspectable? _nodeBeingRenamed;
-        public static int gridSize = 16;
+        public static int gridSize = 1;
         private string _renameBuffer = "";
         private bool _isRenaming = false;
         private bool _showSceneView = true;
@@ -132,7 +132,7 @@ namespace EarthEngineEditor.Windows
                         // Text
                         drawList.AddText(min + new System.Numerics.Vector2(padding, padding), ImGui.ColorConvertFloat4ToU32(new System.Numerics.Vector4(1, 1, 1, 1)), text);
 
-                        _selectedObject.Position = Vector2.Floor(Input.mouseWorldPosition / gridSize) * gridSize;
+                        _selectedObject.Position = Vector2.Floor(new Vector2(Input.mouseWorldPosition.X, Input.mouseWorldPosition.Y) / gridSize) * gridSize;
                     }
                 }
 

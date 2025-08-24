@@ -27,6 +27,7 @@ namespace Engine.Core.Game
         public bool VerticalSync { get; set; } = false;
         public bool FixedTimestep { get; set; } = false;
         public bool CanResizeWindow { get; set; } = false;
+        public float UnitsPerPixel { get; set; } = 1f;
 
         private static GameOptions? Instance;
         public static GameOptions Main => Instance ??= new GameOptions();
@@ -76,8 +77,10 @@ namespace Engine.Core.Game
                 VerticalSync = newOptions.VerticalSync;
                 CanResizeWindow = newOptions.CanResizeWindow;
                 TargetFPS = newOptions.TargetFPS;
+                UnitsPerPixel = newOptions.UnitsPerPixel;
                 EngineContext.InternalWidth = TargetResolutionWidth;
                 EngineContext.InternalHeight = TargetResolutionHeight;
+                EngineContext.UnitsPerPixel = UnitsPerPixel;
                 Console.WriteLine("[DEBUG] Loaded GameOptions:");
             }
         }

@@ -45,34 +45,34 @@ namespace Editor.Windows
         public void Update(GameTime gameTime)
         {
             // Handle camera panning and zooming
-            if (EditorApp.Instance.gameFocused)
+            if (EditorApp.Instance.gameFocused && !EngineContext.Running)
             {
-                // Panning
-                if (Input.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.W))
-                {
-                    Camera.Main.Position += new Vector2(0, -PanSpeed) / Camera.Main.Zoom;
-                }
-                if (Input.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.S))
-                {
-                    Camera.Main.Position += new Vector2(0, PanSpeed) / Camera.Main.Zoom;
-                }
-                if (Input.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.A))
-                {
-                    Camera.Main.Position += new Vector2(-PanSpeed, 0) / Camera.Main.Zoom;
-                }
-                if (Input.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.D))
-                {
-                    Camera.Main.Position += new Vector2(PanSpeed, 0) / Camera.Main.Zoom;
-                }
-                // Zooming
-                if (Input.ScrolledUp)
-                {
-                    Camera.Main.Zoom *= 1.1f; // Zoom in
-                }
-                if (Input.ScrolledDown)
-                {
-                    Camera.Main.Zoom *= 0.9f; // Zoom in
-                }
+                //// Panning
+                //if (Input.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.W))
+                //{
+                //    Camera.Main.Position += new Vector2(0, -PanSpeed) / Camera.Main.Zoom;
+                //}
+                //if (Input.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.S))
+                //{
+                //    Camera.Main.Position += new Vector2(0, PanSpeed) / Camera.Main.Zoom;
+                //}
+                //if (Input.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.A))
+                //{
+                //    Camera.Main.Position += new Vector2(-PanSpeed, 0) / Camera.Main.Zoom;
+                //}
+                //if (Input.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.D))
+                //{
+                //    Camera.Main.Position += new Vector2(PanSpeed, 0) / Camera.Main.Zoom;
+                //}
+                //// Zooming
+                //if (Input.ScrolledUp)
+                //{
+                //    Camera.Main.Zoom *= 1.1f; // Zoom in
+                //}
+                //if (Input.ScrolledDown)
+                //{
+                //    Camera.Main.Zoom *= 0.9f; // Zoom in
+                //}
             }
         }
 
@@ -83,7 +83,7 @@ namespace Editor.Windows
         public void DrawEnd(SpriteBatch spriteBatch)
         {
             spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.NonPremultiplied, SamplerState.PointClamp, null, null, null, Camera.Main.GetViewMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight));
-            DrawGrid(spriteBatch);
+            //DrawGrid(spriteBatch);
             spriteBatch.End();
         }
 

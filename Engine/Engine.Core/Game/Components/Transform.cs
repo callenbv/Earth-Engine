@@ -23,18 +23,18 @@ namespace Engine.Core.Game
         /// <summary>
         /// The position of the GameObject in the world. This is used to position the object in the world.
         /// </summary>
-        new public Vector2 Position { get; set; }
+        new public Vector3 Position { get; set; }
 
         /// <summary>
         /// The old position of the GameObject in the world. This is used to track the previous position of the object for movement calculations.
         /// </summary>
         [HideInInspector]
-        new public Vector2 OldPosition
+        new public Vector3 OldPosition
         {
             get => _oldPosition;
             set => _oldPosition = value;
         }
-        private Vector2 _oldPosition;
+        private Vector3 _oldPosition;
 
         /// <summary>
         /// The rotation of the GameObject in degrees. This is used to rotate the object in the world.
@@ -45,7 +45,7 @@ namespace Engine.Core.Game
         /// <summary>
         /// The scale of the GameObject. This is used to scale the object in the world.
         /// </summary>
-        new public Vector2 Scale { get; set; } = Vector2.One;
+        new public Vector3 Scale { get; set; } = Vector3.One;
 
     }
 }

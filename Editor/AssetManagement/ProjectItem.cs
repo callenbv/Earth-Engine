@@ -78,11 +78,15 @@ namespace Editor.AssetManagement
                 }
 
                 EditorApp.Instance.runtime.gameOptions = settings;
+                // Initialize EngineContext from loaded settings
+                Engine.Core.EngineContext.UnitsPerPixel = settings.UnitsPerPixel;
                 Console.WriteLine("Last Scene: " + settings.StartScene);
             }
             else
             {
                 Console.WriteLine("No project settings file found at: " + optionsPath);
+                // Initialize with default values for new projects
+                Engine.Core.EngineContext.UnitsPerPixel = settings.UnitsPerPixel; // Uses default value of 1f
             }
         }
     }

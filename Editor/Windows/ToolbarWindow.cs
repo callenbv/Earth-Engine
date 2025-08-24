@@ -8,6 +8,8 @@
 
 using Editor.Windows;
 using Engine.Core;
+using Engine.Core.Systems;
+using Engine.Core.Graphics;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
 
@@ -32,13 +34,32 @@ namespace EarthEngineEditor.Windows
         /// </summary>
         private void HandleHotkeys()
         {
-            // Toggle grid
+            // Toggle grid and wireframe with Ctrl
             if (Input.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.LeftControl))
             {
                 if (Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.G))
                 {
-                    showGrid = !showGrid;
-                    ToggleGrid();
+                    Grid3D.Instance.Visible = !Grid3D.Instance.Visible;
+                }
+                
+                // Toggle wireframe
+                if (Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.W))
+                {
+                    EngineContext.Wireframe = !EngineContext.Wireframe;
+                    ToggleWireframe();
+                }
+            }
+
+            // Grid size adjustment (when grid is visible)
+            if (Grid3D.Instance.Visible)
+            {
+                if (Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.OemCloseBrackets))
+                {
+                    Grid3D.Instance.UpdateGridSize(Grid3D.Instance.GridSize + 4f, EngineContext.Current.GraphicsDevice);
+                }
+                if (Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.OemOpenBrackets))
+                {
+                    Grid3D.Instance.UpdateGridSize(Math.Max(4f, Grid3D.Instance.GridSize - 4f), EngineContext.Current.GraphicsDevice);
                 }
             }
 
@@ -54,7 +75,16 @@ namespace EarthEngineEditor.Windows
         /// </summary>
         private void ToggleGrid()
         {
-            EditorOverlay.Instance.showGrid = showGrid;
+            Grid3D.Instance.Visible = showGrid;
+        }
+
+        /// <summary>
+        /// Turn wireframe mode on/off
+        /// </summary>
+        private void ToggleWireframe()
+        {
+            // Set global wireframe state in EngineContext - MeshRenderer will check this
+            Console.WriteLine($"[Wireframe] Global wireframe mode: {(EngineContext.Wireframe ? "ON" : "OFF")}");
         }
 
         /// <summary>
@@ -76,7 +106,8 @@ namespace EarthEngineEditor.Windows
             ImGui.SameLine();
 
             // Grid Toggle
-            string gridIcon = showGrid ? "\uf00a" : "\uf00a";
+            string gridIcon = "\uf00a";
+            showGrid = Grid3D.Instance.Visible; // Sync with 3D grid state
             Microsoft.Xna.Framework.Color gridColor = showGrid ? Microsoft.Xna.Framework.Color.White : Microsoft.Xna.Framework.Color.Gray;
 
             if (ImGuiRenderer.IconButton("grid", gridIcon, gridColor))
@@ -87,10 +118,22 @@ namespace EarthEngineEditor.Windows
 
             ImGui.SameLine();
 
+            // Wireframe Toggle
+            string wireframeIcon = "\uf545"; // Cube outline icon
+            Microsoft.Xna.Framework.Color wireframeColor = EngineContext.Wireframe ? Microsoft.Xna.Framework.Color.White : Microsoft.Xna.Framework.Color.Gray;
+
+            if (ImGuiRenderer.IconButton("wireframe", wireframeIcon, wireframeColor))
+            {
+                EngineContext.Wireframe = !EngineContext.Wireframe;
+                ToggleWireframe();
+            }
+
+            ImGui.SameLine();
+
             // Camera Details
-            Vector2 cameraPosition = Input.mouseWorldPosition;
+            Vector2 cameraPosition = new Vector2(Input.mouseWorldPosition.X, Input.mouseWorldPosition.Y);
             cameraPosition.Round();
-            ImGui.Text($"{cameraPosition} Zoom: {Camera.Main.Zoom}x");
+            ImGui.Text($"{Camera3D.Main.Position} FOV DEG: {Camera3D.Main.FieldOfViewDegrees} Far: {Camera3D.Main.FarPlane} Near: {Camera3D.Main.NearPlane}" );
 
             ImGui.End();
         }

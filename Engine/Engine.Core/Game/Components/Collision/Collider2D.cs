@@ -183,9 +183,9 @@ namespace Engine.Core.Game.Components
         /// <summary>
         /// Called when this collider collides with a tile in a tilemap.
         /// </summary>
-        public void OnTileCollision()
+        public virtual void OnTileCollision()
         {
-            Position = OldPosition;
+
         }
 
         /// <summary>

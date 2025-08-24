@@ -9,13 +9,14 @@
 using EarthEngineEditor.Windows;
 using Engine.Core.Data;
 using System.IO;
+using System.Text.Json;
 
 namespace Editor.AssetManagement
 {
     /// <summary>
     /// Represents the type of asset in the project.
     /// </summary>
-    public enum AssetType { Texture, Scene, Data, Script, Audio, Prefab, Unknown }
+    public enum AssetType { Texture, Scene, Data, Script, Audio, Prefab, Mesh, Material, Unknown }
 
     /// <summary>
     /// Represents an asset in the project.
@@ -87,6 +88,8 @@ namespace Editor.AssetManagement
                 AssetType.Scene => new SceneHandler(),
                 AssetType.Texture => new TextureHandler(),
                 AssetType.Audio => new AudioHandler(),
+                AssetType.Mesh => new MeshHandler(),
+                AssetType.Material => new MaterialHandler(),
                 _ => null
             };
 
@@ -115,6 +118,8 @@ namespace Editor.AssetManagement
                 AssetType.Data => "\uf1c0", // Database / data
                 AssetType.Audio => "\uf001", // Music note
                 AssetType.Prefab => "\uf1b2", // Cube / 3D object
+                AssetType.Mesh => "\uf1b2", // Reuse cube icon
+                AssetType.Material => "\uf53f", // Fill drip (palette-like)
                 AssetType.Unknown => "\uf15b", // Generic file
                 _ => "\uf15b", // Fallback
             };
@@ -137,6 +142,8 @@ namespace Editor.AssetManagement
                 ".json" => AssetType.Data,
                 ".wav" or ".ogg" or ".mp3" => AssetType.Audio,
                 ".prefab" or ".eo" => AssetType.Prefab,
+                ".mesh" => AssetType.Mesh,
+                ".mat" => AssetType.Material,
                 _ => AssetType.Unknown
             };
         }
@@ -165,6 +172,8 @@ namespace Editor.AssetManagement
                 AssetType.Script => ".cs",
                 AssetType.Data => ".json",
                 AssetType.Prefab => ".eo",
+                AssetType.Mesh => ".mesh",
+                AssetType.Material => ".mat",
                 _ => ".asset"
             };
         }

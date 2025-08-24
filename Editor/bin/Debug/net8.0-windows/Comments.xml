@@ -174,6 +174,12 @@
             <param name="member"></param>
             <returns></returns>
         </member>
+        <member name="T:Engine.Core.Data.MeshData">
+            <summary>
+            Serializable mesh container for runtime consumption.
+            Tangents/bitangents optional for now.
+            </summary>
+        </member>
         <member name="T:Engine.Core.Data.EnginePaths">
             <summary>
             Static class to hold paths for the Earth Engine project and assets.
@@ -369,6 +375,21 @@
             Refresh registry upon compilation
             </summary>
         </member>
+        <member name="F:Engine.Core.Game.Components.MeshRenderer._meshName">
+            <summary>
+            Mesh asset name (file name without extension).
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.MeshRenderer.Material">
+            <summary>
+            Material asset name (file name without extension).
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.MeshRenderer.Scale3D">
+            <summary>
+            3D scale multiplier (applied on top of Transform.Scale).
+            </summary>
+        </member>
         <member name="T:Engine.Core.Game.Components.IComponent">
             <summary>
             Base interface for all components in the game engine.
@@ -504,9 +525,18 @@
         </member>
         <member name="M:Engine.Core.Game.Components.Particle.Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
             <summary>
-            Draws the particle using the provided SpriteBatch.
+            Draws the particle using the provided SpriteBatch (2D mode - uses X,Y only).
             </summary>
             <param name="spriteBatch"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.Particle.Draw3D(Microsoft.Xna.Framework.Graphics.GraphicsDevice,Microsoft.Xna.Framework.Matrix,Microsoft.Xna.Framework.Matrix,Microsoft.Xna.Framework.Graphics.BasicEffect)">
+            <summary>
+            Draws the particle in 3D space using BasicEffect
+            </summary>
+            <param name="graphicsDevice"></param>
+            <param name="view"></param>
+            <param name="projection"></param>
+            <param name="effect"></param>
         </member>
         <member name="T:Engine.Core.Game.Components.ParticleShape">
             <summary>
@@ -558,9 +588,14 @@
             The shape of the particle, which determines its texture and appearance.
             </summary>
         </member>
-        <member name="F:Engine.Core.Game.Components.ParticleEmitter.texture">
+        <member name="P:Engine.Core.Game.Components.ParticleEmitter.Texture">
             <summary>
-            Texture used for rendering the particles. This is set based on the ParticleShape and can be changed dynamically.
+            Texture of the particle. Allows for sprite based particles or changes based on shape
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.ParticleEmitter.TexturePath">
+            <summary>
+            Texture path to store reference to texture
             </summary>
         </member>
         <member name="P:Engine.Core.Game.Components.ParticleEmitter.Color">
@@ -583,6 +618,11 @@
             Whether the emitter is enabled or not. If false, no particles will be emitted.
             </summary>
         </member>
+        <member name="P:Engine.Core.Game.Components.ParticleEmitter.Visible">
+            <summary>
+            Visibility of particles
+            </summary>
+        </member>
         <member name="P:Engine.Core.Game.Components.ParticleEmitter.Height">
             <summary>
             Determines depth based on tilemaps
@@ -595,7 +635,7 @@
         </member>
         <member name="P:Engine.Core.Game.Components.ParticleEmitter.EmitterSize">
             <summary>
-            Size of the emitter area from which particles will be emitted. This defines the rectangular area in which particles can spawn.
+            Size of the emitter area from which particles will be emitted. This defines the 3D box in which particles can spawn.
             </summary>
         </member>
         <member name="F:Engine.Core.Game.Components.ParticleEmitter.particles">
@@ -606,6 +646,16 @@
         <member name="F:Engine.Core.Game.Components.ParticleEmitter.ElapsedTime">
             <summary>
             Elapsed time since the last particle emission. This is used to control the emission rate based on SpawnRate.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.ParticleEmitter._particleEffect">
+            <summary>
+            BasicEffect for 3D particle rendering
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.ParticleEmitter.Initialize">
+            <summary>
+            Set the texture
             </summary>
         </member>
         <member name="M:Engine.Core.Game.Components.ParticleEmitter.Update(Microsoft.Xna.Framework.GameTime)">
@@ -625,15 +675,41 @@
             </summary>
             <param name="spriteBatch"></param>
         </member>
+        <member name="M:Engine.Core.Game.Components.ParticleEmitter.Draw3D(Microsoft.Xna.Framework.Graphics.GraphicsDevice,Microsoft.Xna.Framework.Matrix,Microsoft.Xna.Framework.Matrix)">
+            <summary>
+            Draw particles in 3D space using BasicEffect
+            </summary>
+            <param name="graphicsDevice"></param>
+            <param name="view"></param>
+            <param name="projection"></param>
+        </member>
         <member name="M:Engine.Core.Game.Components.ParticleEmitter.DrawUI(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
             <summary>
             Draw bounds in the UI
             </summary>
             <param name="spriteBatch"></param>
         </member>
+        <member name="M:Engine.Core.Game.Components.ParticleEmitter.Draw3DBounds(Microsoft.Xna.Framework.Graphics.GraphicsDevice,Microsoft.Xna.Framework.Matrix,Microsoft.Xna.Framework.Matrix)">
+            <summary>
+            Draw debug bounds in 3D space
+            </summary>
+            <param name="graphicsDevice"></param>
+            <param name="view"></param>
+            <param name="projection"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.ParticleEmitter.DrawWireframeBox(Microsoft.Xna.Framework.Graphics.GraphicsDevice,Microsoft.Xna.Framework.Matrix,Microsoft.Xna.Framework.Matrix,Microsoft.Xna.Framework.Vector3,Microsoft.Xna.Framework.Vector3,Microsoft.Xna.Framework.Color)">
+            <summary>
+            Draw a wireframe box in 3D space
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.ParticleEmitter._wireframeEffect">
+            <summary>
+            BasicEffect for wireframe rendering
+            </summary>
+        </member>
         <member name="M:Engine.Core.Game.Components.ParticleEmitter.DebugDraw(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
             <summary>
-            Draw debug bounds
+            Draw debug bounds (legacy 2D method - kept for compatibility)
             </summary>
             <param name="spriteBatch"></param>
         </member>
@@ -670,6 +746,11 @@
         <member name="F:Engine.Core.Game.Components.Sprite2D._texture">
             <summary>
             The texture used for the sprite. If set, it will automatically update the texturePath, frameWidth, frameHeight, and spriteBox properties.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.Sprite2D._spriteEffect">
+            <summary>
+            AlphaTestEffect for 3D sprite rendering with proper transparency
             </summary>
         </member>
         <member name="P:Engine.Core.Game.Components.Sprite2D.texturePath">
@@ -773,6 +854,14 @@
             Draw the sprite in UI coordinates
             </summary>
             <param name="spriteBatch"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.Sprite2D.Draw3D(Microsoft.Xna.Framework.Graphics.GraphicsDevice,Microsoft.Xna.Framework.Matrix,Microsoft.Xna.Framework.Matrix)">
+            <summary>
+            Draw the sprite in 3D space using BasicEffect
+            </summary>
+            <param name="graphicsDevice"></param>
+            <param name="view"></param>
+            <param name="projection"></param>
         </member>
         <member name="M:Engine.Core.Game.Components.Sprite2D.Update(Microsoft.Xna.Framework.GameTime)">
             <summary>
@@ -1323,7 +1412,7 @@
             Called when an object is clicked
             </summary>
         </member>
-        <member name="M:Engine.Core.Game.GameObject.Instantiate(System.String,Microsoft.Xna.Framework.Vector2)">
+        <member name="M:Engine.Core.Game.GameObject.Instantiate(System.String,Microsoft.Xna.Framework.Vector3)">
             <summary>
             Instantiate game object from object name
             </summary>
@@ -1445,6 +1534,11 @@
             A static class that provides graphics-related functionality, such as creating a pixel texture.
             </summary>
         </member>
+        <member name="F:Engine.Core.Graphics.GraphicsLibrary.DrawColor">
+            <summary>
+            Current color used for draw calls
+            </summary>
+        </member>
         <member name="M:Engine.Core.Graphics.GraphicsLibrary.Initialize">
             <summary>
             Initializes the graphics library, creating a 1x1 pixel texture.
@@ -1453,6 +1547,62 @@
         <member name="M:Engine.Core.Graphics.GraphicsLibrary.LoadTextures">
             <summary>
             Loads the textures used in the graphics library, including primitives
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Graphics.GraphicsLibrary.SetDrawColor(Microsoft.Xna.Framework.Color)">
+            <summary>
+            Set the color to draw
+            </summary>
+            <param name="color"></param>
+        </member>
+        <member name="M:Engine.Core.Graphics.GraphicsLibrary.ResetDraw">
+            <summary>
+            Resets the draw properties to default
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Graphics.GraphicsLibrary.DrawRectangle(System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            Draw a rectangle given a size
+            </summary>
+            <param name="width"></param>
+            <param name="height"></param>
+            <param name="outlined"></param>
+        </member>
+        <member name="M:Engine.Core.Graphics.GraphicsLibrary.DrawEllipse(System.Single,System.Single)">
+            <summary>
+            Draw an ellipse with a radius and size
+            </summary>
+            <param name="width"></param>
+            <param name="height"></param>
+        </member>
+        <member name="T:Engine.Core.Graphics.Grid3D">
+            <summary>
+            Renders a 3D grid in the world for editor visualization
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Graphics.Grid3D.Initialize(Microsoft.Xna.Framework.Graphics.GraphicsDevice)">
+            <summary>
+            Initialize the grid with graphics device
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Graphics.Grid3D.BuildGridBuffers(Microsoft.Xna.Framework.Graphics.GraphicsDevice)">
+            <summary>
+            Build vertex and index buffers for the grid
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Graphics.Grid3D.Draw(Microsoft.Xna.Framework.Graphics.GraphicsDevice,Microsoft.Xna.Framework.Matrix,Microsoft.Xna.Framework.Matrix)">
+            <summary>
+            Render the 3D grid
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Graphics.Grid3D.UpdateGridSize(System.Single,Microsoft.Xna.Framework.Graphics.GraphicsDevice)">
+            <summary>
+            Update grid size and rebuild buffers if needed
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Graphics.Grid3D.Dispose">
+            <summary>
+            Dispose of resources
             </summary>
         </member>
         <member name="F:Engine.Core.Graphics.Lighting.MultiplyBlend">
@@ -1497,6 +1647,11 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Engine.Core.Graphics.MeshLibrary.LogLoadedAssets">
+            <summary>
+            Debug method to list all loaded meshes and materials
+            </summary>
+        </member>
         <member name="M:Engine.Core.Graphics.TextureLibrary.LoadTextures(System.String)">
             <summary>
             Loads all textures within project
@@ -1533,6 +1688,11 @@
         <member name="M:Engine.Core.Rooms.Room.Render(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
             <summary>
             Render a scene
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Rooms.Room.Render3D(Microsoft.Xna.Framework.Graphics.GraphicsDevice,Microsoft.Xna.Framework.Matrix,Microsoft.Xna.Framework.Matrix)">
+            <summary>
+            Render 3D components before the 2D sprite batch.
             </summary>
         </member>
         <member name="M:Engine.Core.Rooms.Room.RenderUI(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
@@ -1781,6 +1941,11 @@
             Draw the camera view preview. Used for knowing the UI speed
             </summary>
             <param name="spriteBatch"></param>
+        </member>
+        <member name="M:Engine.Core.Systems.Camera3D.Update">
+            <summary>
+            Update camera - if TargetObject is set, camera will look at it
+            </summary>
         </member>
         <member name="M:Engine.Core.Systems.CollisionSystem.Initialize">
             <summary>
@@ -2089,6 +2254,11 @@
             </summary>
             <param name="component"></param>
             <param name="props"></param>
+        </member>
+        <member name="T:Editor.AssetManagement.Vector3JsonConverter">
+            <summary>
+            Custom JSON converter for Microsoft.Xna.Framework.Vector3
+            </summary>
         </member>
         <member name="M:TilemapManager.Render(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
             <summary>

@@ -34,6 +34,8 @@ namespace Editor.AssetManagement
         private GameObjectDefinition? _prefab;
         public static string filter = string.Empty;
         private static string newStringItem = string.Empty;
+        private static string meshSearch = string.Empty;
+        private static string materialSearch = string.Empty;
 
         /// <summary>
         /// Loads a prefab from a JSON file.
@@ -72,6 +74,7 @@ namespace Editor.AssetManagement
                 ReferenceHandler = ReferenceHandler.Preserve
             };
             options.Converters.Add(new Vector2JsonConverter());
+            options.Converters.Add(new Vector3JsonConverter());
             options.Converters.Add(new ColorJsonConverter());
 
             string json = JsonSerializer.Serialize<GameObjectDefinition>(_prefab, options);
@@ -255,14 +258,77 @@ namespace Editor.AssetManagement
             }
             else if (value is string s)
             {
-                byte[] buffer = new byte[256];
-                Encoding.UTF8.GetBytes(s, 0, s.Length, buffer, 0);
-                if (ImGui.InputText($"##{name}", buffer, (uint)buffer.Length))
-                    setValue(Encoding.UTF8.GetString(buffer).TrimEnd('\0'));
+                // Special dropdowns for MeshRenderer.Mesh and MeshRenderer.Material
+                string propName = memberInfo.Name;
+                bool isMeshField = memberInfo.DeclaringType == typeof(MeshRenderer) && propName == "Mesh";
+                bool isMatField = memberInfo.DeclaringType == typeof(MeshRenderer) && propName == "Material";
+
+                if (isMeshField || isMatField)
+                {
+                    string current = string.IsNullOrEmpty(s) ? "(None)" : s;
+                    if (ImGui.BeginCombo($"##{propName}", current))
+                    {
+                        // Search box
+                        if (isMeshField)
+                            ImGui.InputText("Search", ref meshSearch, 128);
+                        else
+                            ImGui.InputText("Search", ref materialSearch, 128);
+
+                        // (None)
+                        if (ImGui.Selectable("(None)", string.IsNullOrEmpty(s)))
+                        {
+                            setValue(string.Empty);
+                            ImGui.EndCombo();
+                            ImGui.PopItemWidth();
+                            ImGui.NextColumn();
+                            ImGui.Columns(1);
+                            return;
+                        }
+
+                        try
+                        {
+                            string root = ProjectSettings.AssetsDirectory;
+                            string pattern = isMeshField ? "*.mesh" : "*.mat";
+                            string[] files = Directory.GetFiles(root, pattern, SearchOption.AllDirectories);
+                            string search = isMeshField ? meshSearch : materialSearch;
+
+                            foreach (var filePath in files)
+                            {
+                                string nameNoExt = Path.GetFileNameWithoutExtension(filePath);
+                                if (!string.IsNullOrEmpty(search) && !nameNoExt.Contains(search, StringComparison.OrdinalIgnoreCase))
+                                    continue;
+
+                                bool selected = s == nameNoExt;
+                                if (ImGui.Selectable(nameNoExt, selected))
+                                {
+                                    setValue(nameNoExt);
+                                    ImGui.EndCombo();
+                                    ImGui.PopItemWidth();
+                                    ImGui.NextColumn();
+                                    ImGui.Columns(1);
+                                    return;
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            ImGui.Text($"Error: {ex.Message}");
+                        }
+
+                        ImGui.EndCombo();
+                    }
+                }
+                else
+                {
+                    byte[] buffer = new byte[256];
+                    Encoding.UTF8.GetBytes(s ?? string.Empty, 0, (s ?? string.Empty).Length, buffer, 0);
+                    if (ImGui.InputText($"##{name}", buffer, (uint)buffer.Length))
+                        setValue(Encoding.UTF8.GetString(buffer).TrimEnd('\0'));
+                }
             }
-            else if (value is Microsoft.Xna.Framework.Vector2 v)
+            else if (value is Microsoft.Xna.Framework.Vector2 v2)
             {
-                System.Numerics.Vector2 input = v.ToNumerics();
+                System.Numerics.Vector2 input = v2.ToNumerics();
 
                 if (sliderAttr != null)
                 {
@@ -274,6 +340,25 @@ namespace Editor.AssetManagement
                 else
                 {
                     if (ImGui.InputFloat2($"##{name}", ref input))
+                    {
+                        setValue(input.ToXna());
+                    }
+                }
+            }
+            else if (value is Microsoft.Xna.Framework.Vector3 v3)
+            {
+                System.Numerics.Vector3 input = v3.ToNumerics();
+
+                if (sliderAttr != null)
+                {
+                    if (ImGui.SliderFloat3($"##{name}", ref input, 0f, 20f))
+                    {
+                        setValue(input.ToXna());
+                    }
+                }
+                else
+                {
+                    if (ImGui.InputFloat3($"##{name}", ref input))
                     {
                         setValue(input.ToXna());
                     }

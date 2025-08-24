@@ -20,6 +20,7 @@ using Engine.Core.Rooms;
 using Engine.Core.Scripting;
 using Engine.Core.Audio;
 using Engine.Core.Systems;
+using Engine.Core.Game.Components;
 
 namespace GameRuntime
 {
@@ -40,6 +41,7 @@ namespace GameRuntime
         private int _lastWidth, _lastHeight;
         private Game game;
         public static RuntimeManager Instance { get; private set; }
+        public int _cameraLogFrames = 0;
 
         /// <summary>
         /// Initialize the runtime manager
@@ -53,7 +55,14 @@ namespace GameRuntime
             _lighting = new Lighting(_graphicsDevice, EngineContext.InternalWidth, EngineContext.InternalHeight);
             _lastWidth = EngineContext.InternalWidth;
             _lastHeight = EngineContext.InternalHeight;
-            _sceneRenderTarget = new RenderTarget2D(_graphicsDevice, EngineContext.InternalWidth, EngineContext.InternalHeight);
+            _sceneRenderTarget = new RenderTarget2D(
+                _graphicsDevice,
+                EngineContext.InternalWidth,
+                EngineContext.InternalHeight,
+                false,
+                SurfaceFormat.Color,
+                DepthFormat.Depth24
+            );
         }
 
         /// <summary>
@@ -79,6 +88,8 @@ namespace GameRuntime
             CollisionSystem.Initialize();
             GraphicsLibrary.graphicsDevice = _graphicsDevice;
             GraphicsLibrary.Initialize();
+            EngineContext.Current.GraphicsDevice = _graphicsDevice;
+            Grid3D.Instance.Initialize(_graphicsDevice);
         }
 
         /// <summary>
@@ -91,6 +102,7 @@ namespace GameRuntime
             TextureLibrary textureLibrary = new TextureLibrary();
             textureLibrary.graphicsDevice = _graphicsDevice;
             textureLibrary.LoadTextures();
+            MeshLibrary.LoadAll();
             audioManager.Initialize();
         }
 
@@ -102,6 +114,7 @@ namespace GameRuntime
         {
             Input.Update();
             Camera.Main.Update(gameTime);
+            Camera3D.Main.Update(); // Update 3D camera for target following
             Camera.Main.SetViewportSize(_graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height);
 
             Camera.Main.ViewportHeight = graphicsManager.GraphicsDevice.Viewport.Height;
@@ -122,7 +135,14 @@ namespace GameRuntime
             {
                 _lighting.Resize(EngineContext.InternalWidth, EngineContext.InternalHeight);
                 _sceneRenderTarget?.Dispose();
-                _sceneRenderTarget = new RenderTarget2D(_graphicsDevice, EngineContext.InternalWidth, EngineContext.InternalHeight);
+                _sceneRenderTarget = new RenderTarget2D(
+                    _graphicsDevice,
+                    EngineContext.InternalWidth,
+                    EngineContext.InternalHeight,
+                    false,
+                    SurfaceFormat.Color,
+                    DepthFormat.Depth24
+                );
                 _lastWidth = EngineContext.InternalWidth;
                 _lastHeight = EngineContext.InternalHeight;
                 Console.WriteLine($"Resized to {_lastWidth},{_lastHeight}");
@@ -143,15 +163,34 @@ namespace GameRuntime
 
             // Draw scene to render target (high internal resolution for smooth subpixel movement)
             _graphicsDevice.SetRenderTarget(_sceneRenderTarget);
-            _graphicsDevice.Clear(Microsoft.Xna.Framework.Color.Black);
+            _graphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Microsoft.Xna.Framework.Color.CornflowerBlue, 1f, 0);
+
+            Matrix view3D = Camera3D.Main.GetViewMatrix();
+            Matrix proj3D = Camera3D.Main.GetProjectionMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight);
 
             // Draw the sprites depth sorted
+            _graphicsDevice.DepthStencilState = DepthStencilState.None;
+            _graphicsDevice.BlendState = BlendState.AlphaBlend;
+            _graphicsDevice.RasterizerState = RasterizerState.CullNone;
             spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.Main.GetViewMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight));
             TilemapManager.Render(spriteBatch);
             scene.Render(spriteBatch);
             spriteBatch.End();
 
-            // Update the lightmap
+            // 3D pass (render on top of 2D content in the scene target)
+            _graphicsDevice.DepthStencilState = DepthStencilState.Default;
+            _graphicsDevice.RasterizerState = RasterizerState.CullNone;
+            _graphicsDevice.BlendState = BlendState.Opaque;
+
+            // Render 3D grid (editor only)
+            if (!EngineContext.Running)
+            {
+                Grid3D.Instance.Draw(_graphicsDevice, view3D, proj3D);
+            }
+            
+            scene.Render3D(_graphicsDevice, view3D, proj3D);
+
+            // Update the lightmap (independent light buffer)
             _lighting.Draw(scene,spriteBatch);
 
             // Draw scene to backbuffer (scale from internal resolution to window)

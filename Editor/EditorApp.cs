@@ -122,6 +122,13 @@ namespace EarthEngineEditor
             playingInEditor = (_settings.PlayInEditor && EngineContext.Running);
 
             gameFocused = isInputFree;
+            
+            // Update editor camera for scene navigation (only when not playing in editor)
+            if (!playingInEditor)
+            {
+                Editor.Windows.EditorCamera.Update(gameTime, isInputFree);
+            }
+            
             runtime.Update(gameTime);
 
             if (!playingInEditor)

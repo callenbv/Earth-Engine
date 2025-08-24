@@ -76,6 +76,7 @@ namespace Editor.AssetManagement
                     Converters = { new ComponentListJsonConverter() },
                 };
                 options.Converters.Add(new Vector2JsonConverter());
+                options.Converters.Add(new Vector3JsonConverter());
                 options.Converters.Add(new ColorJsonConverter());
 
                 string json = JsonSerializer.Serialize(scene, options);

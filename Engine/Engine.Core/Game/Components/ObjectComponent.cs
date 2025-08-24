@@ -64,12 +64,16 @@ namespace Engine.Core.Game.Components
         [HideInInspector]
         public Vector2 Position
         {
-            get => Owner?.GetComponent<Transform>()?.Position ?? Vector2.Zero;
+            get
+            {
+                var pos = Owner?.GetComponent<Transform>()?.Position ?? Vector3.Zero;
+                return new Vector2(pos.X, pos.Y);
+            }
             set
             {
                 var transform = Owner?.GetComponent<Transform>();
                 if (transform != null)
-                    transform.Position = value;
+                    transform.Position = new Vector3(value.X, value.Y, transform.Position.Z);
             }
         }
 
@@ -80,7 +84,11 @@ namespace Engine.Core.Game.Components
         [HideInInspector]
         public Vector2 OldPosition
         {
-            get => Owner?.GetComponent<Transform>()?.OldPosition ?? Vector2.Zero;
+            get
+            {
+                var pos = Owner?.GetComponent<Transform>()?.OldPosition ?? Vector3.Zero;
+                return new Vector2(pos.X, pos.Y);
+            }
         }
 
         /// <summary>
@@ -106,12 +114,16 @@ namespace Engine.Core.Game.Components
         [HideInInspector]
         public Vector2 Scale
         {
-            get => Owner?.GetComponent<Transform>()?.Scale ?? Vector2.One;
+            get
+            {
+                var scale = Owner?.GetComponent<Transform>()?.Scale ?? Vector3.One;
+                return new Vector2(scale.X, scale.Y);
+            }
             set
             {
                 var transform = Owner?.GetComponent<Transform>();
                 if (transform != null)
-                    transform.Scale = value;
+                    transform.Scale = new Vector3(value.X, value.Y, transform.Scale.Z);
             }
         }
 

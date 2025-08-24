@@ -6,9 +6,11 @@
 /// <Summary>                
 /// -----------------------------------------------------------------------------
 
+using Engine.Core.Data;
 using Engine.Core.Graphics;
 using Engine.Core.Scripting;
 using System.IO;
+using System.Text.Json;
 
 namespace Editor.AssetManagement
 {
@@ -58,6 +60,12 @@ namespace Editor.AssetManagement
 
                         case ".png":
                             OnTextureChanged(sender, e);
+                            break;
+
+                        case ".obj":
+                            // For file watcher, use the directory where the OBJ file is located
+                            string objDirectory = Path.GetDirectoryName(e.FullPath) ?? Path.Combine(ProjectSettings.AssetsDirectory, "Models");
+                            ObjImporter.ConvertObjToMeshAndMaterial(e.FullPath, objDirectory);
                             break;
                     }
                 });

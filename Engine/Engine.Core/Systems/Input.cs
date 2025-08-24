@@ -34,7 +34,7 @@ namespace Engine.Core
         private static KeyboardState _previousKeyboard;
         private static MouseState _currentMouse;
         private static MouseState _previousMouse;
-        public static Vector2 mouseWorldPosition;
+        public static Vector3 mouseWorldPosition;
         
         public static Microsoft.Xna.Framework.Game gameInstance;
         public static Microsoft.Xna.Framework.GraphicsDeviceManager? graphicsManager;
@@ -81,6 +81,7 @@ namespace Engine.Core
         /// Get the current mouse position in screen coordinates.
         /// </summary>
         public static Point MousePosition => _currentMouse.Position;
+        public static Point PreviousMousePosition => _previousMouse.Position;
 
         /// <summary>
         /// Initializes the Input system, setting up keyboard and mouse states, and GPIO pins if available.
@@ -325,7 +326,7 @@ namespace Engine.Core
         /// Returns the mouse position in world coordinates
         /// </summary>
         /// <returns></returns>
-        private static Vector2 GetMouseWorldPosition()
+        private static Vector3 GetMouseWorldPosition()
         {
             MouseState mouseState = Mouse.GetState();
             Point mouseScreenPos = new Point(mouseState.X, mouseState.Y);
@@ -339,7 +340,8 @@ namespace Engine.Core
         /// <returns></returns>
         public static bool MouseHover(Rectangle rectangle)
         {
-            return rectangle.Contains(mouseWorldPosition);
+            // Use only X,Y components for 2D rectangle collision
+            return rectangle.Contains(new Point((int)mouseWorldPosition.X, (int)mouseWorldPosition.Y));
         }
 
         /// <summary>

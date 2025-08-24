@@ -152,7 +152,7 @@ namespace Engine.Core
         /// </summary>
         /// <param name="screenPos"></param>
         /// <returns></returns>
-        public Vector2 ScreenToWorld(Point screenPos)
+        public Vector3 ScreenToWorld(Point screenPos)
         {
             int screenW = ViewportWidth;
             int screenH = ViewportHeight;
@@ -175,7 +175,7 @@ namespace Engine.Core
             Matrix inverse = Matrix.Invert(view);
             Vector3 worldVec = Vector3.Transform(internalVec, inverse);
 
-            return new Vector2(worldVec.X, worldVec.Y);
+            return worldVec; // Return full Vector3 instead of just X,Y
         }
 
         /// <summary>
@@ -206,13 +206,13 @@ namespace Engine.Core
             int thickness = 2; // Thickness of the outline
 
             // Top
-            spriteBatch.Draw(pixel, new Rectangle(border.X, border.Y, border.Width, thickness), color);
-            // Bottom,
-            spriteBatch.Draw(pixel, new Rectangle(border.X, border.Y + border.Height - thickness, border.Width, thickness), color);
-            // Left
-            spriteBatch.Draw(pixel, new Rectangle(border.X, border.Y, thickness, border.Height), color);
-            // Right
-            spriteBatch.Draw(pixel, new Rectangle(border.X + border.Width - thickness, border.Y, thickness, border.Height), color);
+            //spriteBatch.Draw(pixel, new Rectangle(border.X, border.Y, border.Width, thickness), color);
+            //// Bottom,
+            //spriteBatch.Draw(pixel, new Rectangle(border.X, border.Y + border.Height - thickness, border.Width, thickness), color);
+            //// Left
+            //spriteBatch.Draw(pixel, new Rectangle(border.X, border.Y, thickness, border.Height), color);
+            //// Right
+            //spriteBatch.Draw(pixel, new Rectangle(border.X + border.Width - thickness, border.Y, thickness, border.Height), color);
 
             spriteBatch.End();
         }
