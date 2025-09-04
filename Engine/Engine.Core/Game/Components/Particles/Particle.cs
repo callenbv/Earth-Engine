@@ -44,7 +44,7 @@ namespace Engine.Core.Game.Components
             Position += Velocity * dt;
 
             // Update rotation based on angular velocity
-            Rotation += AngularVelocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            Rotation += AngularVelocity * dt;
 
             // Scale down over lifetime
             FinalScale = Scale * (1f - PercentDone);

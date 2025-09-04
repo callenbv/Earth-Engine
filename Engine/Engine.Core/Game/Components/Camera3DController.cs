@@ -60,9 +60,10 @@ namespace Engine.Core.Game.Components
                 float deltaX = currentMousePos.X - lastMousePosition.X;
                 float deltaY = currentMousePos.Y - lastMousePosition.Y;
                 
-                // Apply mouse movement
-                yaw -= deltaX * MouseSensitivity * 0.01f;
-                pitch -= deltaY * MouseSensitivity * 0.01f;
+                // Apply mouse movement with delta time for consistent sensitivity
+                float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+                yaw -= deltaX * MouseSensitivity * 0.01f * dt;
+                pitch -= deltaY * MouseSensitivity * 0.01f * dt;
                 pitch = MathHelper.Clamp(pitch, -MathHelper.PiOver2 + 0.01f, MathHelper.PiOver2 - 0.01f);
 
                 // Reset mouse to center periodically, not every frame

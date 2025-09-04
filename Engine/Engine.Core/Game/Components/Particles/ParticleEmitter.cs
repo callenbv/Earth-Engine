@@ -240,7 +240,7 @@ namespace Engine.Core.Game.Components
                 float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
                 ElapsedTime += dt;
 
-                if (ElapsedTime > (60f / SpawnRate) * dt)
+                if (ElapsedTime >= (1f / SpawnRate))
                 {
                     for (int i = 0; i < 1; i++)
                     {
