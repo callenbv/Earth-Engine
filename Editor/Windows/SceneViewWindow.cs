@@ -42,7 +42,7 @@ namespace EarthEngineEditor.Windows
         private GameObject? _selectedObject;
         private GameObject? previousSelection;
         private IInspectable? _nodeBeingRenamed;
-        public static int gridSize = 1;
+        public static int gridSize = 16;
         private string _renameBuffer = "";
         private bool _isRenaming = false;
         private bool _showSceneView = true;

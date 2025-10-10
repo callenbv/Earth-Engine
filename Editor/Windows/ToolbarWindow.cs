@@ -39,7 +39,7 @@ namespace EarthEngineEditor.Windows
             {
                 if (Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.G))
                 {
-                    Grid3D.Instance.Visible = !Grid3D.Instance.Visible;
+                    ToggleGrid();
                 }
                 
                 // Toggle wireframe
@@ -75,7 +75,7 @@ namespace EarthEngineEditor.Windows
         /// </summary>
         private void ToggleGrid()
         {
-            Grid3D.Instance.Visible = showGrid;
+            showGrid = !showGrid;
         }
 
         /// <summary>
@@ -107,7 +107,6 @@ namespace EarthEngineEditor.Windows
 
             // Grid Toggle
             string gridIcon = "\uf00a";
-            showGrid = Grid3D.Instance.Visible; // Sync with 3D grid state
             Microsoft.Xna.Framework.Color gridColor = showGrid ? Microsoft.Xna.Framework.Color.White : Microsoft.Xna.Framework.Color.Gray;
 
             if (ImGuiRenderer.IconButton("grid", gridIcon, gridColor))
@@ -133,7 +132,7 @@ namespace EarthEngineEditor.Windows
             // Camera Details
             Vector2 cameraPosition = new Vector2(Input.mouseWorldPosition.X, Input.mouseWorldPosition.Y);
             cameraPosition.Round();
-            ImGui.Text($"{Camera3D.Main.Position} FOV DEG: {Camera3D.Main.FieldOfViewDegrees} Far: {Camera3D.Main.FarPlane} Near: {Camera3D.Main.NearPlane}" );
+            ImGui.Text($"{Camera.Main.Position} FOV DEG: {Camera3D.Main.FieldOfViewDegrees} Far: {Camera3D.Main.FarPlane} Near: {Camera3D.Main.NearPlane}" );
 
             ImGui.End();
         }

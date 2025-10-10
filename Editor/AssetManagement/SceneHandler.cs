@@ -6,6 +6,7 @@
 /// <Summary>                
 /// -----------------------------------------------------------------------------
 
+using EarthEngineEditor;
 using EarthEngineEditor.Windows;
 using Engine.Core.Data;
 using Engine.Core.Game;
@@ -107,6 +108,7 @@ namespace Editor.AssetManagement
         /// <param name="path"></param>
         public void Open(string path)
         {
+            // Load the scene
             scene = Room.Load(path);
             SceneViewWindow.Instance.scene = scene;
             SceneViewWindow.Instance.scene.FilePath = path;

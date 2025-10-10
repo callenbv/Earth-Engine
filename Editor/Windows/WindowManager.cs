@@ -670,7 +670,6 @@ namespace EarthEngineEditor.Windows
                         project.settings.Title = projectName;
                         project.Name = projectName;
                         project.ProjectType = projectType;
-
                         OpenProject(projectFile);
 
                         // Create a default scene file

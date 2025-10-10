@@ -82,6 +82,7 @@ namespace Editor.AssetManagement
             {
                 string json = File.ReadAllText(optionsPath);
                 settings = JsonSerializer.Deserialize<GameOptions>(json);
+                Name = settings.Title;
 
                 Asset scene = Asset.Get(Path.GetFileName(settings.StartScene));
                 InspectorWindow.Instance.Inspect(scene);

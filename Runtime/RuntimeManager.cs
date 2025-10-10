@@ -164,9 +164,6 @@ namespace GameRuntime
             _graphicsDevice.SetRenderTarget(_sceneRenderTarget);
             _graphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Microsoft.Xna.Framework.Color.CornflowerBlue, 1f, 0);
 
-            Matrix view3D = GameCamera.GetViewMatrix();
-            Matrix proj3D = GameCamera.GetProjectionMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight);
-
             // Draw the sprites depth sorted
             _graphicsDevice.DepthStencilState = DepthStencilState.None;
             _graphicsDevice.BlendState = BlendState.AlphaBlend;
@@ -175,19 +172,6 @@ namespace GameRuntime
             TilemapManager.Render(spriteBatch);
             scene.Render(spriteBatch);
             spriteBatch.End();
-
-            // 3D pass (render on top of 2D content in the scene target)
-            _graphicsDevice.DepthStencilState = DepthStencilState.Default;
-            _graphicsDevice.RasterizerState = RasterizerState.CullNone;
-            _graphicsDevice.BlendState = BlendState.Opaque;
-
-            // Render 3D grid (editor only)
-            if (!EngineContext.Running)
-            {
-                Grid3D.Instance.Draw(_graphicsDevice, view3D, proj3D);
-            }
-            
-            scene.Render(spriteBatch);
 
             // Update the lightmap (independent light buffer)
             _lighting.Draw(scene,spriteBatch);

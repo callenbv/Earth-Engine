@@ -224,8 +224,6 @@ namespace Engine.Core.Game.Components
         /// <param name="spriteBatch"></param>
         public override void Draw(SpriteBatch spriteBatch)
         {
-            return;
-
             frame = Math.Clamp(frame, 0, frameCount - 1);
             depth = GetDepth();
             origin = new Vector2(frameWidth / 2, frameHeight / 2);
