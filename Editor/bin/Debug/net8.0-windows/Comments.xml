@@ -1977,10 +1977,19 @@
             </summary>
             <param name="spriteBatch"></param>
         </member>
-        <member name="M:Engine.Core.Systems.Camera3D.Update">
+        <member name="M:Engine.Core.Systems.Camera3D.GetViewMatrix">
             <summary>
-            Update camera - if TargetObject is set, camera will look at it
+            3D view matrix
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Systems.Camera3D.GetProjectionMatrix(System.Int32,System.Int32)">
+            <summary>
+            Projection matrix in 3D
+            </summary>
+            <param name="viewportWidth"></param>
+            <param name="viewportHeight"></param>
+            <returns></returns>
         </member>
         <member name="M:Engine.Core.Systems.CollisionSystem.Initialize">
             <summary>
@@ -2085,6 +2094,16 @@
             </summary>
             <param name="action"></param>
             <returns></returns>
+        </member>
+        <member name="T:Engine.Core.CameraMode">
+            <summary>
+            Define if camera is in 3D or 2D
+            </summary>
+        </member>
+        <member name="T:Engine.Core.GameCamera">
+            <summary>
+            Represents the camera in the game, handling position, zoom, rotation, and target tracking.
+            </summary>
         </member>
         <member name="T:Engine.Core.MockGpioController">
             <summary>

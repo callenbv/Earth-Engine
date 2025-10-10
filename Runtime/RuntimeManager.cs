@@ -114,7 +114,6 @@ namespace GameRuntime
         {
             Input.Update();
             Camera.Main.Update(gameTime);
-            Camera3D.Main.Update(); // Update 3D camera for target following
             Camera.Main.SetViewportSize(_graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height);
 
             Camera.Main.ViewportHeight = graphicsManager.GraphicsDevice.Viewport.Height;
@@ -165,8 +164,8 @@ namespace GameRuntime
             _graphicsDevice.SetRenderTarget(_sceneRenderTarget);
             _graphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Microsoft.Xna.Framework.Color.CornflowerBlue, 1f, 0);
 
-            Matrix view3D = Camera3D.Main.GetViewMatrix();
-            Matrix proj3D = Camera3D.Main.GetProjectionMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight);
+            Matrix view3D = GameCamera.GetViewMatrix();
+            Matrix proj3D = GameCamera.GetProjectionMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight);
 
             // Draw the sprites depth sorted
             _graphicsDevice.DepthStencilState = DepthStencilState.None;
@@ -188,7 +187,7 @@ namespace GameRuntime
                 Grid3D.Instance.Draw(_graphicsDevice, view3D, proj3D);
             }
             
-            scene.Render3D(_graphicsDevice, view3D, proj3D);
+            scene.Render(spriteBatch);
 
             // Update the lightmap (independent light buffer)
             _lighting.Draw(scene,spriteBatch);

@@ -45,6 +45,7 @@ namespace EarthEngineEditor
         private ConsoleWindow _consoleWindow;
         public WindowManager _windowManager;
         public EditorSettings _settings;
+        public EarthProject currentProject;
         private SpriteBatch spriteBatch;
         public RuntimeManager runtime;
         public EditorOverlay editorOverlay;
@@ -120,7 +121,6 @@ namespace EarthEngineEditor
                 !ImGui.GetIO().WantCaptureMouse;
 
             playingInEditor = (_settings.PlayInEditor && EngineContext.Running);
-
             gameFocused = isInputFree;
             
             // Update editor camera for scene navigation (only when not playing in editor)

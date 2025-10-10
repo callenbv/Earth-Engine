@@ -1,6 +1,8 @@
 {
   "WindowWidth": 1400,
   "WindowHeight": 800,
-  "PlayInEditor": true,
-  "RestartOnPlay": false
+  "PlayInEditor": false,
+  "RestartOnPlay": false,
+  "ProjectType": 0,
+  "ProjectName": ""
 }

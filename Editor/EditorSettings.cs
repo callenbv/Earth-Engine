@@ -53,6 +53,16 @@ namespace EarthEngineEditor
         public bool RestartOnPlay { get; set; } = true;
 
         /// <summary>
+        /// Type of project
+        /// </summary>
+        public ProjectType ProjectType { get; set; }
+
+        /// <summary>
+        /// Name of the project
+        /// </summary>
+        public string ProjectName { get; set; } = String.Empty;
+
+        /// <summary>
         /// Loads the editor settings from a JSON file.
         /// </summary>
         /// <returns></returns>

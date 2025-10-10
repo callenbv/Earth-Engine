@@ -14,6 +14,15 @@ using Microsoft.Xna.Framework.Input;
 namespace Editor.Windows
 {
     /// <summary>
+    /// Define if camera is in 3D or 2D
+    /// </summary>
+    public enum CameraMode
+    {
+        Camera2D,
+        Camera3D
+    }
+
+    /// <summary>
     /// Simple editor camera controller for scene navigation
     /// </summary>
     public static class EditorCamera
@@ -26,14 +35,42 @@ namespace Editor.Windows
         
         public static float MoveSpeed = 500f;
         public static float MouseSensitivity = 0.3f;
+        public static CameraMode Mode = CameraMode.Camera2D;
         
         /// <summary>
         /// Update editor camera (call this from EditorApp.Update)
         /// </summary>
         public static void Update(GameTime gameTime, bool canMove)
         {
+            switch (Mode)
+            {
+                case CameraMode.Camera2D:
+                    UpdateIn2D(gameTime);
+                    break;
+                case CameraMode.Camera3D:
+                    UpdateIn3D(gameTime, canMove);
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// For 2D editor camera
+        /// </summary>
+        /// <param name="gameTime"></param>
+        public static void UpdateIn2D(GameTime gameTime)
+        {
+
+        }
+
+        /// <summary>
+        /// For 3D editor camera
+        /// </summary>
+        /// <param name="gameTime"></param>
+        /// <param name="canMove"></param>
+        public static void UpdateIn3D(GameTime gameTime, bool canMove)
+        {
             var cam = Camera3D.Main;
-            
+
             if (!_initialized)
             {
                 _initialized = true;
@@ -60,7 +97,7 @@ namespace Editor.Windows
             {
                 // Right mouse held - process mouse movement for camera look
                 var delta = cur - _pivotStartPosition;
-                
+
                 // Process mouse delta for smooth camera rotation
                 if (Math.Abs(delta.X) > 0 || Math.Abs(delta.Y) > 0)
                 {
@@ -68,7 +105,7 @@ namespace Editor.Windows
                     _pitch -= delta.Y * MouseSensitivity * 0.01f;
                     _pitch = Math.Clamp(_pitch, -MathF.PI / 2f + 0.01f, MathF.PI / 2f - 0.01f);
                 }
-                
+
                 // Reset mouse to pivot start position for continuous movement
                 Mouse.SetPosition(_pivotStartPosition.X, _pivotStartPosition.Y);
             }
@@ -97,7 +134,7 @@ namespace Editor.Windows
 
                 cam.Position += move * speed;
             }
-            
+
             // Editor camera always looks in the direction it's facing
             cam.Target = cam.Position + dir;
             cam.Up = up;

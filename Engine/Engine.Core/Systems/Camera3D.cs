@@ -22,24 +22,26 @@ namespace Engine.Core.Systems
         public float FieldOfViewDegrees { get; set; } = 60f;
         public float NearPlane { get; set; } = 0.01f;
         public float FarPlane { get; set; } = 1000f;
-
+        
+        /// <summary>
+        /// 3D view matrix
+        /// </summary>
+        /// <returns></returns>
         public Matrix GetViewMatrix()
         {
             return Matrix.CreateLookAt(Position, Target, Up);
         }
 
+        /// <summary>
+        /// Projection matrix in 3D
+        /// </summary>
+        /// <param name="viewportWidth"></param>
+        /// <param name="viewportHeight"></param>
+        /// <returns></returns>
         public Matrix GetProjectionMatrix(int viewportWidth, int viewportHeight)
         {
             float aspect = (viewportWidth <= 0 || viewportHeight <= 0) ? 16f / 9f : (float)viewportWidth / viewportHeight;
             return Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(FieldOfViewDegrees), aspect, NearPlane, FarPlane);
-        }
-        
-        /// <summary>
-        /// Update camera - if TargetObject is set, camera will look at it
-        /// </summary>
-        public void Update()
-        {
-
         }
     }
 }

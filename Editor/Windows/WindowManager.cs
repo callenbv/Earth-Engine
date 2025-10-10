@@ -10,6 +10,7 @@ using Editor.AssetManagement;
 using Editor.Windows.TileEditor;
 using Engine.Core;
 using Engine.Core.Data;
+using Engine.Core.Rooms;
 using Engine.Core.Scripting;
 using GameRuntime;
 using ImGuiNET;
@@ -39,8 +40,10 @@ namespace EarthEngineEditor.Windows
         private bool _openSettingsPopup = false;
         private bool openBuildPopup = false;
         private bool openEditorSettings = false;
+        private bool showNewProject = false;
         private static string exportPath = "";
         private static int selectedTargetIndex = 0;
+        private string projectName = String.Empty;
         private static readonly string[] targets = new[] { "linux-arm64", "linux-x64", "win-x64"};
 
         /// <summary>
@@ -166,8 +169,9 @@ namespace EarthEngineEditor.Windows
                 {
                     if (ImGui.MenuItem("New Project"))
                     {
-                        CreateNewProject();
+                        showNewProject = true;
                     }
+
                     if (ImGui.MenuItem("Open Project"))
                     {
                         SelectProject();
@@ -285,7 +289,6 @@ namespace EarthEngineEditor.Windows
                     ImGui.EndMenu();
                 }
                 
-
                 if (_openSettingsPopup)
                     ImGui.OpenPopup("Game Settings");
 
@@ -558,6 +561,39 @@ namespace EarthEngineEditor.Windows
                     ImGui.EndPopup();
                 }
 
+                // Create a new project
+                if (showNewProject)
+                    ImGui.OpenPopup("Create New Project");
+
+                if (ImGui.BeginPopupModal("Create New Project", ImGuiWindowFlags.AlwaysAutoResize))
+                {
+                    ImGui.Text("Project Name");
+                    ImGui.InputText("##ProjectTitle", ref projectName, 20);
+
+                    if (ImGui.MenuItem("2D Game"))
+                    {
+                        if (CreateNewProject(projectName, ProjectType.Project2D))
+                        {
+                            showNewProject = false;
+                        }
+                    }
+                    if (ImGui.MenuItem("3D Game"))
+                    {
+                        if (CreateNewProject(projectName, ProjectType.Project3D))
+                        {
+                            showNewProject = false;
+                        }
+                    }
+                    ImGui.NewLine();
+
+                    if (ImGui.Button("Cancel"))
+                    {
+                        ImGui.CloseCurrentPopup();
+                        showNewProject = false;
+                    }
+                    ImGui.EndPopup();
+                }
+
                 ImGui.EndMainMenuBar();
             }
         }
@@ -565,7 +601,7 @@ namespace EarthEngineEditor.Windows
         /// <summary>
         /// Called when we create a new project
         /// </summary>
-        public void CreateNewProject()
+        public bool CreateNewProject(string name, ProjectType projectType = ProjectType.Project2D)
         {
             using (var folderBrowserDialog = new FolderBrowserDialog())
             {
@@ -575,7 +611,7 @@ namespace EarthEngineEditor.Windows
                 if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
                 {
                     var projectPath = folderBrowserDialog.SelectedPath;
-                    var projectName = "NewProject";
+                    var projectName = name;
                     var projectFolder = Path.Combine(projectPath, projectName);
                     var buildFolder = Path.Combine(projectFolder, "Build");
                     var tilemapFolder = Path.Combine(projectFolder, "Tilemaps");
@@ -627,23 +663,46 @@ namespace EarthEngineEditor.Windows
                         File.WriteAllText(csprojFile, csprojContent);
                         File.WriteAllText(projectFile, projectContent);
 
+                        Console.WriteLine($"Created new project: {projectFile}");
+
+                        // Open the newly created project
+                        CloseProject();
+                        project.settings.Title = projectName;
+                        project.Name = projectName;
+                        project.ProjectType = projectType;
+
+                        OpenProject(projectFile);
+
                         // Create a default scene file
                         var roomData = $@"";
                         string defaultScene = Path.Combine(assetsFolder, "Scene.room");
                         File.WriteAllText(defaultScene, roomData);
+                        ProjectWindow.Instance.RefreshItems();
+                        ProjectWindow.Instance.Get("Scene.room").Open();
 
-                        Console.WriteLine($"Created new project: {projectFile}");
+                        // Create a default camera object in the scene
+                        project.PopulateScene();
 
-                        // Open the newly created project
-                        OpenProject(projectFile);
-                        project.settings.Title = projectName;
+                        // Save project
+                        project.Save();
                     }
                     catch (Exception ex)
                     {
                         Console.WriteLine($"Error creating project: {ex.Message}");
+                        return false;
                     }
                 }
+
+                return true;
             }
+        }
+
+        /// <summary>
+        /// Close and shutdown the project
+        /// </summary>
+        public void CloseProject()
+        {
+
         }
 
         /// <summary>
@@ -731,6 +790,8 @@ namespace EarthEngineEditor.Windows
 
             // Write updated list back to file
             File.WriteAllLines(ProjectSettings.RecentProjects, data);
+            EditorApp.Instance.currentProject = project;
+            EditorApp.Instance.Window.Title = project.settings.Title;
 
             Console.WriteLine($"Opened project {projectDirectory}");
             Console.WriteLine($"Project Directory: {ProjectSettings.ProjectDirectory}");
