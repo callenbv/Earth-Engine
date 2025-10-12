@@ -107,7 +107,7 @@ namespace Engine.Core.Game.Components
             if (Centered)
             {
                 // Center the text around the object's position
-                position -= textSize * new Vector2(Scale.X, Scale.Y) * 0.5f;
+                position -= textSize * (new Vector2(Scale.X, Scale.Y) * TextScale) * 0.5f;
             }
 
             spriteBatch.DrawString(
@@ -195,6 +195,8 @@ namespace Engine.Core.Game.Components
             {
                 textSize = Vector2.Zero;
             }
+
+            Depth = Owner.Depth;
         }
 
         /// <summary>
@@ -204,7 +206,7 @@ namespace Engine.Core.Game.Components
         {
             if (currentFont != null && !string.IsNullOrEmpty(Text))
             {
-                Origin = textSize * 0.5f;
+                Origin = ( textSize * TextScale ) * 0.5f;
             }
         }
 

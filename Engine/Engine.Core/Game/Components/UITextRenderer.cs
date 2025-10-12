@@ -13,7 +13,7 @@ using MonoGame.Extended.BitmapFonts;
 
 namespace Engine.Core.Game.Components
 {
-    [ComponentCategory("Graphics")]
+    [ComponentCategory("UI")]
     public class UITextRenderer : TextRenderer
     {
         public override string Name => "UI Text Renderer";

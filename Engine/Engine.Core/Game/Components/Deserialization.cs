@@ -38,23 +38,18 @@ namespace Editor.AssetManagement
         /// </summary>
         /// <param name="objects"></param>
         public static void Resolve(List<GameObject> objects)
-        {
-            Console.WriteLine($"[ReferenceResolver] Resolving {_pending.Count} references with {objects.Count} objects");
-            
+        {          
             foreach (var (target, field, id) in _pending)
-            {
-                Console.WriteLine($"[ReferenceResolver] Looking for ID: {id} for {target.GetType().Name}.{field.Name}");
-                
+            {          
                 var match = objects.FirstOrDefault(o => o.ID == id);
                 if (match != null)
                 {
                     field.SetValue(target, match);
-                    Console.WriteLine($"[ReferenceResolver] Successfully resolved {target.GetType().Name}.{field.Name} to {match.Name}");
                 }
                 else
                 {
-                    Console.WriteLine($"[ReferenceResolver] GameObject ID {id} not found for {target.GetType().Name}.{field.Name}");
-                    Console.WriteLine($"[ReferenceResolver] Available IDs: {string.Join(", ", objects.Select(o => o.ID))}");
+                    Console.Error.WriteLine($"[ReferenceResolver] GameObject ID {id} not found for {target.GetType().Name}.{field.Name}");
+                    Console.Error.WriteLine($"[ReferenceResolver] Available IDs: {string.Join(", ", objects.Select(o => o.ID))}");
                 }
             }
 
@@ -81,7 +76,6 @@ namespace Editor.AssetManagement
             try
             {
                 using var doc = JsonDocument.ParseValue(ref reader);
-                Console.WriteLine($"[ComponentListJsonConverter] Parsing {doc.RootElement.GetArrayLength()} components");
                 
                 foreach (var element in doc.RootElement.EnumerateArray())
                 {
@@ -89,22 +83,20 @@ namespace Editor.AssetManagement
                     {
                         if (!element.TryGetProperty("type", out var typeProp))
                         {
-                            Console.WriteLine("[ComponentListJsonConverter] Component missing 'type' field");
+                            Console.Error.WriteLine("[ComponentListJsonConverter] Component missing 'type' field");
                             continue;
                         }
 
                         var typeName = typeProp.GetString();
-                        Console.WriteLine($"[ComponentListJsonConverter] Processing component type: {typeName}");
                         
                         if (!ComponentRegistry.Components.TryGetValue(typeName, out var info))
                         {
-                            Console.WriteLine($"[ComponentListJsonConverter] Unknown component type: {typeName}");
+                            Console.Error.WriteLine($"[ComponentListJsonConverter] Unknown component type: {typeName}");
                             continue;
                         }
 
                         var concreteType = info.Type;
                         var component = Activator.CreateInstance(concreteType);
-                        Console.WriteLine($"[ComponentListJsonConverter] Created instance of {concreteType.Name}");
 
                 // Deserialize public fields
                 foreach (var field in concreteType.GetFields(BindingFlags.Public | BindingFlags.Instance))
@@ -128,7 +120,7 @@ namespace Editor.AssetManagement
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine($"[Deserializer] Failed to load field {field.Name} on {concreteType.Name}: {ex.Message}");
+                            Console.Error.WriteLine($"[Deserializer] Failed to load field {field.Name} on {concreteType.Name}: {ex.Message}");
                         }
                     }
                 }
@@ -153,7 +145,7 @@ namespace Editor.AssetManagement
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine($"[Deserializer] Failed to load property {prop.Name} on {concreteType.Name}: {ex.Message}");
+                            Console.Error.WriteLine($"[Deserializer] Failed to load property {prop.Name} on {concreteType.Name}: {ex.Message}");
                         }
                     }
                 }
@@ -161,23 +153,21 @@ namespace Editor.AssetManagement
                         if (component is IComponent comp)
                         {
                             components.Add(comp);
-                            Console.WriteLine($"[ComponentListJsonConverter] Successfully added component {comp.GetType().Name}");
                         }
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"[ComponentListJsonConverter] Error processing component: {ex.Message}");
-                        Console.WriteLine($"[ComponentListJsonConverter] Stack trace: {ex.StackTrace}");
+                        Console.Error.WriteLine($"[ComponentListJsonConverter] Error processing component: {ex.Message}");
+                        Console.Error.WriteLine($"[ComponentListJsonConverter] Stack trace: {ex.StackTrace}");
                     }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ComponentListJsonConverter] Fatal error: {ex.Message}");
-                Console.WriteLine($"[ComponentListJsonConverter] Stack trace: {ex.StackTrace}");
+                Console.Error.WriteLine($"[ComponentListJsonConverter] Fatal error: {ex.Message}");
+                Console.Error.WriteLine($"[ComponentListJsonConverter] Stack trace: {ex.StackTrace}");
             }
 
-            Console.WriteLine($"[ComponentListJsonConverter] Returning {components.Count} components");
             return components;
         }
 
@@ -271,7 +261,7 @@ namespace Editor.AssetManagement
                 if (reader.TokenType == JsonTokenType.String)
                 {
                     string value = reader.GetString() ?? "";
-                    Console.WriteLine($"[Vector3JsonConverter] Parsing string: '{value}'");
+                    //Console.WriteLine($"[Vector3JsonConverter] Parsing string: '{value}'");
                     
                     var parts = value.Split(new char[] { ',', ' ', ';' }, StringSplitOptions.RemoveEmptyEntries);
                     
@@ -287,12 +277,12 @@ namespace Editor.AssetManagement
                                 z = parsedZ;
                             }
                             
-                            Console.WriteLine($"[Vector3JsonConverter] Successfully parsed: ({x}, {y}, {z})");
+                            //Console.WriteLine($"[Vector3JsonConverter] Successfully parsed: ({x}, {y}, {z})");
                             return new Microsoft.Xna.Framework.Vector3(x, y, z);
                         }
                     }
                     
-                    Console.WriteLine($"[Vector3JsonConverter] Failed to parse string: '{value}'");
+                    //Console.WriteLine($"[Vector3JsonConverter] Failed to parse string: '{value}'");
                     return Microsoft.Xna.Framework.Vector3.Zero; // Return zero instead of throwing
                 }
                 
@@ -326,27 +316,33 @@ namespace Editor.AssetManagement
                         }
                     }
 
-                    Console.WriteLine($"[Vector3JsonConverter] Successfully parsed object: ({x}, {y}, {z})");
+                    //Console.WriteLine($"[Vector3JsonConverter] Successfully parsed object: ({x}, {y}, {z})");
                     return new Microsoft.Xna.Framework.Vector3(x, y, z);
                 }
 
                 // Handle null or unexpected tokens
                 if (reader.TokenType == JsonTokenType.Null)
                 {
-                    Console.WriteLine("[Vector3JsonConverter] Received null, returning Vector3.Zero");
+                    //Console.WriteLine("[Vector3JsonConverter] Received null, returning Vector3.Zero");
                     return Microsoft.Xna.Framework.Vector3.Zero;
                 }
 
-                Console.WriteLine($"[Vector3JsonConverter] Unexpected token type: {reader.TokenType}, returning Vector3.Zero");
+                Console.Error.WriteLine($"[Vector3JsonConverter] Unexpected token type: {reader.TokenType}, returning Vector3.Zero");
                 return Microsoft.Xna.Framework.Vector3.Zero; // Return zero instead of throwing
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[Vector3JsonConverter] Exception: {ex.Message}");
+                Console.Error.WriteLine($"[Vector3JsonConverter] Exception: {ex.Message}");
                 return Microsoft.Xna.Framework.Vector3.Zero; // Return zero instead of throwing
             }
         }
 
+        /// <summary>
+        /// Write to the console line, a custom value
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="value"></param>
+        /// <param name="options"></param>
         public override void Write(Utf8JsonWriter writer, Microsoft.Xna.Framework.Vector3 value, JsonSerializerOptions options)
         {
             writer.WriteStartObject();

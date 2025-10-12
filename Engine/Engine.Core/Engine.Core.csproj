@@ -18,5 +18,8 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Device.Gpio" Version="4.0.1" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Graphics\UI\" />
+  </ItemGroup>
 
 </Project> 

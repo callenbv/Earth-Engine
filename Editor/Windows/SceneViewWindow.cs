@@ -170,7 +170,6 @@ namespace EarthEngineEditor.Windows
                 {
                     var newObj = new GameObject($"Empty{scene.objects.Count}");
                     newObj.AddComponent<Transform>();
-                    newObj.AddComponent<Sprite2D>();
                     scene.objects.Add(newObj);
                     folder.GameObjects.Add(newObj);
                 }

@@ -179,7 +179,7 @@ namespace GameRuntime
             // Draw scene to backbuffer (scale from internal resolution to window)
             _graphicsDevice.SetRenderTarget(null);
 
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.LinearClamp);
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp);
 
             // Calculate scale to fit the internal render target in the window while maintaining aspect ratio
             float scaleX = (float)viewport.Width / EngineContext.InternalWidth;
@@ -202,7 +202,7 @@ namespace GameRuntime
             spriteBatch.End();
 
             // Draw UI elements directly to screen (no separate render target for now)
-            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.Main.GetUIViewMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight));
+            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.Main.GetUIViewMatrix(Camera.Main.ViewportWidth,Camera.Main.ViewportHeight));
             scene.RenderUI(spriteBatch);
             spriteBatch.End();
         }

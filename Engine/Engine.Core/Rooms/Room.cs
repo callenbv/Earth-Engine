@@ -186,34 +186,30 @@ namespace Engine.Core.Rooms
                     Console.WriteLine($"[Room.Load] Setting up {scene.objects.Count} objects");
                     foreach (var obj in scene.objects)
                     {
-                        Console.WriteLine($"[Room.Load] Setting up object: {obj.Name} with {obj.components.Count} components");
                         foreach (var component in obj.components)
                         {
                             try
                             {
                                 if (component is ObjectComponent comp)
                                 {
-                                    Console.WriteLine($"[Room.Load] Setting Owner for {component.GetType().Name} on {obj.Name}");
                                     comp.Owner = obj;
-                                    Console.WriteLine($"[Room.Load] Initializing {component.GetType().Name} on {obj.Name}");
                                     comp.Initialize();
                                 }
                             }
                             catch (Exception ex)
                             {
-                                Console.WriteLine($"[Room.Load] Error setting up component {component.GetType().Name} on {obj.Name}: {ex.Message}");
-                                Console.WriteLine($"[Room.Load] Stack trace: {ex.StackTrace}");
+                                Console.Error.WriteLine($"[Room.Load] Error setting up component {component.GetType().Name} on {obj.Name}: {ex.Message}");
+                                Console.Error.WriteLine($"[Room.Load] Stack trace: {ex.StackTrace}");
                             }
                         }
                     }
 
-                    Console.WriteLine($"[Room.Load] Resolving references");
                     GameReferenceResolver.Resolve(scene.objects);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Failed to load scene: {ex.Message}");
+                Console.Error.WriteLine($"Failed to load scene: {ex.Message}");
             }
 
             return scene;
@@ -228,7 +224,6 @@ namespace Engine.Core.Rooms
             {
                 foreach (var component in obj.components)
                 {
-                    Console.WriteLine($"Initializing component {component.Name} on object {obj.Name}");
                     component.Create();
                 }
             }

@@ -304,8 +304,18 @@ namespace Engine.Core.Game.Components
         /// <param name="spriteBatch"></param>
         public override void Draw(SpriteBatch spriteBatch)
         {
-            // Disable 2D rendering for particles - they now render in 3D space
-            return;
+            if (!Visible || particles.Count == 0)
+                return;
+
+            foreach (var particle in particles)
+            {
+                particle.Draw(spriteBatch);
+            }
+
+            if (ShowBounds && !EngineContext.Running)
+            {
+                DebugDraw(spriteBatch);
+            }
         }
 
         /// <summary>
@@ -365,8 +375,7 @@ namespace Engine.Core.Game.Components
         /// <param name="spriteBatch"></param>
         public override void DrawUI(SpriteBatch spriteBatch)
         {
-            // Draw the bounding box of the emitter as an outline
-            DebugDraw(spriteBatch);
+
         }
 
         /// <summary>
@@ -478,8 +487,18 @@ namespace Engine.Core.Game.Components
         /// <param name="spriteBatch"></param>
         private void DebugDraw(SpriteBatch spriteBatch)
         {
-            // This method is now deprecated - use Draw3DBounds instead
-            return;
+            if (!ShowBounds || EngineContext.Running)
+                return;
+
+            Vector3 topLeft = Position + Offset;
+            Rectangle boundingBox = new Rectangle((int)topLeft.X, (int)topLeft.Y, (int)EmitterSize.X, (int)EmitterSize.Y);
+            Color yellow = Color.FromNonPremultiplied(255, 255, 0, 100);
+
+            // Draw a rectangle outline of the bounds, NOT a pure rectangle
+            spriteBatch.Draw(GraphicsLibrary.PixelTexture, new Rectangle(boundingBox.X, boundingBox.Y, boundingBox.Width, 1), yellow); // Top
+            spriteBatch.Draw(GraphicsLibrary.PixelTexture, new Rectangle(boundingBox.X, boundingBox.Y + boundingBox.Height - 1, boundingBox.Width, 1), yellow); // Bottom
+            spriteBatch.Draw(GraphicsLibrary.PixelTexture, new Rectangle(boundingBox.X, boundingBox.Y, 1, boundingBox.Height), yellow); // Left
+            spriteBatch.Draw(GraphicsLibrary.PixelTexture, new Rectangle(boundingBox.X + boundingBox.Width - 1, boundingBox.Y, 1, boundingBox.Height), yellow); // Right
         }
     }
 } 

@@ -81,6 +81,9 @@ namespace Engine.Core
             {
                 Position = Vector2.Lerp(Position, new Vector2(Target.Position.X, Target.Position.Y), SmoothSpeed * dt);
             }
+
+            UIWidth = GameOptions.Main.WindowWidth;
+            UIHeight = GameOptions.Main.WindowHeight;
         }
 
         /// <summary>
@@ -117,15 +120,14 @@ namespace Engine.Core
         /// <param name="viewportWidth"></param>
         /// <param name="viewportHeight"></param>
         /// <returns></returns>
-        public Matrix GetUIViewMatrix(int viewportWidth, int viewportHeight, bool forEditor = false)
+        public Matrix GetUIViewMatrix(int viewportWidth, int viewportHeight)
         {
-            forEditor = !EngineContext.Running;
-            if (!forEditor)
+            if (EngineContext.Running)
             {
                 return GetUIScreenFitMatrix(ViewportWidth, ViewportHeight); // In-game UI
             }
 
-            return GetViewMatrix(viewportWidth,viewportHeight);
+            return GetViewMatrix(viewportWidth, viewportHeight); 
         }
 
         /// <summary>
@@ -136,15 +138,16 @@ namespace Engine.Core
         /// <returns></returns>
         public Matrix GetUIScreenFitMatrix(int viewportWidth, int viewportHeight)
         {
+            // Calculate scale factor from base resolution to actual rendering resolution
             float scaleX = (float)viewportWidth / UIWidth;
             float scaleY = (float)viewportHeight / UIHeight;
             float scale = Math.Min(scaleX, scaleY);
 
-            float offsetX = (viewportWidth - UIWidth * scale) * 0.5f;
-            float offsetY = (viewportHeight - UIHeight * scale) * 0.5f;
+            // Create transform at base resolution, then scale to internal resolution
+            Matrix uiTransform = Matrix.CreateRotationZ(Rotation) *
+                                  Matrix.CreateScale(scale, scale, 1f);
 
-            return Matrix.CreateTranslation(offsetX, offsetY, 0f) *
-                   Matrix.CreateScale(scale, scale, 1f);
+            return uiTransform;
         }
 
         /// <summary>
@@ -198,7 +201,7 @@ namespace Engine.Core
             if (EngineContext.Running)
                 return;
 
-            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, GetUIViewMatrix(ViewportWidth, ViewportHeight, true));
+            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, GetViewMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight));
 
             Texture2D pixel = GraphicsLibrary.PixelTexture;
             Rectangle border = new Rectangle(0, 0, UIWidth, UIHeight);
@@ -206,13 +209,13 @@ namespace Engine.Core
             int thickness = 2; // Thickness of the outline
 
             // Top
-            //spriteBatch.Draw(pixel, new Rectangle(border.X, border.Y, border.Width, thickness), color);
-            //// Bottom,
-            //spriteBatch.Draw(pixel, new Rectangle(border.X, border.Y + border.Height - thickness, border.Width, thickness), color);
-            //// Left
-            //spriteBatch.Draw(pixel, new Rectangle(border.X, border.Y, thickness, border.Height), color);
-            //// Right
-            //spriteBatch.Draw(pixel, new Rectangle(border.X + border.Width - thickness, border.Y, thickness, border.Height), color);
+            spriteBatch.Draw(pixel, new Rectangle(border.X, border.Y, border.Width, thickness), color);
+            // Bottom,
+            spriteBatch.Draw(pixel, new Rectangle(border.X, border.Y + border.Height - thickness, border.Width, thickness), color);
+            // Left
+            spriteBatch.Draw(pixel, new Rectangle(border.X, border.Y, thickness, border.Height), color);
+            // Right
+            spriteBatch.Draw(pixel, new Rectangle(border.X + border.Width - thickness, border.Y, thickness, border.Height), color);
 
             spriteBatch.End();
         }

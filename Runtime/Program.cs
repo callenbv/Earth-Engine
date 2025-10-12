@@ -57,7 +57,7 @@ namespace GameRuntime
                 return;
             }
 
-            string fullPath = Path.Combine(projectPath, "Assets", "Rooms", "Test.room"); // Change filename as needed
+            string fullPath = Path.Combine(projectPath);
 
             Console.WriteLine($"[DEBUG] fullPath = {fullPath}");
             Console.WriteLine($"[DEBUG] File.Exists = {File.Exists(fullPath)}");

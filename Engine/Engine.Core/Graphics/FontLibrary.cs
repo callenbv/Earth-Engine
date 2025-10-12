@@ -58,14 +58,48 @@ namespace Engine.Core.Graphics
                 var fontNames = new[] { "Default", "UI" };
                 var pixelFonts = new[] { "PixelFont" };
 
+                // Bitmap fonts
                 foreach (var fontName in pixelFonts)
                 {
                     try
                     {
                         Console.WriteLine($"[FontLibrary] Attempting to load font: {fontName}");
-                        string relativeFontPath = Path.Combine("PixelFont.fnt");
-                        var font = BitmapFont.FromFile(graphicsDevice, relativeFontPath);
-                        bitmapFonts[fontName] = font;
+                        // Load bitmap font using file stream since BitmapFont.FromFile uses TitleContainer.OpenStream
+                        string fullFontPath = Path.Combine(EnginePaths.SHARED_CONTENT_PATH, "PixelFont.fnt");
+                        string texturePath = Path.Combine(EnginePaths.SHARED_CONTENT_PATH, "PixelFont_0.png");
+                        
+                        // Verify both files exist
+                        if (!File.Exists(fullFontPath))
+                        {
+                            Console.Error.WriteLine($"[FontLibrary] Font file not found: {fullFontPath}");
+                            continue;
+                        }
+                        
+                        if (!File.Exists(texturePath))
+                        {
+                            Console.Error.WriteLine($"[FontLibrary] Font texture not found: {texturePath}");
+                            continue;
+                        }
+                        
+                        // Use FromFile with relative path approach
+                        var originalDir = Directory.GetCurrentDirectory();
+                        try
+                        {
+                            // Set the current directory to where the font files are located
+                            var fontDirectory = Path.GetDirectoryName(fullFontPath);
+                            if (!string.IsNullOrEmpty(fontDirectory))
+                            {
+                                Directory.SetCurrentDirectory(fontDirectory);
+                            }
+                            // Use relative path for FromFile
+                            var font = BitmapFont.FromFile(graphicsDevice, "PixelFont.fnt");
+                            bitmapFonts[fontName] = font;
+                        }
+                        finally
+                        {
+                            // Restore the original directory
+                            Directory.SetCurrentDirectory(originalDir);
+                        }
                         Console.WriteLine($"[FontLibrary] Successfully loaded font: {fontName}");
                     }
                     catch (Exception ex)
@@ -74,6 +108,7 @@ namespace Engine.Core.Graphics
                     }
                 }
 
+                // Spritefonts
                 foreach (var fontName in fontNames)
                 {
                     try

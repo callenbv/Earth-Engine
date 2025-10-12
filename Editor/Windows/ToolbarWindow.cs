@@ -111,7 +111,6 @@ namespace EarthEngineEditor.Windows
 
             if (ImGuiRenderer.IconButton("grid", gridIcon, gridColor))
             {
-                showGrid = !showGrid;
                 ToggleGrid();
             }
 

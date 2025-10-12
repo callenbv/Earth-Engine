@@ -80,7 +80,6 @@ namespace EarthEngineEditor
             editorOverlay = new EditorOverlay(GraphicsDevice);
             string binDir = AppContext.BaseDirectory;
             string projectRoot = Path.GetFullPath(Path.Combine(binDir, "..", "..", "..", ".."));
-            EnginePaths.SHARED_CONTENT_PATH = Path.Combine(projectRoot, "Content", "bin");
 
             // Enable docking
             var io = ImGui.GetIO();

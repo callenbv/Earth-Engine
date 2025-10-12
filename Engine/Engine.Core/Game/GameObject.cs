@@ -65,6 +65,18 @@ namespace Engine.Core.Game
         }
 
         /// <summary>
+        /// Old position of the GameObject, used for tracking movement and animations.
+        /// </summary>
+        public float Depth
+        {
+            get
+            {
+                float depth = GetComponent<Sprite2D>()?.depth ?? 0;
+                return depth;
+            }
+        }
+
+        /// <summary>
         /// Rotation of the GameObject in radians, affecting its orientation in the game world.
         /// </summary>
         public float Rotation

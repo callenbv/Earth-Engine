@@ -185,6 +185,11 @@
             Static class to hold paths for the Earth Engine project and assets.
             </summary>
         </member>
+        <member name="P:Engine.Core.Data.EnginePaths.SHARED_CONTENT_PATH">
+            <summary>
+            Gets the shared content path, dynamically resolving to the current user's directory
+            </summary>
+        </member>
         <member name="T:Engine.Core.Data.IComponentContainer">
             <summary>
             Interface for a component container, which can hold multiple components.
@@ -1313,6 +1318,11 @@
             Old position of the GameObject, used for tracking movement and animations.
             </summary>
         </member>
+        <member name="P:Engine.Core.Game.GameObject.Depth">
+            <summary>
+            Old position of the GameObject, used for tracking movement and animations.
+            </summary>
+        </member>
         <member name="P:Engine.Core.Game.GameObject.Rotation">
             <summary>
             Rotation of the GameObject in radians, affecting its orientation in the game world.
@@ -1941,7 +1951,7 @@
             <param name="viewportHeight"></param>
             <returns></returns>
         </member>
-        <member name="M:Engine.Core.Camera.GetUIViewMatrix(System.Int32,System.Int32,System.Boolean)">
+        <member name="M:Engine.Core.Camera.GetUIViewMatrix(System.Int32,System.Int32)">
             <summary>
             Get the UI view matrix, which is typically an identity matrix since UI is not affected by camera transformations.
             </summary>
@@ -2094,16 +2104,6 @@
             </summary>
             <param name="action"></param>
             <returns></returns>
-        </member>
-        <member name="T:Engine.Core.CameraMode">
-            <summary>
-            Define if camera is in 3D or 2D
-            </summary>
-        </member>
-        <member name="T:Engine.Core.GameCamera">
-            <summary>
-            Represents the camera in the game, handling position, zoom, rotation, and target tracking.
-            </summary>
         </member>
         <member name="T:Engine.Core.MockGpioController">
             <summary>
@@ -2313,6 +2313,14 @@
             <summary>
             Custom JSON converter for Microsoft.Xna.Framework.Vector3
             </summary>
+        </member>
+        <member name="M:Editor.AssetManagement.Vector3JsonConverter.Write(System.Text.Json.Utf8JsonWriter,Microsoft.Xna.Framework.Vector3,System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            Write to the console line, a custom value
+            </summary>
+            <param name="writer"></param>
+            <param name="value"></param>
+            <param name="options"></param>
         </member>
         <member name="M:TilemapManager.Render(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
             <summary>
