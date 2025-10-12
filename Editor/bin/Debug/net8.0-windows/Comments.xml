@@ -913,6 +913,11 @@
             The rotation of the text in radians. This is applied around the origin point.
             </summary>
         </member>
+        <member name="P:Engine.Core.Game.Components.TextRenderer.TextRotation">
+            <summary>
+            Text rotation
+            </summary>
+        </member>
         <member name="P:Engine.Core.Game.Components.TextRenderer.Depth">
             <summary>
             The rotation of the text in radians. This is applied around the origin point.

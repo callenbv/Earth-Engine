@@ -48,6 +48,12 @@ namespace Engine.Core.Game.Components
         public float TextScale { get; set; } = 1.0f;
 
         /// <summary>
+        /// Text rotation
+        /// </summary>
+        [SliderEditor(0,360)]
+        public float TextRotation { get; set; } = 0f;
+
+        /// <summary>
         /// The rotation of the text in radians. This is applied around the origin point.
         /// </summary>
         public float Depth { get; set; } = 1.0f;
@@ -109,13 +115,12 @@ namespace Engine.Core.Game.Components
                 // Center the text around the object's position
                 position -= textSize * (new Vector2(Scale.X, Scale.Y) * TextScale) * 0.5f;
             }
-
             spriteBatch.DrawString(
                 bitFont,
                 Text,
                 position,
                 Color,
-                Rotation,
+                Rotation+(TextRotation* (3.14f/180f)),
                 Origin,
                 TextScale,
                 Effects,
@@ -196,7 +201,7 @@ namespace Engine.Core.Game.Components
                 textSize = Vector2.Zero;
             }
 
-            Depth = Owner.Depth;
+            Depth = Owner.Depth+0.0000001f;
         }
 
         /// <summary>
