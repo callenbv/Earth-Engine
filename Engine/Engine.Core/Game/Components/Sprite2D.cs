@@ -53,18 +53,12 @@ namespace Engine.Core.Game.Components
         /// <summary>
         /// The position of the sprite in world coordinates. This is where the sprite will be drawn in the game world.
         /// </summary>
-        [SliderEditor(1f, 10f)]
         public Vector3 SpriteScale;
 
         /// <summary>
         /// Height in terms of layers, used for tilemap depth ordering
         /// </summary>
         public int Height { get; set; } = 0;
-
-        /// <summary>
-        /// The position of the sprite in world coordinates. This is where the sprite will be drawn in the game world.
-        /// </summary>
-        private Vector3 position;
 
         /// <summary>
         /// The texture used for the sprite. If set, it will automatically update the texturePath, frameWidth, frameHeight, and spriteBox properties.

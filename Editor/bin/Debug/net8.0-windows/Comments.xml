@@ -758,11 +758,6 @@
             Height in terms of layers, used for tilemap depth ordering
             </summary>
         </member>
-        <member name="F:Engine.Core.Game.Components.Sprite2D.position">
-            <summary>
-            The position of the sprite in world coordinates. This is where the sprite will be drawn in the game world.
-            </summary>
-        </member>
         <member name="F:Engine.Core.Game.Components.Sprite2D._texture">
             <summary>
             The texture used for the sprite. If set, it will automatically update the texturePath, frameWidth, frameHeight, and spriteBox properties.
@@ -933,6 +928,11 @@
             Whether the text should be centered around the object's position.
             </summary>
         </member>
+        <member name="P:Engine.Core.Game.Components.TextRenderer.LineWidth">
+            <summary>
+            Line width is infinity
+            </summary>
+        </member>
         <member name="F:Engine.Core.Game.Components.TextRenderer.Effects">
             <summary>
             The rotation of the text in radians. This is applied around the origin point.
@@ -1009,6 +1009,15 @@
             Set the text to be centered around the object's position
             </summary>
             <param name="centered">Whether to center the text</param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.TextRenderer.WrapBitmapText(MonoGame.Extended.BitmapFonts.BitmapFont,System.String,System.Single)">
+            <summary>
+            Given text and a line width, add the newlines as appropriate
+            </summary>
+            <param name="font"></param>
+            <param name="text"></param>
+            <param name="maxLineWidth"></param>
+            <returns></returns>
         </member>
         <member name="T:Engine.Core.Game.Components.TilemapRenderer">
             <summary>
@@ -1168,6 +1177,23 @@
             </summary>
             <param name="worldPos"></param>
             <returns></returns>
+        </member>
+        <member name="T:Engine.Core.Game.Components.Image">
+            <summary>
+            A 2D sprite component that can be attached to a GameObject.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.Image.Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
+            <summary>
+            Draw the sprite if valid
+            </summary>
+            <param name="spriteBatch"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.Image.DrawUI(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
+            <summary>
+            Draw the sprite in UI coordinates
+            </summary>
+            <param name="spriteBatch"></param>
         </member>
         <member name="M:Engine.Core.Game.Components.UITextRenderer.Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
             <summary>

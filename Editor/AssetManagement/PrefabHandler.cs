@@ -36,6 +36,7 @@ namespace Editor.AssetManagement
         private static string newStringItem = string.Empty;
         private static string meshSearch = string.Empty;
         private static string materialSearch = string.Empty;
+        private static string textBuffer = string.Empty;
 
         /// <summary>
         /// Loads a prefab from a JSON file.
@@ -320,10 +321,29 @@ namespace Editor.AssetManagement
                 }
                 else
                 {
-                    byte[] buffer = new byte[256];
-                    Encoding.UTF8.GetBytes(s ?? string.Empty, 0, (s ?? string.Empty).Length, buffer, 0);
-                    if (ImGui.InputText($"##{name}", buffer, (uint)buffer.Length))
-                        setValue(Encoding.UTF8.GetString(buffer).TrimEnd('\0'));
+                    // Check for Multi-line or single line
+                    if (memberInfo.GetCustomAttribute<MultilineTextAttribute>() != null)
+                    {
+                        // Cache text buffer
+                        if (textBuffer != s)
+                        {
+                            textBuffer = s;
+                        }
+
+                        // Multi-line text
+                        if (ImGui.InputTextMultiline($"##{name}", ref textBuffer, 1024u, new Vector2()))
+                        {
+                            setValue(textBuffer);
+                        }
+                    }
+                    else
+                    {
+                        // Single line text
+                        byte[] buffer = new byte[256];
+                        Encoding.UTF8.GetBytes(s ?? string.Empty, 0, (s ?? string.Empty).Length, buffer, 0);
+                        if (ImGui.InputText($"##{name}", buffer, (uint)buffer.Length))
+                            setValue(Encoding.UTF8.GetString(buffer).TrimEnd('\0'));
+                    }
                 }
             }
             else if (value is Microsoft.Xna.Framework.Vector2 v2)

@@ -6,11 +6,12 @@
 /// <Summary>      Renders text to the screen in world coordinates.          
 /// -----------------------------------------------------------------------------
 
+using Engine.Core.Data;
+using Engine.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Engine.Core.Graphics;
-using Engine.Core.Data;
 using MonoGame.Extended.BitmapFonts;
+using System.Text;
 
 namespace Engine.Core.Game.Components
 {
@@ -26,6 +27,7 @@ namespace Engine.Core.Game.Components
         /// <summary>
         /// The text to render. If null, it will default to an empty string.
         /// </summary>
+        [MultilineText()]
         public string Text
         {
             get => text_;
@@ -36,6 +38,8 @@ namespace Engine.Core.Game.Components
         }
 
         private string text_ = string.Empty;
+        private string lastText = string.Empty;
+        private string rawText = string.Empty;
 
         /// <summary>
         /// The rotation of the text in radians. This is applied around the origin point.
@@ -67,6 +71,11 @@ namespace Engine.Core.Game.Components
         /// Whether the text should be centered around the object's position.
         /// </summary>
         public bool Centered { get; set; } = false;
+
+        /// <summary>
+        /// Line width is infinity
+        /// </summary>
+        public float LineWidth { get; set; } = 3840f;
 
         /// <summary>
         /// The rotation of the text in radians. This is applied around the origin point.
@@ -115,9 +124,10 @@ namespace Engine.Core.Game.Components
                 // Center the text around the object's position
                 position -= textSize * (new Vector2(Scale.X, Scale.Y) * TextScale) * 0.5f;
             }
+
             spriteBatch.DrawString(
                 bitFont,
-                Text,
+                rawText,
                 position,
                 Color,
                 Rotation+(TextRotation* (3.14f/180f)),
@@ -195,6 +205,13 @@ namespace Engine.Core.Game.Components
             if (bitFont != null && !string.IsNullOrEmpty(Text))
             {
                 textSize = bitFont.MeasureString(Text);
+
+                // Check for text wrapping
+                if (lastText != Text)
+                {
+                    rawText = WrapBitmapText(bitFont, Text, LineWidth);
+                    lastText = rawText;
+                }
             }
             else
             {
@@ -222,6 +239,43 @@ namespace Engine.Core.Game.Components
         public void SetCentered(bool centered)
         {
             Centered = centered;
+        }
+
+
+        /// <summary>
+        /// Given text and a line width, add the newlines as appropriate
+        /// </summary>
+        /// <param name="font"></param>
+        /// <param name="text"></param>
+        /// <param name="maxLineWidth"></param>
+        /// <returns></returns>
+        public string WrapBitmapText(BitmapFont font, string text, float maxWidth)
+        {
+            if (font == null || string.IsNullOrEmpty(text))
+                return text;
+
+            string[] words = text.Split(' ');
+            StringBuilder result = new StringBuilder();
+            float lineWidth = 0f;
+            float spaceWidth = font.MeasureString(" ").Width;
+
+            foreach (string word in words)
+            {
+                float wordWidth = font.MeasureString(word).Width;
+
+                if (lineWidth + wordWidth <= maxWidth)
+                {
+                    result.Append(word + " ");
+                    lineWidth += wordWidth + spaceWidth;
+                }
+                else
+                {
+                    result.Append("\n" + word + " ");
+                    lineWidth = wordWidth + spaceWidth;
+                }
+            }
+
+            return result.ToString().TrimEnd();
         }
     }
 } 

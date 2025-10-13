@@ -6,10 +6,11 @@
 /// <Summary>                
 /// -----------------------------------------------------------------------------
 
+using Engine.Core.Data;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Engine.Core.Data;
 using MonoGame.Extended.BitmapFonts;
+using System.Text;
 
 namespace Engine.Core.Game.Components
 {

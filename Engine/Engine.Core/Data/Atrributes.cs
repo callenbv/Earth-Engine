@@ -34,6 +34,12 @@ namespace Engine.Core.Data
     public class EditorOnlyAttribute : Attribute { }
 
     /// <summary>
+    /// This text field allows multilines (new lines)
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Property)]
+    public class MultilineTextAttribute : Attribute { }
+
+    /// <summary>
     /// Attribute to mark a property or field as editable in the editor with a slider.
     /// </summary>
 
