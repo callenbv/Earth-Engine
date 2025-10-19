@@ -9,12 +9,14 @@
 using EarthEngineEditor;
 using EarthEngineEditor.Windows;
 using Editor.AssetManagement;
+using Editor.Windows.Inspector;
 using Engine.Core;
+using Engine.Core.Data;
 using Engine.Core.Game.Components;
+using Engine.Core.Rooms.Tiles;
 using ImGuiNET;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Numerics;
-using System.Reflection;
 
 namespace Editor.Windows.TileEditor
 {
@@ -33,338 +35,118 @@ namespace Editor.Windows.TileEditor
     /// <summary>
     /// Represents the Tile Editor window in the editor, allowing users to create and edit tile layers.
     /// </summary>
-    public class TileEditorWindow
+    public class TileEditorWindow : IInspectable
     {
         private bool show = true;
-        private float previewScale = 1;
-        private int selectedTileIndex = 1;
-        private TilemapRenderer? selectedLayer;
-        public TilemapHandler? tilemapHandler;
-        public int TileSize = 16;
         public int BrushSize = 1;
+        public Tilemap? SelectedTilemap;
 
         TileEditorMode mode = TileEditorMode.Paint;
+        public int tileX = 0;
+        public int tileY = 0;
 
         /// <summary>
-        /// Handles the hotkeys
+        /// Tile editor draw
         /// </summary>
-        private void HandleHotkeys()
+        public void Draw()
         {
-            // Toggle paint mode
-            if (Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.P))
+            if (ImGui.Begin("Tile Editor", ref show))
             {
-                mode = TileEditorMode.Paint;
-            }
-            // Toggle erase mode
-            else if (Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.E))
-            {
-                mode = TileEditorMode.Erase;
-            }
-            else if (Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.C))
-            {
-                mode = TileEditorMode.Collision;
-            }
-
-            // Control keybinds
-            if (Input.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.LeftControl))
-            {
-
-            }
-        }
-
-        /// <summary>
-        /// Renders the tile editor panel
-        /// </summary>
-        public void Render()
-        {
-            if (!show) return;
-
-            HandleHotkeys();
-
-            if(ImGui.Begin("Tile Editor", ref show))
                 EditorApp.Instance.selectionMode = EditorSelectionMode.Tile;
-
-            bool tree = ImGui.TreeNodeEx("Tile Layers", ImGuiTreeNodeFlags.DefaultOpen);
-
-            if (tree)
-            {
-                foreach (var layer in TilemapManager.layers)
-                {
-                    ImGui.PushID(layer.ID); // isolate ImGui ID space
-
-                    // Start horizontal layout
-                    ImGui.BeginGroup();
-
-                    // Visibility toggle button
-                    if (ImGuiRenderer.IconButton($"##Visibility{layer.ID}", layer.Visible ? ImGuiRenderer.EyeIcon : ImGuiRenderer.EyeSlashIcon, Microsoft.Xna.Framework.Color.White,16,8,1f,-6))
-                        layer.ToggleVisibility();
-
-                    ImGui.SameLine();
-
-                    // Collapsing header with no overlap
-                    bool isOpen = (selectedLayer == layer);
-
-                    if (ImGui.Selectable($"##{layer.ID}", isOpen))
-                    {
-                        selectedLayer = layer;
-                        tilemapHandler = new TilemapHandler(selectedLayer);
-                        InspectorWindow.Instance.Inspect(tilemapHandler);
-                    }
-
-                    ImGui.SameLine();
-                    ImGui.Text(layer.Title);
-
-                    ImGui.EndGroup();
-                    ImGui.PopID();
-                }
-                ImGui.TreePop();
+                DrawEditor();
             }
-
-            if (ImGui.Button("Add Layer"))
-            {
-                // Create a new layer with default values
-                var newLayer = new TilemapRenderer(100, 100, "");
-                newLayer.Title = $"Layer {TilemapManager.layers.Count + 1}";
-                TilemapManager.layers.Add(newLayer);
-            }
-
             ImGui.Separator();
-
-            // Paint on the selected layer
-            if (selectedLayer != null && EditorApp.Instance.selectionMode == EditorSelectionMode.Tile)
-            {
-                // Draw data for each tileset
-                ImGui.Text(selectedLayer.Title + $" (Level {selectedLayer.FloorLevel})");
-                ImGui.SliderInt("Brush Size", ref BrushSize, 1, 10);
-
-                Microsoft.Xna.Framework.Color paintColor = mode == TileEditorMode.Paint ? Microsoft.Xna.Framework.Color.Blue : Microsoft.Xna.Framework.Color.White;
-                if (ImGuiRenderer.IconButton("Paint", ImGuiRenderer.PaintIcon, paintColor, 16, 8, 1f, 0))
-                    mode = TileEditorMode.Paint;
-
-                ImGui.SameLine();
-
-                Microsoft.Xna.Framework.Color eraseColor = mode == TileEditorMode.Erase ? Microsoft.Xna.Framework.Color.Blue : Microsoft.Xna.Framework.Color.White;
-                if (ImGuiRenderer.IconButton("Eraser", ImGuiRenderer.EraserIcon, eraseColor, 16, 8, 1f, 0))
-                    mode = TileEditorMode.Erase;
-
-                ImGui.SameLine();
-
-                Microsoft.Xna.Framework.Color collideColor = mode == TileEditorMode.Collision ? Microsoft.Xna.Framework.Color.Blue : Microsoft.Xna.Framework.Color.White;
-                if (ImGuiRenderer.IconButton("Collision", ImGuiRenderer.CollisionIcon, collideColor, 16, 8, 1f, 0))
-                    mode = TileEditorMode.Collision;
-
-                ImGui.SameLine();
-
-                Microsoft.Xna.Framework.Color stairColor = mode == TileEditorMode.Stair ? Microsoft.Xna.Framework.Color.Blue : Microsoft.Xna.Framework.Color.White;
-                if (ImGuiRenderer.IconButton("Stair", ImGuiRenderer.StairIcon, stairColor, 16, 8, 1f, 0))
-                    mode = TileEditorMode.Stair;
-
-                // Tileset preview
-                if (selectedLayer.Texture != null)
-                {
-                    int tileSize = selectedLayer.TileSize;
-                    int texWidth = selectedLayer.Texture.Width;
-                    int texHeight = selectedLayer.Texture.Height;
-
-                    int tilesX = texWidth / tileSize;
-                    int tilesY = texHeight / tileSize;
-
-                    Vector2 scaledTileSize = new Vector2(tileSize * previewScale);
-
-                    // Show full tileset image
-                    Vector2 imageSize = new Vector2(texWidth * previewScale, texHeight * previewScale);
-
-                    if (selectedLayer.TexturePtr == IntPtr.Zero)
-                        selectedLayer.TexturePtr = ImGuiRenderer.Instance.BindTexture(selectedLayer.Texture);
-                    
-                    // Draw the preview
-                    ImGui.Image(selectedLayer.TexturePtr, imageSize);
-
-                    // Draw overlay grid of invisible buttons
-                    Vector2 imagePos = ImGui.GetItemRectMin(); // top-left corner of the image
-                    var drawList = ImGui.GetWindowDrawList();
-
-                    for (int y = 0; y < tilesY; y++)
-                    {
-                        for (int x = 0; x < tilesX; x++)
-                        {
-                            int index = y * tilesX + x;
-
-                            Vector2 min = imagePos + new Vector2(x * scaledTileSize.X, y * scaledTileSize.Y);
-                            Vector2 max = min + scaledTileSize;
-
-                            ImGui.SetCursorScreenPos(min);
-                            ImGui.PushID(index);
-
-                            if (ImGui.InvisibleButton("tile", scaledTileSize))
-                            {
-                                selectedTileIndex = index;
-                            }
-
-                            // Draw outline if selected
-                            if (index == selectedTileIndex)
-                            {
-                                drawList.AddRect(min, max, ImGui.ColorConvertFloat4ToU32(new Vector4(255,0,0,1)), 0f, ImDrawFlags.None, 2.0f);
-                            }
-
-                            ImGui.PopID();
-                        }
-                    }
-                }
-
-                // Now paint with the selected tile index
-                if (!ImGui.GetIO().WantCaptureMouse && EditorApp.Instance.gameFocused)
-                {
-                    int offx = (int)selectedLayer.Offset.X;
-                    int offy = (int)selectedLayer.Offset.Y;
-                    int gridSize = selectedLayer.TileSize;
-
-                    Microsoft.Xna.Framework.Vector2 mousePos = new Vector2(Input.mouseWorldPosition.X, Input.mouseWorldPosition.Y);
-                    int tileX = (int)((mousePos.X - offx) / gridSize);
-                    int tileY = (int)((mousePos.Y - offy) / gridSize);
-
-                    if (Input.IsMouseDown())
-                    {
-                        if (tileX >= 0 && tileX < selectedLayer.Width && tileY >= 0 && tileY < selectedLayer.Height)
-                        {
-                            for (int dx = -BrushSize / 2; dx <= BrushSize / 2; dx++)
-                            {
-                                for (int dy = -BrushSize / 2; dy <= BrushSize / 2; dy++)
-                                {
-                                    int px = (tileX) + dx;
-                                    int py = (tileY) + dy;
-
-                                    if (px >= 0 && px < selectedLayer.Width &&
-                                        py >= 0 && py < selectedLayer.Height)
-                                    {
-
-                                        if (mode == TileEditorMode.Paint)
-                                        {
-                                            selectedLayer.SetTile(px, py, selectedTileIndex);
-                                        }
-                                        else if (mode == TileEditorMode.Erase)
-                                        {
-                                            selectedLayer.SetTile(px, py, -4);
-                                        }
-                                        else if (mode == TileEditorMode.Collision)
-                                        {
-                                            selectedLayer.SetCollision(px, py, true);
-                                        }
-                                        else if (mode == TileEditorMode.Stair)
-                                        {
-                                            selectedLayer.SetStair(px, py, true);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    // Handle scrolling in and out of preview
-                    if (Input.ScrollDelta > 0)
-                    {
-                        previewScale = Math.Min(previewScale * 1.1f, 4.0f); // zoom in
-                    }
-                    else if (Input.ScrollDelta < 0)
-                    {
-                        previewScale = Math.Max(previewScale * 0.9f, 0.25f); // zoom out
-                    }
-                }
-            }
-
             ImGui.End();
         }
 
         /// <summary>
-        /// Draws a preview of the world in the tile editor, showing the current tilemap layers and their tiles.
+        /// Draws the inspector fields
         /// </summary>
-        /// <param name="spriteBatch"></param>
-        public void DrawWorldPreview(SpriteBatch spriteBatch)
+        public void Render()
         {
-            if (selectedLayer == null || EditorApp.Instance.selectionMode != EditorSelectionMode.Tile || selectedTileIndex < 0) return;
+            InspectorUI.DrawComponent(SelectedTilemap);
+        }
 
-            spriteBatch.Begin(
-                SpriteSortMode.Immediate,
-                BlendState.AlphaBlend,
-                SamplerState.PointClamp,
-                null, null, null,
-                Camera.Main.GetViewMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight)
-            );
+        /// <summary>
+        /// Draw the tile editor
+        /// </summary>
+        public void DrawEditor()
+        {
+            List<Tilemap> Tilemaps = new List<Tilemap>();
+            Tilemaps.Clear();
 
-            int tileSize = selectedLayer.TileSize;
-            int tilesPerRow = selectedLayer.Texture.Width / tileSize;
-
-            if (tilesPerRow <= 0)
-                tilesPerRow = 1;
-
-            int tileIndex = selectedTileIndex;
-            int srcX = tileIndex % tilesPerRow;
-            int srcY = tileIndex / tilesPerRow;
-            Microsoft.Xna.Framework.Rectangle sourceRect = new Microsoft.Xna.Framework.Rectangle(srcX * tileSize, srcY * tileSize, tileSize, tileSize);
-
-            int offx = (int)selectedLayer.Offset.X;
-            int offy = (int)selectedLayer.Offset.Y;
-
-            Microsoft.Xna.Framework.Vector2 mousePos = new Vector2(Input.mouseWorldPosition.X, Input.mouseWorldPosition.Y);
-            int centerX = (int)((mousePos.X - offx) / tileSize);
-            int centerY = (int)((mousePos.Y - offy) / tileSize);
-
-            int halfBrush = BrushSize / 2;
-            Microsoft.Xna.Framework.Color col = Microsoft.Xna.Framework.Color.FromNonPremultiplied(255, 255, 255, 100);
-            for (int dy = -halfBrush; dy <= halfBrush; dy++)
+            foreach (var gameObj in EngineContext.Current.Scene.objects)
             {
-                for (int dx = -halfBrush; dx <= halfBrush; dx++)
+                foreach (var component in gameObj.components)
                 {
-                    int tileX = (centerX + dx) * tileSize + offx;
-                    int tileY = (centerY + dy) * tileSize + offy;
-
-                    spriteBatch.Draw(
-                        selectedLayer.Texture,
-                        new Vector2(tileX, tileY),
-                        sourceRect,
-                        col
-                    );
+                    if (component is Tilemap tilemap)
+                    {
+                        Tilemaps.Add(tilemap);
+                    }
                 }
             }
 
-            spriteBatch.End();
+            // Draw the editor
+            foreach (var map in Tilemaps)
+            {
+                // Select the tilemap
+                bool selected = ImGui.Selectable($"{map.Name}");
+
+                if (selected)
+                {
+                    InspectorWindow.Instance.Inspect(this);
+                    SelectedTilemap = map;
+                }
+            }
+
+            // Add more tilemaps
+            if (ImGui.Button("Add Tilemap Layer"))
+            {
+                Tilemaps.Add(new Tilemap());
+            }
+
+            // No tilemap selected
+            if (SelectedTilemap == null)
+                return;
         }
 
-
         /// <summary>
-        /// Draws a circular selectable button with an icon/text inside it.
+        /// Handle the logic for painting tiles
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="icon"></param>
-        /// <param name="mode"></param>
-        /// <param name="selectedMode"></param>
-        /// <param name="clicked"></param>
-        /// <returns></returns>
-        private bool CircularSelectable(string id, string icon, TileEditorMode mode, TileEditorMode selectedMode, out bool clicked)
+        public void HandleTilepainting(SpriteBatch spriteBatch)
         {
-            ImGui.PushID(id);
+            // Game is not focused
+            if (EditorApp.Instance.selectionMode != EditorSelectionMode.Tile || !EditorApp.Instance.gameFocused || SelectedTilemap == null)
+                return;
 
-            float size = 36f;
-            var drawList = ImGui.GetWindowDrawList();
-            var cursor = ImGui.GetCursorScreenPos();
-            var center = cursor + new Vector2(size / 2f);
-            var color = mode == selectedMode ? new Vector4(0.4f, 0.7f, 1.0f, 1.0f) : new Vector4(0.2f, 0.2f, 0.2f, 1.0f);
+            // Paint tiles
+            Vector3 mousePos = Input.mouseWorldPosition;
+            mousePos.X = (int)(mousePos.X / SelectedTilemap.CellSize) * SelectedTilemap.CellSize;
+            mousePos.Y = (int)(mousePos.Y / SelectedTilemap.CellSize) * SelectedTilemap.CellSize;
 
-            ImGui.InvisibleButton("##btn", new Vector2(size));
-            bool hovered = ImGui.IsItemHovered();
-            clicked = ImGui.IsItemClicked();
+            Vector3 gridPos = new Vector3(mousePos.X / SelectedTilemap.CellSize, mousePos.Y/SelectedTilemap.CellSize, 0);
 
-            drawList.AddCircleFilled(center, size / 2f, ImGui.ColorConvertFloat4ToU32(color), 20);
+            if (Input.IsMouseDown())
+            {
+                RuleTile newTile = new RuleTile(0, 0, SelectedTilemap.CellSize, SelectedTilemap.CellSize);
+                newTile.SetBaseFrame(0, 0, SelectedTilemap.CellSize, SelectedTilemap.CellSize);
+                SelectedTilemap.SetTile(newTile, gridPos);
+            }
 
-            // Icon/text
-            var textSize = ImGui.CalcTextSize(icon);
-            var textPos = center - textSize / 2;
-            drawList.AddText(textPos, ImGui.GetColorU32(ImGuiCol.Text), icon);
+            Microsoft.Xna.Framework.Rectangle tilePreview = new Microsoft.Xna.Framework.Rectangle((int)mousePos.X+tileX, (int)mousePos.Y+tileY, SelectedTilemap.CellSize, SelectedTilemap.CellSize);
+                
+            // Draw the top-left tile frame for preview
+            if (SelectedTilemap?.texture?.texture != null)
+            {
+                Microsoft.Xna.Framework.Rectangle sourceFrame = new Microsoft.Xna.Framework.Rectangle(0, 0, SelectedTilemap.CellSize, SelectedTilemap.CellSize);
+                spriteBatch.Draw(SelectedTilemap.texture.texture, tilePreview, sourceFrame, Microsoft.Xna.Framework.Color.Green);
+            }
 
-            ImGui.PopID();
-            return hovered;
+            // Erase tiles
+            if (Input.IsMouseDown(Engine.Core.Systems.Button.Right))
+            {
+                SelectedTilemap.SetTile(null, gridPos);
+            }
         }
 
         public bool IsVisible => show;

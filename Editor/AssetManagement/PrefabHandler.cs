@@ -8,8 +8,10 @@
 
 using EarthEngineEditor;
 using EarthEngineEditor.Windows;
+using Editor.Windows.Inspector;
 using Engine.Core.CustomMath;
 using Engine.Core.Data;
+using Engine.Core.Data.Graphics;
 using Engine.Core.Game;
 using Engine.Core.Game.Components;
 using Engine.Core.Graphics;
@@ -190,6 +192,17 @@ namespace Editor.AssetManagement
 
             var sliderAttr = memberInfo.GetCustomAttribute<SliderEditorAttribute>();
 
+            // Recursive calls
+            if (expectedType == typeof(TextureData))
+            {
+                if (value is TextureData texData)
+                {
+                    ImGui.NextColumn();
+                    ImGui.Columns(1);
+                    InspectorUI.DrawClass(texData);
+                }
+                return;
+            }
             // Start two-column layout
             ImGui.Columns(2, null, false);
 
@@ -207,7 +220,6 @@ namespace Editor.AssetManagement
             ImGui.Text(name);
 
             // Use the parsed XML comments as an ImGui tooltip
-            // Note: I really like this
             if (ImGui.IsItemHovered())
             {
                 string memberKey = Comments.GetXmlDocMemberKey(memberInfo);
@@ -452,8 +464,8 @@ namespace Editor.AssetManagement
                         float ux = sprite.frame * ratio;
                         uv_1.X = ux;
                         uv_2.X = ux + (ratio);
-                        targetSize.X = sprite.frameWidth*4;
-                        targetSize.Y = sprite.frameHeight*4;
+                        targetSize.X = sprite.frameWidth * 4;
+                        targetSize.Y = sprite.frameHeight * 4;
                         originalSize = targetSize;
                     }
 
@@ -518,13 +530,55 @@ namespace Editor.AssetManagement
                     }
                 }
             }
-            else if (typeof(IComponent).IsAssignableFrom(expectedType))
+            else if (expectedType.IsAssignableFrom(typeof(ObjectComponent)))
             {
                 ObjectComponent comp = (ObjectComponent)value;
                 string label = comp != null ? comp.Name : "None";
 
                 if (ImGui.Button(label))
                 {
+                    ImGui.OpenPopup("SelectedComponent");
+                }
+
+                // Assign a reference
+                if (ImGui.BeginPopup("SelectedComponent"))
+                {
+                    foreach (var sceneObj in SceneViewWindow.Instance.scene.objects)
+                    {
+                        if (ImGui.Selectable(sceneObj.Name))
+                        {
+                            Console.WriteLine($"Ref is {sceneObj.Name}, instance: {sceneObj.GetHashCode()}");
+                            setValue(sceneObj); // update your serialized field
+                        }
+                    }
+
+                    ImGui.EndPopup();
+                }
+
+                if (ImGui.BeginDragDropSource())
+                {
+                    unsafe
+                    {
+                        GCHandle handle = GCHandle.Alloc(comp);
+                        ImGui.SetDragDropPayload("COMP_REF", (IntPtr)handle, sizeof(uint));
+                        ImGui.Text(comp.Name);
+                        ImGui.EndDragDropSource();
+                    }
+                }
+
+                if (ImGui.BeginDragDropTarget())
+                {
+                    unsafe
+                    {
+                        var payload = ImGui.AcceptDragDropPayload("COMP_REF");
+                        if (payload.NativePtr != null)
+                        {
+                            var handle = GCHandle.FromIntPtr(payload.Data);
+                            value = (ObjectComponent)handle.Target;
+                            handle.Free();
+                        }
+                        ImGui.EndDragDropTarget();
+                    }
                 }
             }
             else if (typeof(List<string>) == expectedType)

@@ -70,7 +70,30 @@ namespace Editor.Windows.Inspector
             }
             PrefabHandler.DrawEditableButtons(obj);
         }
-    }
 
+        /// <summary>
+        /// Exposes all fields of a class, any class
+        /// </summary>
+        /// <param name="comp"></param>
+        public static void DrawClass(object comp)
+        {
+            var type = comp.GetType();
+            var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
+            var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+            foreach (var field in fields)
+            {
+                var value = field.GetValue(comp);
+                PrefabHandler.DrawField(field.Name, value, field.FieldType, newValue => field.SetValue(comp, newValue), field);
+            }
+
+            foreach (var prop in properties)
+            {
+                if (!prop.CanRead || !prop.CanWrite) continue;
+                var value = prop.GetValue(comp);
+                PrefabHandler.DrawField(prop.Name, value, prop.PropertyType, newValue => prop.SetValue(comp, newValue), prop);
+            }
+        }
+    }
 }
 

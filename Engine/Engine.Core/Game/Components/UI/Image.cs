@@ -20,7 +20,7 @@ namespace Engine.Core.Game.Components
     {
         public override string Name => "Image";
         public override bool UpdateInEditor => true;
-
+        public override bool IsUI => true;
 
         /// <summary>
         /// Draw the sprite if valid

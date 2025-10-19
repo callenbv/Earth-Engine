@@ -83,6 +83,7 @@ namespace Editor.Windows
         {
             spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.NonPremultiplied, SamplerState.PointClamp, null, null, null, Camera.Main.GetViewMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight));
             DrawGrid(spriteBatch);
+            EditorApp.Instance._windowManager.tileEditor.HandleTilepainting(spriteBatch);
             spriteBatch.End();
         }
 

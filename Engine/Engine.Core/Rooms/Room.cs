@@ -6,15 +6,16 @@
 /// <Summary>                
 /// -----------------------------------------------------------------------------
 
-using Microsoft.Xna.Framework.Graphics;
-using System.Text.Json;
-using Microsoft.Xna.Framework;
-using Engine.Core.Game;
 using Editor.AssetManagement;
-using Engine.Core.Game.Components;
-using MonoGame.Extended.Serialization.Json;
 using Engine.Core.Data;
+using Engine.Core.Game;
+using Engine.Core.Game.Components;
 using Engine.Core.Systems;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended.Serialization.Json;
+using System;
+using System.Text.Json;
 
 namespace Engine.Core.Rooms
 {
@@ -43,6 +44,9 @@ namespace Engine.Core.Rooms
         /// </summary>
         public void Render(SpriteBatch spriteBatch)
         {
+            if (EngineContext.UIOnly)
+                return;
+
             try
             {
                 foreach (var obj in objects)
@@ -101,6 +105,11 @@ namespace Engine.Core.Rooms
         /// <param name="spriteBatch"></param>
         public void RenderUI(SpriteBatch spriteBatch)
         {
+            if (!EngineContext.UIOnly && !EngineContext.Running)
+                return;
+
+            Camera.Main.DrawUI(spriteBatch);
+
             try
             {
                 foreach (var obj in objects)

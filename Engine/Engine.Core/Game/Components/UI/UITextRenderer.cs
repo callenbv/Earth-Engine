@@ -19,7 +19,7 @@ namespace Engine.Core.Game.Components
     {
         public override string Name => "UI Text Renderer";
         public override bool UpdateInEditor => true;
-
+        public override bool IsUI => true;
 
         /// <summary>
         /// Does not inherit draw from text renderer in world

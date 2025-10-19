@@ -6,6 +6,8 @@
 /// <Summary>                
 /// -----------------------------------------------------------------------------
 
+using Engine.Core.Rooms.Tiles;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Engine.Core
@@ -15,10 +17,19 @@ namespace Engine.Core
     /// </summary>
     public class Tile
     {
-        public int TileIndex { get; set; } // Index in the tileset
+        public int TileIndex { get; set; }
         public bool IsCollidable { get; set; }
         public int Height { get; set; } = 0;
-        public bool IsStair { get; set; } = false; // Indicates if the tile is a stair tile
+
+        /// <summary>
+        /// This is the frame relative to the tile texture we want to source from
+        /// </summary>
+        public Rectangle Frame = new Rectangle();
+
+        /// <summary>
+        /// Destination render
+        /// </summary>
+        public Rectangle Destination = new Rectangle();
 
         /// <summary>
         /// Create a new Tile with a specified tile index.
@@ -33,7 +44,15 @@ namespace Engine.Core
         /// Default constructor for Tile, initializes with default values.
         /// </summary>
         public Tile()
-        { 
+        {
+        }
+
+        /// <summary>
+        /// Base autotile method
+        /// </summary>
+        public virtual void AutoTile(TilemapRenderer renderer)
+        {
+
         }
     }
 

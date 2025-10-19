@@ -26,7 +26,6 @@ namespace Engine.Core
         public GraphicsDevice? GraphicsDevice { get; set; }
         public ScriptManager? ScriptManager { get; set; }
         public static SpriteBatch? SpriteBatch { get; set; }
-        public static TilemapRenderer? CurrentTilemap { get; set; }
         public Room? Scene { get; set; }
         public string? AssetsRoot { get; set; }
         public string? RoomsDir { get; set; }
@@ -37,6 +36,7 @@ namespace Engine.Core
         public static bool Debug = true;
         public static float DeltaTime = 0f;
         public static bool Wireframe = false;
+        public static bool UIOnly = false;
         public static float UnitsPerPixel = 1f;
         // Add more as needed
 

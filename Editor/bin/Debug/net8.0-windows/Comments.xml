@@ -140,6 +140,11 @@
             Attribute to mark a method as editor-only, meaning it should not be called in the final build of the game.
             </summary>
         </member>
+        <member name="T:Engine.Core.Data.MultilineTextAttribute">
+            <summary>
+            This text field allows multilines (new lines)
+            </summary>
+        </member>
         <member name="T:Engine.Core.Data.SliderEditorAttribute">
             <summary>
             Attribute to mark a property or field as editable in the editor with a slider.
@@ -213,6 +218,95 @@
             <summary>
             Represents a game object definition that can hold multiple components.
             </summary>
+        </member>
+        <member name="T:Engine.Core.Data.Graphics.TextureData">
+            <summary>
+            Texture data acts as serializable wrapper for textures for ease of use
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Data.Graphics.TextureData.#ctor">
+            <summary>
+            Default constructor
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Data.Graphics.TextureData.#ctor(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Sets the frame size and count 
+            </summary>
+            <param name="width"></param>
+            <param name="height"></param>
+            <param name="frameCount"></param>
+        </member>
+        <member name="P:Engine.Core.Data.Graphics.TextureData.texture">
+            <summary>
+            The texture used for the sprite. If set, it will automatically update the texturePath, frameWidth, frameHeight, and spriteBox properties.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Data.Graphics.TextureData.Textures">
+            <summary>
+            This a list of the sliced texture sources
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Data.Graphics.TextureData.texturePath">
+            <summary>
+            Path of the texture
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Data.Graphics.TextureData.frameHeight">
+            <summary>
+            Height of the frame
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Data.Graphics.TextureData.frameWidth">
+            <summary>
+            Width of the frame
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Data.Graphics.TextureData.textureWidth">
+            <summary>
+            Width of whole texture
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Data.Graphics.TextureData.textureHeight">
+            <summary>
+            Height of the texture
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Data.Graphics.TextureData.animated">
+            <summary>
+            If this texture has a 2D animation
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Data.Graphics.TextureData.frameCount">
+            <summary>
+            The number of frames
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Data.Graphics.TextureData.spriteBox">
+            <summary>
+            The visible frame of this sprite, default 16x16 square
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Data.Graphics.TextureData.Color">
+            <summary>
+            The color tint of this texture
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Data.Graphics.TextureData.Initialize">
+            <summary>
+            Inititalize the texture data when loaded
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Data.Graphics.TextureData.Slice(System.Int32,System.Int32)">
+            <summary>
+            Slicing can be done to textures to get multiple frame sources
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Data.Graphics.TextureData.Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch,Microsoft.Xna.Framework.Rectangle,Microsoft.Xna.Framework.Color)">
+            <summary>
+            Draw the texture
+            </summary>
+            <param name="spriteBatch"></param>
         </member>
         <member name="T:Engine.Core.Game.Components.RectangleF">
             <summary>
@@ -322,7 +416,7 @@
             </summary>
             <param name="spriteBatch"></param>
         </member>
-        <member name="M:Engine.Core.Game.Components.Collider2D.CollidesWithTiles(Engine.Core.Game.Components.TilemapRenderer)">
+        <member name="M:Engine.Core.Game.Components.Collider2D.CollidesWithTiles(Engine.Core.Rooms.Tiles.TilemapRenderer)">
             <summary>
             Checks if this collider collides with any solid tiles in the given tilemap.
             </summary>
@@ -424,6 +518,16 @@
         <member name="P:Engine.Core.Game.Components.ObjectComponent.Name">
             <summary>
             Name of the component. This is used to identify the component in the editor and in the game.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.ObjectComponent.IsUI">
+            <summary>
+            Mark this component as UI
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.ObjectComponent.Active">
+            <summary>
+            If this is active
             </summary>
         </member>
         <member name="P:Engine.Core.Game.Components.ObjectComponent.ID">
@@ -703,12 +807,6 @@
             <param name="view"></param>
             <param name="projection"></param>
         </member>
-        <member name="M:Engine.Core.Game.Components.ParticleEmitter.DrawUI(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
-            <summary>
-            Draw bounds in the UI
-            </summary>
-            <param name="spriteBatch"></param>
-        </member>
         <member name="M:Engine.Core.Game.Components.ParticleEmitter.Draw3DBounds(Microsoft.Xna.Framework.Graphics.GraphicsDevice,Microsoft.Xna.Framework.Matrix,Microsoft.Xna.Framework.Matrix)">
             <summary>
             Draw debug bounds in 3D space
@@ -801,11 +899,6 @@
         <member name="F:Engine.Core.Game.Components.Sprite2D.depth">
             <summary>
             The depth of the sprite in the scene. This is used for rendering order.
-            </summary>
-        </member>
-        <member name="P:Engine.Core.Game.Components.Sprite2D.IsUI">
-            <summary>
-            Indicates if this sprite will be drawn in UI coordinates
             </summary>
         </member>
         <member name="F:Engine.Core.Game.Components.Sprite2D.spriteEffect">
@@ -1019,165 +1112,6 @@
             <param name="maxLineWidth"></param>
             <returns></returns>
         </member>
-        <member name="T:Engine.Core.Game.Components.TilemapRenderer">
-            <summary>
-            Represents a tilemap renderer component that can be attached to a GameObject.
-            </summary>
-        </member>
-        <member name="F:Engine.Core.Game.Components.TilemapRenderer.Width">
-            <summary>
-            Width of the tilemap in tiles. Default is 100x100 tiles.
-            </summary>
-        </member>
-        <member name="F:Engine.Core.Game.Components.TilemapRenderer.Height">
-            <summary>
-            Height of the tilemap in tiles. Default is 100x100 tiles.
-            </summary>
-        </member>
-        <member name="F:Engine.Core.Game.Components.TilemapRenderer.FloorLevel">
-            <summary>
-            Floor level of the tilemap, used for rendering order. Default is 100.
-            </summary>
-        </member>
-        <member name="F:Engine.Core.Game.Components.TilemapRenderer.TexturePath">
-            <summary>
-            Path to the texture used for the tilemap. This is set automatically when the texture is assigned.
-            </summary>
-        </member>
-        <member name="P:Engine.Core.Game.Components.TilemapRenderer.Title">
-            <summary>
-            Title of the tilemap layer, used for identification in the editor.
-            </summary>
-        </member>
-        <member name="F:Engine.Core.Game.Components.TilemapRenderer.TileSize">
-            <summary>
-            Size of each tile in pixels. Default is 16x16 pixels.
-            </summary>
-        </member>
-        <member name="F:Engine.Core.Game.Components.TilemapRenderer.Depth">
-            <summary>
-            Depth of the tilemap layer, used for rendering order. Default is 0.
-            </summary>
-        </member>
-        <member name="F:Engine.Core.Game.Components.TilemapRenderer.Visible">
-            <summary>
-            Visibility of the tilemap layer. If false, the layer will not be rendered.
-            </summary>
-        </member>
-        <member name="F:Engine.Core.Game.Components.TilemapRenderer.CollisionEnabled">
-            <summary>
-            CollisionEnabled indicates whether the tilemap layer should handle collisions. If true, the layer will check for collisions with tiles.
-            </summary>
-        </member>
-        <member name="P:Engine.Core.Game.Components.TilemapRenderer.Tiles">
-            <summary>
-            Array of tiles in the tilemap. Each tile is represented by a Tile object, which contains its index in the tileset and other properties.
-            </summary>
-        </member>
-        <member name="P:Engine.Core.Game.Components.TilemapRenderer.Texture">
-            <summary>
-            Texture used for the tilemap. This is set automatically when the texture is assigned.
-            </summary>
-        </member>
-        <member name="F:Engine.Core.Game.Components.TilemapRenderer.texture_">
-            <summary>
-            Real texture
-            </summary>
-        </member>
-        <member name="P:Engine.Core.Game.Components.TilemapRenderer.TexturePtr">
-            <summary>
-            Pointer to the texture used for the tilemap. This is used for rendering the tileset preview in the editor.
-            </summary>
-        </member>
-        <member name="P:Engine.Core.Game.Components.TilemapRenderer.Tint">
-            <summary>
-            Tint color applied to the tilemap when rendering. This can be used to change the color of the tiles without modifying the texture.
-            </summary>
-        </member>
-        <member name="F:Engine.Core.Game.Components.TilemapRenderer.Offset">
-            <summary>
-            Offset for the tilemap position, used to adjust the rendering position of the tilemap in the world.
-            </summary>
-        </member>
-        <member name="M:Engine.Core.Game.Components.TilemapRenderer.#ctor">
-            <summary>
-            Default constructor for TilemapRenderer, initializes with default values.
-            </summary>
-        </member>
-        <member name="M:Engine.Core.Game.Components.TilemapRenderer.#ctor(System.Int32,System.Int32,System.String)">
-            <summary>
-            Create a new TilemapRenderer with specified width, height, and texture path.
-            </summary>
-            <param name="width"></param>
-            <param name="height"></param>
-            <param name="texture"></param>
-        </member>
-        <member name="M:Engine.Core.Game.Components.TilemapRenderer.SetTile(System.Int32,System.Int32,System.Int32)">
-            <summary>
-            Set the tile at the specified position to the given index.
-            </summary>
-            <param name="x"></param>
-            <param name="y"></param>
-            <param name="index"></param>
-        </member>
-        <member name="M:Engine.Core.Game.Components.TilemapRenderer.SetCollision(System.Int32,System.Int32,System.Boolean)">
-            <summary>
-            Set the collision property of the tile at the specified position.
-            </summary>
-            <param name="x"></param>
-            <param name="y"></param>
-            <param name="collidable"></param>
-        </member>
-        <member name="M:Engine.Core.Game.Components.TilemapRenderer.SetStair(System.Int32,System.Int32,System.Boolean)">
-            <summary>
-            Set the stair property of the tile at the specified position. If collidable is true, the tile will be treated as a stair tile.
-            </summary>
-            <param name="x"></param>
-            <param name="y"></param>
-            <param name="collidable"></param>
-        </member>
-        <member name="M:Engine.Core.Game.Components.TilemapRenderer.IsValidTile(System.Int32,System.Int32)">
-            <summary>
-            Check if the specified tile coordinates are valid within the tilemap dimensions.
-            </summary>
-            <param name="x"></param>
-            <param name="y"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Engine.Core.Game.Components.TilemapRenderer.GetTile(System.Int32,System.Int32)">
-            <summary>
-            Get the tile at the specified position.
-            </summary>
-            <param name="x"></param>
-            <param name="y"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Engine.Core.Game.Components.TilemapRenderer.ToggleVisibility">
-            <summary>
-            Toggle the visibility of the tilemap layer. If the layer is currently visible, it will be hidden, and vice versa.
-            </summary>
-        </member>
-        <member name="M:Engine.Core.Game.Components.TilemapRenderer.Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
-            <summary>
-            Render the tilemap layer using the provided SpriteBatch. This method draws each tile in the layer based on its index in the tileset texture.
-            </summary>
-            <param name="spriteBatch"></param>
-        </member>
-        <member name="M:Engine.Core.Game.Components.TilemapRenderer.IsSolidAtTile(System.Int32,System.Int32)">
-            <summary>
-            Check if a tile at the specified coordinates is solid (collidable).
-            </summary>
-            <param name="x"></param>
-            <param name="y"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Engine.Core.Game.Components.TilemapRenderer.IsSolidAtWorld(Microsoft.Xna.Framework.Vector2)">
-            <summary>
-            Check if a tile at the specified world position is solid (collidable).
-            </summary>
-            <param name="worldPos"></param>
-            <returns></returns>
-        </member>
         <member name="T:Engine.Core.Game.Components.Image">
             <summary>
             A 2D sprite component that can be attached to a GameObject.
@@ -1332,6 +1266,11 @@
         <member name="T:Engine.Core.Game.GameObject">
             <summary>
             Represents a game object in the scene, which can have multiple components attached to it.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.GameObject.Active">
+            <summary>
+            If this game object is active 
             </summary>
         </member>
         <member name="P:Engine.Core.Game.GameObject.Name">
@@ -1522,6 +1461,476 @@
             Loads the game options from a JSON file located at the specified path.
             </summary>
             <param name="path"></param>
+        </member>
+        <member name="T:Engine.Core.Rooms.Tiles.TilemapRenderer">
+            <summary>
+            Defines a tilemap class to hold the texture and tiles within a world
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Rooms.Tiles.TilemapRenderer.Tilemap">
+            <summary>
+            The tilemap reference 
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.TilemapRenderer.#ctor(Engine.Core.Rooms.Tiles.Tilemap)">
+            <summary>
+            Sets up the render with a tilemap
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.TilemapRenderer.#ctor">
+            <summary>
+            Default constructor - this should never be called!
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Rooms.Tiles.TilemapRenderer.texture">
+            <summary>
+            Source texture of the tilemap. Slices the texture whenever it is set
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.TilemapRenderer.Slice">
+            <summary>
+            Call when we want to update the tilemap (e.g, slice it into grid)
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.TilemapRenderer.Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
+            <summary>
+            Draw the tiles in the tilemap
+            </summary>
+            <param name="spriteBatch"></param>
+        </member>
+        <member name="T:Engine.Core.Rooms.Tiles.AutotilePattern">
+            <summary>
+            Different types of autotile patterns
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Rooms.Tiles.AutotilePattern.ThreeByThree">
+            <summary>
+            3x3 pattern with 9 tiles (corners, edges, center)
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Rooms.Tiles.AutotilePattern.TwoByTwo">
+            <summary>
+            2x2 pattern with 4 tiles (corners only)
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Rooms.Tiles.AutotilePattern.FourByFour">
+            <summary>
+            4x4 pattern with 16 tiles (more detailed corners and edges)
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Rooms.Tiles.AutotilePattern.TwoByThree">
+            <summary>
+            2x3 pattern with 6 tiles (horizontal edges)
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Rooms.Tiles.AutotilePattern.ThreeByTwo">
+            <summary>
+            3x2 pattern with 6 tiles (vertical edges)
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Rooms.Tiles.AutotilePatterns">
+            <summary>
+            Static class containing autotile pattern implementations
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.AutotilePatterns.CalculateThreeByThree(System.Collections.Generic.Dictionary{Engine.Core.Rooms.Tiles.TileDirection,System.Boolean},Microsoft.Xna.Framework.Rectangle)">
+            <summary>
+            Calculate the frame for a 3x3 autotile pattern
+            </summary>
+            <param name="directions">Dictionary of tile directions</param>
+            <param name="baseFrame">Base frame rectangle</param>
+            <returns>Updated frame rectangle</returns>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.AutotilePatterns.CalculateTwoByTwo(System.Collections.Generic.Dictionary{Engine.Core.Rooms.Tiles.TileDirection,System.Boolean},Microsoft.Xna.Framework.Rectangle)">
+            <summary>
+            Calculate the frame for a 2x2 autotile pattern (corners only)
+            </summary>
+            <param name="directions">Dictionary of tile directions</param>
+            <param name="baseFrame">Base frame rectangle</param>
+            <returns>Updated frame rectangle</returns>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.AutotilePatterns.CalculateFourByFour(System.Collections.Generic.Dictionary{Engine.Core.Rooms.Tiles.TileDirection,System.Boolean},Microsoft.Xna.Framework.Rectangle)">
+            <summary>
+            Calculate the frame for a 4x4 autotile pattern (more detailed)
+            </summary>
+            <param name="directions">Dictionary of tile directions</param>
+            <param name="baseFrame">Base frame rectangle</param>
+            <returns>Updated frame rectangle</returns>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.AutotilePatterns.CalculateTwoByThree(System.Collections.Generic.Dictionary{Engine.Core.Rooms.Tiles.TileDirection,System.Boolean},Microsoft.Xna.Framework.Rectangle)">
+            <summary>
+            Calculate the frame for a 2x3 autotile pattern (horizontal edges)
+            </summary>
+            <param name="directions">Dictionary of tile directions</param>
+            <param name="baseFrame">Base frame rectangle</param>
+            <returns>Updated frame rectangle</returns>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.AutotilePatterns.CalculateThreeByTwo(System.Collections.Generic.Dictionary{Engine.Core.Rooms.Tiles.TileDirection,System.Boolean},Microsoft.Xna.Framework.Rectangle)">
+            <summary>
+            Calculate the frame for a 3x2 autotile pattern (vertical edges)
+            </summary>
+            <param name="directions">Dictionary of tile directions</param>
+            <param name="baseFrame">Base frame rectangle</param>
+            <returns>Updated frame rectangle</returns>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.AutotilePatterns.CalculateFrame(Engine.Core.Rooms.Tiles.AutotilePattern,System.Collections.Generic.Dictionary{Engine.Core.Rooms.Tiles.TileDirection,System.Boolean},Microsoft.Xna.Framework.Rectangle)">
+            <summary>
+            Calculate the frame for any autotile pattern
+            </summary>
+            <param name="pattern">The autotile pattern to use</param>
+            <param name="directions">Dictionary of tile directions</param>
+            <param name="baseFrame">Base frame rectangle</param>
+            <returns>Updated frame rectangle</returns>
+        </member>
+        <member name="T:Engine.Core.Rooms.Tiles.TileDirection">
+            <summary>
+            Lets us define whether or not a tile is facing a certain direction
+            Defines the directions a tile is facing (orthogonal)
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Rooms.Tiles.RuleTile">
+            <summary>
+            Defines a rule tile class that has autotiling rules
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Rooms.Tiles.RuleTile.Pattern">
+            <summary>
+            The autotile pattern to use for this rule tile
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Rooms.Tiles.RuleTile.BaseFrame">
+            <summary>
+            Base frame rectangle (top-left tile in the autotile set)
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.RuleTile.#ctor(System.Int32,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Set the frame
+            </summary>
+            <param name="width"></param>
+            <param name="height"></param>
+        </member>
+        <member name="F:Engine.Core.Rooms.Tiles.RuleTile.Directions">
+            <summary>
+            These are the directions the tile is facing. They define how the tile is autotiled
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.RuleTile.AutoTile(Engine.Core.Rooms.Tiles.Tilemap,System.Int32,System.Int32)">
+            <summary>
+            Given adjacent cells, autotile this tile with O(n)
+            </summary>
+            <param name="tilemap">The tilemap containing this tile</param>
+            <param name="x">X coordinate of this tile</param>
+            <param name="y">Y coordinate of this tile</param>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.RuleTile.HasSameTileType(Engine.Core.Tile)">
+            <summary>
+            Check if a neighboring tile is of the same type as this rule tile
+            </summary>
+            <param name="neighbor">The neighboring tile to check</param>
+            <returns>True if the neighbor is of the same type</returns>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.RuleTile.UpdateFrameFromDirections">
+            <summary>
+            Update the frame based on the current directions using the selected pattern
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.RuleTile.SetBaseFrame(System.Int32,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Set the base frame for this rule tile (the top-left tile in the autotile set)
+            </summary>
+            <param name="x">X coordinate of the base tile in the tileset</param>
+            <param name="y">Y coordinate of the base tile in the tileset</param>
+            <param name="width">Width of each tile</param>
+            <param name="height">Height of each tile</param>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.RuleTile.SetPattern(Engine.Core.Rooms.Tiles.AutotilePattern)">
+            <summary>
+            Set the autotile pattern for this rule tile
+            </summary>
+            <param name="pattern">The autotile pattern to use</param>
+        </member>
+        <member name="T:Engine.Core.Rooms.Tiles.TileData">
+            <summary>
+            Serializable data structure for tiles used in JSON serialization.
+            This class represents a tile's data in a format that can be easily serialized to/from JSON.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Rooms.Tiles.TileData.X">
+            <summary>
+            X coordinate of the tile in the tilemap grid
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Rooms.Tiles.TileData.Y">
+            <summary>
+            Y coordinate of the tile in the tilemap grid
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Rooms.Tiles.TileData.TileIndex">
+            <summary>
+            Index of the tile in the tileset
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Rooms.Tiles.TileData.IsCollidable">
+            <summary>
+            Whether this tile is collidable
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Rooms.Tiles.TileData.Height">
+            <summary>
+            Height of the tile (for 3D tilemaps)
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Rooms.Tiles.TileData.Frame">
+            <summary>
+            Source rectangle in the tileset texture
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Rooms.Tiles.TileData.Destination">
+            <summary>
+            Destination rectangle for rendering
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.TileData.#ctor">
+            <summary>
+            Default constructor
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.TileData.#ctor(Engine.Core.Tile,System.Int32,System.Int32)">
+            <summary>
+            Create TileData from a Tile object and its position
+            </summary>
+            <param name="tile">The tile to convert</param>
+            <param name="x">X coordinate</param>
+            <param name="y">Y coordinate</param>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.TileData.ToTile">
+            <summary>
+            Convert this TileData back to a Tile object
+            </summary>
+            <returns>A new Tile object with this data</returns>
+        </member>
+        <member name="T:Engine.Core.Rooms.Tiles.Tilemap">
+            <summary>
+            Holds the grid of tile data, manages adding, removing, and other operations
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Rooms.Tiles.Tilemap.Tiles">
+            <summary>
+            The grid of tiles in the world (not serialized directly)
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Rooms.Tiles.Tilemap.SerializableTiles">
+            <summary>
+            Serializable representation of the tiles for JSON serialization
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Rooms.Tiles.Tilemap.Renderer">
+            <summary>
+            The actual renderer for the tilemap. Used to issue rendering calls
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Rooms.Tiles.Tilemap.MapSize">
+            <summary>
+            By default, our tilemap is 100x100 tiles (we allocate this much)
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Rooms.Tiles.Tilemap.CellSize">
+            <summary>
+            Size of cell of the grid
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Rooms.Tiles.Tilemap.MapWidth">
+            <summary>
+            Tilemap width
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Rooms.Tiles.Tilemap.MapHeight">
+            <summary>
+            Map height
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Rooms.Tiles.Tilemap.texture">
+            <summary>
+            Wrapper to get the renderer's texture, so we can change it in editor
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.Tilemap.#ctor">
+            <summary>
+            Initialize the tilemap grid
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.Tilemap.Resize(System.Int32,System.Int32)">
+            <summary>
+            Resize the tilemap
+            </summary>
+            <param name="width"></param>
+            <param name="height"></param>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.Tilemap.Resize(System.Int32)">
+            <summary>
+            Overload for square (nxn) resize
+            </summary>
+            <param name="mapSize"></param>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.Tilemap.SetTile(Engine.Core.Tile,System.Int32,System.Int32)">
+            <summary>
+            Place a tile in the grid at the given position
+            </summary>
+            <param name="tile"></param>
+            <param name="x"></param>
+            <param name="y"></param>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.Tilemap.SetTile(Engine.Core.Tile,Microsoft.Xna.Framework.Vector3)">
+            <summary>
+            Place a tile in the grid given a vector position
+            </summary>
+            <param name="tile"></param>
+            <param name="position"></param>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.Tilemap.GetTile(System.Int32,System.Int32)">
+            <summary>
+            Get a tile at the specified position, returns null if out of bounds
+            </summary>
+            <param name="x">X coordinate</param>
+            <param name="y">Y coordinate</param>
+            <returns>The tile at the position, or null if out of bounds</returns>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.Tilemap.GetTile(Microsoft.Xna.Framework.Vector2)">
+            <summary>
+            Get a tile at the specified position, returns null if out of bounds
+            </summary>
+            <param name="position">Position as Vector2</param>
+            <returns>The tile at the position, or null if out of bounds</returns>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.Tilemap.HasTile(System.Int32,System.Int32)">
+            <summary>
+            Check if a tile exists at the specified position (not null and within bounds)
+            </summary>
+            <param name="x">X coordinate</param>
+            <param name="y">Y coordinate</param>
+            <returns>True if a tile exists at the position</returns>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.Tilemap.HasTile(Microsoft.Xna.Framework.Vector2)">
+            <summary>
+            Check if a tile exists at the specified position (not null and within bounds)
+            </summary>
+            <param name="position">Position as Vector2</param>
+            <returns>True if a tile exists at the position</returns>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.Tilemap.GetNeighboringTiles(System.Int32,System.Int32)">
+            <summary>
+            Get all neighboring tiles (8-directional) for autotiling
+            </summary>
+            <param name="x">X coordinate of the center tile</param>
+            <param name="y">Y coordinate of the center tile</param>
+            <returns>Dictionary of directions to neighboring tiles</returns>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.Tilemap.UpdateAutotiling(System.Int32,System.Int32)">
+            <summary>
+            Update autotiling for a specific tile and its neighbors
+            </summary>
+            <param name="x">X coordinate of the tile to update</param>
+            <param name="y">Y coordinate of the tile to update</param>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.Tilemap.GetNeighborPosition(System.Int32,System.Int32,Engine.Core.Rooms.Tiles.TileDirection)">
+            <summary>
+            Get the position of a neighbor in a specific direction
+            </summary>
+            <param name="x">X coordinate of the center tile</param>
+            <param name="y">Y coordinate of the center tile</param>
+            <param name="direction">Direction to get neighbor position for</param>
+            <returns>Position of the neighbor</returns>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.Tilemap.Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
+            <summary>
+            Issue rendering calls via the tilemap renderer
+            </summary>
+            <param name="spriteBatch"></param>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.Tilemap.Initialize">
+            <summary>
+            Initialize the renderer's texture
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Rooms.Tiles.TilemapSerializer">
+            <summary>
+            Handles the serialization and deserialization of tilemap tile data.
+            This class provides methods to convert between the 2D Tile array and a serializable format.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.TilemapSerializer.ToSerializable(Engine.Core.Tile[0:,0:])">
+            <summary>
+            Convert a 2D tile array to a serializable list of TileData objects.
+            Only non-null tiles are included in the result.
+            </summary>
+            <param name="tiles">The 2D tile array to convert</param>
+            <returns>A list of TileData objects representing the non-null tiles</returns>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.TilemapSerializer.FromSerializable(System.Collections.Generic.List{Engine.Core.Rooms.Tiles.TileData},System.Int32,System.Int32)">
+            <summary>
+            Convert a list of TileData objects back to a 2D tile array.
+            </summary>
+            <param name="tileDataList">The list of TileData objects to convert</param>
+            <param name="width">Width of the tilemap</param>
+            <param name="height">Height of the tilemap</param>
+            <returns>A 2D tile array with tiles placed at their correct positions</returns>
+        </member>
+        <member name="T:Engine.Core.Rooms.Room">
+            <summary>
+            Represents a room or scene in the game, containing GameObjects and their components.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Rooms.Room.Name">
+            <summary>
+            Name of the room. This is used to identify the room in the editor and in the game.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Rooms.Room.FilePath">
+            <summary>
+            File path of the room. This is used to load the room from disk.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Rooms.Room.objects">
+            <summary>
+            List of GameObjects in the room. Each GameObject can have multiple components.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Rooms.Room.Render(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
+            <summary>
+            Render a scene
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Rooms.Room.Render3D(Microsoft.Xna.Framework.Graphics.GraphicsDevice,Microsoft.Xna.Framework.Matrix,Microsoft.Xna.Framework.Matrix)">
+            <summary>
+            Render 3D components before the 2D sprite batch.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Rooms.Room.RenderUI(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
+            <summary>
+            Render UI elements in the scene
+            </summary>
+            <param name="spriteBatch"></param>
+        </member>
+        <member name="M:Engine.Core.Rooms.Room.Update(Microsoft.Xna.Framework.GameTime)">
+            <summary>
+            Update a scene
+            </summary>
+            <param name="gameTime"></param>
+        </member>
+        <member name="M:Engine.Core.Rooms.Room.Load(System.String)">
+            <summary>
+            Creates a room given a path
+            </summary>
+            <param name="path"></param>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:Engine.Core.Rooms.Room.Initialize" -->
+        <member name="M:Engine.Core.Rooms.Room.FindByName(System.String)">
+            <summary>
+            Find a GameObject by name
+            </summary>
+            <param name="name">Name to search for</param>
+            <returns>The GameObject if found, null otherwise</returns>
         </member>
         <member name="M:Engine.Core.Graphics.FontLibrary.Initialize(Microsoft.Xna.Framework.Graphics.GraphicsDevice,Microsoft.Xna.Framework.Content.ContentManager)">
             <summary>
@@ -1741,115 +2150,19 @@
             Retrieve a previously loaded texture by name (file name without extension).
             </summary>
         </member>
-        <member name="T:Engine.Core.Rooms.Room">
-            <summary>
-            Represents a room or scene in the game, containing GameObjects and their components.
-            </summary>
-        </member>
-        <member name="P:Engine.Core.Rooms.Room.Name">
-            <summary>
-            Name of the room. This is used to identify the room in the editor and in the game.
-            </summary>
-        </member>
-        <member name="P:Engine.Core.Rooms.Room.FilePath">
-            <summary>
-            File path of the room. This is used to load the room from disk.
-            </summary>
-        </member>
-        <member name="P:Engine.Core.Rooms.Room.objects">
-            <summary>
-            List of GameObjects in the room. Each GameObject can have multiple components.
-            </summary>
-        </member>
-        <member name="M:Engine.Core.Rooms.Room.Render(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
-            <summary>
-            Render a scene
-            </summary>
-        </member>
-        <member name="M:Engine.Core.Rooms.Room.Render3D(Microsoft.Xna.Framework.Graphics.GraphicsDevice,Microsoft.Xna.Framework.Matrix,Microsoft.Xna.Framework.Matrix)">
-            <summary>
-            Render 3D components before the 2D sprite batch.
-            </summary>
-        </member>
-        <member name="M:Engine.Core.Rooms.Room.RenderUI(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
-            <summary>
-            Render UI elements in the scene
-            </summary>
-            <param name="spriteBatch"></param>
-        </member>
-        <member name="M:Engine.Core.Rooms.Room.Update(Microsoft.Xna.Framework.GameTime)">
-            <summary>
-            Update a scene
-            </summary>
-            <param name="gameTime"></param>
-        </member>
-        <member name="M:Engine.Core.Rooms.Room.Load(System.String)">
-            <summary>
-            Creates a room given a path
-            </summary>
-            <param name="path"></param>
-        </member>
-        <!-- Badly formed XML comment ignored for member "M:Engine.Core.Rooms.Room.Initialize" -->
-        <member name="M:Engine.Core.Rooms.Room.FindByName(System.String)">
-            <summary>
-            Find a GameObject by name
-            </summary>
-            <param name="name">Name to search for</param>
-            <returns>The GameObject if found, null otherwise</returns>
-        </member>
-        <member name="T:Engine.Core.Rooms.Tiles.TileArrayUtils">
-            <summary>
-            Utility class for converting between jagged arrays and 2D arrays for tile data.
-            </summary>
-        </member>
-        <member name="M:Engine.Core.Rooms.Tiles.TileArrayUtils.ToJagged``1(``0[0:,0:])">
-            <summary>
-            Converts a 2D array to a jagged array.
-            </summary>
-            <typeparam name="T"></typeparam>
-            <param name="array"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Engine.Core.Rooms.Tiles.TileArrayUtils.To2D``1(``0[][])">
-            <summary>
-            Converts a jagged array to a 2D array.
-            </summary>
-            <typeparam name="T"></typeparam>
-            <param name="jagged"></param>
-            <returns></returns>
-        </member>
-        <member name="T:Engine.Core.Rooms.Tiles.TilemapLayerData">
-            <summary>
-            Serializable data for a single tilemap layer.
-            </summary>
-        </member>
-        <member name="T:Engine.Core.Rooms.Tiles.TilemapSaveData">
-            <summary>
-            Serializable data for a tilemap, containing multiple layers.
-            </summary>
-        </member>
-        <member name="T:Engine.Core.Rooms.Tiles.TilemapRendererExtensions">
-            <summary>
-            Extensions for TilemapRenderer to convert to and from TilemapLayerData.
-            </summary>
-        </member>
-        <member name="M:Engine.Core.Rooms.Tiles.TilemapRendererExtensions.ToData(Engine.Core.Game.Components.TilemapRenderer)">
-            <summary>
-            Converts the TilemapRenderer to TilemapLayerData, extracting its properties and tiles.
-            </summary>
-            <param name="renderer"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Engine.Core.Rooms.Tiles.TilemapRendererExtensions.ApplyData(Engine.Core.Game.Components.TilemapRenderer,Engine.Core.Rooms.Tiles.TilemapLayerData)">
-            <summary>
-            Applies the given TilemapLayerData to the TilemapRenderer, updating its properties and tiles.
-            </summary>
-            <param name="renderer"></param>
-            <param name="data"></param>
-        </member>
         <member name="T:Engine.Core.Tile">
             <summary>
             Represents a single tile in a tile layer, including its index in the tileset, collision properties, and height.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Tile.Frame">
+            <summary>
+            This is the frame relative to the tile texture we want to source from
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Tile.Destination">
+            <summary>
+            Destination render
             </summary>
         </member>
         <member name="M:Engine.Core.Tile.#ctor(System.Int32)">
@@ -1861,6 +2174,11 @@
         <member name="M:Engine.Core.Tile.#ctor">
             <summary>
             Default constructor for Tile, initializes with default values.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Tile.AutoTile(Engine.Core.Rooms.Tiles.TilemapRenderer)">
+            <summary>
+            Base autotile method
             </summary>
         </member>
         <member name="T:Engine.Core.TileLayer">
@@ -2357,13 +2675,6 @@
             <summary>
             Render all tilemaps in the manager. Users can add their own, 
             </summary>
-        </member>
-        <member name="M:TilemapManager.GetTilemapsAtFloor(System.Int32)">
-            <summary>
-            Get all tilemaps at a specific floor level. This is useful for rendering only the tilemaps that are relevant to the current floor in a multi-floor environment.
-            </summary>
-            <param name="floorLevel"></param>
-            <returns></returns>
         </member>
         <member name="M:TilemapManager.Save">
             <summary>

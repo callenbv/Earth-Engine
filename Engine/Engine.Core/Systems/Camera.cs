@@ -201,8 +201,6 @@ namespace Engine.Core
             if (EngineContext.Running)
                 return;
 
-            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, GetViewMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight));
-
             Texture2D pixel = GraphicsLibrary.PixelTexture;
             Rectangle border = new Rectangle(0, 0, UIWidth, UIHeight);
             Color color = Color.White;
@@ -217,7 +215,6 @@ namespace Engine.Core
             // Right
             spriteBatch.Draw(pixel, new Rectangle(border.X + border.Width - thickness, border.Y, thickness, border.Height), color);
 
-            spriteBatch.End();
         }
     }
 } 

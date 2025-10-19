@@ -8,6 +8,7 @@
 
 using Engine.Core.Data;
 using Engine.Core.Graphics;
+using Engine.Core.Rooms.Tiles;
 using Engine.Core.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -209,29 +210,6 @@ namespace Engine.Core.Game.Components
         /// <returns></returns>
         public bool CollidesWithTiles(TilemapRenderer tilemap)
         {
-            if (tilemap == null)
-                return false;
-
-            // Only collide on same layer
-            if (tilemap.FloorLevel != Owner.Height)
-                return false;
-
-            var bounds = this.Bounds;
-
-            // Convert bounding box to tile coordinates
-            int xStart = (int)(bounds.Left / tilemap.TileSize);
-            int yStart = (int)(bounds.Top / tilemap.TileSize);
-            int xEnd = (int)(bounds.Right / tilemap.TileSize);
-            int yEnd = (int)(bounds.Bottom / tilemap.TileSize);
-
-            for (int y = yStart; y <= yEnd; y++)
-            {
-                for (int x = xStart; x <= xEnd; x++)
-                {
-                    if (tilemap.IsSolidAtTile(x, y))
-                        return true;
-                }
-            }
             return false;
         }
 
@@ -241,11 +219,6 @@ namespace Engine.Core.Game.Components
         /// <returns></returns>
         public bool IsCollidingWithTiles()
         {
-            foreach (var tilemap in TilemapManager.GetTilemapsAtFloor(Owner.Height))
-            {
-                if (!IsTrigger && CollidesWithTiles(tilemap))
-                    return true;
-            }
             return false;
         }
 
@@ -255,30 +228,6 @@ namespace Engine.Core.Game.Components
         public List<(int X, int Y, TilemapRenderer Map)> GetOverlappingTiles()
         {
             List<(int X, int Y, TilemapRenderer Map)> overlappingTiles = new();
-
-            var bounds = this.Bounds;
-            int floor = Owner.Height;
-
-            foreach (var tilemap in TilemapManager.GetTilemapsAtFloor(floor))
-            {
-                if (tilemap.TileSize <= 0) continue;
-
-                int xStart = (int)(bounds.Left / tilemap.TileSize);
-                int yStart = (int)(bounds.Top / tilemap.TileSize);
-                int xEnd = (int)(bounds.Right / tilemap.TileSize);
-                int yEnd = (int)(bounds.Bottom / tilemap.TileSize);
-
-                for (int y = yStart; y <= yEnd; y++)
-                {
-                    for (int x = xStart; x <= xEnd; x++)
-                    {
-                        if (tilemap.IsValidTile(x, y))
-                        {
-                            overlappingTiles.Add((x, y, tilemap));
-                        }
-                    }
-                }
-            }
 
             return overlappingTiles;
         }
@@ -290,28 +239,6 @@ namespace Engine.Core.Game.Components
         {
             List<(int X, int Y, TilemapRenderer Map)> overlappingTiles = new();
 
-            var bounds = this.Bounds;
-
-            foreach (var tilemap in TilemapManager.layers) // Don't filter by floor
-            {
-                if (tilemap.TileSize <= 0) continue;
-
-                int xStart = (int)(bounds.Left / tilemap.TileSize);
-                int yStart = (int)(bounds.Top / tilemap.TileSize);
-                int xEnd = (int)(bounds.Right / tilemap.TileSize);
-                int yEnd = (int)(bounds.Bottom / tilemap.TileSize);
-
-                for (int y = yStart; y <= yEnd; y++)
-                {
-                    for (int x = xStart; x <= xEnd; x++)
-                    {
-                        if (tilemap.IsValidTile(x, y))
-                        {
-                            overlappingTiles.Add((x, y, tilemap));
-                        }
-                    }
-                }
-            }
 
             return overlappingTiles;
         }
@@ -323,12 +250,6 @@ namespace Engine.Core.Game.Components
         /// <returns></returns>
         public TilemapRenderer GetTilemapAtFloor(int floor)
         {
-            foreach (var tilemap in TilemapManager.layers)
-            {
-                if (tilemap.FloorLevel == floor)
-                    return tilemap;
-            }
-
             return null; // Not found
         }
 

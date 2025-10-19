@@ -12,6 +12,7 @@ using ImGuiNET;
 using Editor.Windows.Inspector;
 using Engine.Core;
 using Engine.Core.Game.Components;
+using Editor.Windows.TileEditor;
 
 namespace EarthEngineEditor.Windows
 {
@@ -103,9 +104,9 @@ namespace EarthEngineEditor.Windows
                 Title = gameObject.Name;
             }
 
-            if (item is TilemapHandler tilemap)
+            if (item is TileEditorWindow tileEditor)
             {
-                Title = tilemap.layer.Title;
+                Title = "Tilemap Editor";
             }
         }
     }

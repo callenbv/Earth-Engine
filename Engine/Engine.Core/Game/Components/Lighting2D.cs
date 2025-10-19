@@ -61,6 +61,9 @@ namespace Engine.Core.Game
             {
                 Lighting.Instance.AmbientLightColor = Color.White;
             }
+
+            if (EngineContext.UIOnly)
+                Lighting.Instance.Enabled = false;
         }
     }
 }

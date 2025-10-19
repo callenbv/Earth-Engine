@@ -47,6 +47,7 @@ namespace EarthEngineEditor.Windows
         private bool _isRenaming = false;
         private bool _showSceneView = true;
         public static SceneViewWindow Instance { get; private set; }
+        public static bool UIMode = false;
         public SceneFolder rootFolder = new SceneFolder("Root");
 
         /// <summary>
@@ -69,6 +70,11 @@ namespace EarthEngineEditor.Windows
 
             if (_showSceneView && scene != null)
             {
+                // Toggle UI mode on/off
+                ImGui.Checkbox("UI Mode", ref UIMode);
+                EngineContext.UIOnly = UIMode;
+
+                // Render the hierarchy
                 SyncUnfolderedObjects();
                 RenderHierarchy();
             }
@@ -98,6 +104,9 @@ namespace EarthEngineEditor.Windows
                 {
                     foreach (var obj in scene.objects)
                     {
+                        if (!obj.Active)
+                            continue;
+
                         Microsoft.Xna.Framework.Rectangle rect = obj.GetBoundingBox();
 
                         if (Input.MouseHover(rect))

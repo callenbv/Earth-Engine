@@ -86,8 +86,8 @@ namespace EarthEngineEditor.Windows
             _about.Render();
             _performance.Render();
             _console.Render();
-            tileEditor.Render();
             toolbar.Render();
+            tileEditor.Draw();
         }
 
         /// <summary>

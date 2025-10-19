@@ -46,6 +46,16 @@ namespace Engine.Core.Game.Components
         public virtual string Name => GetType().Name;
 
         /// <summary>
+        /// Mark this component as UI
+        /// </summary>
+        public virtual bool IsUI => false;
+
+        /// <summary>
+        /// If this is active
+        /// </summary>
+        public bool Active { get; set; } = true;
+
+        /// <summary>
         /// Unique identifier for the component. This is used to identify the component in the editor and in the game
         /// </summary>
         [JsonIgnore]

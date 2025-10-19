@@ -22,6 +22,7 @@ namespace Engine.Core.Game.Components
     {
         public override string Name => "Sprite 2D";
         public override bool UpdateInEditor => true;
+        public override bool IsUI => false;
 
         /// <summary>
         /// The texture used for the sprite. If set, it will automatically update the texturePath, frameWidth, frameHeight, and spriteBox properties.
@@ -109,11 +110,6 @@ namespace Engine.Core.Game.Components
         [HideInInspector]
         [JsonIgnore]
         public float depth = 0;
-
-        /// <summary>
-        /// Indicates if this sprite will be drawn in UI coordinates
-        /// </summary>
-        public bool IsUI { get; set; } = false;
 
         /// <summary>
         /// The sprite effects applied to the sprite, such as flipping or mirroring.

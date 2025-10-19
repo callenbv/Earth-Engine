@@ -183,12 +183,10 @@ namespace EarthEngineEditor
             GraphicsDevice.Clear(XnaColor.CornflowerBlue);
 
             runtime.Draw(spriteBatch);
-            Camera.Main.DrawUI(spriteBatch);
 
             if (!playingInEditor)
             {
                 editorOverlay.DrawEnd(spriteBatch);
-                _windowManager.tileEditor.DrawWorldPreview(spriteBatch);
                 _imGuiRenderer?.BeforeLayout(gameTime);
 
                 ImGuiViewportPtr viewport = ImGui.GetMainViewport();

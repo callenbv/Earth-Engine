@@ -3,198 +3,93 @@
 /// <File>         TileData.cs
 /// <Author>       Callen Betts Virott 
 /// <Copyright>    @2025 Callen Betts Virott. All rights reserved.
-/// <Summary>                
+/// <Summary>      Serializable data structure for tiles used in JSON serialization                
 /// -----------------------------------------------------------------------------
 
-using Engine.Core.Game.Components;
-using Engine.Core.Graphics;
-using System.Numerics;
+using Microsoft.Xna.Framework;
 
 namespace Engine.Core.Rooms.Tiles
 {
     /// <summary>
-    /// Utility class for converting between jagged arrays and 2D arrays for tile data.
+    /// Serializable data structure for tiles used in JSON serialization.
+    /// This class represents a tile's data in a format that can be easily serialized to/from JSON.
     /// </summary>
-    public static class TileArrayUtils
+    public class TileData
     {
         /// <summary>
-        /// Converts a 2D array to a jagged array.
+        /// X coordinate of the tile in the tilemap grid
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="array"></param>
-        /// <returns></returns>
-        public static T[][] ToJagged<T>(T[,] array)
-        {
-            if (array == null)
-                return null;
-
-            int width = array.GetLength(0);
-            int height = array.GetLength(1);
-
-            var jagged = new T[width][];
-            for (int x = 0; x < width; x++)
-            {
-                jagged[x] = new T[height];
-                for (int y = 0; y < height; y++)
-                    jagged[x][y] = array[x, y];
-            }
-            return jagged;
-        }
+        public int X { get; set; }
 
         /// <summary>
-        /// Converts a jagged array to a 2D array.
+        /// Y coordinate of the tile in the tilemap grid
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="jagged"></param>
-        /// <returns></returns>
-        public static T[,] To2D<T>(T[][] jagged)
-        {
-            if (jagged == null)
-                return null;
+        public int Y { get; set; }
 
-            int width = jagged.Length;
-            int height = jagged[0].Length;
+        /// <summary>
+        /// Index of the tile in the tileset
+        /// </summary>
+        public int TileIndex { get; set; }
 
-            var array = new T[width, height];
-            for (int x = 0; x < width; x++)
-                for (int y = 0; y < height; y++)
-                    array[x, y] = jagged[x][y];
+        /// <summary>
+        /// Whether this tile is collidable
+        /// </summary>
+        public bool IsCollidable { get; set; }
 
-            return array;
-        }
-    }
-
-    /// <summary>
-    /// Serializable data for a single tilemap layer.
-    /// </summary>
-    public class TilemapLayerData
-    {
-        public string Title { get; set; }
-        public string TexturePath { get; set; }
-        public int Width { get; set; }
+        /// <summary>
+        /// Height of the tile (for 3D tilemaps)
+        /// </summary>
         public int Height { get; set; }
-        public int FloorLevel { get; set; }
-        public float Depth { get; set; }
-        public Vector2 Offset { get; set; }
-        public int[][] TileIndices { get; set; } 
-        public bool[][] Collision { get; set; }
-        public bool[][] Stair { get; set; }
-        public int[][] HeightMap { get; set; }
-    }
 
-    /// <summary>
-    /// Serializable data for a tilemap, containing multiple layers.
-    /// </summary>
-    public class TilemapSaveData
-    {
-        public List<TilemapLayerData> Layers { get; set; } = new();
-    }
-
-    /// <summary>
-    /// Extensions for TilemapRenderer to convert to and from TilemapLayerData.
-    /// </summary>
-    public static class TilemapRendererExtensions
-    {
         /// <summary>
-        /// Converts the TilemapRenderer to TilemapLayerData, extracting its properties and tiles.
+        /// Source rectangle in the tileset texture
         /// </summary>
-        /// <param name="renderer"></param>
-        /// <returns></returns>
-        public static TilemapLayerData ToData(this TilemapRenderer renderer)
+        public Rectangle Frame { get; set; }
+
+        /// <summary>
+        /// Destination rectangle for rendering
+        /// </summary>
+        public Rectangle Destination { get; set; }
+
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        public TileData()
         {
-            int w = renderer.Width;
-            int h = renderer.Height;
-
-            var indices = new int[w, h];
-            var solid = new bool[w, h];
-            var height = new int[w, h];
-            var stair = new bool[w, h];
-
-            for (int x = 0; x < w; x++)
-            {
-                for (int y = 0; y < h; y++)
-                {
-                    var tile = renderer.Tiles[x, y];
-
-                    if (tile == null)
-                    {
-                        indices[x, y] = -2;
-                        continue;
-                    }
-
-                    indices[x, y] = tile.TileIndex;
-                    solid[x, y] = tile.IsCollidable;
-                    stair[x, y] = tile.IsStair;
-                    height[x, y] = tile.Height;
-                }
-            }
-
-            return new TilemapLayerData
-            {
-                Title = renderer.Title,
-                TexturePath = renderer.TexturePath,
-                Width = w,
-                Height = h,
-                Depth = renderer.Depth,
-                FloorLevel = renderer.FloorLevel,
-                TileIndices = TileArrayUtils.ToJagged(indices),
-                Collision = TileArrayUtils.ToJagged(solid),
-                Stair = TileArrayUtils.ToJagged(stair),
-                HeightMap = TileArrayUtils.ToJagged(height),
-                Offset = renderer.Offset
-            };
+            Frame = new Rectangle();
+            Destination = new Rectangle();
         }
 
         /// <summary>
-        /// Applies the given TilemapLayerData to the TilemapRenderer, updating its properties and tiles.
+        /// Create TileData from a Tile object and its position
         /// </summary>
-        /// <param name="renderer"></param>
-        /// <param name="data"></param>
-        public static void ApplyData(this TilemapRenderer renderer, TilemapLayerData data)
+        /// <param name="tile">The tile to convert</param>
+        /// <param name="x">X coordinate</param>
+        /// <param name="y">Y coordinate</param>
+        public TileData(Tile tile, int x, int y)
         {
+            X = x;
+            Y = y;
+            TileIndex = tile.TileIndex;
+            IsCollidable = tile.IsCollidable;
+            Height = tile.Height;
+            Frame = tile.Frame;
+            Destination = tile.Destination;
+        }
 
-            renderer.Title = data.Title;
-            renderer.TexturePath = data.TexturePath;
-            renderer.Texture = TextureLibrary.Instance.Get(renderer.TexturePath);
-            renderer.Width = data.Width;
-            renderer.Height = data.Height;
-            renderer.Offset = data.Offset;
-            renderer.Depth = data.Depth;
-            renderer.FloorLevel = data.FloorLevel;
-
-            int[,] indices = TileArrayUtils.To2D(data.TileIndices);
-            bool[,] collision = TileArrayUtils.To2D(data.Collision);
-            int[,] height = TileArrayUtils.To2D(data.HeightMap);
-            bool[,] stair = TileArrayUtils.To2D(data.Stair);
-
-            renderer.Tiles = new Tile[renderer.Width, renderer.Height];
-            for (int x = 0; x < renderer.Width; x++)
+        /// <summary>
+        /// Convert this TileData back to a Tile object
+        /// </summary>
+        /// <returns>A new Tile object with this data</returns>
+        public Tile ToTile()
+        {
+            return new Tile(TileIndex)
             {
-                for (int y = 0; y < renderer.Height; y++)
-                {
-                    if (indices[x, y] <= -2)
-                    {
-                        continue;
-                    }
-
-                    try
-                    {
-                        renderer.Tiles[x, y] = new Tile
-                        {
-                            TileIndex = indices[x, y],
-                            IsCollidable = collision[x, y],
-                            IsStair = stair[x, y],
-                            Height = height[x, y]
-                        };
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"[TilemapRenderer] Error applying data: {ex.Message}");
-                        return;
-                    }
-                }
-            }
+                IsCollidable = IsCollidable,
+                Height = Height,
+                Frame = Frame,
+                Destination = Destination
+            };
         }
     }
 }
-

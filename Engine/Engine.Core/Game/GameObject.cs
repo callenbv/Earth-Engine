@@ -25,6 +25,11 @@ namespace Engine.Core.Game
     public class GameObject : IComponentContainer, IInspectable
     {
         /// <summary>
+        /// If this game object is active 
+        /// </summary>
+        public bool Active { get; set; } = true;
+
+        /// <summary>
         /// Name of the GameObject, used for identification and debugging.
         /// </summary>
         public string Name { get; set; } = string.Empty;
@@ -280,6 +285,9 @@ namespace Engine.Core.Game
                     // Check for no owner
                     if (component is ObjectComponent objComp)
                     {
+                        if (!objComp.Active)
+                            continue;
+
                         if (objComp.Owner == null)
                             continue;
 
@@ -288,6 +296,19 @@ namespace Engine.Core.Game
                         // Do not update other scripts if the engine is paused
                         if (!EngineContext.Running && !objComp.UpdateInEditor)
                             continue;
+
+                        // Disable non-ui objects when relevant
+                        if (EngineContext.UIOnly)
+                        {
+                            if (!objComp.IsUI)
+                            {
+                                Active = false;
+                            }
+                        }
+                        else
+                        {
+                            Active = true;
+                        }
                     }
 
                     component.Update(gameTime);
@@ -332,11 +353,13 @@ namespace Engine.Core.Game
         /// <param name="spriteBatch"></param>
         public void Draw(SpriteBatch spriteBatch)
         {
-            // Draw components
             foreach (var component in components)
             {
                 try
                 {
+                    if (component is ObjectComponent gameComp && !gameComp.Active)
+                        continue;
+
                     component.Draw(spriteBatch);
                 }
                 catch (Exception ex)
@@ -516,8 +539,8 @@ namespace Engine.Core.Game
                 return new Rectangle(
                     (int)(pos.X - sprite.origin.X),
                     (int)(pos.Y - sprite.origin.Y),
-                    sprite.spriteBox.Width,
-                    sprite.spriteBox.Height
+                    (int)(sprite.spriteBox.Width * Scale.X * sprite.Scale.X),
+                    (int)(sprite.spriteBox.Height * Scale.Y * sprite.Scale.Y)
                 );
             }
 

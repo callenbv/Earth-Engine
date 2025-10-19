@@ -117,6 +117,10 @@ namespace Engine.Core.Game.Components
                 {
                     TexturePath = texture.Name;
                 }
+                else
+                {
+                    TexturePath = string.Empty;
+                }
             }
         }
         private Texture2D texture = GraphicsLibrary.SquareTexture;
@@ -274,13 +278,10 @@ namespace Engine.Core.Game.Components
 
             float finalDirection = Direction + ERandom.Range(-DirectionWiggle, DirectionWiggle);
             float scaleFalloff = ParticleSize / texture.Width;
+            float depth = Owner.Depth+0.00001f;
 
-            float depth = Height + Owner.Height;
-
-            if (Owner.GetComponent<Sprite2D>() != null)
-            {
-                depth = Owner.GetComponent<Sprite2D>().depth;
-            }
+            if (depth == 0.00001f)
+                depth = 1f;
 
             Particle particle = new Particle
             {
@@ -367,15 +368,6 @@ namespace Engine.Core.Game.Components
                 graphicsDevice.DepthStencilState = originalDepthStencilState;
                 graphicsDevice.RasterizerState = originalRasterizerState;
             }
-        }
-
-        /// <summary>
-        /// Draw bounds in the UI
-        /// </summary>
-        /// <param name="spriteBatch"></param>
-        public override void DrawUI(SpriteBatch spriteBatch)
-        {
-
         }
 
         /// <summary>
@@ -487,18 +479,27 @@ namespace Engine.Core.Game.Components
         /// <param name="spriteBatch"></param>
         private void DebugDraw(SpriteBatch spriteBatch)
         {
-            if (!ShowBounds || EngineContext.Running)
-                return;
-
             Vector3 topLeft = Position + Offset;
-            Rectangle boundingBox = new Rectangle((int)topLeft.X, (int)topLeft.Y, (int)EmitterSize.X, (int)EmitterSize.Y);
+            Rectangle boundingBox = new Rectangle((int)(topLeft.X-EmitterSize.X/2), (int)(topLeft.Y-EmitterSize.Y/2), (int)EmitterSize.X, (int)EmitterSize.Y);
             Color yellow = Color.FromNonPremultiplied(255, 255, 0, 100);
 
-            // Draw a rectangle outline of the bounds, NOT a pure rectangle
-            spriteBatch.Draw(GraphicsLibrary.PixelTexture, new Rectangle(boundingBox.X, boundingBox.Y, boundingBox.Width, 1), yellow); // Top
-            spriteBatch.Draw(GraphicsLibrary.PixelTexture, new Rectangle(boundingBox.X, boundingBox.Y + boundingBox.Height - 1, boundingBox.Width, 1), yellow); // Bottom
-            spriteBatch.Draw(GraphicsLibrary.PixelTexture, new Rectangle(boundingBox.X, boundingBox.Y, 1, boundingBox.Height), yellow); // Left
-            spriteBatch.Draw(GraphicsLibrary.PixelTexture, new Rectangle(boundingBox.X + boundingBox.Width - 1, boundingBox.Y, 1, boundingBox.Height), yellow); // Right
+            float depth = 0.99f;
+
+            spriteBatch.Draw(GraphicsLibrary.PixelTexture,
+                new Rectangle(boundingBox.X, boundingBox.Y, boundingBox.Width, 1),
+                null, yellow, 0f, Vector2.Zero, SpriteEffects.None, depth); // Top
+
+            spriteBatch.Draw(GraphicsLibrary.PixelTexture,
+                new Rectangle(boundingBox.X, boundingBox.Y + boundingBox.Height - 1, boundingBox.Width, 1),
+                null, yellow, 0f, Vector2.Zero, SpriteEffects.None, depth); // Bottom
+
+            spriteBatch.Draw(GraphicsLibrary.PixelTexture,
+                new Rectangle(boundingBox.X, boundingBox.Y, 1, boundingBox.Height),
+                null, yellow, 0f, Vector2.Zero, SpriteEffects.None, depth); // Left
+
+            spriteBatch.Draw(GraphicsLibrary.PixelTexture,
+                new Rectangle(boundingBox.X + boundingBox.Width - 1, boundingBox.Y, 1, boundingBox.Height),
+                null, yellow, 0f, Vector2.Zero, SpriteEffects.None, depth); // Right
         }
     }
 } 
