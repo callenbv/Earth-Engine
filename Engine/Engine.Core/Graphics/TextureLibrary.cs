@@ -70,8 +70,15 @@ namespace Engine.Core.Graphics
         /// </summary>
         public Texture2D Get(string name)
         {
-            if (textures.TryGetValue(name, out var tex))
-                return tex;
+            try
+            {
+                if (textures.TryGetValue(name, out var tex))
+                    return tex;
+            }
+            catch (System.Exception e)
+            {
+                Console.Error.WriteLine(e.Message);
+            }
 
             return defaultTexture;
         }

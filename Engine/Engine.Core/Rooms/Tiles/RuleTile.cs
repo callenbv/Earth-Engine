@@ -1,123 +1,140 @@
-﻿
+﻿using Engine.Core.Data.Graphics;
 using Microsoft.Xna.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Engine.Core.Rooms.Tiles
 {
-    /// <summary>
-    /// Lets us define whether or not a tile is facing a certain direction
-    /// Defines the directions a tile is facing (orthogonal)
-    /// </summary>
     public enum TileDirection
-    { 
-        Up,
-        Down,
-        Left,
-        Right
+    {
+        TopLeft, Top, TopRight,
+        Left, Center, Right,
+        BottomLeft, Bottom, BottomRight
     }
 
     /// <summary>
-    /// Defines a rule tile class that has autotiling rules
+    /// Tri-state neighbor condition like Unity’s RuleTile:
+    /// Any = ignore, This = must match, NotThis = must not match.
     /// </summary>
+    public enum NeighborCondition
+    {
+        Any,
+        This,
+        NotThis
+    }
+
     public class RuleTile : Tile
     {
-        /// <summary>
-        /// The autotile pattern to use for this rule tile
-        /// </summary>
-        public AutotilePattern Pattern { get; set; } = AutotilePattern.ThreeByThree;
-
-        /// <summary>
-        /// Base frame rectangle (top-left tile in the autotile set)
-        /// </summary>
-        public Rectangle BaseFrame { get; set; } = new Rectangle();
+        public List<TileRule> Rules = new();
+        public int DefaultFrameIndex { get; set; } = 0;
 
         public RuleTile()
         {
-            BaseFrame = new Rectangle();
+            if (Rules.Count == 0)
+                Rules.Add(new TileRule());
         }
 
-        /// <summary>
-        /// Set the frame
-        /// </summary>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        public RuleTile(int x, int y, int width, int height)
-        {
-            Frame.X = x;
-            Frame.Y = y;
-            Frame.Width = width;
-            Frame.Height = height;
-        }
-
-        /// <summary>
-        /// These are the directions the tile is facing. They define how the tile is autotiled
-        /// </summary>
-        public Dictionary<TileDirection, bool> Directions = new Dictionary<TileDirection, bool>();
-
-        /// <summary>
-        /// Given adjacent cells, autotile this tile with O(n)
-        /// </summary>
-        /// <param name="tilemap">The tilemap containing this tile</param>
-        /// <param name="x">X coordinate of this tile</param>
-        /// <param name="y">Y coordinate of this tile</param>
         public void AutoTile(Tilemap tilemap, int x, int y)
         {
-            // Get neighboring tiles
-            var neighbors = tilemap.GetNeighboringTiles(x, y);
-            
-            // Check which directions have tiles of the same type
-            Directions[TileDirection.Up] = HasSameTileType(neighbors[TileDirection.Up]);
-            Directions[TileDirection.Down] = HasSameTileType(neighbors[TileDirection.Down]);
-            Directions[TileDirection.Left] = HasSameTileType(neighbors[TileDirection.Left]);
-            Directions[TileDirection.Right] = HasSameTileType(neighbors[TileDirection.Right]);
-            
-            // Update the frame based on the autotile pattern
-            UpdateFrameFromDirections();
+            var neighbors = GetNeighborStates(tilemap, x, y);
+
+            // Prioritize more specific rules (those with more non-Any conditions)
+            foreach (var rule in Rules.OrderByDescending(r => r.Conditions.Count(c => c.Value != NeighborCondition.Any)))
+            {
+                if (MatchesRule(rule, neighbors))
+                {
+                    SetFrameFromIndex(tilemap, rule.SelectedFrameIndex);
+                    return;
+                }
+            }
+
+            // Fallback to default
+            SetFrameFromIndex(tilemap, DefaultFrameIndex);
         }
 
-        /// <summary>
-        /// Check if a neighboring tile is of the same type as this rule tile
-        /// </summary>
-        /// <param name="neighbor">The neighboring tile to check</param>
-        /// <returns>True if the neighbor is of the same type</returns>
+        private Dictionary<TileDirection, bool> GetNeighborStates(Tilemap tilemap, int x, int y)
+        {
+            var dirs = new Dictionary<TileDirection, bool>
+            {
+                [TileDirection.Top] = HasSameTileType(tilemap.GetTile(x, y - 1)),
+                [TileDirection.Bottom] = HasSameTileType(tilemap.GetTile(x, y + 1)),
+                [TileDirection.Left] = HasSameTileType(tilemap.GetTile(x - 1, y)),
+                [TileDirection.Right] = HasSameTileType(tilemap.GetTile(x + 1, y)),
+                [TileDirection.TopLeft] = HasSameTileType(tilemap.GetTile(x - 1, y - 1)),
+                [TileDirection.TopRight] = HasSameTileType(tilemap.GetTile(x + 1, y - 1)),
+                [TileDirection.BottomLeft] = HasSameTileType(tilemap.GetTile(x - 1, y + 1)),
+                [TileDirection.BottomRight] = HasSameTileType(tilemap.GetTile(x + 1, y + 1)),
+                [TileDirection.Center] = true
+            };
+            return dirs;
+        }
+
         private bool HasSameTileType(Tile? neighbor)
         {
-            if (neighbor == null)
+            return neighbor is RuleTile rule && rule.TileIndex == TileIndex;
+        }
+
+        /// <summary>
+        /// Checks whether this tile’s neighbors satisfy the given rule.
+        /// </summary>
+        private bool MatchesRule(TileRule rule, Dictionary<TileDirection, bool> neighbors)
+        {
+            // Skip empty rules
+            if (!rule.Conditions.Values.Any(v => v != NeighborCondition.Any))
                 return false;
-                
-            // Check if the neighbor is the same type of rule tile
-            // You can customize this logic based on your needs
-            return neighbor is RuleTile && neighbor.TileIndex == this.TileIndex;
+
+            foreach (var kvp in rule.Conditions)
+            {
+                if (kvp.Key == TileDirection.Center)
+                    continue;
+
+                bool actual = neighbors.GetValueOrDefault(kvp.Key);
+                var expected = kvp.Value;
+
+                switch (expected)
+                {
+                    case NeighborCondition.Any:
+                        continue;
+                    case NeighborCondition.This:
+                        if (!actual)
+                            return false;
+                        break;
+                    case NeighborCondition.NotThis:
+                        if (actual)
+                            return false;
+                        break;
+                }
+            }
+            return true;
         }
 
-        /// <summary>
-        /// Update the frame based on the current directions using the selected pattern
-        /// </summary>
-        private void UpdateFrameFromDirections()
+        private void SetFrameFromIndex(Tilemap tilemap, int index)
         {
-            // Use the pattern system to calculate the correct frame
-            Frame = AutotilePatterns.CalculateFrame(Pattern, Directions, BaseFrame);
-        }
+            int cell = tilemap.CellSize;
+            TextureData? texture = tilemap.texture;
+            if (texture?.texture == null)
+                return;
 
-        /// <summary>
-        /// Set the base frame for this rule tile (the top-left tile in the autotile set)
-        /// </summary>
-        /// <param name="x">X coordinate of the base tile in the tileset</param>
-        /// <param name="y">Y coordinate of the base tile in the tileset</param>
-        /// <param name="width">Width of each tile</param>
-        /// <param name="height">Height of each tile</param>
-        public void SetBaseFrame(int x, int y, int width, int height)
-        {
-            BaseFrame = new Rectangle(x, y, width, height);
-            Frame = BaseFrame; // Set initial frame to base frame
-        }
+            int texWidth = texture.texture.Width;
+            int cols = texWidth / cell;
 
-        /// <summary>
-        /// Set the autotile pattern for this rule tile
-        /// </summary>
-        /// <param name="pattern">The autotile pattern to use</param>
-        public void SetPattern(AutotilePattern pattern)
+            int x = (index % cols) * cell;
+            int y = (index / cols) * cell;
+
+            Frame = new Rectangle(x, y, cell, cell);
+        }
+    }
+
+    public class TileRule
+    {
+        public Dictionary<TileDirection, NeighborCondition> Conditions = new();
+        public int SelectedFrameIndex { get; set; } = 0;
+
+        public TileRule()
         {
-            Pattern = pattern;
+            foreach (TileDirection dir in Enum.GetValues(typeof(TileDirection)))
+                Conditions[dir] = NeighborCondition.Any;
         }
     }
 }

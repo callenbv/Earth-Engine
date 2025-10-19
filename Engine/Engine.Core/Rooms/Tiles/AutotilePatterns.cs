@@ -57,11 +57,11 @@ namespace Engine.Core.Rooms.Tiles
             int autotileIndex = 0;
             
             // Calculate index based on neighboring tiles
-            if (directions[TileDirection.Up] && directions[TileDirection.Left])
+            if (directions[TileDirection.Top] && directions[TileDirection.Left])
                 autotileIndex += 1; // Top-left corner
-            if (directions[TileDirection.Up])
+            if (directions[TileDirection.Top])
                 autotileIndex += 2; // Top edge
-            if (directions[TileDirection.Up] && directions[TileDirection.Right])
+            if (directions[TileDirection.Top] && directions[TileDirection.Right])
                 autotileIndex += 4; // Top-right corner
                 
             if (directions[TileDirection.Left])
@@ -70,11 +70,11 @@ namespace Engine.Core.Rooms.Tiles
             if (directions[TileDirection.Right])
                 autotileIndex += 32; // Right edge
                 
-            if (directions[TileDirection.Down] && directions[TileDirection.Left])
+            if (directions[TileDirection.Bottom] && directions[TileDirection.Left])
                 autotileIndex += 64; // Bottom-left corner
-            if (directions[TileDirection.Down])
+            if (directions[TileDirection.Bottom])
                 autotileIndex += 128; // Bottom edge
-            if (directions[TileDirection.Down] && directions[TileDirection.Right])
+            if (directions[TileDirection.Bottom] && directions[TileDirection.Right])
                 autotileIndex += 256; // Bottom-right corner
 
             // Convert to frame coordinates (3x3 grid)
@@ -96,13 +96,13 @@ namespace Engine.Core.Rooms.Tiles
             int autotileIndex = 0;
             
             // Only check corners for 2x2 pattern
-            if (directions[TileDirection.Up] && directions[TileDirection.Left])
+            if (directions[TileDirection.Top] && directions[TileDirection.Left])
                 autotileIndex = 0; // Top-left
-            else if (directions[TileDirection.Up] && directions[TileDirection.Right])
+            else if (directions[TileDirection.Top] && directions[TileDirection.Right])
                 autotileIndex = 1; // Top-right
-            else if (directions[TileDirection.Down] && directions[TileDirection.Left])
+            else if (directions[TileDirection.Bottom] && directions[TileDirection.Left])
                 autotileIndex = 2; // Bottom-left
-            else if (directions[TileDirection.Down] && directions[TileDirection.Right])
+            else if (directions[TileDirection.Bottom] && directions[TileDirection.Right])
                 autotileIndex = 3; // Bottom-right
             else
                 autotileIndex = 0; // Default to top-left
@@ -127,9 +127,9 @@ namespace Engine.Core.Rooms.Tiles
             int autotileIndex = 0;
             
             // Calculate based on all 4 directions
-            if (directions[TileDirection.Up]) autotileIndex += 1;
+            if (directions[TileDirection.Top]) autotileIndex += 1;
             if (directions[TileDirection.Right]) autotileIndex += 2;
-            if (directions[TileDirection.Down]) autotileIndex += 4;
+            if (directions[TileDirection.Bottom]) autotileIndex += 4;
             if (directions[TileDirection.Left]) autotileIndex += 8;
 
             // Convert to frame coordinates (4x4 grid)
@@ -179,11 +179,11 @@ namespace Engine.Core.Rooms.Tiles
             int autotileIndex = 0;
             
             // Focus on vertical connections
-            if (directions[TileDirection.Up] && directions[TileDirection.Down])
+            if (directions[TileDirection.Top] && directions[TileDirection.Bottom])
                 autotileIndex = 0; // Both top and bottom
-            else if (directions[TileDirection.Up])
+            else if (directions[TileDirection.Top])
                 autotileIndex = 1; // Top only
-            else if (directions[TileDirection.Down])
+            else if (directions[TileDirection.Bottom])
                 autotileIndex = 2; // Bottom only
             else
                 autotileIndex = 3; // Neither top nor bottom

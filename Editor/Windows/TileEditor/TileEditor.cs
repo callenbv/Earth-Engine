@@ -15,8 +15,9 @@ using Engine.Core.Data;
 using Engine.Core.Game.Components;
 using Engine.Core.Rooms.Tiles;
 using ImGuiNET;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace Editor.Windows.TileEditor
 {
@@ -90,7 +91,7 @@ namespace Editor.Windows.TileEditor
             foreach (var map in Tilemaps)
             {
                 // Select the tilemap
-                bool selected = ImGui.Selectable($"{map.Name}");
+                bool selected = ImGui.Selectable($"{map.Name}##{map.GetHashCode()}");
 
                 if (selected)
                 {
@@ -120,27 +121,65 @@ namespace Editor.Windows.TileEditor
                 return;
 
             // Paint tiles
-            Vector3 mousePos = Input.mouseWorldPosition;
-            mousePos.X = (int)(mousePos.X / SelectedTilemap.CellSize) * SelectedTilemap.CellSize;
-            mousePos.Y = (int)(mousePos.Y / SelectedTilemap.CellSize) * SelectedTilemap.CellSize;
+            Vector3 mousePos = Input.mouseWorldPosition.ToNumerics();
 
-            Vector3 gridPos = new Vector3(mousePos.X / SelectedTilemap.CellSize, mousePos.Y/SelectedTilemap.CellSize, 0);
+            // Snap the mouse to the nearest tile cell
+            mousePos.X = (int)Math.Floor(mousePos.X / SelectedTilemap.CellSize) * SelectedTilemap.CellSize;
+            mousePos.Y = (int)Math.Floor(mousePos.Y / SelectedTilemap.CellSize) * SelectedTilemap.CellSize;
 
+            // Grid coordinates (tile index)
+            Vector3 gridPos = new Vector3(
+                (int)(mousePos.X / SelectedTilemap.CellSize),
+                (int)(mousePos.Y / SelectedTilemap.CellSize),
+                0);
+
+            // Place tile on click
             if (Input.IsMouseDown())
             {
-                RuleTile newTile = new RuleTile(0, 0, SelectedTilemap.CellSize, SelectedTilemap.CellSize);
-                newTile.SetBaseFrame(0, 0, SelectedTilemap.CellSize, SelectedTilemap.CellSize);
-                SelectedTilemap.SetTile(newTile, gridPos);
+                // Create a *copy* of the RuleTile asset
+                RuleTile newTile = new RuleTile
+                {
+                    Rules = new List<TileRule>(SelectedTilemap.Tile.Rules.Select(r =>
+                    {
+                        // Deep-copy each rule (so instances don’t share references)
+                        TileRule copy = new TileRule();
+                        foreach (var kvp in r.Conditions)
+                            copy.Conditions[kvp.Key] = kvp.Value;
+                        copy.SelectedFrameIndex = r.SelectedFrameIndex;
+                        return copy;
+                    })),
+                    DefaultFrameIndex = SelectedTilemap.Tile.DefaultFrameIndex,
+                    TileIndex = SelectedTilemap.Tile.TileIndex,
+                    Frame = SelectedTilemap.Tile.Frame
+                };
+
+                // Place the new tile into the map grid
+                SelectedTilemap.SetTile(newTile, (int)gridPos.X, (int)gridPos.Y);
             }
 
-            Microsoft.Xna.Framework.Rectangle tilePreview = new Microsoft.Xna.Framework.Rectangle((int)mousePos.X+tileX, (int)mousePos.Y+tileY, SelectedTilemap.CellSize, SelectedTilemap.CellSize);
-                
-            // Draw the top-left tile frame for preview
+            // Draw the preview overlay
             if (SelectedTilemap?.texture?.texture != null)
             {
-                Microsoft.Xna.Framework.Rectangle sourceFrame = new Microsoft.Xna.Framework.Rectangle(0, 0, SelectedTilemap.CellSize, SelectedTilemap.CellSize);
-                spriteBatch.Draw(SelectedTilemap.texture.texture, tilePreview, sourceFrame, Microsoft.Xna.Framework.Color.Green);
+                Microsoft.Xna.Framework.Rectangle tilePreview = new Microsoft.Xna.Framework.Rectangle(
+                    (int)mousePos.X,
+                    (int)mousePos.Y,
+                    SelectedTilemap.CellSize,
+                    SelectedTilemap.CellSize);
+
+                // Draw whichever frame you want to preview (currently top-left)
+                Microsoft.Xna.Framework.Rectangle sourceFrame = new Microsoft.Xna.Framework.Rectangle(
+                    0,
+                    0,
+                    SelectedTilemap.CellSize,
+                    SelectedTilemap.CellSize);
+
+                spriteBatch.Draw(
+                    SelectedTilemap.texture.texture,
+                    tilePreview,
+                    sourceFrame,
+                    Microsoft.Xna.Framework.Color.Green * 0.5f); // semi-transparent overlay
             }
+
 
             // Erase tiles
             if (Input.IsMouseDown(Engine.Core.Systems.Button.Right))

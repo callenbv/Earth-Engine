@@ -230,6 +230,16 @@ namespace Engine.Core.Game
         }
 
         /// <summary>
+        /// If we have a component of a type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public bool HasComponent(Type type)
+        {
+            return components.Any(c => type.IsAssignableFrom(c.GetType()));
+        }
+
+        /// <summary>
         /// Add an already existing component 
         /// </summary>
         /// <param name="comp"></param>

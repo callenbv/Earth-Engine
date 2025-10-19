@@ -16,6 +16,7 @@ using Engine.Core.Game;
 using Engine.Core.Game.Components;
 using Engine.Core.Graphics;
 using ImGuiNET;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Serialization.Json;
 using System.IO;
@@ -530,7 +531,7 @@ namespace Editor.AssetManagement
                     }
                 }
             }
-            else if (expectedType.IsAssignableFrom(typeof(ObjectComponent)))
+            else if (typeof(ObjectComponent).IsAssignableFrom(expectedType))
             {
                 ObjectComponent comp = (ObjectComponent)value;
                 string label = comp != null ? comp.Name : "None";
@@ -545,10 +546,21 @@ namespace Editor.AssetManagement
                 {
                     foreach (var sceneObj in SceneViewWindow.Instance.scene.objects)
                     {
-                        if (ImGui.Selectable(sceneObj.Name))
+                        if (sceneObj.HasComponent(expectedType))
                         {
-                            Console.WriteLine($"Ref is {sceneObj.Name}, instance: {sceneObj.GetHashCode()}");
-                            setValue(sceneObj); // update your serialized field
+                            int compIndex = 0;
+                            foreach (var component in sceneObj.components)
+                            {
+                                if (component.GetType() == expectedType)
+                                {
+                                    if (ImGui.Selectable($"{component.Name} {compIndex} ({sceneObj.Name})"))
+                                    {
+                                        Console.WriteLine($"Ref is {component.Name}, instance: {component.GetHashCode()}");
+                                        setValue(component);
+                                    }
+                                }
+                                compIndex++;
+                            }
                         }
                     }
 

@@ -1373,6 +1373,13 @@
             <typeparam name="T"></typeparam>
             <returns></returns>
         </member>
+        <member name="M:Engine.Core.Game.GameObject.HasComponent(System.Type)">
+            <summary>
+            If we have a component of a type
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
         <member name="M:Engine.Core.Game.GameObject.AddComponent(Engine.Core.Game.Components.ObjectComponent)">
             <summary>
             Add an already existing component 
@@ -1582,73 +1589,16 @@
             <param name="baseFrame">Base frame rectangle</param>
             <returns>Updated frame rectangle</returns>
         </member>
-        <member name="T:Engine.Core.Rooms.Tiles.TileDirection">
+        <member name="T:Engine.Core.Rooms.Tiles.NeighborCondition">
             <summary>
-            Lets us define whether or not a tile is facing a certain direction
-            Defines the directions a tile is facing (orthogonal)
+            Tri-state neighbor condition like Unity’s RuleTile:
+            Any = ignore, This = must match, NotThis = must not match.
             </summary>
         </member>
-        <member name="T:Engine.Core.Rooms.Tiles.RuleTile">
+        <member name="M:Engine.Core.Rooms.Tiles.RuleTile.MatchesRule(Engine.Core.Rooms.Tiles.TileRule,System.Collections.Generic.Dictionary{Engine.Core.Rooms.Tiles.TileDirection,System.Boolean})">
             <summary>
-            Defines a rule tile class that has autotiling rules
+            Checks whether this tile’s neighbors satisfy the given rule.
             </summary>
-        </member>
-        <member name="P:Engine.Core.Rooms.Tiles.RuleTile.Pattern">
-            <summary>
-            The autotile pattern to use for this rule tile
-            </summary>
-        </member>
-        <member name="P:Engine.Core.Rooms.Tiles.RuleTile.BaseFrame">
-            <summary>
-            Base frame rectangle (top-left tile in the autotile set)
-            </summary>
-        </member>
-        <member name="M:Engine.Core.Rooms.Tiles.RuleTile.#ctor(System.Int32,System.Int32,System.Int32,System.Int32)">
-            <summary>
-            Set the frame
-            </summary>
-            <param name="width"></param>
-            <param name="height"></param>
-        </member>
-        <member name="F:Engine.Core.Rooms.Tiles.RuleTile.Directions">
-            <summary>
-            These are the directions the tile is facing. They define how the tile is autotiled
-            </summary>
-        </member>
-        <member name="M:Engine.Core.Rooms.Tiles.RuleTile.AutoTile(Engine.Core.Rooms.Tiles.Tilemap,System.Int32,System.Int32)">
-            <summary>
-            Given adjacent cells, autotile this tile with O(n)
-            </summary>
-            <param name="tilemap">The tilemap containing this tile</param>
-            <param name="x">X coordinate of this tile</param>
-            <param name="y">Y coordinate of this tile</param>
-        </member>
-        <member name="M:Engine.Core.Rooms.Tiles.RuleTile.HasSameTileType(Engine.Core.Tile)">
-            <summary>
-            Check if a neighboring tile is of the same type as this rule tile
-            </summary>
-            <param name="neighbor">The neighboring tile to check</param>
-            <returns>True if the neighbor is of the same type</returns>
-        </member>
-        <member name="M:Engine.Core.Rooms.Tiles.RuleTile.UpdateFrameFromDirections">
-            <summary>
-            Update the frame based on the current directions using the selected pattern
-            </summary>
-        </member>
-        <member name="M:Engine.Core.Rooms.Tiles.RuleTile.SetBaseFrame(System.Int32,System.Int32,System.Int32,System.Int32)">
-            <summary>
-            Set the base frame for this rule tile (the top-left tile in the autotile set)
-            </summary>
-            <param name="x">X coordinate of the base tile in the tileset</param>
-            <param name="y">Y coordinate of the base tile in the tileset</param>
-            <param name="width">Width of each tile</param>
-            <param name="height">Height of each tile</param>
-        </member>
-        <member name="M:Engine.Core.Rooms.Tiles.RuleTile.SetPattern(Engine.Core.Rooms.Tiles.AutotilePattern)">
-            <summary>
-            Set the autotile pattern for this rule tile
-            </summary>
-            <param name="pattern">The autotile pattern to use</param>
         </member>
         <member name="T:Engine.Core.Rooms.Tiles.TileData">
             <summary>
@@ -1728,6 +1678,11 @@
         <member name="P:Engine.Core.Rooms.Tiles.Tilemap.Renderer">
             <summary>
             The actual renderer for the tilemap. Used to issue rendering calls
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Rooms.Tiles.Tilemap.Tile">
+            <summary>
+            The tile to place (e.g, rule tile asset)
             </summary>
         </member>
         <member name="P:Engine.Core.Rooms.Tiles.Tilemap.MapSize">

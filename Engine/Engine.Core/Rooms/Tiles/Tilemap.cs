@@ -42,6 +42,11 @@ namespace Engine.Core.Rooms.Tiles
         public TilemapRenderer Renderer { get; set; }
 
         /// <summary>
+        /// The tile to place (e.g, rule tile asset)
+        /// </summary>
+        public RuleTile Tile { get; set; }
+
+        /// <summary>
         /// By default, our tilemap is 100x100 tiles (we allocate this much)
         /// </summary>
         public int MapSize { get; set; } = 100;
@@ -187,8 +192,8 @@ namespace Engine.Core.Rooms.Tiles
         {
             var neighbors = new Dictionary<TileDirection, Tile?>();
             
-            neighbors[TileDirection.Up] = GetTile(x, y - 1);
-            neighbors[TileDirection.Down] = GetTile(x, y + 1);
+            neighbors[TileDirection.Top] = GetTile(x, y - 1);
+            neighbors[TileDirection.Bottom] = GetTile(x, y + 1);
             neighbors[TileDirection.Left] = GetTile(x - 1, y);
             neighbors[TileDirection.Right] = GetTile(x + 1, y);
             
@@ -233,8 +238,8 @@ namespace Engine.Core.Rooms.Tiles
         {
             return direction switch
             {
-                TileDirection.Up => new Vector2(x, y - 1),
-                TileDirection.Down => new Vector2(x, y + 1),
+                TileDirection.Top => new Vector2(x, y - 1),
+                TileDirection.Bottom => new Vector2(x, y + 1),
                 TileDirection.Left => new Vector2(x - 1, y),
                 TileDirection.Right => new Vector2(x + 1, y),
                 _ => new Vector2(x, y)

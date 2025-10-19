@@ -16,7 +16,7 @@ namespace Editor.AssetManagement
     /// <summary>
     /// Represents the type of asset in the project.
     /// </summary>
-    public enum AssetType { Texture, Scene, Data, Script, Audio, Prefab, Mesh, Material, Unknown }
+    public enum AssetType { Texture, Scene, Data, Script, Audio, Prefab, Mesh, Material, RuleTile, Unknown }
 
     /// <summary>
     /// Represents an asset in the project.
@@ -90,6 +90,7 @@ namespace Editor.AssetManagement
                 AssetType.Audio => new AudioHandler(),
                 AssetType.Mesh => new MeshHandler(),
                 AssetType.Material => new MaterialHandler(),
+                AssetType.RuleTile => new RuleTileHandler(),
                 _ => null
             };
 
@@ -119,6 +120,7 @@ namespace Editor.AssetManagement
                 AssetType.Audio => "\uf001", // Music note
                 AssetType.Prefab => "\uf1b2", // Cube / 3D object
                 AssetType.Mesh => "\uf1b2", // Reuse cube icon
+                AssetType.RuleTile => "\uf1b2", // Reuse cube icon
                 AssetType.Material => "\uf53f", // Fill drip (palette-like)
                 AssetType.Unknown => "\uf15b", // Generic file
                 _ => "\uf15b", // Fallback
@@ -143,6 +145,7 @@ namespace Editor.AssetManagement
                 ".wav" or ".ogg" or ".mp3" => AssetType.Audio,
                 ".prefab" or ".eo" => AssetType.Prefab,
                 ".mesh" => AssetType.Mesh,
+                ".tile" => AssetType.RuleTile,
                 ".mat" => AssetType.Material,
                 _ => AssetType.Unknown
             };
@@ -173,6 +176,7 @@ namespace Editor.AssetManagement
                 AssetType.Data => ".json",
                 AssetType.Prefab => ".eo",
                 AssetType.Mesh => ".mesh",
+                AssetType.RuleTile => ".tile",
                 AssetType.Material => ".mat",
                 _ => ".asset"
             };
