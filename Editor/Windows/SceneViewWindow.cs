@@ -165,6 +165,12 @@ namespace EarthEngineEditor.Windows
             // We also draw a folder view here for better organization
             DrawFolderNode(rootFolder);
         }
+
+        /// <summary>
+        /// Draw the root node
+        /// </summary>
+        /// <param name="folder"></param>
+        /// <returns></returns>
         private bool DrawFolderNode(SceneFolder folder)
         {
             bool open = ImGui.TreeNodeEx($"{folder.Name}");

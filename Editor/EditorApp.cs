@@ -273,6 +273,7 @@ namespace EarthEngineEditor
         public void LaunchGame()
         {
             _windowManager.SaveProject();
+            EngineContext.UIOnly = false;
 
             if (!_settings.PlayInEditor)
             {
