@@ -17,6 +17,11 @@ namespace Engine.Core.Rooms.Tiles
         public override bool UpdateInEditor => true;
 
         /// <summary>
+        /// Name of the tilemap to be displayed in the tile editor
+        /// </summary>
+        public string DisplayName = "Tilemap";
+
+        /// <summary>
         /// The grid of tiles in the world (not serialized directly)
         /// </summary>
         [JsonIgnore]
@@ -35,6 +40,13 @@ namespace Engine.Core.Rooms.Tiles
         }
 
         /// <summary>
+        /// List of brushes we can select on this tilemap
+        /// </summary>
+        [HideInInspector]
+        [JsonIgnore]
+        public List<RuleTile> Brushes = new List<RuleTile>();
+
+        /// <summary>
         /// The actual renderer for the tilemap. Used to issue rendering calls
         /// </summary>
         [JsonIgnore]
@@ -44,6 +56,7 @@ namespace Engine.Core.Rooms.Tiles
         /// <summary>
         /// The tile to place (e.g, rule tile asset)
         /// </summary>
+        [HideInInspector]
         public RuleTile Tile { get; set; }
 
         /// <summary>
@@ -67,13 +80,9 @@ namespace Engine.Core.Rooms.Tiles
         public int MapHeight { get; set; } = 100;
 
         /// <summary>
-        /// Wrapper to get the renderer's texture, so we can change it in editor
+        /// The order at which tilemaps are rendered (0-255)
         /// </summary>
-        public TextureData? texture
-        {
-            get => Renderer.texture ?? null;
-            set => Renderer.texture = value;
-        }
+        public int SortingOrder = 0;
 
         /// <summary>
         /// Initialize the tilemap grid
@@ -81,7 +90,6 @@ namespace Engine.Core.Rooms.Tiles
         public Tilemap()
         {
             Renderer = new TilemapRenderer(this);
-            texture = new TextureData();
             Resize(MapSize);
         }
 
@@ -103,6 +111,7 @@ namespace Engine.Core.Rooms.Tiles
         {
             Resize(mapSize, mapSize);
         }
+
 
         /// <summary>
         /// Place a tile in the grid at the given position
@@ -130,7 +139,7 @@ namespace Engine.Core.Rooms.Tiles
         /// </summary>
         /// <param name="tile"></param>
         /// <param name="position"></param>
-        public void SetTile(Tile? tile, Vector3 position)
+        public void SetTile(Tile? tile, Vector2 position)
         {
             // Set the tile
             SetTile(tile, (int)position.X, (int)position.Y);

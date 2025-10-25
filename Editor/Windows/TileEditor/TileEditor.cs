@@ -39,12 +39,15 @@ namespace Editor.Windows.TileEditor
     public class TileEditorWindow : IInspectable
     {
         private bool show = true;
-        public int BrushSize = 1;
-        public Tilemap? SelectedTilemap;
+        [SliderEditor(1,25)]
+        public int BrushSize { get; set; } = 1;
 
-        TileEditorMode mode = TileEditorMode.Paint;
-        public int tileX = 0;
-        public int tileY = 0;
+        [HideInInspector]
+        public Tilemap? SelectedTilemap;
+        [HideInInspector]
+        public Texture2D? PreviewTexture;
+        [HideInInspector]
+        public TileEditorMode mode = TileEditorMode.Paint;
 
         /// <summary>
         /// Tile editor draw
@@ -66,6 +69,7 @@ namespace Editor.Windows.TileEditor
         public void Render()
         {
             InspectorUI.DrawComponent(SelectedTilemap);
+            InspectorUI.DrawClass(this);
         }
 
         /// <summary>
@@ -91,7 +95,7 @@ namespace Editor.Windows.TileEditor
             foreach (var map in Tilemaps)
             {
                 // Select the tilemap
-                bool selected = ImGui.Selectable($"{map.Name}##{map.GetHashCode()}");
+                bool selected = ImGui.Selectable($"{map.DisplayName}##{map.GetHashCode()}");
 
                 if (selected)
                 {
@@ -100,10 +104,36 @@ namespace Editor.Windows.TileEditor
                 }
             }
 
-            // Add more tilemaps
-            if (ImGui.Button("Add Tilemap Layer"))
+            ImGui.NewLine();
+            bool header = ImGui.CollapsingHeader("Brushes");
+
+            // Select tilemap brushes
+            if (header)
             {
-                Tilemaps.Add(new Tilemap());
+                foreach (var brush in Asset.GetAll(AssetType.RuleTile))
+                {
+                    // Cast to RuleTile 
+                    RuleTileHandler? handler = brush._handler as RuleTileHandler;
+
+                    if (handler == null)
+                    {
+                        brush.EnsureLoaded();
+                        handler = brush._handler as RuleTileHandler;
+                    }
+
+                    RuleTile tile = handler.Tile;
+
+                    if (tile != null)
+                    {
+                        bool selected = ImGui.Selectable($"{brush.Name}");
+
+                        if (selected && SelectedTilemap != null)
+                        {
+                            PreviewTexture = tile.Texture.texture;
+                            SelectedTilemap.Tile = tile;
+                        }
+                    }
+                }
             }
 
             // No tilemap selected
@@ -134,57 +164,76 @@ namespace Editor.Windows.TileEditor
                 0);
 
             // Place tile on click
-            if (Input.IsMouseDown())
+            if (Input.IsMouseDown() && SelectedTilemap.Tile != null)
             {
-                // Create a *copy* of the RuleTile asset
-                RuleTile newTile = new RuleTile
+                for (int i = 0; i < BrushSize*BrushSize; i++)
                 {
-                    Rules = new List<TileRule>(SelectedTilemap.Tile.Rules.Select(r =>
+                    // Create a *copy* of the RuleTile asset
+                    RuleTile newTile = new RuleTile
                     {
-                        // Deep-copy each rule (so instances don’t share references)
-                        TileRule copy = new TileRule();
-                        foreach (var kvp in r.Conditions)
-                            copy.Conditions[kvp.Key] = kvp.Value;
-                        copy.SelectedFrameIndex = r.SelectedFrameIndex;
-                        return copy;
-                    })),
-                    DefaultFrameIndex = SelectedTilemap.Tile.DefaultFrameIndex,
-                    TileIndex = SelectedTilemap.Tile.TileIndex,
-                    Frame = SelectedTilemap.Tile.Frame
-                };
+                        Rules = new List<TileRule>(SelectedTilemap.Tile.Rules.Select(r =>
+                        {
+                            // Deep-copy each rule (so instances don't share references)
+                            TileRule copy = new TileRule();
+                            foreach (var kvp in r.Conditions)
+                                copy.Conditions[kvp.Key] = kvp.Value;
+                            copy.SelectedFrameIndex = r.SelectedFrameIndex;
+                            return copy;
+                        })),
+                        DefaultFrameIndex = SelectedTilemap.Tile.DefaultFrameIndex,
+                        TileIndex = SelectedTilemap.Tile.TileIndex,
+                        Frame = SelectedTilemap.Tile.Frame
+                    };
+                    newTile.Texture.texture = PreviewTexture;
 
-                // Place the new tile into the map grid
-                SelectedTilemap.SetTile(newTile, (int)gridPos.X, (int)gridPos.Y);
+                    // Place the new tile into the map grid
+                    int r = i % BrushSize;
+                    int c = i / BrushSize;
+                    SelectedTilemap.SetTile(newTile, (int)gridPos.X+r, (int)gridPos.Y+c);
+                }
             }
 
             // Draw the preview overlay
-            if (SelectedTilemap?.texture?.texture != null)
+            if (PreviewTexture != null)
             {
-                Microsoft.Xna.Framework.Rectangle tilePreview = new Microsoft.Xna.Framework.Rectangle(
-                    (int)mousePos.X,
-                    (int)mousePos.Y,
-                    SelectedTilemap.CellSize,
-                    SelectedTilemap.CellSize);
+                for (int i = 0; i < BrushSize*BrushSize; ++i)
+                {
+                    float r = (i % BrushSize) *SelectedTilemap.CellSize;
+                    float c = (i / BrushSize) *SelectedTilemap.CellSize;
 
-                // Draw whichever frame you want to preview (currently top-left)
-                Microsoft.Xna.Framework.Rectangle sourceFrame = new Microsoft.Xna.Framework.Rectangle(
-                    0,
-                    0,
-                    SelectedTilemap.CellSize,
-                    SelectedTilemap.CellSize);
+                    Microsoft.Xna.Framework.Rectangle tilePreview = new Microsoft.Xna.Framework.Rectangle(
+                        (int)(mousePos.X+r),
+                        (int)(mousePos.Y+c),
+                        SelectedTilemap.CellSize,
+                        SelectedTilemap.CellSize);
 
-                spriteBatch.Draw(
-                    SelectedTilemap.texture.texture,
-                    tilePreview,
-                    sourceFrame,
-                    Microsoft.Xna.Framework.Color.Green * 0.5f); // semi-transparent overlay
+                    // Draw whichever frame you want to preview (currently top-left)
+                    Microsoft.Xna.Framework.Rectangle sourceFrame = new Microsoft.Xna.Framework.Rectangle(
+                        0,
+                        0,
+                        SelectedTilemap.CellSize,
+                        SelectedTilemap.CellSize);
+
+                    spriteBatch.Draw(
+                        PreviewTexture,
+                        tilePreview,
+                        sourceFrame,
+                        Microsoft.Xna.Framework.Color.Green * 0.5f); // semi-transparent overlay
+                }
             }
-
 
             // Erase tiles
             if (Input.IsMouseDown(Engine.Core.Systems.Button.Right))
             {
-                SelectedTilemap.SetTile(null, gridPos);
+                for (int i = 0; i < BrushSize*BrushSize; ++i)
+                {
+                    int r = i % BrushSize;
+                    int c = i / BrushSize;
+                    
+                    Vector2 erasePos = new Vector2(gridPos.X+r,gridPos.Y+c);
+
+                    SelectedTilemap.SetTile(null, erasePos);
+                }
             }
         }
 

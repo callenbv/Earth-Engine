@@ -766,7 +766,7 @@ namespace EarthEngineEditor.Windows
 
             // Update the project window
             _project.RefreshItems();
-               
+
             // Load project settings
             project = new EarthProject();
             project.Load();

@@ -125,7 +125,7 @@ namespace EarthEngineEditor
             // Update editor camera for scene navigation (only when not playing in editor)
             if (!playingInEditor)
             {
-                Editor.Windows.EditorCamera.Update(gameTime, isInputFree);
+                EditorCamera.Update(gameTime, isInputFree);
             }
             
             runtime.Update(gameTime);

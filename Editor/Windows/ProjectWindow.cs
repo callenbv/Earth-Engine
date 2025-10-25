@@ -27,7 +27,7 @@ namespace EarthEngineEditor.Windows
         private bool _showProject = true;
         private string _currentFolder = "";
         private List<Asset> items = new();
-        private List<Asset> allAssets = new();
+        public List<Asset> allAssets = new();
         private Asset? _selectedItem = null;
 
         // Folder creation dialog
@@ -122,6 +122,7 @@ namespace EarthEngineEditor.Windows
 
             return null;
         }
+
 
         /// <summary>
         /// Try to save any changes made to assets
@@ -626,6 +627,17 @@ namespace EarthEngineEditor.Windows
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error loading items: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Loads all asset when game is started
+        /// </summary>
+        public void LoadAllAssets()
+        {
+            foreach (var asset in allAssets)
+            {
+                asset.EnsureLoaded();
             }
         }
 

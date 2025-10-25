@@ -30,15 +30,8 @@ namespace Editor.AssetManagement
     public class RuleTileHandler : IAssetHandler
     {
         /// <summary>
-        /// The tilemap this rule tile is used with.
+        /// The RuleTile asset itself
         /// </summary>
-        [JsonIgnore]
-        public Tilemap? Tilemap;
-
-        /// <summary>
-        /// The RuleTile being edited.
-        /// </summary>
-        [HideInInspector]
         public RuleTile Tile = new RuleTile();
 
         public void Open(string path)
@@ -74,6 +67,9 @@ namespace Editor.AssetManagement
                 Console.Error.WriteLine($"Failed to load RuleTile from {path}: {ex.Message}");
                 Tile = new RuleTile();
             }
+
+            // Initialize tile texture
+            Tile.Texture?.Initialize();
         }
 
         /// <summary>
@@ -98,12 +94,7 @@ namespace Editor.AssetManagement
         /// </summary>
         public void Render()
         {
-            if (Tilemap != null)
-            {
-                Tilemap.Tile = Tile;
-            }
-
-            InspectorUI.DrawClass(this);
+            InspectorUI.DrawClass(Tile);
 
             int ruleIndex = 0;
             foreach (var rule in Tile.Rules)
@@ -131,10 +122,6 @@ namespace Editor.AssetManagement
             }
         }
 
-        /// <summary>
-        /// Draws the 3x3 grid for a rule’s pattern.
-        /// </summary>
-        /// <summary>
         /// Draws the 3x3 grid for a rule’s pattern with tri-state buttons.
         /// Left-click = cycle forward (Any → This → NotThis → Any)
         /// Right-click = directly set to NotThis.
@@ -205,11 +192,12 @@ namespace Editor.AssetManagement
         /// </summary>
         private unsafe void SelectTileImage(TileRule rule)
         {
-            if (Tilemap?.texture?.texture == null)
+            if (Tile.Texture.texture == null)
                 return;
 
-            Texture2D tex = Tilemap.texture.texture;
-            var frames = GetTileFrames(Tilemap);
+            Texture2D tex = Tile.Texture.texture;
+            var frames = GetTileFrames();
+
             if (frames.Count == 0)
                 return;
 
@@ -257,16 +245,16 @@ namespace Editor.AssetManagement
         /// <summary>
         /// Returns all tile frame rectangles for the tileset.
         /// </summary>
-        private List<Rectangle> GetTileFrames(Tilemap map)
+        private List<Rectangle> GetTileFrames()
         {
             var frames = new List<Rectangle>();
-            if (map.texture?.texture == null)
+            if (Tile.Texture.texture == null)
                 return frames;
 
-            Texture2D tex = map.texture.texture;
+            Texture2D tex = Tile.Texture.texture;
             int texWidth = tex.Width;
             int texHeight = tex.Height;
-            int cell = map.CellSize;
+            int cell = Tile.CellSize;
 
             int cols = texWidth / cell;
             int rows = texHeight / cell;

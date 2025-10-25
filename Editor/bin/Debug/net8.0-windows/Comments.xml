@@ -130,6 +130,11 @@
             Attribute to mark a property or field as editable in the editor.
             </summary>
         </member>
+        <member name="T:Engine.Core.Data.ClampValueAtrribute">
+            <summary>
+            Ensures this value is clamped between a max and min (UNIMPLEMENTED)
+            </summary>
+        </member>
         <member name="T:Engine.Core.Data.ComponentCategoryAttribute">
             <summary>
             Attribute to mark a class as a component category for organization in the editor.
@@ -1595,9 +1600,50 @@
             Any = ignore, This = must match, NotThis = must not match.
             </summary>
         </member>
+        <member name="T:Engine.Core.Rooms.Tiles.RuleTile">
+            <summary>
+            Rule class tile for autotiling
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.RuleTile.AutoTile(Engine.Core.Rooms.Tiles.Tilemap,System.Int32,System.Int32)">
+            <summary>
+            Autotile the tile based on surrounding tiles
+            </summary>
+            <param name="tilemap"></param>
+            <param name="x"></param>
+            <param name="y"></param>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.RuleTile.GetNeighborStates(Engine.Core.Rooms.Tiles.Tilemap,System.Int32,System.Int32)">
+            <summary>
+            Get the state of neighbor tiles
+            </summary>
+            <param name="tilemap"></param>
+            <param name="x"></param>
+            <param name="y"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.RuleTile.HasSameTileType(Engine.Core.Tile)">
+            <summary>
+            If this neighbor is the same type
+            </summary>
+            <param name="neighbor"></param>
+            <returns></returns>
+        </member>
         <member name="M:Engine.Core.Rooms.Tiles.RuleTile.MatchesRule(Engine.Core.Rooms.Tiles.TileRule,System.Collections.Generic.Dictionary{Engine.Core.Rooms.Tiles.TileDirection,System.Boolean})">
             <summary>
             Checks whether this tile’s neighbors satisfy the given rule.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.RuleTile.SetFrameFromIndex(Engine.Core.Rooms.Tiles.Tilemap,System.Int32)">
+            <summary>
+            Set the frame of texture to use
+            </summary>
+            <param name="tilemap"></param>
+            <param name="index"></param>
+        </member>
+        <member name="T:Engine.Core.Rooms.Tiles.TileRule">
+            <summary>
+            Data structure of the tile to use
             </summary>
         </member>
         <member name="T:Engine.Core.Rooms.Tiles.TileData">
@@ -1641,6 +1687,11 @@
             Destination rectangle for rendering
             </summary>
         </member>
+        <member name="P:Engine.Core.Rooms.Tiles.TileData.TexturePath">
+            <summary>
+            Path of the texture
+            </summary>
+        </member>
         <member name="M:Engine.Core.Rooms.Tiles.TileData.#ctor">
             <summary>
             Default constructor
@@ -1660,9 +1711,20 @@
             </summary>
             <returns>A new Tile object with this data</returns>
         </member>
+        <member name="M:Engine.Core.Rooms.Tiles.TileData.ToRuleTile">
+            <summary>
+            Serialize rule tiles
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:Engine.Core.Rooms.Tiles.Tilemap">
             <summary>
             Holds the grid of tile data, manages adding, removing, and other operations
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Rooms.Tiles.Tilemap.DisplayName">
+            <summary>
+            Name of the tilemap to be displayed in the tile editor
             </summary>
         </member>
         <member name="P:Engine.Core.Rooms.Tiles.Tilemap.Tiles">
@@ -1673,6 +1735,11 @@
         <member name="P:Engine.Core.Rooms.Tiles.Tilemap.SerializableTiles">
             <summary>
             Serializable representation of the tiles for JSON serialization
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Rooms.Tiles.Tilemap.Brushes">
+            <summary>
+            List of brushes we can select on this tilemap
             </summary>
         </member>
         <member name="P:Engine.Core.Rooms.Tiles.Tilemap.Renderer">
@@ -1705,9 +1772,9 @@
             Map height
             </summary>
         </member>
-        <member name="P:Engine.Core.Rooms.Tiles.Tilemap.texture">
+        <member name="F:Engine.Core.Rooms.Tiles.Tilemap.SortingOrder">
             <summary>
-            Wrapper to get the renderer's texture, so we can change it in editor
+            The order at which tilemaps are rendered (0-255)
             </summary>
         </member>
         <member name="M:Engine.Core.Rooms.Tiles.Tilemap.#ctor">
@@ -1830,6 +1897,15 @@
             <param name="width">Width of the tilemap</param>
             <param name="height">Height of the tilemap</param>
             <returns>A 2D tile array with tiles placed at their correct positions</returns>
+        </member>
+        <member name="M:Engine.Core.Rooms.Tiles.TilemapSerializer.FromSerializableRuleTile(System.Collections.Generic.List{Engine.Core.Rooms.Tiles.TileData},System.Int32,System.Int32)">
+            <summary>
+            Serialize rule tiles
+            </summary>
+            <param name="tileDataList"></param>
+            <param name="width"></param>
+            <param name="height"></param>
+            <returns></returns>
         </member>
         <member name="T:Engine.Core.Rooms.Room">
             <summary>

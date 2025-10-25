@@ -6,6 +6,7 @@
 /// <Summary>      Serializable data structure for tiles used in JSON serialization                
 /// -----------------------------------------------------------------------------
 
+using Engine.Core.Data.Graphics;
 using Microsoft.Xna.Framework;
 
 namespace Engine.Core.Rooms.Tiles
@@ -52,6 +53,21 @@ namespace Engine.Core.Rooms.Tiles
         public Rectangle Destination { get; set; }
 
         /// <summary>
+        /// Path of the texture
+        /// </summary>
+        public string TexturePath { get; set; }
+
+        /// <summary>
+        /// Rules for rule tiles (null for regular tiles)
+        /// </summary>
+        public List<TileRule>? Rules { get; set; }
+
+        /// <summary>
+        /// Default frame index for rule tiles
+        /// </summary>
+        public int DefaultFrameIndex { get; set; }
+
+        /// <summary>
         /// Default constructor
         /// </summary>
         public TileData()
@@ -75,6 +91,22 @@ namespace Engine.Core.Rooms.Tiles
             Height = tile.Height;
             Frame = tile.Frame;
             Destination = tile.Destination;
+            TexturePath = tile.Texture.texturePath;
+
+            // If it's a RuleTile, copy the rule data
+            if (tile is RuleTile ruleTile)
+            {
+                Rules = new List<TileRule>();
+                foreach (var rule in ruleTile.Rules)
+                {
+                    var newRule = new TileRule();
+                    foreach (var kvp in rule.Conditions)
+                        newRule.Conditions[kvp.Key] = kvp.Value;
+                    newRule.SelectedFrameIndex = rule.SelectedFrameIndex;
+                    Rules.Add(newRule);
+                }
+                DefaultFrameIndex = ruleTile.DefaultFrameIndex;
+            }
         }
 
         /// <summary>
@@ -83,13 +115,48 @@ namespace Engine.Core.Rooms.Tiles
         /// <returns>A new Tile object with this data</returns>
         public Tile ToTile()
         {
-            return new Tile(TileIndex)
+            // If we have rule data, create a RuleTile, otherwise create a regular Tile
+            if (Rules != null)
             {
-                IsCollidable = IsCollidable,
-                Height = Height,
-                Frame = Frame,
-                Destination = Destination
-            };
+                RuleTile tile = new RuleTile()
+                {
+                    TileIndex = TileIndex,
+                    IsCollidable = IsCollidable,
+                    Height = Height,
+                    Frame = Frame,
+                    Destination = Destination
+                };
+                tile.Texture.texturePath = TexturePath;
+                tile.Texture.Initialize();
+
+                // Restore rule data
+                tile.Rules = new List<TileRule>();
+                foreach (var rule in Rules)
+                {
+                    var newRule = new TileRule();
+                    foreach (var kvp in rule.Conditions)
+                        newRule.Conditions[kvp.Key] = kvp.Value;
+                    newRule.SelectedFrameIndex = rule.SelectedFrameIndex;
+                    tile.Rules.Add(newRule);
+                }
+                tile.DefaultFrameIndex = DefaultFrameIndex;
+
+                return tile;
+            }
+            else
+            {
+                Tile tile = new Tile(TileIndex)
+                {
+                    IsCollidable = IsCollidable,
+                    Height = Height,
+                    Frame = Frame,
+                    Destination = Destination
+                };
+                tile.Texture.texturePath = TexturePath;
+                tile.Texture.Initialize();
+
+                return tile;
+            }
         }
     }
 }

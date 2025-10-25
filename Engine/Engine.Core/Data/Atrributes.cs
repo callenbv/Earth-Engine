@@ -15,6 +15,22 @@ namespace Engine.Core.Data
     public class HideInInspectorAttribute : Attribute { }
 
     /// <summary>
+    /// Ensures this value is clamped between a max and min (UNIMPLEMENTED)
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+    public class ClampValueAtrribute : Attribute 
+    {
+        public float Min { get; }
+        public float Max { get; }
+
+        public ClampValueAtrribute(float min = 0f, float max = 1f)
+        {
+            Min = min;
+            Max = max;
+        }
+    }
+
+    /// <summary>
     /// Attribute to mark a class as a component category for organization in the editor.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]

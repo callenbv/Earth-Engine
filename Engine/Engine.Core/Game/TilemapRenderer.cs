@@ -1,6 +1,8 @@
-﻿using Engine.Core.Data.Graphics;
+﻿using Engine.Core.Data;
+using Engine.Core.Data.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Text.Json.Serialization;
 
 namespace Engine.Core.Rooms.Tiles
 {
@@ -12,6 +14,8 @@ namespace Engine.Core.Rooms.Tiles
         /// <summary>
         /// The tilemap reference 
         /// </summary>
+        [HideInInspector]
+        [JsonIgnore]
         public Tilemap Tilemap { get; set; }
 
         /// <summary>
@@ -39,7 +43,6 @@ namespace Engine.Core.Rooms.Tiles
             set
             {
                 texture_ = value;
-                texture?.Slice(Tilemap.CellSize, Tilemap.CellSize);
             }
         }
         private TextureData? texture_;
@@ -49,7 +52,6 @@ namespace Engine.Core.Rooms.Tiles
         /// </summary>
         public void Slice()
         {
-            texture?.Slice(Tilemap.CellSize,Tilemap.CellSize);
         }
 
         /// <summary>
@@ -58,10 +60,6 @@ namespace Engine.Core.Rooms.Tiles
         /// <param name="spriteBatch"></param>
         public void Draw(SpriteBatch spriteBatch)
         {
-            // Bad texture, no draw
-            if (texture == null)
-                return;
-
             // Draw the tiles in the map
             for (int x = 0; x < Tilemap.MapWidth; x++) 
             {
@@ -72,8 +70,11 @@ namespace Engine.Core.Rooms.Tiles
                     if (tile == null)
                         continue;
 
-                    Rectangle dest = new Rectangle(x*Tilemap.CellSize, y*Tilemap.CellSize, Tilemap.CellSize, Tilemap.CellSize);
-                    spriteBatch.Draw(texture.texture, dest, tile.Frame, texture.Color);
+                    if (tile?.Texture?.texture == null)
+                        continue;
+
+                    Rectangle dest = new Rectangle(x*tile.CellSize, y* tile.CellSize, tile.CellSize, tile.CellSize);
+                    spriteBatch.Draw(tile.Texture.texture, dest, tile.Frame, Color.White, 0f,Vector2.Zero,SpriteEffects.None,0f);
                 }
             }
         }

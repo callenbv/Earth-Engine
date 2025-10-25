@@ -1,5 +1,7 @@
-﻿using Engine.Core.Data.Graphics;
+﻿using Engine.Core.Data;
+using Engine.Core.Data.Graphics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,9 +26,15 @@ namespace Engine.Core.Rooms.Tiles
         NotThis
     }
 
+    /// <summary>
+    /// Rule class tile for autotiling
+    /// </summary>
     public class RuleTile : Tile
     {
+        [HideInInspector]
         public List<TileRule> Rules = new();
+
+        [HideInInspector]
         public int DefaultFrameIndex { get; set; } = 0;
 
         public RuleTile()
@@ -35,6 +43,12 @@ namespace Engine.Core.Rooms.Tiles
                 Rules.Add(new TileRule());
         }
 
+        /// <summary>
+        /// Autotile the tile based on surrounding tiles
+        /// </summary>
+        /// <param name="tilemap"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
         public void AutoTile(Tilemap tilemap, int x, int y)
         {
             var neighbors = GetNeighborStates(tilemap, x, y);
@@ -53,6 +67,13 @@ namespace Engine.Core.Rooms.Tiles
             SetFrameFromIndex(tilemap, DefaultFrameIndex);
         }
 
+        /// <summary>
+        /// Get the state of neighbor tiles
+        /// </summary>
+        /// <param name="tilemap"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
         private Dictionary<TileDirection, bool> GetNeighborStates(Tilemap tilemap, int x, int y)
         {
             var dirs = new Dictionary<TileDirection, bool>
@@ -70,6 +91,11 @@ namespace Engine.Core.Rooms.Tiles
             return dirs;
         }
 
+        /// <summary>
+        /// If this neighbor is the same type
+        /// </summary>
+        /// <param name="neighbor"></param>
+        /// <returns></returns>
         private bool HasSameTileType(Tile? neighbor)
         {
             return neighbor is RuleTile rule && rule.TileIndex == TileIndex;
@@ -109,14 +135,19 @@ namespace Engine.Core.Rooms.Tiles
             return true;
         }
 
+        /// <summary>
+        /// Set the frame of texture to use
+        /// </summary>
+        /// <param name="tilemap"></param>
+        /// <param name="index"></param>
         private void SetFrameFromIndex(Tilemap tilemap, int index)
         {
-            int cell = tilemap.CellSize;
-            TextureData? texture = tilemap.texture;
-            if (texture?.texture == null)
+            int cell = CellSize;
+
+            if (Texture.texture == null)
                 return;
 
-            int texWidth = texture.texture.Width;
+            int texWidth = Texture.texture.Width;
             int cols = texWidth / cell;
 
             int x = (index % cols) * cell;
@@ -126,6 +157,9 @@ namespace Engine.Core.Rooms.Tiles
         }
     }
 
+    /// <summary>
+    /// Data structure of the tile to use
+    /// </summary>
     public class TileRule
     {
         public Dictionary<TileDirection, NeighborCondition> Conditions = new();

@@ -28,7 +28,7 @@ namespace Editor.AssetManagement
         public string Path = string.Empty;
         public string FullPath = string.Empty;
         public bool Folder = false;
-        private IAssetHandler? _handler;
+        public IAssetHandler? _handler;
         public string FileIcon = "\uf15b";
         private DateTime _lastModified;
 
@@ -63,6 +63,14 @@ namespace Editor.AssetManagement
                 File.Delete(filePath);
                 Console.WriteLine($"Deleted {Name} at {filePath}");
             }
+        }
+
+        /// <summary>
+        /// Load references
+        /// </summary>
+        public void LoadData()
+        {
+            EnsureLoaded();
         }
 
         /// <summary>
@@ -162,6 +170,16 @@ namespace Editor.AssetManagement
         }
 
         /// <summary>
+        /// Returns all assets of the type
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static List<Asset> GetAll(AssetType type)
+        {
+            return ProjectWindow.Instance.allAssets.FindAll(asset => asset.Type == type);
+        }
+
+        /// <summary>
         /// Gets the file extension associated with the given asset type.
         /// </summary>
         /// <param name="type"></param>
@@ -219,7 +237,6 @@ namespace Editor.AssetManagement
         /// </summary>
         public void Render()
         {
-            EnsureLoaded();
             _handler?.Render();
         }
     }

@@ -6,9 +6,12 @@
 /// <Summary>                
 /// -----------------------------------------------------------------------------
 
+using Engine.Core.Data;
+using Engine.Core.Data.Graphics;
 using Engine.Core.Rooms.Tiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Text.Json.Serialization;
 
 namespace Engine.Core
 {
@@ -17,18 +20,24 @@ namespace Engine.Core
     /// </summary>
     public class Tile
     {
+        [HideInInspector]
         public int TileIndex { get; set; }
+        public TextureData? Texture = new TextureData();
         public bool IsCollidable { get; set; }
         public int Height { get; set; } = 0;
+        public int CellSize { get; set; } = 16;
+
 
         /// <summary>
         /// This is the frame relative to the tile texture we want to source from
         /// </summary>
+        [HideInInspector]
         public Rectangle Frame = new Rectangle();
 
         /// <summary>
         /// Destination render
         /// </summary>
+        [HideInInspector]
         public Rectangle Destination = new Rectangle();
 
         /// <summary>
