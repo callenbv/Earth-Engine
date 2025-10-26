@@ -128,10 +128,7 @@ namespace Engine.Core.Rooms.Tiles
             Tiles[x,y] = tile;
             
             // Trigger autotiling if this is a rule tile
-            if (tile is RuleTile)
-            {
-                UpdateAutotiling(x, y);
-            }
+            UpdateAutotiling(x, y);
         }
 
         /// <summary>
