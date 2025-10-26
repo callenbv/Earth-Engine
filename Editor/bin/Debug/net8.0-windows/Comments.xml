@@ -1692,6 +1692,16 @@
             Path of the texture
             </summary>
         </member>
+        <member name="P:Engine.Core.Rooms.Tiles.TileData.Rules">
+            <summary>
+            Rules for rule tiles (null for regular tiles)
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Rooms.Tiles.TileData.DefaultFrameIndex">
+            <summary>
+            Default frame index for rule tiles
+            </summary>
+        </member>
         <member name="M:Engine.Core.Rooms.Tiles.TileData.#ctor">
             <summary>
             Default constructor
@@ -1710,12 +1720,6 @@
             Convert this TileData back to a Tile object
             </summary>
             <returns>A new Tile object with this data</returns>
-        </member>
-        <member name="M:Engine.Core.Rooms.Tiles.TileData.ToRuleTile">
-            <summary>
-            Serialize rule tiles
-            </summary>
-            <returns></returns>
         </member>
         <member name="T:Engine.Core.Rooms.Tiles.Tilemap">
             <summary>
@@ -1803,7 +1807,7 @@
             <param name="x"></param>
             <param name="y"></param>
         </member>
-        <member name="M:Engine.Core.Rooms.Tiles.Tilemap.SetTile(Engine.Core.Tile,Microsoft.Xna.Framework.Vector3)">
+        <member name="M:Engine.Core.Rooms.Tiles.Tilemap.SetTile(Engine.Core.Tile,Microsoft.Xna.Framework.Vector2)">
             <summary>
             Place a tile in the grid given a vector position
             </summary>
@@ -1897,15 +1901,6 @@
             <param name="width">Width of the tilemap</param>
             <param name="height">Height of the tilemap</param>
             <returns>A 2D tile array with tiles placed at their correct positions</returns>
-        </member>
-        <member name="M:Engine.Core.Rooms.Tiles.TilemapSerializer.FromSerializableRuleTile(System.Collections.Generic.List{Engine.Core.Rooms.Tiles.TileData},System.Int32,System.Int32)">
-            <summary>
-            Serialize rule tiles
-            </summary>
-            <param name="tileDataList"></param>
-            <param name="width"></param>
-            <param name="height"></param>
-            <returns></returns>
         </member>
         <member name="T:Engine.Core.Rooms.Room">
             <summary>

@@ -74,7 +74,7 @@ namespace Engine.Core.Rooms.Tiles
                         continue;
 
                     Rectangle dest = new Rectangle(x*tile.CellSize, y* tile.CellSize, tile.CellSize, tile.CellSize);
-                    spriteBatch.Draw(tile.Texture.texture, dest, tile.Frame, Color.White, 0f,Vector2.Zero,SpriteEffects.None,0f);
+                    spriteBatch.Draw(tile.Texture.texture, dest, tile.Frame, Color.White, 0f,Vector2.Zero,SpriteEffects.None,Tilemap.SortingOrder/255f);
                 }
             }
         }
