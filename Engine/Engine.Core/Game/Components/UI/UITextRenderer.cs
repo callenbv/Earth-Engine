@@ -54,7 +54,7 @@ namespace Engine.Core.Game.Components
                 Color,
                 Rotation,
                 Origin,
-                new Vector2(Scale.X, Scale.Y),
+                new Vector2(Scale.X*TextScale, Scale.Y* TextScale),
                 Effects,
                 Depth
             );

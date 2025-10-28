@@ -65,38 +65,6 @@ namespace Engine.Core.Rooms
         /// </summary>
         public void Render3D(GraphicsDevice graphicsDevice, Matrix view, Matrix projection)
         {
-            try
-            {
-                foreach (var obj in objects)
-                {
-                    // Render 3D meshes
-                    var mr = obj.GetComponent<MeshRenderer>();
-                    if (mr != null)
-                    {
-                        mr.Draw3D(graphicsDevice, view, projection);
-                    }
-
-                    // Render 2D sprites in 3D space
-                    var sprite = obj.GetComponent<Sprite2D>();
-                    if (sprite != null)
-                    {
-                        sprite.Draw3D(graphicsDevice, view, projection);
-                    }
-
-                    // Render particle emitters in 3D space
-                    var particleEmitter = obj.GetComponent<ParticleEmitter>();
-                    if (particleEmitter != null)
-                    {
-                        particleEmitter.Draw3D(graphicsDevice, view, projection);
-                        // Draw 3D bounds for particle emitters
-                        particleEmitter.Draw3DBounds(graphicsDevice, view, projection);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error rendering 3D scene: {ex.Message}");
-            }
         }
 
         /// <summary>
@@ -214,6 +182,7 @@ namespace Engine.Core.Rooms
                     }
 
                     GameReferenceResolver.Resolve(scene.objects);
+                    ComponentReferenceResolver.Resolve(scene.objects);
                 }
             }
             catch (Exception ex)

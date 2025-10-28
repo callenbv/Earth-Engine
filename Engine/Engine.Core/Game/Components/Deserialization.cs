@@ -16,6 +16,88 @@ using Engine.Core;
 namespace Editor.AssetManagement
 {
     /// <summary>
+    /// Handles resolving references to Components by their unique IDs during deserialization.
+    /// </summary>
+    public static class ComponentReferenceResolver
+    {
+        private static readonly List<(object Target, FieldInfo Field, int ID)> _pending = new();
+
+        /// <summary>
+        /// Registers a pending reference to a Component by its ID.
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="field"></param>
+        /// <param name="id"></param>
+        public static void Register(object target, FieldInfo field, int id)
+        {
+            _pending.Add((target, field, id));
+            Console.WriteLine($"[ComponentReferenceResolver] Registered pending Component reference: {target.GetType().Name}.{field.Name} -> ID {id}");
+        }
+
+        /// <summary>
+        /// Resolves all pending Component references by matching IDs with actual Components in the scene.
+        /// </summary>
+        /// <param name="objects"></param>
+        public static void Resolve(List<GameObject> objects)
+        {          
+            Console.WriteLine($"[ComponentReferenceResolver] Resolving {_pending.Count} pending Component references...");
+            
+            foreach (var (target, field, id) in _pending)
+            {          
+                var match = FindComponentById(objects, id);
+                
+                if (match != null)
+                {
+                    field.SetValue(target, match);
+                    Console.WriteLine($"[ComponentReferenceResolver] ✓ Resolved Component ID {id} for {target.GetType().Name}.{field.Name}");
+                }
+                else
+                {
+                    Console.Error.WriteLine($"[ComponentReferenceResolver] ✗ Component ID {id} not found for {target.GetType().Name}.{field.Name}");
+                    
+                    // Debug: List all available Component IDs
+                    var allIds = new List<int>();
+                    foreach (var gameObject in objects)
+                    {
+                        foreach (var component in gameObject.components)
+                        {
+                            if (component is ObjectComponent objComp)
+                            {
+                                allIds.Add(objComp.ID);
+                            }
+                        }
+                    }
+                    Console.Error.WriteLine($"[ComponentReferenceResolver] Available Component IDs: {string.Join(", ", allIds)}");
+                }
+            }
+
+            _pending.Clear();
+        }
+
+        /// <summary>
+        /// Finds a component by its ID in the given list of GameObjects.
+        /// </summary>
+        /// <param name="objects"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public static IComponent? FindComponentById(List<GameObject> objects, int id)
+        {
+            // Search through all GameObjects and their components to find the component with this ID
+            foreach (var gameObject in objects)
+            {
+                foreach (var component in gameObject.components)
+                {
+                    if (component is ObjectComponent objComp && objComp.ID == id)
+                    {
+                        return component;
+                    }
+                }
+            }
+            return null;
+        }
+    }
+
+    /// <summary>
     /// Handles resolving references to GameObjects by their unique IDs during deserialization.
     /// </summary>
     public static class GameReferenceResolver
@@ -112,6 +194,13 @@ namespace Editor.AssetManagement
                                     GameReferenceResolver.Register(component, field, id);
                                 }
                             }
+                            else if (typeof(IComponent).IsAssignableFrom(field.FieldType))
+                            {
+                                if (fieldElement.ValueKind == JsonValueKind.Number && fieldElement.TryGetInt32(out int id))
+                                {
+                                    ComponentReferenceResolver.Register(component, field, id);
+                                }
+                            }
                             else
                             {
                                 object? value = JsonSerializer.Deserialize(fieldElement.GetRawText(), field.FieldType, options);
@@ -136,10 +225,28 @@ namespace Editor.AssetManagement
                     {
                         try
                         {
-                            object? value = prop.PropertyType == typeof(GameObject)
-                                ? EngineContext.Current.Scene?.objects.FirstOrDefault(o =>
-                                    o.ID == Guid.Parse(propElement.GetString() ?? string.Empty))
-                                : JsonSerializer.Deserialize(propElement.GetRawText(), prop.PropertyType, options);
+                            object? value;
+                            if (prop.PropertyType == typeof(GameObject))
+                            {
+                                value = EngineContext.Current.Scene?.objects.FirstOrDefault(o =>
+                                    o.ID == Guid.Parse(propElement.GetString() ?? string.Empty));
+                            }
+                            else if (typeof(IComponent).IsAssignableFrom(prop.PropertyType))
+                            {
+                                if (propElement.ValueKind == JsonValueKind.Number && propElement.TryGetInt32(out int id))
+                                {
+                                    // Find the component immediately
+                                    value = ComponentReferenceResolver.FindComponentById(EngineContext.Current.Scene?.objects ?? new List<GameObject>(), id);
+                                }
+                                else
+                                {
+                                    value = null;
+                                }
+                            }
+                            else
+                            {
+                                value = JsonSerializer.Deserialize(propElement.GetRawText(), prop.PropertyType, options);
+                            }
 
                             prop.SetValue(component, value);
                         }
@@ -196,6 +303,8 @@ namespace Editor.AssetManagement
 
                     if (fieldValue is GameObject go)
                         writer.WriteStringValue(go.ID.ToString());
+                    else if (fieldValue is IComponent comp && comp is ObjectComponent objComp)
+                        writer.WriteNumberValue(objComp.ID);
                     else
                         JsonSerializer.Serialize(writer, fieldValue, field.FieldType, options);
                 }
@@ -212,6 +321,8 @@ namespace Editor.AssetManagement
 
                     if (propValue is GameObject go)
                         writer.WriteStringValue(go.ID.ToString());
+                    else if (propValue is IComponent comp && comp is ObjectComponent objComp)
+                        writer.WriteNumberValue(objComp.ID);
                     else
                         JsonSerializer.Serialize(writer, propValue, prop.PropertyType, options);
                 }

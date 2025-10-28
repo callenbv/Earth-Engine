@@ -58,7 +58,6 @@ namespace Engine.Core.Game.Components
         /// <summary>
         /// Unique identifier for the component. This is used to identify the component in the editor and in the game
         /// </summary>
-        [JsonIgnore]
         [HideInInspector]
         public int ID { get; set; } = ERandom.Range(0, 9999999);
 

@@ -457,6 +457,11 @@
             </summary>
             <param name="gameTime"></param>
         </member>
+        <member name="T:Engine.Core.Game.Components.ComponentReferenceConverter">
+            <summary>
+            Custom JSON converter for serializing and deserializing Component references by their ID.
+            </summary>
+        </member>
         <member name="M:Engine.Core.Game.Components.ComponentRegistry.Register(System.String,System.Type)">
             <summary>
             Register a new component
@@ -961,20 +966,6 @@
             Draw the sprite if valid
             </summary>
             <param name="spriteBatch"></param>
-        </member>
-        <member name="M:Engine.Core.Game.Components.Sprite2D.DrawUI(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
-            <summary>
-            Draw the sprite in UI coordinates
-            </summary>
-            <param name="spriteBatch"></param>
-        </member>
-        <member name="M:Engine.Core.Game.Components.Sprite2D.Draw3D(Microsoft.Xna.Framework.Graphics.GraphicsDevice,Microsoft.Xna.Framework.Matrix,Microsoft.Xna.Framework.Matrix)">
-            <summary>
-            Draw the sprite in 3D space using BasicEffect
-            </summary>
-            <param name="graphicsDevice"></param>
-            <param name="view"></param>
-            <param name="projection"></param>
         </member>
         <member name="M:Engine.Core.Game.Components.Sprite2D.Update(Microsoft.Xna.Framework.GameTime)">
             <summary>
@@ -2635,6 +2626,33 @@
             Set the fullscreen mode directly
             </summary>
             <param name="val"></param>
+        </member>
+        <member name="T:Editor.AssetManagement.ComponentReferenceResolver">
+            <summary>
+            Handles resolving references to Components by their unique IDs during deserialization.
+            </summary>
+        </member>
+        <member name="M:Editor.AssetManagement.ComponentReferenceResolver.Register(System.Object,System.Reflection.FieldInfo,System.Int32)">
+            <summary>
+            Registers a pending reference to a Component by its ID.
+            </summary>
+            <param name="target"></param>
+            <param name="field"></param>
+            <param name="id"></param>
+        </member>
+        <member name="M:Editor.AssetManagement.ComponentReferenceResolver.Resolve(System.Collections.Generic.List{Engine.Core.Game.GameObject})">
+            <summary>
+            Resolves all pending Component references by matching IDs with actual Components in the scene.
+            </summary>
+            <param name="objects"></param>
+        </member>
+        <member name="M:Editor.AssetManagement.ComponentReferenceResolver.FindComponentById(System.Collections.Generic.List{Engine.Core.Game.GameObject},System.Int32)">
+            <summary>
+            Finds a component by its ID in the given list of GameObjects.
+            </summary>
+            <param name="objects"></param>
+            <param name="id"></param>
+            <returns></returns>
         </member>
         <member name="T:Editor.AssetManagement.GameReferenceResolver">
             <summary>

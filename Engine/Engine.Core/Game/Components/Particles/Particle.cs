@@ -25,6 +25,7 @@ namespace Engine.Core.Game.Components
         public float Age;
         public Color Color;
         public float Scale;
+        public BlendState BlendState = BlendState.NonPremultiplied;
         private float FinalScale;
         public bool IsAlive => Age < Lifetime/60f;
         public Texture2D? Texture = GraphicsLibrary.SquareTexture;
