@@ -148,6 +148,9 @@ namespace GameRuntime
             }
 
             SceneManager.Update();
+
+            if (SceneManager.CurrentSceneData != null && scene != SceneManager.CurrentSceneData) 
+                scene = SceneManager.CurrentSceneData;
         }
 
         /// <summary>

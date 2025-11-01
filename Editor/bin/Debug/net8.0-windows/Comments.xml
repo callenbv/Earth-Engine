@@ -2133,6 +2133,11 @@
             The current scene we are in
             </summary>
         </member>
+        <member name="F:Engine.Core.Rooms.SceneManager.CurrentSceneData">
+            <summary>
+            The Scene data
+            </summary>
+        </member>
         <member name="M:Engine.Core.Rooms.SceneManager.EnterScene(Engine.Core.Data.SceneAsset)">
             <summary>
             Enter a new scene

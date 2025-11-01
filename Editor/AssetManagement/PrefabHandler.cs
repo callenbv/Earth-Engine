@@ -654,8 +654,25 @@ namespace Editor.AssetManagement
 
                     foreach (var available in availableAssignables)
                     {
-                        string displayName = AssignableHelper.GetDisplayName(available);
-                        string assetPath = AssignableHelper.GetAssignableIdentifier(available);
+                        // Try direct cast first (Editor only - no reflection needed)
+                        string displayName;
+                        string assetPath;
+                        
+                        if (available is Asset asset)
+                        {
+                            // Direct access - no reflection needed
+                            displayName = !string.IsNullOrEmpty(asset.Name) 
+                                ? $"{asset.Name} ({asset.Type})" 
+                                : $"{System.IO.Path.GetFileNameWithoutExtension(asset.Path)} ({asset.Type})";
+                            assetPath = asset.Path;
+                        }
+                        else
+                        {
+                            // Fallback to helper methods (for reflection-based access)
+                            displayName = AssignableHelper.GetDisplayName(available);
+                            assetPath = AssignableHelper.GetAssignableIdentifier(available);
+                        }
+                        
                         bool isSelected = sceneAsset != null && sceneAsset.Path == assetPath;
                         
                         if (ImGui.Selectable(displayName, isSelected))

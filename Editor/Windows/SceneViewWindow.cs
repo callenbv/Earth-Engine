@@ -277,11 +277,18 @@ namespace EarthEngineEditor.Windows
         /// </summary>
         private void SyncUnfolderedObjects()
         {
+            // Remove objects that are no longer in the scene
+            rootFolder.GameObjects.RemoveAll(obj => !scene.objects.Contains(obj));
+            
             foreach (var obj in scene.objects)
             {
                 if (!IsGroupedInAnyFolder(obj))
                 {
-                    rootFolder.GameObjects.Add(obj);
+                    // Only add if not already in the root folder
+                    if (!rootFolder.GameObjects.Contains(obj))
+                    {
+                        rootFolder.GameObjects.Add(obj);
+                    }
                 }
             }
         }

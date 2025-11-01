@@ -18,6 +18,11 @@ namespace Engine.Core.Rooms
         public static SceneAsset? CurrentScene;
 
         /// <summary>
+        /// The Scene data
+        /// </summary>
+        public static Room? CurrentSceneData;
+
+        /// <summary>
         /// Enter a new scene
         /// </summary>
         /// <param name="scene"></param>
@@ -34,10 +39,10 @@ namespace Engine.Core.Rooms
         /// </summary>
         public static void Update()
         {
-            if (EngineContext.Current.NextScene != CurrentScene)
+            if (EngineContext.Current.NextScene?.Path != CurrentScene?.Path)
             {
                 CurrentScene = EngineContext.Current.NextScene;
-                CurrentScene.LoadRoom();
+                CurrentSceneData = CurrentScene.LoadRoom();
             }
         }
     }

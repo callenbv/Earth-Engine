@@ -114,6 +114,11 @@ namespace Engine.Core.Game
         }
 
         /// <summary>
+        /// If this game object should stay persistent throughout scene changes (be copied over)
+        /// </summary>
+        public bool Persistent { get; set; } = false;
+
+        /// <summary>
         /// List of child GameObjects that are part of this GameObject's hierarchy.
         /// </summary>
         public List<GameObject> children = new List<GameObject>();
