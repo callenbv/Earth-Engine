@@ -593,6 +593,167 @@ namespace Editor.AssetManagement
                     }
                 }
             }
+            else if (expectedType == typeof(SceneAsset) || expectedType.Name == "SceneAsset")
+            {
+                // Special handling for SceneAsset
+                SceneAsset? sceneAsset = value as SceneAsset;
+                string label = sceneAsset != null && !string.IsNullOrEmpty(sceneAsset.Path) 
+                    ? sceneAsset.GetDisplayName() 
+                    : "None";
+
+                if (ImGui.Button(label))
+                {
+                    ImGui.OpenPopup($"SelectSceneAsset_{name}");
+                }
+
+                // Assign a reference
+                if (ImGui.BeginPopup($"SelectSceneAsset_{name}"))
+                {
+                    var availableAssignables = AssignableHelper.GetAssignablesForType(expectedType);
+                    
+                    Console.WriteLine($"[PrefabHandler] SelectSceneAsset: Found {availableAssignables.Count} available Scene assets");
+                    
+                    // Also try direct access to ProjectWindow assets (Editor only, no reflection needed)
+                    if (availableAssignables.Count == 0)
+                    {
+                        try
+                        {
+                            var projectWindow = ProjectWindow.Instance;
+                            if (projectWindow != null && projectWindow.allAssets != null)
+                            {
+                                foreach (var asset in projectWindow.allAssets)
+                                {
+                                    if (asset != null && asset.Type == AssetType.Scene)
+                                    {
+                                        Console.WriteLine($"[PrefabHandler] Direct access found Scene asset: {asset.Name}, Path: {asset.Path}");
+                                        // Create a wrapper that implements IAssignable (the asset already does)
+                                        if (asset is IAssignable assignableAsset)
+                                        {
+                                            availableAssignables.Add(assignableAsset);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"[PrefabHandler] Error accessing ProjectWindow directly: {ex.Message}");
+                        }
+                    }
+                    
+                    // Add "(None)" option
+                    if (ImGui.Selectable("(None)", sceneAsset == null || string.IsNullOrEmpty(sceneAsset.Path)))
+                    {
+                        setValue(new SceneAsset());
+                        ImGui.EndPopup();
+                        ImGui.PopItemWidth();
+                        ImGui.NextColumn();
+                        ImGui.Columns(1);
+                        return;
+                    }
+
+                    foreach (var available in availableAssignables)
+                    {
+                        string displayName = AssignableHelper.GetDisplayName(available);
+                        string assetPath = AssignableHelper.GetAssignableIdentifier(available);
+                        bool isSelected = sceneAsset != null && sceneAsset.Path == assetPath;
+                        
+                        if (ImGui.Selectable(displayName, isSelected))
+                        {
+                            Console.WriteLine($"SceneAsset ref is {displayName}, path: {assetPath}");
+                            setValue(new SceneAsset(assetPath));
+                            ImGui.EndPopup();
+                            ImGui.PopItemWidth();
+                            ImGui.NextColumn();
+                            ImGui.Columns(1);
+                            return;
+                        }
+                    }
+
+                    if (availableAssignables.Count == 0)
+                    {
+                        ImGui.Text("No Scene assets found. Make sure you have .room files in your Assets folder.");
+                    }
+
+                    ImGui.EndPopup();
+                }
+            }
+            else if (AssignableHelper.IsAssignableType(expectedType))
+            {
+                IAssignable? assignable = value as IAssignable;
+                string label = AssignableHelper.GetDisplayName(assignable);
+
+                if (ImGui.Button(label))
+                {
+                    ImGui.OpenPopup($"SelectAssignable_{name}");
+                }
+
+                // Assign a reference
+                if (ImGui.BeginPopup($"SelectAssignable_{name}"))
+                {
+                    var availableAssignables = AssignableHelper.GetAssignablesForType(expectedType);
+                    
+                    // Add "(None)" option
+                    if (ImGui.Selectable("(None)", assignable == null))
+                    {
+                        setValue(null);
+                        ImGui.EndPopup();
+                        ImGui.PopItemWidth();
+                        ImGui.NextColumn();
+                        ImGui.Columns(1);
+                        return;
+                    }
+
+                    foreach (var available in availableAssignables)
+                    {
+                        string displayName = AssignableHelper.GetDisplayName(available);
+                        bool isSelected = assignable != null && assignable == available;
+                        
+                        if (ImGui.Selectable(displayName, isSelected))
+                        {
+                            Console.WriteLine($"Assignable ref is {displayName}, instance: {available.GetHashCode()}");
+                            setValue(available);
+                            ImGui.EndPopup();
+                            ImGui.PopItemWidth();
+                            ImGui.NextColumn();
+                            ImGui.Columns(1);
+                            return;
+                        }
+                    }
+
+                    ImGui.EndPopup();
+                }
+
+                if (assignable != null && ImGui.BeginDragDropSource())
+                {
+                    unsafe
+                    {
+                        GCHandle handle = GCHandle.Alloc(assignable);
+                        ImGui.SetDragDropPayload("ASSIGNABLE_REF", (IntPtr)handle, sizeof(uint));
+                        ImGui.Text(label);
+                        ImGui.EndDragDropSource();
+                    }
+                }
+
+                if (ImGui.BeginDragDropTarget())
+                {
+                    unsafe
+                    {
+                        var payload = ImGui.AcceptDragDropPayload("ASSIGNABLE_REF");
+                        if (payload.NativePtr != null)
+                        {
+                            var handle = GCHandle.FromIntPtr(payload.Data);
+                            IAssignable? droppedAssignable = handle.Target as IAssignable;
+                            if (droppedAssignable != null && expectedType.IsAssignableFrom(droppedAssignable.GetType()))
+                            {
+                                setValue(droppedAssignable);
+                            }
+                            handle.Free();
+                        }
+                        ImGui.EndDragDropTarget();
+                    }
+                }
+            }
             else if (typeof(List<string>) == expectedType)
             {
                 var list = value as List<string>;

@@ -26,7 +26,7 @@ namespace Engine.Core.Data
     /// <summary>
     /// Interface for handling assets in the editor.
     /// </summary>
-    public interface IAssetHandler
+    public interface IAssetHandler : IAssignable
     {
         void Load(string path);
         virtual void Render() { }

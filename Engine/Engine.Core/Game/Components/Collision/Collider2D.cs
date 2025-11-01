@@ -92,6 +92,11 @@ namespace Engine.Core.Game.Components
         public bool IsTrigger = false;
 
         /// <summary>
+        /// If we've triggered this
+        /// </summary>
+        public bool Triggered = false;
+
+        /// <summary>
         /// Tags for collision. Useful for colliding only with certain objects
         /// </summary>
         public List<string> Tags = new List<string>();
@@ -153,11 +158,41 @@ namespace Engine.Core.Game.Components
         }
 
         /// <summary>
+        /// Reset triggers and anything on end overlap
+        /// </summary>
+        /// <param name="other"></param>
+        public override void OnCollisionExit(Collider2D other)
+        {
+            if (!Triggered)
+                return;
+
+            if (Triggered)
+                Triggered = false;
+
+            try
+            {
+                foreach (ObjectComponent component in Owner.components)
+                {
+                    component.OnCollisionExit(other);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine(e);
+            }
+        }
+
+        /// <summary>
         /// Called when this collider enters a trigger with another collider.
         /// </summary>
         /// <param name="other"></param>
         public virtual void OnTriggerEnter(Collider2D other)
         {
+            if (Triggered)
+                return;
+
+            Triggered = true;
+
             try
             {
                 foreach (ObjectComponent component in Owner.components)
@@ -198,9 +233,9 @@ namespace Engine.Core.Game.Components
             if (!EngineContext.Debug)
                 return;
 
-            //var bounds = Bounds;
-            //var rect = new Rectangle((int)bounds.X, (int)bounds.Y, (int)bounds.Width, (int)bounds.Height);
-            //spriteBatch.Draw(GraphicsLibrary.PixelTexture, rect, IsTrigger ? Color.Green * 0.5f : Color.Red * 0.5f);
+            var bounds = Bounds;
+            var rect = new Rectangle((int)bounds.X, (int)bounds.Y, (int)bounds.Width, (int)bounds.Height);
+            spriteBatch.Draw(GraphicsLibrary.PixelTexture, rect, IsTrigger ? Color.Green * 0.5f : Color.Red * 0.5f);
         }
 
         /// <summary>
@@ -238,8 +273,6 @@ namespace Engine.Core.Game.Components
         public List<(int X, int Y, TilemapRenderer Map)> GetOverlappingTilesAllFloors()
         {
             List<(int X, int Y, TilemapRenderer Map)> overlappingTiles = new();
-
-
             return overlappingTiles;
         }
 

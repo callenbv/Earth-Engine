@@ -21,7 +21,7 @@ namespace Editor.AssetManagement
     /// <summary>
     /// Represents an asset in the project.
     /// </summary>
-    public class Asset : IInspectable
+    public class Asset : IInspectable, IAssignable
     {
         public AssetType Type = AssetType.Unknown;
         public string Name = string.Empty;

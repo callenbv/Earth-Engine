@@ -12,6 +12,7 @@ using System.Text.Json.Serialization;
 using System.Reflection;
 using Engine.Core.Game;
 using Engine.Core;
+using Engine.Core.Data;
 
 namespace Editor.AssetManagement
 {
@@ -201,6 +202,24 @@ namespace Editor.AssetManagement
                                     ComponentReferenceResolver.Register(component, field, id);
                                 }
                             }
+                            else if (field.FieldType == typeof(SceneAsset) || field.FieldType.Name == "SceneAsset")
+                            {
+                                // Use the SceneAssetConverter for SceneAsset fields
+                                var sceneAssetValue = JsonSerializer.Deserialize<SceneAsset>(fieldElement.GetRawText(), new JsonSerializerOptions
+                                {
+                                    Converters = { new SceneAssetConverter() }
+                                });
+                                field.SetValue(component, sceneAssetValue);
+                            }
+                            else if (typeof(IAssignable).IsAssignableFrom(field.FieldType))
+                            {
+                                // Use the AssignableReferenceConverter for IAssignable fields
+                                var assignableValue = JsonSerializer.Deserialize<IAssignable>(fieldElement.GetRawText(), new JsonSerializerOptions
+                                {
+                                    Converters = { new AssignableReferenceConverter() }
+                                });
+                                field.SetValue(component, assignableValue);
+                            }
                             else
                             {
                                 object? value = JsonSerializer.Deserialize(fieldElement.GetRawText(), field.FieldType, options);
@@ -242,6 +261,22 @@ namespace Editor.AssetManagement
                                 {
                                     value = null;
                                 }
+                            }
+                            else if (prop.PropertyType == typeof(SceneAsset) || prop.PropertyType.Name == "SceneAsset")
+                            {
+                                // Use the SceneAssetConverter for SceneAsset properties
+                                value = JsonSerializer.Deserialize<SceneAsset>(propElement.GetRawText(), new JsonSerializerOptions
+                                {
+                                    Converters = { new SceneAssetConverter() }
+                                });
+                            }
+                            else if (typeof(IAssignable).IsAssignableFrom(prop.PropertyType))
+                            {
+                                // Use the AssignableReferenceConverter for IAssignable properties
+                                value = JsonSerializer.Deserialize<IAssignable>(propElement.GetRawText(), new JsonSerializerOptions
+                                {
+                                    Converters = { new AssignableReferenceConverter() }
+                                });
                             }
                             else
                             {
@@ -305,6 +340,10 @@ namespace Editor.AssetManagement
                         writer.WriteStringValue(go.ID.ToString());
                     else if (fieldValue is IComponent comp && comp is ObjectComponent objComp)
                         writer.WriteNumberValue(objComp.ID);
+                    else if (fieldValue is SceneAsset sceneAsset)
+                        JsonSerializer.Serialize(writer, sceneAsset, typeof(SceneAsset), new JsonSerializerOptions { Converters = { new SceneAssetConverter() } });
+                    else if (fieldValue is IAssignable assignable)
+                        JsonSerializer.Serialize(writer, assignable, typeof(IAssignable), new JsonSerializerOptions { Converters = { new AssignableReferenceConverter() } });
                     else
                         JsonSerializer.Serialize(writer, fieldValue, field.FieldType, options);
                 }
@@ -323,6 +362,10 @@ namespace Editor.AssetManagement
                         writer.WriteStringValue(go.ID.ToString());
                     else if (propValue is IComponent comp && comp is ObjectComponent objComp)
                         writer.WriteNumberValue(objComp.ID);
+                    else if (propValue is SceneAsset sceneAsset)
+                        JsonSerializer.Serialize(writer, sceneAsset, typeof(SceneAsset), new JsonSerializerOptions { Converters = { new SceneAssetConverter() } });
+                    else if (propValue is IAssignable assignable)
+                        JsonSerializer.Serialize(writer, assignable, typeof(IAssignable), new JsonSerializerOptions { Converters = { new AssignableReferenceConverter() } });
                     else
                         JsonSerializer.Serialize(writer, propValue, prop.PropertyType, options);
                 }

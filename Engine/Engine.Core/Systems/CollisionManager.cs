@@ -72,6 +72,14 @@ namespace Engine.Core.Systems
                             b.OnCollisionEnter(a);
                         }
                     }
+                    else
+                    {
+                        if (b.Triggered && a.Triggered && !b.Intersects(a))
+                        {
+                            a.OnCollisionExit(b);
+                            b.OnCollisionExit(a);
+                        }
+                    }
                 }
             }
         }

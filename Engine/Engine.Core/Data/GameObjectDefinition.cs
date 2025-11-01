@@ -14,7 +14,7 @@ namespace Engine.Core.Data
     /// <summary>
     /// Interface for a component container, which can hold multiple components.
     /// </summary>
-    public interface IComponentContainer
+    public interface IComponentContainer : IAssignable
     {
         string Name { get; }
         List<IComponent> components { get; }

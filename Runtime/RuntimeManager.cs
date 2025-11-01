@@ -147,6 +147,7 @@ namespace GameRuntime
                 Console.WriteLine($"Resized to {_lastWidth},{_lastHeight}");
             }
 
+            SceneManager.Update();
         }
 
         /// <summary>

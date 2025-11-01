@@ -54,7 +54,7 @@ namespace Engine.Core.Game.Components
         /// <summary>
         /// The position of the sprite in world coordinates. This is where the sprite will be drawn in the game world.
         /// </summary>
-        public Vector3 SpriteScale;
+        public Vector3 SpriteScale = Vector3.One;
 
         /// <summary>
         /// Height in terms of layers, used for tilemap depth ordering

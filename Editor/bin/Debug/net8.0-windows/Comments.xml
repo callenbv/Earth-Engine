@@ -125,6 +125,90 @@
             Interface for handling assets in the editor.
             </summary>
         </member>
+        <member name="T:Engine.Core.Data.IAssignable">
+            <summary>
+            Defines an interface for classes that can be assigned in the editor
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Data.AssignableHelper">
+            <summary>
+            Helper class for working with IAssignable references in the editor.
+            Provides utilities to check field types and get all available assignable objects.
+            
+            Usage in Editor:
+            To draw an IAssignable field in the inspector:
+            1. Check if the field is assignable: AssignableHelper.IsAssignableField(field)
+            2. Get available assignables: var assignables = AssignableHelper.GetAssignablesForType(field.FieldType)
+            3. Display them in a dropdown/selector similar to GameObject/Component fields
+            4. When user selects one, set it: field.SetValue(component, selectedAssignable)
+            
+            The serialization will automatically handle the conversion using AssignableReferenceConverter.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Data.AssignableHelper.IsAssignableType(System.Type)">
+            <summary>
+            Checks if a field or property type is assignable (IAssignable).
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Data.AssignableHelper.IsAssignableField(System.Reflection.FieldInfo)">
+            <summary>
+            Checks if a field info represents an IAssignable field.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Data.AssignableHelper.IsAssignableProperty(System.Reflection.PropertyInfo)">
+            <summary>
+            Checks if a property info represents an IAssignable property.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Data.AssignableHelper.GetAllAssignables">
+            <summary>
+            Gets all available assignable objects in the current scene.
+            This includes all Components, GameObjects, and Assets.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Data.AssignableHelper.GetAssignablesOfType``1">
+            <summary>
+            Gets all assignable objects of a specific type.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Data.AssignableHelper.GetDisplayName(Engine.Core.Data.IAssignable)">
+            <summary>
+            Gets a display name for an IAssignable object.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Data.AssignableHelper.GetAssignableIdentifier(Engine.Core.Data.IAssignable)">
+            <summary>
+            Gets a unique identifier for an IAssignable object for serialization.
+            This returns the appropriate identifier based on the type:
+            - Component: ID (int as string)
+            - GameObject: GUID (string)
+            - Asset: Path (string)
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Data.AssignableHelper.FindAssignableByIdentifier(System.String,System.Type)">
+            <summary>
+            Finds an IAssignable by its identifier.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Data.AssignableHelper.GetAssignablesForType(System.Type)">
+            <summary>
+            Gets a filtered list of assignables that can be assigned to a specific field type.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Data.AssignableHelper.IsSceneAsset(Engine.Core.Data.IAssignable)">
+            <summary>
+            Checks if an assignable is a Scene asset
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Data.AssignableReferenceConverter">
+            <summary>
+            Custom JSON converter for serializing and deserializing IAssignable references.
+            Handles different identification methods for different types:
+            - IComponent (ObjectComponent): uses ID (int)
+            - GameObject: uses ID (Guid)
+            - Asset: uses Path (string)
+            </summary>
+        </member>
         <member name="T:Engine.Core.Data.HideInInspectorAttribute">
             <summary>
             Attribute to mark a property or field as editable in the editor.
@@ -313,6 +397,43 @@
             </summary>
             <param name="spriteBatch"></param>
         </member>
+        <member name="T:Engine.Core.Data.SceneAsset">
+            <summary>
+            Represents a reference to a Scene asset. 
+            In the editor, this can be assigned from Scene assets.
+            At runtime, this stores the path and can load the Room.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Data.SceneAsset.Path">
+            <summary>
+            The path to the scene asset (relative to Assets directory)
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Data.SceneAsset.#ctor">
+            <summary>
+            Creates a new SceneAsset reference
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Data.SceneAsset.#ctor(System.String)">
+            <summary>
+            Creates a SceneAsset from a path
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Data.SceneAsset.LoadRoom">
+            <summary>
+            Loads the Room from this scene asset
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Data.SceneAsset.GetDisplayName">
+            <summary>
+            Gets the display name for this scene asset
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Data.SceneAssetConverter">
+            <summary>
+            JSON converter for SceneAsset that serializes as a string path
+            </summary>
+        </member>
         <member name="T:Engine.Core.Game.Components.RectangleF">
             <summary>
             Represents a rectangle in 2D space with floating-point precision.
@@ -361,6 +482,11 @@
             Whether this collider is a trigger (doesn't block, but detects).
             </summary>
         </member>
+        <member name="F:Engine.Core.Game.Components.Collider2D.Triggered">
+            <summary>
+            If we've triggered this
+            </summary>
+        </member>
         <member name="F:Engine.Core.Game.Components.Collider2D.Tags">
             <summary>
             Tags for collision. Useful for colliding only with certain objects
@@ -394,6 +520,12 @@
         <member name="M:Engine.Core.Game.Components.Collider2D.OnCollisionEnter(Engine.Core.Game.Components.Collider2D)">
             <summary>
             Called when this collider collides with another collider.
+            </summary>
+            <param name="other"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.Collider2D.OnCollisionExit(Engine.Core.Game.Components.Collider2D)">
+            <summary>
+            Reset triggers and anything on end overlap
             </summary>
             <param name="other"></param>
         </member>
@@ -482,6 +614,37 @@
         <member name="M:Engine.Core.Game.Components.ComponentRegistry.RefreshAll">
             <summary>
             Refresh registry upon compilation
+            </summary>
+        </member>
+        <member name="T:Engine.Core.Game.Components.SceneWarp">
+            <summary>
+            A component for warping to a target scene when colliding with a specified object.
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.SceneWarp.WarpObject">
+            <summary>
+            Object to check warp for
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Game.Components.SceneWarp.TargetSceneAsset">
+            <summary>
+            The scene asset we want to go to. Assign a Scene asset in the inspector.
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.SceneWarp.Warped">
+            <summary>
+            If we have warped (prevent warping too much at once)
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.Components.SceneWarp.OnCollisionTrigger(Engine.Core.Game.Components.Collider2D)">
+            <summary>
+            When colliding with the target object, it will go to the target scene
+            </summary>
+            <param name="other"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.SceneWarp.Warp">
+            <summary>
+            Warps to the target scene asset
             </summary>
         </member>
         <member name="F:Engine.Core.Game.Components.MeshRenderer._meshName">
@@ -643,6 +806,12 @@
         <member name="M:Engine.Core.Game.Components.ObjectComponent.OnCollisionTrigger(Engine.Core.Game.Components.Collider2D)">
             <summary>
             Called when this collider enters a trigger with another collider.
+            </summary>
+            <param name="other"></param>
+        </member>
+        <member name="M:Engine.Core.Game.Components.ObjectComponent.OnCollisionExit(Engine.Core.Game.Components.Collider2D)">
+            <summary>
+            Called when two objects stop colliding
             </summary>
             <param name="other"></param>
         </member>
@@ -1941,6 +2110,11 @@
             </summary>
             <param name="path"></param>
         </member>
+        <member name="M:Engine.Core.Rooms.Room.Load">
+            <summary>
+            Loads a room relative to itself
+            </summary>
+        </member>
         <!-- Badly formed XML comment ignored for member "M:Engine.Core.Rooms.Room.Initialize" -->
         <member name="M:Engine.Core.Rooms.Room.FindByName(System.String)">
             <summary>
@@ -1948,6 +2122,27 @@
             </summary>
             <param name="name">Name to search for</param>
             <returns>The GameObject if found, null otherwise</returns>
+        </member>
+        <member name="T:Engine.Core.Rooms.SceneManager">
+            <summary>
+            Scene manager to easily call scene updates
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Rooms.SceneManager.CurrentScene">
+            <summary>
+            The current scene we are in
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Rooms.SceneManager.EnterScene(Engine.Core.Data.SceneAsset)">
+            <summary>
+            Enter a new scene
+            </summary>
+            <param name="scene"></param>
+        </member>
+        <member name="M:Engine.Core.Rooms.SceneManager.Update">
+            <summary>
+            Unload and activate scenes
+            </summary>
         </member>
         <member name="M:Engine.Core.Graphics.FontLibrary.Initialize(Microsoft.Xna.Framework.Graphics.GraphicsDevice,Microsoft.Xna.Framework.Content.ContentManager)">
             <summary>

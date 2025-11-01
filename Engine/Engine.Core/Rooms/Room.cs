@@ -194,6 +194,14 @@ namespace Engine.Core.Rooms
         }
 
         /// <summary>
+        /// Loads a room relative to itself
+        /// </summary>
+        public void Load()
+        {
+            Load(FilePath);
+        }
+        
+        /// <summary>
         /// Initialize the room and all of its objects & components
         /// </summary>
         public void Initialize()

@@ -6,13 +6,14 @@
 /// <Summary>                
 /// -----------------------------------------------------------------------------
 
+using Engine.Core.Data;
+using Engine.Core.Game;
+using Engine.Core.Game.Components;
+using Engine.Core.Rooms;
+using GameRuntime;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Engine.Core.Game;
-using GameRuntime;
-using Engine.Core.Rooms;
-using Engine.Core.Game.Components;
 
 namespace Engine.Core
 {
@@ -27,6 +28,7 @@ namespace Engine.Core
         public ScriptManager? ScriptManager { get; set; }
         public static SpriteBatch? SpriteBatch { get; set; }
         public Room? Scene { get; set; }
+        public SceneAsset? NextScene { get; set; }
         public string? AssetsRoot { get; set; }
         public string? RoomsDir { get; set; }
         public GameOptions? GameOptions { get; set; }

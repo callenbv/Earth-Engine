@@ -18,7 +18,7 @@ namespace Engine.Core.Game.Components
     /// <summary>
     /// Base interface for all components in the game engine.
     /// </summary>
-    public interface IComponent 
+    public interface IComponent : IAssignable
     {
         string Name { get; }
         virtual void Update(GameTime gameTime) { }
@@ -227,6 +227,15 @@ namespace Engine.Core.Game.Components
         /// <param name="other"></param>
         public virtual void OnCollisionTrigger(Collider2D other)
         {
+        }
+
+        /// <summary>
+        /// Called when two objects stop colliding
+        /// </summary>
+        /// <param name="other"></param>
+        public virtual void OnCollisionExit(Collider2D other)
+        {
+
         }
     }
 }
