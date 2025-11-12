@@ -23,6 +23,7 @@ using Engine.Core.Scripting;
 using Engine.Core.Data;
 using System.IO;
 using Engine.Core.Systems;
+using Editor.Windows.Homepage;
 
 namespace EarthEngineEditor
 {
@@ -50,6 +51,7 @@ namespace EarthEngineEditor
         public RuntimeManager runtime;
         public EditorOverlay editorOverlay;
         public EditorWatcher fileWatcher;
+        public Homepage homePage;
         public bool gameFocused = false;
         public EditorSelectionMode selectionMode = EditorSelectionMode.Object;
         public static EditorApp Instance { get; private set; }
@@ -65,6 +67,7 @@ namespace EarthEngineEditor
             IsMouseVisible = true;
             Window.AllowUserResizing = true;
             Instance = this;
+            homePage = new Homepage();
         }
 
         /// <summary>
@@ -182,7 +185,8 @@ namespace EarthEngineEditor
         {
             GraphicsDevice.Clear(XnaColor.CornflowerBlue);
 
-            runtime.Draw(spriteBatch);
+            if (!homePage.Active)
+                runtime.Draw(spriteBatch);
 
             if (!playingInEditor)
             {
@@ -234,8 +238,16 @@ namespace EarthEngineEditor
                 // Render menu bar
                 _windowManager?.RenderMenuBar();
 
-                // Render all windows
-                _windowManager?.RenderAll();
+                if (!homePage.Active)
+                {
+                    // Render all windows
+                    _windowManager?.RenderAll();
+                }
+                else
+                {
+                    // Render the homepage as applicable
+                    homePage.Render();
+                }
 
                 // Pop the font
                 if (_imGuiRenderer?.HasCustomFont == true)
