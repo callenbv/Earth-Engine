@@ -1,4 +1,6 @@
-﻿using Editor.AssetManagement;
+﻿using EarthEngineEditor;
+using EarthEngineEditor.Windows;
+using Editor.AssetManagement;
 using Editor.Windows.ImGuiWrappers;
 using ImGuiNET;
 using System;
@@ -14,26 +16,32 @@ namespace Editor.Windows.Homepage
     /// </summary>
     public class Homepage
     {
-        public bool Active = true;
+        public bool Active = false;
         public EButton OpenProjectButton;
         public EButton NewProjectButton;
         public EButton Help;
-        public EDropdown<EButton> RecentProjects;
+        public EDropdown<string> RecentProjects;
         public List<EWidget> MainContainer = new List<EWidget>();
+
+        float containerWidth = 400f;
+        float containerHeight = 48f;
 
         /// <summary>
         /// Initialize homepage buttons
         /// </summary>
         public Homepage()
         {
-            OpenProjectButton = new EButton();
-            NewProjectButton = new EButton();
-            Help = new EButton();
-            RecentProjects = new EDropdown<EButton>();
+            OpenProjectButton = new EButton("Open Project", new System.Numerics.Vector2(containerWidth, containerHeight));
+            NewProjectButton = new EButton("Create New Project", new System.Numerics.Vector2(containerWidth, containerHeight));
+            Help = new EButton("Help", new System.Numerics.Vector2(containerWidth, containerHeight));
+            RecentProjects = new EDropdown<string>("Recent Projects", new System.Numerics.Vector2(containerWidth,containerHeight));
 
+            // Bind functions
+            OpenProjectButton.Bind(FileActions.SelectProject);
+
+            // Add to the main container
             MainContainer.Add(OpenProjectButton);
             MainContainer.Add(NewProjectButton);
-            MainContainer.Add(Help);
             MainContainer.Add(RecentProjects);
         }
 
@@ -55,10 +63,13 @@ namespace Editor.Windows.Homepage
             if (!Active)
                 return;
 
-            ImGui.Begin("Homepage");
+            ImGui.Begin("Homepage",ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse);
+            ImGui.SetCursorPosY(ImGui.GetWindowHeight()/4);
+            RecentProjects.Items = EditorApp.Instance._windowManager.recentProjects;
 
             foreach (var widget in MainContainer)
             {
+                ImGuiRenderer.CenterDrawing(containerWidth);
                 widget.Draw();
             }
 

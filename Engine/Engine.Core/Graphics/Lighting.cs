@@ -111,12 +111,11 @@ namespace Engine.Core.Graphics
 
             // Draw the lightmap (no shadow mask, no shader)
             graphicsDevice.SetRenderTarget(lightmap);
-            graphicsDevice.Clear(Color.Black);
+            graphicsDevice.Clear(Color.White);
 
             // Draw all lights as soft circles (additive blending)
             if (Enabled)
             {
-
                 // Draw ambient light first (gray background so scene isn't completely black)
                 spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
                 spriteBatch.Draw(whitePixel, new Rectangle(0, 0, width, height), AmbientLightColor);

@@ -517,6 +517,7 @@ namespace EarthEngineEditor.Windows
                         }
 
                         _selectedItem = null;
+                        InspectorWindow.Instance.Inspect(null);
                         RefreshItems();
                     }
                 }

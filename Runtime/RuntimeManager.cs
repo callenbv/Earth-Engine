@@ -90,6 +90,7 @@ namespace GameRuntime
             GraphicsLibrary.Initialize();
             EngineContext.Current.GraphicsDevice = _graphicsDevice;
             Grid3D.Instance.Initialize(_graphicsDevice);
+            graphicsManager.HardwareModeSwitch = false;
         }
 
         /// <summary>
@@ -166,13 +167,12 @@ namespace GameRuntime
 
             // Draw scene to render target (high internal resolution for smooth subpixel movement)
             _graphicsDevice.SetRenderTarget(_sceneRenderTarget);
-            _graphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Microsoft.Xna.Framework.Color.CornflowerBlue, 1f, 0);
+            _graphicsDevice.Clear(Color.CornflowerBlue);
 
             // Draw the sprites depth sorted
-            _graphicsDevice.DepthStencilState = DepthStencilState.None;
             _graphicsDevice.BlendState = BlendState.NonPremultiplied;
-            _graphicsDevice.RasterizerState = RasterizerState.CullNone;
             spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.NonPremultiplied, SamplerState.PointClamp, null, null, null, Camera.Main.GetViewMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight));
+            
             TilemapManager.Render(spriteBatch);
             scene.Render(spriteBatch);
             spriteBatch.End();

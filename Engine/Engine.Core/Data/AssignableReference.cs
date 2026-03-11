@@ -10,7 +10,6 @@ using Engine.Core.Game.Components;
 using Engine.Core.Game;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Engine.Core;
 
 namespace Engine.Core.Data
 {

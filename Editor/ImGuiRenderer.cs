@@ -167,6 +167,16 @@ namespace EarthEngineEditor
         }
 
         /// <summary>
+        /// Centers the ImGui drawing from now on
+        /// </summary>
+        public static void CenterDrawing(float containerWidth=300f)
+        {
+            float windowWidth = ImGui.GetContentRegionAvail().X;
+            float startX = (windowWidth - containerWidth) * 0.5f;
+            ImGui.SetCursorPosX(startX);
+        }
+
+        /// <summary>
         /// Sets up device resources required for rendering ImGui.
         /// </summary>
         private void SetupDeviceResources()

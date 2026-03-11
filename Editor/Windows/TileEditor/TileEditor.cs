@@ -13,6 +13,7 @@ using Editor.Windows.Inspector;
 using Engine.Core;
 using Engine.Core.Data;
 using Engine.Core.Game.Components;
+using Engine.Core.Rooms;
 using Engine.Core.Rooms.Tiles;
 using ImGuiNET;
 using Microsoft.Xna.Framework.Graphics;
@@ -80,7 +81,7 @@ namespace Editor.Windows.TileEditor
             List<Tilemap> Tilemaps = new List<Tilemap>();
             Tilemaps.Clear();
 
-            foreach (var gameObj in EngineContext.Current.Scene.objects)
+            foreach (var gameObj in SceneManager.GetAllActiveObjects())
             {
                 foreach (var component in gameObj.components)
                 {

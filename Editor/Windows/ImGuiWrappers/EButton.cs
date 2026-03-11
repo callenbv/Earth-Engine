@@ -3,6 +3,7 @@ using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,6 +17,7 @@ namespace Editor.Windows.ImGuiWrappers
         public string Text { get; set; } = string.Empty;
         public Sprite2D? Sprite { get; set; }
         public Action? OnClick { get; set; }
+        public Vector2 Size { get; set; } = Vector2.One;
 
         public EButton()
         {
@@ -26,9 +28,10 @@ namespace Editor.Windows.ImGuiWrappers
         /// Create a button with text
         /// </summary>
         /// <param name="text"></param>
-        public EButton(string text)
+        public EButton(string text, Vector2 size)
         {
             Text = text;
+            Size = size;
         }
 
         /// <summary>
@@ -45,7 +48,7 @@ namespace Editor.Windows.ImGuiWrappers
         /// </summary>
         public override void Draw()
         {
-            bool button = ImGui.Button($"{Text}##{GetHashCode()}");
+            bool button = ImGui.Button($"{Text}##{GetHashCode()}",Size);
 
             if (button)
             {

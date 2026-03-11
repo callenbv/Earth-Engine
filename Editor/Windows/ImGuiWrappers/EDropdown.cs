@@ -1,4 +1,5 @@
 ﻿using ImGuiNET;
+using System.Numerics;
 
 namespace Editor.Windows.ImGuiWrappers
 {
@@ -11,6 +12,26 @@ namespace Editor.Windows.ImGuiWrappers
         public T? Current { get; set; }
         public Action<T>? OnValueChanged { get; set; }
         public List<T> Items = new List<T>();
+        public Vector2 Size = Vector2.One;
+
+        /// <summary>
+        /// Set size
+        /// </summary>
+        public EDropdown()
+        {
+
+        }
+
+        /// <summary>
+        /// Setup dropdown
+        /// </summary>
+        /// <param name="label"></param>
+        /// <param name="size"></param>
+        public EDropdown(string label, Vector2 size)
+        {
+            Label = label;
+            Size = size;
+        }
 
         /// <summary>
         /// Render the button
@@ -19,7 +40,8 @@ namespace Editor.Windows.ImGuiWrappers
         {
             string currentLabel = Current?.ToString() ?? string.Empty;
 
-            if (ImGui.BeginCombo($"{Label}##{GetHashCode()}", currentLabel))
+            ImGui.PushItemWidth(Size.X);
+            if (ImGui.BeginCombo($"##{GetHashCode()}", currentLabel))
             {
                 for (int i = 0; i < Items.Count; i++)
                 {

@@ -12,6 +12,7 @@ using Engine.Core;
 using Engine.Core.Data;
 using Engine.Core.Game;
 using Engine.Core.Game.Components;
+using Engine.Core.Rooms;
 using Engine.Core.Scripting;
 using GameRuntime;
 using System.IO;
@@ -53,8 +54,9 @@ namespace Editor.AssetManagement
         public void Save()
         {
             // Project settings
-            settings.StartScene = SceneViewWindow.Instance.scene?.FilePath;
+            settings.StartScene = SceneViewWindow.Instance.scene == null ? settings.StartScene : SceneViewWindow.Instance.scene.FilePath;
             settings.Title = Name;
+
             string json = JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(optionsPath, json);
 
@@ -80,28 +82,39 @@ namespace Editor.AssetManagement
             // Load any game options
             if (File.Exists(optionsPath))
             {
-                string json = File.ReadAllText(optionsPath);
-                settings = JsonSerializer.Deserialize<GameOptions>(json);
-                Name = settings.Title;
-
-                Asset scene = Asset.Get(Path.GetFileName(settings.StartScene));
-                InspectorWindow.Instance.Inspect(scene);
-
-                if (scene != null)
+                try
                 {
-                    scene.Open();
+                    string json = File.ReadAllText(optionsPath);
+
+                    settings = JsonSerializer.Deserialize<GameOptions>(json);
+                    Name = settings.Title == null ? "Empty" : settings.Title;
+
+                    SceneAsset? sceneAsset = Asset.Get<SceneAsset>(Path.GetFileName(settings.StartScene));
+
+                    if (sceneAsset != null)
+                    {
+                        SceneManager.EnterScene(sceneAsset);
+                        InspectorWindow.Instance.Inspect(sceneAsset);
+                    }
+
+                    EditorApp.Instance.runtime.gameOptions = settings;
+
+                    // Initialize EngineContext from loaded settings
+                    EngineContext.UnitsPerPixel = settings.UnitsPerPixel;
+                    Console.WriteLine("Last Scene: " + settings.StartScene);
+                }
+                catch
+                {
+                    throw new Exception($"ERROR: Loading Project Options {optionsPath} failed");
                 }
 
-                EditorApp.Instance.runtime.gameOptions = settings;
-                // Initialize EngineContext from loaded settings
-                Engine.Core.EngineContext.UnitsPerPixel = settings.UnitsPerPixel;
-                Console.WriteLine("Last Scene: " + settings.StartScene);
             }
             else
             {
                 Console.WriteLine("No project settings file found at: " + optionsPath);
+
                 // Initialize with default values for new projects
-                Engine.Core.EngineContext.UnitsPerPixel = settings.UnitsPerPixel; // Uses default value of 1f
+                EngineContext.UnitsPerPixel = settings.UnitsPerPixel; // Uses default value of 1f
             }
         }
 

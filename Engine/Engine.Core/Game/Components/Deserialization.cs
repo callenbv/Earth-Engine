@@ -152,162 +152,195 @@ namespace Editor.AssetManagement
         /// <param name="typeToConvert"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        public override List<IComponent> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override List<IComponent> Read(
+    ref Utf8JsonReader reader,
+    Type typeToConvert,
+    JsonSerializerOptions options)
         {
             var components = new List<IComponent>();
 
-            try
+            if (reader.TokenType != JsonTokenType.StartArray)
+                throw new JsonException("Expected start of components array.");
+
+            // Move into the array
+            while (reader.Read())
             {
+                if (reader.TokenType == JsonTokenType.EndArray)
+                    break;
+
+                // Parse single component object
                 using var doc = JsonDocument.ParseValue(ref reader);
-                
-                foreach (var element in doc.RootElement.EnumerateArray())
+                var element = doc.RootElement;
+
+                // ----- Determine component type -----
+                if (!element.TryGetProperty("type", out var typeProp))
                 {
-                    try
-                    {
-                        if (!element.TryGetProperty("type", out var typeProp))
-                        {
-                            Console.Error.WriteLine("[ComponentListJsonConverter] Component missing 'type' field");
-                            continue;
-                        }
+                    Console.Error.WriteLine("[ComponentListJsonConverter] Component missing 'type'");
+                    continue;
+                }
 
-                        var typeName = typeProp.GetString();
-                        
-                        if (!ComponentRegistry.Components.TryGetValue(typeName, out var info))
-                        {
-                            Console.Error.WriteLine($"[ComponentListJsonConverter] Unknown component type: {typeName}");
-                            continue;
-                        }
+                var typeName = typeProp.GetString();
+                if (!ComponentRegistry.Components.TryGetValue(typeName, out var info))
+                {
+                    Console.Error.WriteLine($"[ComponentListJsonConverter] Unknown component type: {typeName}");
+                    continue;
+                }
 
-                        var concreteType = info.Type;
-                        var component = Activator.CreateInstance(concreteType);
+                var concreteType = info.Type;
+                var componentObj = Activator.CreateInstance(concreteType);
 
-                // Deserialize public fields
+                if (componentObj is not IComponent component)
+                    continue;
+
+                // ===== Deserialize fields =====
                 foreach (var field in concreteType.GetFields(BindingFlags.Public | BindingFlags.Instance))
                 {
-                    if (element.TryGetProperty(field.Name, out var fieldElement))
+                    if (!element.TryGetProperty(field.Name, out var fieldElement))
+                        continue;
+
+                    try
                     {
-                        try
+                        // GameObject reference
+                        if (field.FieldType == typeof(GameObject))
                         {
-                            if (field.FieldType == typeof(GameObject))
-                            {
-                                if (Guid.TryParse(fieldElement.GetString(), out Guid id))
-                                {
-                                    GameReferenceResolver.Register(component, field, id);
-                                }
-                            }
-                            else if (typeof(IComponent).IsAssignableFrom(field.FieldType))
-                            {
-                                if (fieldElement.ValueKind == JsonValueKind.Number && fieldElement.TryGetInt32(out int id))
-                                {
-                                    ComponentReferenceResolver.Register(component, field, id);
-                                }
-                            }
-                            else if (field.FieldType == typeof(SceneAsset) || field.FieldType.Name == "SceneAsset")
-                            {
-                                // Use the SceneAssetConverter for SceneAsset fields
-                                var sceneAssetValue = JsonSerializer.Deserialize<SceneAsset>(fieldElement.GetRawText(), new JsonSerializerOptions
-                                {
-                                    Converters = { new SceneAssetConverter() }
-                                });
-                                field.SetValue(component, sceneAssetValue);
-                            }
-                            else if (typeof(IAssignable).IsAssignableFrom(field.FieldType))
-                            {
-                                // Use the AssignableReferenceConverter for IAssignable fields
-                                var assignableValue = JsonSerializer.Deserialize<IAssignable>(fieldElement.GetRawText(), new JsonSerializerOptions
-                                {
-                                    Converters = { new AssignableReferenceConverter() }
-                                });
-                                field.SetValue(component, assignableValue);
-                            }
-                            else
-                            {
-                                object? value = JsonSerializer.Deserialize(fieldElement.GetRawText(), field.FieldType, options);
-                                field.SetValue(component, value);
-                            }
+                            if (Guid.TryParse(fieldElement.GetString(), out Guid id))
+                                GameReferenceResolver.Register(componentObj, field, id);
+                            continue;
                         }
-                        catch (Exception ex)
-                        {
-                            Console.Error.WriteLine($"[Deserializer] Failed to load field {field.Name} on {concreteType.Name}: {ex.Message}");
-                        }
-                    }
-                }
 
-                // Deserialize public properties with both getter and setter
-                foreach (var prop in concreteType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
-                {
-                    if (!prop.CanRead || !prop.CanWrite) continue;
-                    if (prop.GetIndexParameters().Length > 0) continue;
-                    if (prop.GetCustomAttribute<JsonIgnoreAttribute>() != null) continue;
-
-                    if (element.TryGetProperty(prop.Name, out var propElement))
-                    {
-                        try
+                        // Component reference
+                        if (typeof(IComponent).IsAssignableFrom(field.FieldType))
                         {
-                            object? value;
-                            if (prop.PropertyType == typeof(GameObject))
+                            if (fieldElement.ValueKind == JsonValueKind.Number &&
+                                fieldElement.TryGetInt32(out int id))
                             {
-                                value = EngineContext.Current.Scene?.objects.FirstOrDefault(o =>
-                                    o.ID == Guid.Parse(propElement.GetString() ?? string.Empty));
+                                ComponentReferenceResolver.Register(componentObj, field, id);
                             }
-                            else if (typeof(IComponent).IsAssignableFrom(prop.PropertyType))
-                            {
-                                if (propElement.ValueKind == JsonValueKind.Number && propElement.TryGetInt32(out int id))
-                                {
-                                    // Find the component immediately
-                                    value = ComponentReferenceResolver.FindComponentById(EngineContext.Current.Scene?.objects ?? new List<GameObject>(), id);
-                                }
-                                else
-                                {
-                                    value = null;
-                                }
-                            }
-                            else if (prop.PropertyType == typeof(SceneAsset) || prop.PropertyType.Name == "SceneAsset")
-                            {
-                                // Use the SceneAssetConverter for SceneAsset properties
-                                value = JsonSerializer.Deserialize<SceneAsset>(propElement.GetRawText(), new JsonSerializerOptions
-                                {
-                                    Converters = { new SceneAssetConverter() }
-                                });
-                            }
-                            else if (typeof(IAssignable).IsAssignableFrom(prop.PropertyType))
-                            {
-                                // Use the AssignableReferenceConverter for IAssignable properties
-                                value = JsonSerializer.Deserialize<IAssignable>(propElement.GetRawText(), new JsonSerializerOptions
-                                {
-                                    Converters = { new AssignableReferenceConverter() }
-                                });
-                            }
-                            else
-                            {
-                                value = JsonSerializer.Deserialize(propElement.GetRawText(), prop.PropertyType, options);
-                            }
+                            continue;
+                        }
 
-                            prop.SetValue(component, value);
-                        }
-                        catch (Exception ex)
+                        // SceneAsset
+                        if (field.FieldType == typeof(SceneAsset))
                         {
-                            Console.Error.WriteLine($"[Deserializer] Failed to load property {prop.Name} on {concreteType.Name}: {ex.Message}");
+                            var val = JsonSerializer.Deserialize<SceneAsset>(
+                                fieldElement.GetRawText(),
+                                new JsonSerializerOptions { Converters = { new SceneAssetConverter() } }
+                            );
+                            field.SetValue(componentObj, val);
+                            continue;
                         }
-                    }
-                }
 
-                        if (component is IComponent comp)
+                        // IAssignable
+                        if (typeof(IAssignable).IsAssignableFrom(field.FieldType))
                         {
-                            components.Add(comp);
+                            var val = JsonSerializer.Deserialize<IAssignable>(
+                                fieldElement.GetRawText(),
+                                new JsonSerializerOptions { Converters = { new AssignableReferenceConverter() } }
+                            );
+                            field.SetValue(componentObj, val);
+                            continue;
                         }
+
+                        // Regular type
+                        var fieldValue = JsonSerializer.Deserialize(
+                            fieldElement.GetRawText(),
+                            field.FieldType,
+                            options
+                        );
+                        field.SetValue(componentObj, fieldValue);
                     }
                     catch (Exception ex)
                     {
-                        Console.Error.WriteLine($"[ComponentListJsonConverter] Error processing component: {ex.Message}");
-                        Console.Error.WriteLine($"[ComponentListJsonConverter] Stack trace: {ex.StackTrace}");
+                        Console.Error.WriteLine(
+                            $"[Deserializer] Failed to load field {field.Name} on {concreteType.Name}: {ex.Message}"
+                        );
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"[ComponentListJsonConverter] Fatal error: {ex.Message}");
-                Console.Error.WriteLine($"[ComponentListJsonConverter] Stack trace: {ex.StackTrace}");
+
+                // ===== Deserialize properties =====
+                foreach (var prop in concreteType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                {
+                    if (!prop.CanRead || !prop.CanWrite)
+                        continue;
+                    if (prop.GetIndexParameters().Length > 0)
+                        continue;
+                    if (prop.GetCustomAttribute<JsonIgnoreAttribute>() != null)
+                        continue;
+                    if (!element.TryGetProperty(prop.Name, out var propElement))
+                        continue;
+
+                    try
+                    {
+                        object? value;
+
+                        // GameObject prop
+                        if (prop.PropertyType == typeof(GameObject))
+                        {
+                            if (Guid.TryParse(propElement.GetString(), out Guid id))
+                                value = EngineContext.Current.Scene?.objects.FirstOrDefault(o => o.ID == id);
+                            else
+                                value = null;
+
+                            prop.SetValue(componentObj, value);
+                            continue;
+                        }
+
+                        // Component prop
+                        if (typeof(IComponent).IsAssignableFrom(prop.PropertyType))
+                        {
+                            if (propElement.ValueKind == JsonValueKind.Number &&
+                                propElement.TryGetInt32(out int id))
+                            {
+                                value = ComponentReferenceResolver.FindComponentById(
+                                    EngineContext.Current.Scene?.objects ?? new(),
+                                    id
+                                );
+                            }
+                            else value = null;
+
+                            prop.SetValue(componentObj, value);
+                            continue;
+                        }
+
+                        // SceneAsset prop
+                        if (prop.PropertyType == typeof(SceneAsset))
+                        {
+                            value = JsonSerializer.Deserialize<SceneAsset>(
+                                propElement.GetRawText(),
+                                new JsonSerializerOptions { Converters = { new SceneAssetConverter() } }
+                            );
+                            prop.SetValue(componentObj, value);
+                            continue;
+                        }
+
+                        // IAssignable prop
+                        if (typeof(IAssignable).IsAssignableFrom(prop.PropertyType))
+                        {
+                            value = JsonSerializer.Deserialize<IAssignable>(
+                                propElement.GetRawText(),
+                                new JsonSerializerOptions { Converters = { new AssignableReferenceConverter() } }
+                            );
+                            prop.SetValue(componentObj, value);
+                            continue;
+                        }
+
+                        // Regular property
+                        value = JsonSerializer.Deserialize(
+                            propElement.GetRawText(),
+                            prop.PropertyType,
+                            options
+                        );
+                        prop.SetValue(componentObj, value);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.Error.WriteLine(
+                            $"[Deserializer] Failed to load property {prop.Name} on {concreteType.Name}: {ex.Message}"
+                        );
+                    }
+                }
+
+                components.Add(component);
             }
 
             return components;

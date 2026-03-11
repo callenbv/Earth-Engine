@@ -55,7 +55,8 @@ namespace Editor.AssetManagement
             {
                 if (File.Exists(path))
                 {
-                    scene = Room.Load(path);
+                    SceneAsset newScene = Asset.Get<SceneAsset>(Path.GetFileName(path));
+                    SceneManager.EnterScene(newScene);
                 }
             }
             catch (Exception ex)
@@ -72,92 +73,8 @@ namespace Editor.AssetManagement
         {
             // Normalize paths for comparison
             string normalizedPath = Path.GetFullPath(path);
-            
-            // Check if this path matches the currently open scene
-            Room? sceneToSave = null;
-            
-            // If the path matches the currently open scene, use that (so changes are saved)
-            if (SceneViewWindow.Instance.scene != null)
-            {
-                string currentScenePath = Path.Combine(ProjectSettings.AssetsDirectory, SceneViewWindow.Instance.scene.FilePath);
-                currentScenePath = Path.GetFullPath(currentScenePath);
-                
-                if (normalizedPath.Equals(currentScenePath, StringComparison.OrdinalIgnoreCase))
-                {
-                    sceneToSave = SceneViewWindow.Instance.scene;
-                }
-            }
-            
-            // Otherwise, if we don't have a scene loaded for this path, load it first
-            if (sceneToSave == null)
-            {
-                try
-                {
-                    if (File.Exists(path))
-                    {
-                        sceneToSave = Room.Load(path);
-                        scene = sceneToSave; // Store it for next time
-                    }
-                    else
-                    {
-                        // Create a new empty scene if the file doesn't exist
-                        sceneToSave = new Room
-                        {
-                            Name = Path.GetFileNameWithoutExtension(path),
-                            FilePath = Path.GetRelativePath(ProjectSettings.AssetsDirectory, path)
-                        };
-                        scene = sceneToSave;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Failed to load scene from {path} for saving: {ex.Message}");
-                    return;
-                }
-            }
 
-            if (sceneToSave == null)
-            {
-                Console.WriteLine("No scene to save.");
-                return;
-            }
-
-            try
-            {
-                var options = new JsonSerializerOptions
-                {
-                    WriteIndented = true,
-                    IncludeFields = true,
-                    Converters = { new ComponentListJsonConverter() },
-                };
-                options.Converters.Add(new Vector2JsonConverter());
-                options.Converters.Add(new Vector3JsonConverter());
-                options.Converters.Add(new ColorJsonConverter());
-
-                string json = JsonSerializer.Serialize(sceneToSave, options);
-                File.WriteAllText(path, json);
-                Console.WriteLine($"Scene saved: {sceneToSave.Name} to {path}");
-
-                // Save folder metadata only if this is the currently open scene
-                if (SceneViewWindow.Instance.scene != null && 
-                    SceneViewWindow.Instance.scene.FilePath == path)
-                {
-                    var metadata = new SceneMetadata();
-                    foreach (var folder in SceneViewWindow.Instance.rootFolder.SubFolders)
-                    {
-                        metadata.Folders.Add(ToSerializable(folder));
-                    }
-
-                    string metaPath = path + ".meta";
-                    string metaJson = JsonSerializer.Serialize(metadata, new JsonSerializerOptions { WriteIndented = true, IncludeFields = true });
-                    File.WriteAllText(metaPath, metaJson);
-                    Console.WriteLine("Scene metadata saved.");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Failed to save scene: {ex.Message}");
-            }
+            SceneManager.SaveScene();
         }
 
         /// <summary>

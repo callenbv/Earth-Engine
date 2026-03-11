@@ -1468,6 +1468,11 @@
             Scale of the GameObject, affecting its size in the game world.
             </summary>
         </member>
+        <member name="P:Engine.Core.Game.GameObject.Persistent">
+            <summary>
+            If this game object should stay persistent throughout scene changes (be copied over)
+            </summary>
+        </member>
         <member name="F:Engine.Core.Game.GameObject.children">
             <summary>
             List of child GameObjects that are part of this GameObject's hierarchy.
@@ -2148,6 +2153,18 @@
             <summary>
             Unload and activate scenes
             </summary>
+        </member>
+        <member name="M:Engine.Core.Rooms.SceneManager.GetAllActiveObjects">
+            <summary>
+            Returns a list of all active game objects. Empty if bad scene
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Engine.Core.Rooms.SceneManager.SaveScene">
+            <summary>
+            Save the current scene
+            </summary>
+            <returns></returns>
         </member>
         <member name="M:Engine.Core.Graphics.FontLibrary.Initialize(Microsoft.Xna.Framework.Graphics.GraphicsDevice,Microsoft.Xna.Framework.Content.ContentManager)">
             <summary>

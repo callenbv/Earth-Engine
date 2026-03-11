@@ -7,6 +7,7 @@
 /// -----------------------------------------------------------------------------
 
 using Editor.AssetManagement;
+using Editor.Windows.Homepage;
 using Editor.Windows.TileEditor;
 using Engine.Core;
 using Engine.Core.Data;
@@ -174,7 +175,7 @@ namespace EarthEngineEditor.Windows
 
                     if (ImGui.MenuItem("Open Project"))
                     {
-                        SelectProject();
+                        FileActions.SelectProject();
                     }
                     if (ImGui.MenuItem("Save Project"))
                     {
@@ -702,45 +703,6 @@ namespace EarthEngineEditor.Windows
         public void CloseProject()
         {
 
-        }
-
-        /// <summary>
-        /// Select a project to open
-        /// </summary>
-        public void SelectProject()
-        {
-            using (var openFileDialog = new OpenFileDialog())
-            {
-                openFileDialog.Filter = "Earth Engine Project (*.earthproj)|*.earthproj|All files (*.*)|*.*";
-                openFileDialog.FilterIndex = 1;
-                openFileDialog.RestoreDirectory = true;
-
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    var projectFile = openFileDialog.FileName;
-                    if (File.Exists(projectFile))
-                    {
-                        try
-                        {
-                            OpenProject(projectFile);
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show(
-                                $"Error opening project:\n{ex.Message}",
-                                "Error",
-                                MessageBoxButtons.OK,
-                                MessageBoxIcon.Error
-                            );
-                            Console.WriteLine($"Error opening project: {ex.Message}");
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Project file not found: {projectFile}");
-                    }
-                }
-            }
         }
 
         /// <summary>

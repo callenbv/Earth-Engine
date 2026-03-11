@@ -96,7 +96,6 @@ namespace EarthEngineEditor
             // Load default project for test
             runtime.InitializeSystems();
             _windowManager.OpenProject(_windowManager.GetLastProject());
-            _graphics.HardwareModeSwitch = false;
 
             // Override game options
             EditorSettings.Load();

@@ -9,6 +9,7 @@
 using EarthEngineEditor.Windows;
 using Engine.Core.Data;
 using System.IO;
+using System.Reflection.Metadata;
 using System.Text.Json;
 
 namespace Editor.AssetManagement
@@ -167,6 +168,37 @@ namespace Editor.AssetManagement
         public static Asset Get(string path)
         {
             return ProjectWindow.Instance.Get(path);
+        }
+
+        /// <summary>
+        /// Return asset of any type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static T? Get<T>(string path) where T : class, IAssignable
+        {
+            Asset? asset = Get(path);
+
+            if (asset == null)
+                return default;
+
+            IAssignable? assignable = asset.ToAssignable();
+
+            return assignable as T;
+        }
+
+        /// <summary>
+        /// Get any specific asset data here
+        /// </summary>
+        /// <returns></returns>
+        public IAssignable? ToAssignable()
+        {
+            return Type switch
+            {
+                AssetType.Scene => new SceneAsset(Path),
+                _ => this
+            };
         }
 
         /// <summary>

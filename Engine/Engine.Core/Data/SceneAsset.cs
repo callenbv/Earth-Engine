@@ -17,7 +17,7 @@ namespace Engine.Core.Data
     /// In the editor, this can be assigned from Scene assets.
     /// At runtime, this stores the path and can load the Room.
     /// </summary>
-    public class SceneAsset : IAssignable
+    public class SceneAsset : IAssignable, IInspectable
     {
         /// <summary>
         /// The path to the scene asset (relative to Assets directory)

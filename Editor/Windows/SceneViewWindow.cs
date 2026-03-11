@@ -205,6 +205,8 @@ namespace EarthEngineEditor.Windows
                 if (ImGui.MenuItem("Delete"))
                 {
                     rootFolder.SubFolders.Remove(folder);
+                    ImGui.EndPopup();
+
                     return false;
                 }
                 ImGui.EndPopup();

@@ -1,8 +1,13 @@
-﻿using Engine.Core.Data;
+﻿using Editor.AssetManagement;
+using Engine.Core.Data;
+using Engine.Core.Game;
+using MonoGame.Extended.Serialization.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Engine.Core.Rooms
@@ -44,6 +49,51 @@ namespace Engine.Core.Rooms
                 CurrentScene = EngineContext.Current.NextScene;
                 CurrentSceneData = CurrentScene.LoadRoom();
             }
+        }
+
+        /// <summary>
+        /// Returns a list of all active game objects. Empty if bad scene
+        /// </summary>
+        /// <returns></returns>
+        public static List<GameObject> GetAllActiveObjects()
+        {
+            return (CurrentSceneData == null ? new List<GameObject>() : CurrentSceneData.objects);
+        }
+
+        /// <summary>
+        /// Save the current scene
+        /// </summary>
+        /// <returns></returns>
+        public static bool SaveScene()
+        {
+            if (CurrentSceneData == null)
+            {
+                Console.Error.WriteLine("Tried to save NULL scene");
+                return false;
+            }
+
+            try
+            {
+                var options = new JsonSerializerOptions
+                {
+                    WriteIndented = true,
+                    IncludeFields = true,
+                    Converters = { new ComponentListJsonConverter() },
+                };
+                options.Converters.Add(new Vector2JsonConverter());
+                options.Converters.Add(new Vector3JsonConverter());
+                options.Converters.Add(new ColorJsonConverter());
+
+                string json = JsonSerializer.Serialize(CurrentSceneData, options);
+                File.WriteAllText(CurrentSceneData.FilePath, json);
+                Console.WriteLine($"Scene saved: {CurrentSceneData.Name} to {CurrentSceneData.FilePath}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to save scene: {ex.Message}");
+            }
+
+            return true;
         }
     }
 }

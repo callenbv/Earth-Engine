@@ -87,9 +87,13 @@ namespace EarthEngineEditor.Windows
         /// Trigger an inspect
         /// </summary>
         /// <param name="item"></param>
-        public void Inspect(IInspectable item)
+        public void Inspect(IInspectable? item)
         {
-            if (item == null) return;
+            if (item == null)
+            {
+                selectedItem = null;
+                return;
+            }
 
             selectedItem = item;
 
