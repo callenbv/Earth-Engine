@@ -1,13 +1,6 @@
 ﻿using EarthEngineEditor;
-using EarthEngineEditor.Windows;
-using Editor.AssetManagement;
 using Editor.Windows.ImGuiWrappers;
 using ImGuiNET;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Editor.Windows.Homepage
 {

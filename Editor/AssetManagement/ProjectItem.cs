@@ -87,21 +87,23 @@ namespace Editor.AssetManagement
                     string json = File.ReadAllText(optionsPath);
 
                     settings = JsonSerializer.Deserialize<GameOptions>(json);
+
+                    string sceneFileName = Path.GetFileName(settings.StartScene);
                     Name = settings.Title == null ? "Empty" : settings.Title;
 
-                    SceneAsset? sceneAsset = Asset.Get<SceneAsset>(Path.GetFileName(settings.StartScene));
+                    SceneAsset? sceneAsset = Asset.Get<SceneAsset>(sceneFileName);
+                    Asset sc = Asset.Get(sceneFileName);
 
                     if (sceneAsset != null)
                     {
+                        sc.Open();
                         SceneManager.EnterScene(sceneAsset);
                         InspectorWindow.Instance.Inspect(sceneAsset);
                     }
 
-                    EditorApp.Instance.runtime.gameOptions = settings;
-
                     // Initialize EngineContext from loaded settings
-                    EngineContext.UnitsPerPixel = settings.UnitsPerPixel;
-                    Console.WriteLine("Last Scene: " + settings.StartScene);
+                    EditorApp.Instance.runtime.gameOptions = settings;
+                    EngineContext.UnitsPerPixel = settings.UnitsPerPixel;                 
                 }
                 catch
                 {
@@ -111,10 +113,7 @@ namespace Editor.AssetManagement
             }
             else
             {
-                Console.WriteLine("No project settings file found at: " + optionsPath);
-
-                // Initialize with default values for new projects
-                EngineContext.UnitsPerPixel = settings.UnitsPerPixel; // Uses default value of 1f
+                throw new Exception($"ERROR: No Project Options at {optionsPath}");
             }
         }
 
