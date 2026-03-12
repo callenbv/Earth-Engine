@@ -1,4 +1,12 @@
-﻿using EarthEngineEditor;
+﻿/// -----------------------------------------------------------------------------
+/// <Project>      Earth Engine 
+/// <File>         FileActions.cs
+/// <Author>       Callen Betts Virott 
+/// <Copyright>    @2026 Callen Betts Virott. All rights reserved.
+/// <Summary>                
+/// -----------------------------------------------------------------------------
+
+using EarthEngineEditor;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -52,3 +60,4 @@ namespace Editor.Windows.Homepage
         }
     }
 }
+

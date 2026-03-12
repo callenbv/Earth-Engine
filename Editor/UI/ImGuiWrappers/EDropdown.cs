@@ -1,4 +1,12 @@
-﻿using ImGuiNET;
+﻿/// -----------------------------------------------------------------------------
+/// <Project>      Earth Engine 
+/// <File>         EDropdown.cs
+/// <Author>       Callen Betts Virott 
+/// <Copyright>    @2026 Callen Betts Virott. All rights reserved.
+/// <Summary>                
+/// -----------------------------------------------------------------------------
+
+using ImGuiNET;
 using System.Numerics;
 
 namespace Editor.Windows.ImGuiWrappers
@@ -65,3 +73,4 @@ namespace Editor.Windows.ImGuiWrappers
         }
     }
 }
+

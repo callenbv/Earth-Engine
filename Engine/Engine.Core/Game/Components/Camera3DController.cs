@@ -1,3 +1,11 @@
+﻿/// -----------------------------------------------------------------------------
+/// <Project>      Earth Engine 
+/// <File>         Camera3DController.cs
+/// <Author>       Callen Betts Virott 
+/// <Copyright>    @2026 Callen Betts Virott. All rights reserved.
+/// <Summary>                
+/// -----------------------------------------------------------------------------
+
 using Engine.Core.Systems;
 using Engine.Core.Data;
 using Engine.Core;

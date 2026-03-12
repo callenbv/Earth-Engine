@@ -1,4 +1,12 @@
-﻿using EarthEngineEditor;
+﻿/// -----------------------------------------------------------------------------
+/// <Project>      Earth Engine 
+/// <File>         Homepage.cs
+/// <Author>       Callen Betts Virott 
+/// <Copyright>    @2026 Callen Betts Virott. All rights reserved.
+/// <Summary>                
+/// -----------------------------------------------------------------------------
+
+using EarthEngineEditor;
 using Editor.Windows.ImGuiWrappers;
 using ImGuiNET;
 
@@ -70,3 +78,4 @@ namespace Editor.Windows.Homepage
         }
     }
 }
+

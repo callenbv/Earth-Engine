@@ -1,4 +1,12 @@
-﻿using Engine.Core.Game.Components;
+﻿/// -----------------------------------------------------------------------------
+/// <Project>      Earth Engine 
+/// <File>         EWidget.cs
+/// <Author>       Callen Betts Virott 
+/// <Copyright>    @2026 Callen Betts Virott. All rights reserved.
+/// <Summary>                
+/// -----------------------------------------------------------------------------
+
+using Engine.Core.Game.Components;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
@@ -22,3 +30,4 @@ namespace Editor.Windows.ImGuiWrappers
         public virtual void Draw() { }
     }
 }
+

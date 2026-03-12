@@ -1,4 +1,12 @@
-﻿using Editor.AssetManagement;
+﻿/// -----------------------------------------------------------------------------
+/// <Project>      Earth Engine 
+/// <File>         SceneManager.cs
+/// <Author>       Callen Betts Virott 
+/// <Copyright>    @2026 Callen Betts Virott. All rights reserved.
+/// <Summary>                
+/// -----------------------------------------------------------------------------
+
+using Editor.AssetManagement;
 using Engine.Core.Data;
 using Engine.Core.Game;
 using MonoGame.Extended.Serialization.Json;
@@ -97,3 +105,4 @@ namespace Engine.Core.Rooms
         }
     }
 }
+

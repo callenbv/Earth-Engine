@@ -1,4 +1,12 @@
-﻿using Engine.Core.Data;
+﻿/// -----------------------------------------------------------------------------
+/// <Project>      Earth Engine 
+/// <File>         Tilemap.cs
+/// <Author>       Callen Betts Virott 
+/// <Copyright>    @2026 Callen Betts Virott. All rights reserved.
+/// <Summary>                
+/// -----------------------------------------------------------------------------
+
+using Engine.Core.Data;
 using Engine.Core.Data.Graphics;
 using Engine.Core.Game.Components;
 using Microsoft.Xna.Framework;
@@ -270,3 +278,4 @@ namespace Engine.Core.Rooms.Tiles
         }
     }
 }
+
