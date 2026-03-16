@@ -1669,7 +1669,7 @@
             Call when we want to update the tilemap (e.g, slice it into grid)
             </summary>
         </member>
-        <member name="M:Engine.Core.Rooms.Tiles.TilemapRenderer.Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
+        <member name="M:Engine.Core.Rooms.Tiles.TilemapRenderer.Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch,Microsoft.Xna.Framework.Vector3)">
             <summary>
             Draw the tiles in the tilemap
             </summary>

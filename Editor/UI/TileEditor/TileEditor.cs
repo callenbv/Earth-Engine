@@ -12,13 +12,12 @@ using Editor.AssetManagement;
 using Editor.Windows.Inspector;
 using Engine.Core;
 using Engine.Core.Data;
-using Engine.Core.Game.Components;
 using Engine.Core.Rooms;
 using Engine.Core.Rooms.Tiles;
 using ImGuiNET;
 using Microsoft.Xna.Framework.Graphics;
 using System.Numerics;
-using System.Runtime.CompilerServices;
+using UI;
 
 namespace Editor.Windows.TileEditor
 {
@@ -37,7 +36,7 @@ namespace Editor.Windows.TileEditor
     /// <summary>
     /// Represents the Tile Editor window in the editor, allowing users to create and edit tile layers.
     /// </summary>
-    public class TileEditorWindow : IInspectable
+    public class TileEditorWindow : ImGuiEditor, IInspectable
     {
         private bool show = true;
         [SliderEditor(1,25)]
@@ -53,7 +52,7 @@ namespace Editor.Windows.TileEditor
         /// <summary>
         /// Tile editor draw
         /// </summary>
-        public void Draw()
+        public override void Draw()
         {
             if (ImGui.Begin("Tile Editor", ref show))
             {
@@ -65,15 +64,6 @@ namespace Editor.Windows.TileEditor
         }
 
         /// <summary>
-        /// Draws the inspector fields
-        /// </summary>
-        public void Render()
-        {
-            InspectorUI.DrawComponent(SelectedTilemap);
-            InspectorUI.DrawClass(this);
-        }
-
-        /// <summary>
         /// Draw the tile editor
         /// </summary>
         public void DrawEditor()
@@ -81,6 +71,7 @@ namespace Editor.Windows.TileEditor
             List<Tilemap> Tilemaps = new List<Tilemap>();
             Tilemaps.Clear();
 
+            // Get all tilemaps
             foreach (var gameObj in SceneManager.GetAllActiveObjects())
             {
                 foreach (var component in gameObj.components)
@@ -128,14 +119,19 @@ namespace Editor.Windows.TileEditor
                     {
                         bool selected = ImGui.Selectable($"{brush.Name}");
 
-                        if (selected && SelectedTilemap != null)
+                        if (selected)
                         {
                             PreviewTexture = tile.Texture.texture;
-                            SelectedTilemap.Tile = tile;
+                            if (SelectedTilemap != null) SelectedTilemap.Tile = tile;
+                            InspectorWindow.Instance.Inspect(handler);
                         }
                     }
                 }
             }
+
+            // Draw the tilemap settings
+            ImGui.Separator();
+            InspectorUI.DrawClass(this);
 
             // No tilemap selected
             if (SelectedTilemap == null)
@@ -237,7 +233,6 @@ namespace Editor.Windows.TileEditor
                 }
             }
         }
-
         public bool IsVisible => show;
         public void SetVisible(bool visible) => show = visible;
     }

@@ -160,7 +160,7 @@ namespace Engine.Core.Rooms.Tiles
         {
             if (x < 0 || y < 0 || x >= MapWidth || y >= MapHeight)
                 return null;
-            
+
             return Tiles[x, y];
         }
 
@@ -266,7 +266,7 @@ namespace Engine.Core.Rooms.Tiles
         /// <param name="spriteBatch"></param>
         public override void Draw(SpriteBatch spriteBatch)
         {
-            Renderer.Draw(spriteBatch);
+            Renderer.Draw(spriteBatch,Position);
         }
 
         /// <summary>

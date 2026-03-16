@@ -27,7 +27,7 @@ namespace Editor.AssetManagement
     /// <summary>
     /// Handles loading, saving, and rendering RuleTiles in the editor.
     /// </summary>
-    public class RuleTileHandler : IAssetHandler
+    public class RuleTileHandler : IAssetHandler, IInspectable
     {
         /// <summary>
         /// The RuleTile asset itself

@@ -529,15 +529,6 @@ namespace EarthEngineEditor.Windows
                     
                     // Units Per Pixel setting
                     ImGui.Separator();
-                    ImGui.Text("3D Rendering Settings");
-                    
-                    float unitsPerPixel = EngineContext.UnitsPerPixel;
-                    if (ImGui.SliderFloat("Units Per Pixel", ref unitsPerPixel, 0.1f, 10f, "%.2f"))
-                    {
-                        EngineContext.UnitsPerPixel = unitsPerPixel;
-                        // Also update the game options so it gets saved
-                        game.runtime.gameOptions.UnitsPerPixel = unitsPerPixel;
-                    }
                     if (ImGui.IsItemHovered())
                     {
                         ImGui.SetTooltip("Controls the scale conversion from 2D pixels to 3D world units.\nHigher values = smaller 3D objects relative to 2D coordinates.");

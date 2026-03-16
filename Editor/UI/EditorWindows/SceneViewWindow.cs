@@ -38,7 +38,12 @@ namespace EarthEngineEditor.Windows
     /// </summary>
     public class SceneViewWindow
     {
-        public Room? scene;
+        public Room? scene
+        {
+            get => SceneManager.CurrentSceneData;
+            private set { }
+        }
+
         private GameObject? _selectedObject;
         private GameObject? previousSelection;
         private IInspectable? _nodeBeingRenamed;

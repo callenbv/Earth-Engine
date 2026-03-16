@@ -79,6 +79,9 @@ namespace Editor.AssetManagement
             // Load scripts in project if possible
             ScriptCompiler.CompileAndLoadScripts(ProjectSettings.ProjectDirectory, out var scriptManager);
 
+            // Set the engine base path
+            EnginePaths.ProjectBase = ProjectSettings.ProjectDirectory;
+
             // Load any game options
             if (File.Exists(optionsPath))
             {
@@ -103,7 +106,7 @@ namespace Editor.AssetManagement
 
                     // Initialize EngineContext from loaded settings
                     EditorApp.Instance.runtime.gameOptions = settings;
-                    EngineContext.UnitsPerPixel = settings.UnitsPerPixel;                 
+                    EngineContext.UnitsPerPixel = settings.UnitsPerPixel;        
                 }
                 catch
                 {

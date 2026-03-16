@@ -55,7 +55,7 @@ namespace EarthEngineEditor
 
             // Redirect console output
             Console.SetOut(_consoleWriter);
-            Console.SetError(new ConsoleWriter(this, new Vector4(1, 0.4f, 0.4f, 1))); // light red for errors
+            Console.SetError(new ConsoleWriter(this, new Vector4(1, 0.4f, 0.4f, 1)));
         }
 
         /// <summary>

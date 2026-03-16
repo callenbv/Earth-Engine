@@ -93,7 +93,7 @@ namespace Engine.Core.Rooms
                 options.Converters.Add(new ColorJsonConverter());
 
                 string json = JsonSerializer.Serialize(CurrentSceneData, options);
-                File.WriteAllText(CurrentSceneData.FilePath, json);
+                File.WriteAllText($"{EnginePaths.AssetsBase}/{CurrentSceneData.FilePath}", json);
                 Console.WriteLine($"Scene saved: {CurrentSceneData.Name} to {CurrentSceneData.FilePath}");
             }
             catch (Exception ex)

@@ -135,6 +135,7 @@ namespace Engine.Core.Rooms
 
             Room scene = new Room();
             string name = Path.GetFileName(path);
+            scene.FilePath = fullPath;
 
             try
             {

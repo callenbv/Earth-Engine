@@ -26,6 +26,8 @@ namespace Editor.Windows.Inspector
         /// <param name="comp"></param>
         public static void DrawComponent(IComponent comp)
         {
+            if (comp == null) return;
+
             var type = comp.GetType();
             var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
             var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
@@ -77,6 +79,8 @@ namespace Editor.Windows.Inspector
         /// <param name="comp"></param>
         public static void DrawClass(object comp)
         {
+            if (comp == null) return;
+
             var type = comp.GetType();
             var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
             var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);

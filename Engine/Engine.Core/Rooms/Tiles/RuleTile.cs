@@ -37,7 +37,7 @@ namespace Engine.Core.Rooms.Tiles
     /// <summary>
     /// Rule class tile for autotiling
     /// </summary>
-    public class RuleTile : Tile
+    public class RuleTile : Tile, IInspectable
     {
         [HideInInspector]
         public List<TileRule> Rules = new();

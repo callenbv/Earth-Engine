@@ -24,10 +24,7 @@ public static class TilemapManager
     /// </summary>
     public static void Render(SpriteBatch spriteBatch)
     {
-        foreach (var layer in layers)
-        {
-            layer.Draw(spriteBatch);
-        }
+
     }
 
     /// <summary>

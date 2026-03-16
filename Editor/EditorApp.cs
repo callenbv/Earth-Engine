@@ -164,8 +164,6 @@ namespace EarthEngineEditor
                     Room scene = Room.Load(runtime.scene.FilePath);
                     Asset room = Asset.Get(scene.Name);
                     runtime.scene = scene;
-                    SceneViewWindow.Instance.scene = scene;
-                    SceneViewWindow.Instance.scene.FilePath = scene.FilePath;
                     room.Open();
                     InspectorWindow.Instance.selectedItem = null;
 

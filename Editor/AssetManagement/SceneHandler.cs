@@ -84,10 +84,9 @@ namespace Editor.AssetManagement
         public void Open(string path)
         {
             // Load the scene
-            scene = Room.Load(path);
-            SceneViewWindow.Instance.scene = scene;
-            SceneViewWindow.Instance.scene.FilePath = path;
-            RuntimeManager.Instance.scene = scene;
+            SceneAsset sc = Asset.Get<SceneAsset>(path);
+            SceneManager.EnterScene(sc);
+            scene = RuntimeManager.Instance.scene;
 
             // Clear the old folder structure completely - create a fresh root
             SceneFolder root = new SceneFolder("Root");
