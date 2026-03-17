@@ -18,7 +18,7 @@ namespace Engine.Core.Game.Components
     /// <summary>
     /// Base interface for all components in the game engine.
     /// </summary>
-    public interface IComponent : IAssignable
+    public interface IComponent : IAssignable, Activatable
     {
         string Name { get; }
         virtual void Update(GameTime gameTime) { }
@@ -51,9 +51,24 @@ namespace Engine.Core.Game.Components
         public virtual bool IsUI => false;
 
         /// <summary>
-        /// If this is active
+        /// If this component is active
         /// </summary>
-        public bool Active { get; set; } = true;
+        private bool active = true;
+        public virtual bool Active
+        {
+            get => active;
+            set => active = value;
+        }
+
+        /// <summary>
+        /// Render order of this component
+        /// </summary>
+        private int renderOrder = 0;
+        public virtual int RenderOrder
+        {
+            get => renderOrder;
+            set => renderOrder = value;
+        }
 
         /// <summary>
         /// Unique identifier for the component. This is used to identify the component in the editor and in the game

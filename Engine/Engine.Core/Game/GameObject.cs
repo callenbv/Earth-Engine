@@ -22,12 +22,27 @@ namespace Engine.Core.Game
     /// <summary>
     /// Represents a game object in the scene, which can have multiple components attached to it.
     /// </summary>
-    public class GameObject : IComponentContainer, IInspectable
+    public class GameObject : IComponentContainer, IInspectable, Activatable
     {
         /// <summary>
-        /// If this game object is active 
+        /// If this component is active
         /// </summary>
-        public bool Active { get; set; } = true;
+        private bool active = true;
+        public virtual bool Active
+        {
+            get => active;
+            set => active = value;
+        }
+
+        /// <summary>
+        /// Render order of this component
+        /// </summary>
+        private int renderOrder = 0;
+        public virtual int RenderOrder
+        {
+            get => renderOrder;
+            set => renderOrder = value;
+        }
 
         /// <summary>
         /// Name of the GameObject, used for identification and debugging.
@@ -335,7 +350,6 @@ namespace Engine.Core.Game
             }
 
             // Order component updates
-            // NOTE: This will be replaced by priority queue later
             foreach (var component in components)
             {
                 try
@@ -372,7 +386,7 @@ namespace Engine.Core.Game
             {
                 try
                 {
-                    if (component is ObjectComponent gameComp && !gameComp.Active)
+                    if (!component.Active)
                         continue;
 
                     component.Draw(spriteBatch);
@@ -400,6 +414,9 @@ namespace Engine.Core.Game
             {
                 try
                 {
+                    if (!component.Active)
+                        continue;
+
                     component.DrawUI(spriteBatch);
                 }
                 catch (Exception ex)

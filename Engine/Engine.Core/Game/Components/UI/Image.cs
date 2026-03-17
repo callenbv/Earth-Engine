@@ -40,9 +40,8 @@ namespace Engine.Core.Game.Components
                 return;
 
             frame = Math.Clamp(frame, 0, frameCount - 1);
-            depth = GetDepth();
-            origin = new Vector2(frameWidth / 2, frameHeight / 2);
-            spriteBatch.Draw(texture, new Vector2(Position.X, Position.Y) + new Vector2(Offset.X, Offset.Y), spriteBox, Tint, Rotation, origin, new Vector2(Scale.X, Scale.Y) + new Vector2(SpriteScale.X, SpriteScale.Y), spriteEffect, depth);
+
+            spriteBatch.Draw(texture, new Vector2(Position.X, Position.Y) + new Vector2(Offset.X, Offset.Y), spriteBox, Tint, Rotation, origin, new Vector2(Scale.X, Scale.Y) + new Vector2(SpriteScale.X, SpriteScale.Y), spriteEffect, RenderOrder);
         }
     }
 }

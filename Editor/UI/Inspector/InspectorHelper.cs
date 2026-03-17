@@ -98,6 +98,55 @@ namespace Editor.Windows.Inspector
                 PrefabHandler.DrawField(prop.Name, value, prop.PropertyType, newValue => prop.SetValue(comp, newValue), prop);
             }
         }
+
+        /// <summary>
+        /// Draw the property field
+        /// </summary>
+        /// <param name="field"></param>
+        public static void DrawField(object target, string memberName)
+        {
+            if (target == null || string.IsNullOrEmpty(memberName))
+                return;
+
+            var type = target.GetType();
+
+            const BindingFlags flags =
+                BindingFlags.Instance |
+                BindingFlags.Public |
+                BindingFlags.NonPublic;
+
+            // Try property first
+            var prop = type.GetProperty(memberName, flags);
+            if (prop != null && prop.CanRead && prop.CanWrite)
+            {
+                var value = prop.GetValue(target);
+
+                PrefabHandler.DrawField(
+                    prop.Name,
+                    value,
+                    prop.PropertyType,
+                    newValue => prop.SetValue(target, newValue),
+                    prop
+                );
+
+                return;
+            }
+
+            // Try field
+            var field = type.GetField(memberName, flags);
+            if (field != null)
+            {
+                var value = field.GetValue(target);
+
+                PrefabHandler.DrawField(
+                    field.Name,
+                    value,
+                    field.FieldType,
+                    newValue => field.SetValue(target, newValue),
+                    field
+                );
+            }
+        }
     }
 }
 

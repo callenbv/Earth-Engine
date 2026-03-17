@@ -82,6 +82,10 @@ namespace Engine.Core.Rooms
             {
                 foreach (var obj in objects)
                 {
+                    // Ignore deactive objects
+                    if (!obj.Active)
+                        continue;
+
                     obj.DrawUI(spriteBatch);
                 }
             }
@@ -99,10 +103,17 @@ namespace Engine.Core.Rooms
         {
             List<GameObject> destroyedObjects = new List<GameObject>();
 
+            // Sort gameobjects by rendering order
+            objects.Sort((a,b) => a.RenderOrder.CompareTo(b.RenderOrder));
+
             try
             {
                 foreach (var obj in objects)
                 {
+                    // Ignore deactive objects
+                    if (!obj.Active)
+                        continue;
+
                     // Destroyed objects defer their destruction
                     if (obj.IsDestroyed)
                         destroyedObjects.Add(obj);

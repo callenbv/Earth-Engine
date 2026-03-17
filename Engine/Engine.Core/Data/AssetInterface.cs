@@ -23,6 +23,19 @@ namespace Engine.Core.Data
         virtual void Render() { }
     }
 
+    public interface Activatable
+    {
+        /// <summary>
+        /// If this game object is active 
+        /// </summary>
+        bool Active { get; set; }
+
+        /// <summary>
+        /// Render order. Higher values go in front
+        /// </summary>
+        int RenderOrder { get; set; }
+    }
+
     /// <summary>
     /// Interface for handling assets in the editor.
     /// </summary>

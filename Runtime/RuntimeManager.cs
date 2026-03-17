@@ -173,7 +173,6 @@ namespace GameRuntime
             _graphicsDevice.BlendState = BlendState.NonPremultiplied;
             spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.NonPremultiplied, SamplerState.PointClamp, null, null, null, Camera.Main.GetViewMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight));
             
-            TilemapManager.Render(spriteBatch);
             scene.Render(spriteBatch);
             spriteBatch.End();
 

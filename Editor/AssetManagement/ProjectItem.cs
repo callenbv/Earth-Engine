@@ -62,7 +62,6 @@ namespace Editor.AssetManagement
 
             // Editor settings
             EditorApp.Instance?._settings?.Save();
-            TilemapManager.Save();
         }
 
         /// <summary>
@@ -72,9 +71,6 @@ namespace Editor.AssetManagement
         {
             // Load per project assets
             EditorApp.Instance.runtime.LoadAssets();
-
-            // Load static tilemaps
-            TilemapManager.Load(Path.Combine(ProjectSettings.ProjectDirectory,"Tilemaps","tilemaps.json"));
 
             // Load scripts in project if possible
             ScriptCompiler.CompileAndLoadScripts(ProjectSettings.ProjectDirectory, out var scriptManager);

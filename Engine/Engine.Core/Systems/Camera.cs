@@ -22,6 +22,7 @@ namespace Engine.Core
         /// The position of the camera in world space.
         /// </summary>
         public Vector2 Position { get; set; } = Vector2.Zero;
+        private Vector2 OldPosition = Vector2.Zero;
 
         /// <summary>
         /// The zoom level of the camera, where 1f is normal size.
@@ -73,10 +74,12 @@ namespace Engine.Core
         /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
         {
+            OldPosition = Position;
             Math.Clamp(Zoom, 0.1f, 4f);
 
             float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
+            // Lerp towards target position
             if (Target != null)
             {
                 Position = Vector2.Lerp(Position, new Vector2(Target.Position.X, Target.Position.Y), SmoothSpeed * dt);

@@ -63,6 +63,7 @@ namespace Editor.Windows
                 {
                     Camera.Main.Position += new Vector2(PanSpeed, 0) / Camera.Main.Zoom;
                 }
+
                 // Zooming
                 if (Input.ScrolledUp)
                 {
@@ -72,6 +73,16 @@ namespace Editor.Windows
                 {
                     Camera.Main.Zoom *= 0.9f; // Zoom in
                 }
+            }
+
+            // Pan with middle mouse button
+            if (Input.IsMouseDown(Engine.Core.Systems.Button.Middle))
+            {
+                // Get the delta mouse pan
+                Microsoft.Xna.Framework.Point deltaPosition = Input.MousePosition - Input.PreviousMousePosition;
+
+                // Apply
+                Camera.Main.Position -= new Vector2(deltaPosition.X, deltaPosition.Y);
             }
         }
 

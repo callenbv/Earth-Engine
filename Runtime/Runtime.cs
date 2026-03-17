@@ -83,8 +83,6 @@ namespace GameRuntime
             runtimeManager.scene = Room.Load(gameOptions.StartScene);
             runtimeManager.scene.Initialize();
 
-            // Load static tilemaps
-            TilemapManager.Load(Path.Combine(EnginePaths.ProjectBase, "Tilemaps", "tilemaps.json"));
 
             // Apply any graphics changes
             _graphics.ApplyChanges();

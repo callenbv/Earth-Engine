@@ -52,6 +52,21 @@ namespace Engine.Core.Game.Components
         public float TextScale { get; set; } = 1.0f;
 
         /// <summary>
+        /// Size of text font
+        /// </summary>
+        private int fontSize = 16;
+        private int baseFontSize = 16;
+        public int FontSize
+        {
+            get => fontSize;
+            set
+            {
+                fontSize = Math.Max(1, value);
+                TextScale = fontSize / (float)baseFontSize;
+            }
+        }
+
+        /// <summary>
         /// Text rotation
         /// </summary>
         [SliderEditor(0,360)]
@@ -193,8 +208,11 @@ namespace Engine.Core.Game.Components
 
             if (bitFont == null)
             {
-                Console.WriteLine($"[TextRenderer] Font '{FontName}' not found, using fallback");
+                Console.Error.WriteLine($"[TextRenderer] Font '{FontName}' not found, using fallback");
+                throw (new Exception("Bit font was NULL."));
             }
+
+            baseFontSize = bitFont.Size;
         }
 
         /// <summary>

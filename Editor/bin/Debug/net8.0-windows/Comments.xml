@@ -120,6 +120,16 @@
             Interface for any asset that can be inspected in the editor.
             </summary>
         </member>
+        <member name="P:Engine.Core.Data.Activatable.Active">
+            <summary>
+            If this game object is active 
+            </summary>
+        </member>
+        <member name="P:Engine.Core.Data.Activatable.RenderOrder">
+            <summary>
+            Render order. Higher values go in front
+            </summary>
+        </member>
         <member name="T:Engine.Core.Data.IAssetHandler">
             <summary>
             Interface for handling assets in the editor.
@@ -698,9 +708,14 @@
             Mark this component as UI
             </summary>
         </member>
-        <member name="P:Engine.Core.Game.Components.ObjectComponent.Active">
+        <member name="F:Engine.Core.Game.Components.ObjectComponent.active">
             <summary>
-            If this is active
+            If this component is active
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.Components.ObjectComponent.renderOrder">
+            <summary>
+            Render order of this component
             </summary>
         </member>
         <member name="P:Engine.Core.Game.Components.ObjectComponent.ID">
@@ -1166,6 +1181,11 @@
             The rotation of the text in radians. This is applied around the origin point.
             </summary>
         </member>
+        <member name="F:Engine.Core.Game.Components.TextRenderer.fontSize">
+            <summary>
+            Size of text font
+            </summary>
+        </member>
         <member name="P:Engine.Core.Game.Components.TextRenderer.TextRotation">
             <summary>
             Text rotation
@@ -1433,9 +1453,14 @@
             Represents a game object in the scene, which can have multiple components attached to it.
             </summary>
         </member>
-        <member name="P:Engine.Core.Game.GameObject.Active">
+        <member name="F:Engine.Core.Game.GameObject.active">
             <summary>
-            If this game object is active 
+            If this component is active
+            </summary>
+        </member>
+        <member name="F:Engine.Core.Game.GameObject.renderOrder">
+            <summary>
+            Render order of this component
             </summary>
         </member>
         <member name="P:Engine.Core.Game.GameObject.Name">
@@ -2931,16 +2956,6 @@
             <param name="writer"></param>
             <param name="value"></param>
             <param name="options"></param>
-        </member>
-        <member name="M:TilemapManager.Render(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
-            <summary>
-            Render all tilemaps in the manager. Users can add their own, 
-            </summary>
-        </member>
-        <member name="M:TilemapManager.Save">
-            <summary>
-            Save the static tilemaps per project
-            </summary>
         </member>
         <member name="M:GameRuntime.ScriptManager.CreateComponentInstanceByName(System.String)">
             <summary>

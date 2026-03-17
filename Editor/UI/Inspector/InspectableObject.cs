@@ -8,6 +8,7 @@
 
 using Engine.Core.Data;
 using Engine.Core.Game;
+using ImGuiNET;
 
 namespace Editor.Windows.Inspector
 {
@@ -35,7 +36,14 @@ namespace Editor.Windows.Inspector
         /// </summary>
         public void Render()
         {
-            InspectorUI.DrawGameObject(this.obj);
+            if (GameObject != null)
+            {
+                InspectorUI.DrawField(GameObject, "Active");
+                InspectorUI.DrawField(GameObject, "Name");
+                ImGui.Separator();
+            }
+
+            InspectorUI.DrawGameObject(obj);
         }
     }
 }
