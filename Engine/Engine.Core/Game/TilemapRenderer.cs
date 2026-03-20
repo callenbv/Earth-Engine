@@ -81,10 +81,7 @@ namespace Engine.Core.Rooms.Tiles
                     if (tile?.Texture?.texture == null)
                         continue;
 
-                    int xOffset = (int)position.X;
-                    int yOffset = (int)position.Y;
-
-                    Rectangle dest = new Rectangle(xOffset+x * tile.CellSize, yOffset+y * tile.CellSize, tile.CellSize, tile.CellSize);
+                    Rectangle dest = new Rectangle(x * tile.CellSize, y * tile.CellSize, tile.CellSize, tile.CellSize);
                     spriteBatch.Draw(tile.Texture.texture, dest, tile.Frame, Color.White, 0f,Vector2.Zero,SpriteEffects.None,Tilemap.SortingOrder/255f);
                 }
             }

@@ -51,11 +51,13 @@ namespace Engine.Core.Data
             {
                 string fullPath = System.IO.Path.Combine(EnginePaths.AssetsBase, Path);
                 fullPath = System.IO.Path.GetFullPath(fullPath);
-                return Room.Load(fullPath);
+                Room loadedRoom = Room.Load(fullPath);
+                loadedRoom.FilePath = Path;
+                return loadedRoom;
             }
             catch (Exception ex)
             {
-                System.Console.Error.WriteLine($"[SceneAsset] Failed to load scene from path '{Path}': {ex.Message}");
+                Console.Error.WriteLine($"[SceneAsset] Failed to load scene from path '{Path}': {ex.Message}");
                 return null;
             }
         }

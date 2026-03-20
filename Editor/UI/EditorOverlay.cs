@@ -79,10 +79,10 @@ namespace Editor.Windows
             if (Input.IsMouseDown(Engine.Core.Systems.Button.Middle))
             {
                 // Get the delta mouse pan
-                Microsoft.Xna.Framework.Point deltaPosition = Input.MousePosition - Input.PreviousMousePosition;
+                Microsoft.Xna.Framework.Point deltaPosition = (Input.MousePosition - Input.PreviousMousePosition);
 
                 // Apply
-                Camera.Main.Position -= new Vector2(deltaPosition.X, deltaPosition.Y);
+                Camera.Main.Position -= new Vector2(deltaPosition.X * Time.dt * 32, deltaPosition.Y * Time.dt * 32);
             }
         }
 
@@ -95,7 +95,6 @@ namespace Editor.Windows
             spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.NonPremultiplied, SamplerState.PointClamp, null, null, null, Camera.Main.GetViewMatrix(EngineContext.InternalWidth, EngineContext.InternalHeight));
             DrawGrid(spriteBatch);
             EditorApp.Instance._windowManager.tileEditor.HandleTilepainting(spriteBatch);
-            spriteBatch.End();
         }
 
         /// <summary>

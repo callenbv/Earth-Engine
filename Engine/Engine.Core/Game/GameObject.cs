@@ -16,6 +16,7 @@ using Engine.Core.Data;
 using MonoGame.Extended.Serialization.Json;
 using Engine.Core.CustomMath;
 using Engine.Core.Graphics;
+using Engine.Core.Rooms;
 
 namespace Engine.Core.Game
 {
@@ -175,6 +176,9 @@ namespace Engine.Core.Game
         /// </summary>
         public int Height { get; set; } = 1;
 
+        private bool SelectedX;
+        private bool SelectedY;
+
         /// <summary>
         /// Default constructor for GameObject, initializes with an empty name.
         /// </summary>
@@ -198,7 +202,6 @@ namespace Engine.Core.Game
         /// </summary>
         public void OnCreate()
         {
-
         }
 
         /// <summary>
@@ -315,30 +318,17 @@ namespace Engine.Core.Game
                     // Check for no owner
                     if (component is ObjectComponent objComp)
                     {
-                        if (!objComp.Active)
-                            continue;
+                        if (!objComp.Active)                            continue;
 
                         if (objComp.Owner == null)
                             continue;
 
                         // Always update Camera3DController to allow camera navigation in editor and play
                         bool isCam3D = objComp is Camera3DController;
+
                         // Do not update other scripts if the engine is paused
                         if (!EngineContext.Running && !objComp.UpdateInEditor)
                             continue;
-
-                        // Disable non-ui objects when relevant
-                        if (EngineContext.UIOnly)
-                        {
-                            if (!objComp.IsUI)
-                            {
-                                Active = false;
-                            }
-                        }
-                        else
-                        {
-                            Active = true;
-                        }
                     }
 
                     component.Update(gameTime);
@@ -401,6 +391,59 @@ namespace Engine.Core.Game
             {
                 obj.Draw(spriteBatch);
             }
+        }
+
+        /// <summary>
+        /// Draw the widgets to visualize transform easily
+        /// </summary>
+        /// <param name="spriteBatch"></param>
+        public void DrawWidgets(SpriteBatch spriteBatch)
+        {
+            if (spriteBatch == null)
+                return;
+
+            // Get drawing data
+            int arrowWidth = 24;
+            int arrowHeight = 3;
+            int posX = (int)Position.X;
+            int posY = (int)Position.Y-8;
+
+            Point deltaMousePos = Input.MousePosition - Input.PreviousMousePosition;
+            Vector2 mouseDiff = new Vector2(deltaMousePos.X*Time.dt, deltaMousePos.Y * Time.dt);
+
+            Rectangle xBox = new Rectangle(posX, posY, arrowWidth, arrowHeight);
+            Rectangle yBox = new Rectangle(posX, posY- arrowWidth, arrowHeight, arrowWidth);
+
+            // X
+            if (Input.MouseHover(xBox) && !SelectedY)
+            {
+                if (Input.IsMouseDown(Systems.Button.Left))
+                {
+                    SelectedX = true;
+                }
+            }
+            // Y
+            if (Input.MouseHover(yBox) && !SelectedX)
+            {
+                if (Input.IsMouseDown(Systems.Button.Left))
+                {
+                    SelectedY = true;
+                }
+            }
+            if (SelectedX) Position += new Vector3(mouseDiff.X*24, 0, 0);
+            if (SelectedY) Position += new Vector3(0, mouseDiff.Y*24, 0);
+
+            if (Input.IsMouseReleased(Systems.Button.Left))
+            {
+                SelectedX = false;
+                SelectedY = false;
+            }
+
+            GraphicsLibrary.SetDrawColor(Color.Green);
+            GraphicsLibrary.DrawRectangle(spriteBatch,arrowWidth, arrowHeight, false, posX, posY);
+            GraphicsLibrary.SetDrawColor(Color.Red);
+            GraphicsLibrary.DrawRectangle(spriteBatch,arrowHeight, arrowWidth, false, posX, posY-arrowWidth);
+            GraphicsLibrary.ResetDraw();
         }
 
         /// <summary>
@@ -501,7 +544,7 @@ namespace Engine.Core.Game
                 // Add to the scene
                 string objectName = Path.GetFileNameWithoutExtension(defName);
                 obj.Name = $"{objectName}{EngineContext.Current.Scene?.objects.Count}";
-                EngineContext.Current.Scene?.objects.Add(obj);
+                SceneManager.AddObject(obj);
                 return obj;
             }
             catch (Exception ex)

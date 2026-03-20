@@ -123,27 +123,19 @@ namespace Engine.Core.Graphics
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <param name="outlined"></param>
-        public static void DrawRectangle(int width, int height, bool outlined = false)
+        public static void DrawRectangle(SpriteBatch spriteBatch, int width, int height, bool outlined = false, int x = 0, int y = 0)
         {
-            SpriteBatch? spriteBatch = EngineContext.SpriteBatch;
-
             if (spriteBatch == null) return;
 
             if (outlined)
             {
                 // Simple rectangle
-                spriteBatch.Draw(PixelTexture, new Rectangle(0, 0, width, height), DrawColor);
+                spriteBatch.Draw(PixelTexture, new Rectangle(x, y, width, height), null, DrawColor, 0f, Vector2.Zero,SpriteEffects.None, 1f);
             }
             else
             {
                 // Top line
-                spriteBatch.Draw(PixelTexture, new Rectangle(0, 0, width, 0), DrawColor);
-                // Right line
-                spriteBatch.Draw(PixelTexture, new Rectangle(width, 0, width+1, height), DrawColor);
-                // Bottom line
-                spriteBatch.Draw(PixelTexture, new Rectangle(0, height, width, height+1), DrawColor);
-                // Left line
-                spriteBatch.Draw(PixelTexture, new Rectangle(0, 0, 1, height), DrawColor);
+                spriteBatch.Draw(PixelTexture, new Rectangle(x, y, width, height), null, DrawColor, 0f, Vector2.Zero, SpriteEffects.None, 1f);
             }
         }
 

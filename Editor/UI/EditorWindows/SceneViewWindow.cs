@@ -41,7 +41,6 @@ namespace EarthEngineEditor.Windows
         public Room? scene
         {
             get => SceneManager.CurrentSceneData;
-            private set { }
         }
 
         private GameObject? _selectedObject;
@@ -157,13 +156,6 @@ namespace EarthEngineEditor.Windows
                 {
                     _selectedObject = null;
                 }
-            }
-
-            // Delete
-            if (_selectedObject != null && Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Delete))
-            {
-                _selectedObject.Destroy();
-                _selectedObject = null; // Clear selection
             }
 
             // Draw the actual nodes in the tree

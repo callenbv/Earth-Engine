@@ -238,7 +238,7 @@ namespace EarthEngineEditor
                 if (!homePage.Active)
                 {
                     // Render all windows
-                    _windowManager?.RenderAll();
+                    _windowManager?.RenderAll(spriteBatch);
                 }
                 else
                 {
@@ -251,6 +251,7 @@ namespace EarthEngineEditor
                 {
                     ImGui.PopFont();
                 }
+                spriteBatch.End();
 
                 ImGui.End();
                 _imGuiRenderer?.AfterLayout();

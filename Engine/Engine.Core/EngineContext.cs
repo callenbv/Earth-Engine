@@ -27,7 +27,7 @@ namespace Engine.Core
         public GraphicsDevice? GraphicsDevice { get; set; }
         public ScriptManager? ScriptManager { get; set; }
         public static SpriteBatch? SpriteBatch { get; set; }
-        public Room? Scene { get; set; }
+        public Room? Scene => SceneManager.CurrentSceneData;
         public SceneAsset? NextScene { get; set; }
         public string? AssetsRoot { get; set; }
         public string? RoomsDir { get; set; }
@@ -43,5 +43,10 @@ namespace Engine.Core
         // Add more as needed
 
         private EngineContext() { }
+    }
+
+    public static class Time
+    {
+        public static float dt => EngineContext.DeltaTime;
     }
 } 

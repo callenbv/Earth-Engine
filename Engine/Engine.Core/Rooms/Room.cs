@@ -51,6 +51,9 @@ namespace Engine.Core.Rooms
             {
                 foreach (var obj in objects)
                 {
+                    if (!obj.Active)
+                        continue;
+
                     obj.Draw(spriteBatch);
                 }
             }
@@ -73,9 +76,6 @@ namespace Engine.Core.Rooms
         /// <param name="spriteBatch"></param>
         public void RenderUI(SpriteBatch spriteBatch)
         {
-            if (!EngineContext.UIOnly && !EngineContext.Running)
-                return;
-
             Camera.Main.DrawUI(spriteBatch);
 
             try
@@ -110,13 +110,13 @@ namespace Engine.Core.Rooms
             {
                 foreach (var obj in objects)
                 {
-                    // Ignore deactive objects
-                    if (!obj.Active)
-                        continue;
-
                     // Destroyed objects defer their destruction
                     if (obj.IsDestroyed)
                         destroyedObjects.Add(obj);
+
+                    // Ignore deactive objects
+                    if (!obj.Active)
+                        continue;
 
                     obj.Update(gameTime);
                 }

@@ -1598,6 +1598,12 @@
             </summary>
             <param name="spriteBatch"></param>
         </member>
+        <member name="M:Engine.Core.Game.GameObject.DrawWidgets(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
+            <summary>
+            Draw the widgets to visualize transform easily
+            </summary>
+            <param name="spriteBatch"></param>
+        </member>
         <member name="M:Engine.Core.Game.GameObject.DrawUI(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
             <summary>
             Draw the object and its attached scripts
@@ -2185,6 +2191,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Engine.Core.Rooms.SceneManager.AddObject(Engine.Core.Game.GameObject)">
+            <summary>
+            Add a new object to the scene
+            </summary>
+            <param name="obj"></param>
+        </member>
         <member name="M:Engine.Core.Rooms.SceneManager.SaveScene">
             <summary>
             Save the current scene
@@ -2284,7 +2296,7 @@
             Resets the draw properties to default
             </summary>
         </member>
-        <member name="M:Engine.Core.Graphics.GraphicsLibrary.DrawRectangle(System.Int32,System.Int32,System.Boolean)">
+        <member name="M:Engine.Core.Graphics.GraphicsLibrary.DrawRectangle(Microsoft.Xna.Framework.Graphics.SpriteBatch,System.Int32,System.Int32,System.Boolean,System.Int32,System.Int32)">
             <summary>
             Draw a rectangle given a size
             </summary>

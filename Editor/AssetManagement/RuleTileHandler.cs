@@ -92,7 +92,7 @@ namespace Editor.AssetManagement
         /// <summary>
         /// Draws the full editor for the RuleTile.
         /// </summary>
-        public void Render()
+        void IInspectable.DrawEditor(SpriteBatch spriteBatch)
         {
             InspectorUI.DrawClass(Tile);
 

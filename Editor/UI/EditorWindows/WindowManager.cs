@@ -16,6 +16,7 @@ using Engine.Core.Scripting;
 using GameRuntime;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
@@ -79,10 +80,10 @@ namespace EarthEngineEditor.Windows
         /// <summary>
         /// Render all windows in ImGui
         /// </summary>
-        public void RenderAll()
+        public void RenderAll(SpriteBatch spriteBatch)
         {
             _sceneView.Render();
-            _inspector.Render();
+            _inspector.Render(spriteBatch);
             _project.Render();
             _about.Render();
             _performance.Render();

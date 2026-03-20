@@ -77,7 +77,7 @@ namespace Engine.Core
             OldPosition = Position;
             Math.Clamp(Zoom, 0.1f, 4f);
 
-            float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            float dt = Time.dt;
 
             // Lerp towards target position
             if (Target != null)

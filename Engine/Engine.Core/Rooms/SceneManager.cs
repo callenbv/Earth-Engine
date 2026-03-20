@@ -44,7 +44,8 @@ namespace Engine.Core.Rooms
             if (scene == null)
                 return;
 
-            EngineContext.Current.NextScene = scene;
+            CurrentScene = scene;
+            CurrentSceneData = CurrentScene.LoadRoom();
         }
 
         /// <summary>
@@ -52,11 +53,7 @@ namespace Engine.Core.Rooms
         /// </summary>
         public static void Update()
         {
-            if (EngineContext.Current.NextScene?.Path != CurrentScene?.Path)
-            {
-                CurrentScene = EngineContext.Current.NextScene;
-                CurrentSceneData = CurrentScene.LoadRoom();
-            }
+
         }
 
         /// <summary>
@@ -66,6 +63,27 @@ namespace Engine.Core.Rooms
         public static List<GameObject> GetAllActiveObjects()
         {
             return (CurrentSceneData == null ? new List<GameObject>() : CurrentSceneData.objects);
+        }
+
+        /// <summary>
+        /// Add a new object to the scene
+        /// </summary>
+        /// <param name="obj"></param>
+        public static void AddObject(GameObject obj)
+        {
+            if (CurrentSceneData == null)
+                return;
+
+            CurrentSceneData.objects.Add(obj);
+        }
+
+        public static void RemoveObject(GameObject obj)
+        {
+            if (CurrentSceneData == null)
+                return;
+
+            obj.Destroy();
+            CurrentSceneData.objects.Remove(obj);
         }
 
         /// <summary>
@@ -93,12 +111,13 @@ namespace Engine.Core.Rooms
                 options.Converters.Add(new ColorJsonConverter());
 
                 string json = JsonSerializer.Serialize(CurrentSceneData, options);
+                Console.WriteLine($"Scene writing: {EnginePaths.AssetsBase} to {CurrentSceneData.FilePath}");
                 File.WriteAllText($"{EnginePaths.AssetsBase}/{CurrentSceneData.FilePath}", json);
                 Console.WriteLine($"Scene saved: {CurrentSceneData.Name} to {CurrentSceneData.FilePath}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Failed to save scene: {ex.Message}");
+                Console.Error.WriteLine($"Failed to save scene: {ex.Message}");
             }
 
             return true;

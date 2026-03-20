@@ -13,6 +13,8 @@ using Editor.Windows.Inspector;
 using Engine.Core;
 using Engine.Core.Game.Components;
 using Editor.Windows.TileEditor;
+using Microsoft.Xna.Framework.Graphics;
+using Engine.Core.Rooms;
 
 namespace EarthEngineEditor.Windows
 {
@@ -35,7 +37,7 @@ namespace EarthEngineEditor.Windows
         /// <summary>
         /// Render the inspector panel
         /// </summary>
-        public void Render()
+        public void Render(SpriteBatch spriteBatch)
         {
             if (!_showInspector) return;
 
@@ -43,7 +45,7 @@ namespace EarthEngineEditor.Windows
             ImGui.Text($"{Title}");
             ImGui.Separator();
 
-            selectedItem?.Render();
+            selectedItem?.DrawEditor(spriteBatch);
             Update();
 
             ImGui.End();

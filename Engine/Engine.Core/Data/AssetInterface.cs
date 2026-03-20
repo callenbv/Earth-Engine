@@ -7,6 +7,7 @@
 /// -----------------------------------------------------------------------------
 
 using Engine.Core.Game;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +21,7 @@ namespace Engine.Core.Data
     /// </summary>
     public interface IInspectable
     {
-        virtual void Render() { }
+        public virtual void DrawEditor(SpriteBatch spriteBatch) { }
     }
 
     public interface Activatable

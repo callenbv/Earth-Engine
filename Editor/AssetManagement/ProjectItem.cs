@@ -96,8 +96,6 @@ namespace Editor.AssetManagement
                     if (sceneAsset != null)
                     {
                         sc.Open();
-                        SceneManager.EnterScene(sceneAsset);
-                        InspectorWindow.Instance.Inspect(sceneAsset);
                     }
 
                     // Initialize EngineContext from loaded settings

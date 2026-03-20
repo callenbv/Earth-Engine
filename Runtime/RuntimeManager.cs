@@ -120,11 +120,11 @@ namespace GameRuntime
             Camera.Main.ViewportHeight = graphicsManager.GraphicsDevice.Viewport.Height;
             Camera.Main.ViewportWidth = graphicsManager.GraphicsDevice.Viewport.Width;
             Camera.Main.graphicsDevice = _graphicsDevice;
+            scene = SceneManager.CurrentSceneData;
 
             if (scene != null)
             {
                 scene.Update(gameTime);
-                EngineContext.Current.Scene = scene;
             }
             CollisionSystem.Update(gameTime);
 
@@ -147,11 +147,6 @@ namespace GameRuntime
                 _lastHeight = EngineContext.InternalHeight;
                 Console.WriteLine($"Resized to {_lastWidth},{_lastHeight}");
             }
-
-            SceneManager.Update();
-
-            if (SceneManager.CurrentSceneData != null && scene != SceneManager.CurrentSceneData) 
-                scene = SceneManager.CurrentSceneData;
         }
 
         /// <summary>

@@ -6,9 +6,11 @@
 /// <Summary>                
 /// -----------------------------------------------------------------------------
 
+using Engine.Core;
 using Engine.Core.Data;
 using Engine.Core.Game;
 using ImGuiNET;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Editor.Windows.Inspector
 {
@@ -34,13 +36,17 @@ namespace Editor.Windows.Inspector
         /// <summary>
         /// Renders the inspectable game object in the inspector window.
         /// </summary>
-        public void Render()
+        void IInspectable.DrawEditor(SpriteBatch spriteBatch)
         {
             if (GameObject != null)
             {
+                // Draw the game object fields
                 InspectorUI.DrawField(GameObject, "Active");
                 InspectorUI.DrawField(GameObject, "Name");
                 ImGui.Separator();
+
+                // Draw the widgets
+                GameObject.DrawWidgets(spriteBatch);
             }
 
             InspectorUI.DrawGameObject(obj);
