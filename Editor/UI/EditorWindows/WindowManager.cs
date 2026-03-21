@@ -211,15 +211,21 @@ namespace EarthEngineEditor.Windows
                             }
                         }
                     }
-                    if (ImGui.MenuItem("Exit"))
+                    if (ImGui.MenuItem("Quit"))
                     {
-                        EditorApp.Instance.Exit();
+                        if (EditorApp.Instance.homePage.Active)
+                            EditorApp.Instance.Exit();
+                        else
+                            EditorApp.Instance.homePage.Active = true;
                     }
                     ImGui.EndMenu();
                 }
                 
                 if (ImGui.BeginMenu("Window"))
                 {
+                    if (ImGui.MenuItem("Home"))
+                        EditorApp.Instance.homePage.Active = !EditorApp.Instance.homePage.Active;
+
                     bool sceneVisible = _sceneView.IsVisible;
                     if (ImGui.MenuItem("Scene View", null, ref sceneVisible))
                         _sceneView.SetVisible(sceneVisible);
