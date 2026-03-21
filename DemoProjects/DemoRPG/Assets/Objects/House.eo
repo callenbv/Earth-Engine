@@ -1,0 +1,113 @@
+{
+  "$id": "1",
+  "Name": "NewPrefab",
+  "components": [
+    {
+      "type": "Transform",
+      "Position": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "OldPosition": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "Rotation": 0,
+      "Scale": {
+        "X": 1,
+        "Y": 1,
+        "Z": 0
+      },
+      "Active": true,
+      "RenderOrder": 0,
+      "ID": 1342055
+    },
+    {
+      "type": "PointLight",
+      "lightRadius": 64,
+      "finalRadius": 1,
+      "lightIntensity": 1,
+      "finalIntensity": 1,
+      "lightColor": "#ffffffff",
+      "Offset": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "FlickerIntensity": 0,
+      "Active": true,
+      "RenderOrder": 0,
+      "ID": 8443839
+    },
+    {
+      "type": "Sprite2D",
+      "Offset": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "SpriteScale": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "animated": false,
+      "depth": 0,
+      "spriteEffect": 0,
+      "origin": "0 0",
+      "Tint": "#ffffffff",
+      "spriteBox": {
+        "Left": 0,
+        "Right": 160,
+        "Top": 0,
+        "Bottom": 128,
+        "IsEmpty": false,
+        "Location": {
+          "X": 0,
+          "Y": 0
+        },
+        "Size": {
+          "X": 160,
+          "Y": 128
+        },
+        "Center": {
+          "X": 80,
+          "Y": 64
+        },
+        "X": 0,
+        "Y": 0,
+        "Width": 160,
+        "Height": 128
+      },
+      "Height": 0,
+      "texturePath": "House",
+      "frameWidth": 160,
+      "frameHeight": 128,
+      "frameCount": 1,
+      "frameSpeed": 1,
+      "frame": 0,
+      "Active": true,
+      "RenderOrder": 0,
+      "ID": 8565338
+    },
+    {
+      "type": "PointLight",
+      "lightRadius": 64,
+      "finalRadius": 1,
+      "lightIntensity": 1,
+      "finalIntensity": 1,
+      "lightColor": "#ffffffff",
+      "Offset": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "FlickerIntensity": 0,
+      "Active": true,
+      "RenderOrder": 0,
+      "ID": 2081815
+    }
+  ]
+}

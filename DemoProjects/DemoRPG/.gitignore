@@ -1,0 +1,6 @@
+*.db
+*.db-shm
+/.vs/NewProject/CopilotIndices
+/.vs/NewProject/FileContentIndex
+/.vs
+/obj

@@ -1,0 +1,94 @@
+{
+  "$id": "1",
+  "Name": "NewPrefab",
+  "components": [
+    {
+      "type": "Transform",
+      "Position": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "OldPosition": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "Rotation": 0,
+      "Scale": {
+        "X": 1,
+        "Y": 1,
+        "Z": 0
+      },
+      "Active": true,
+      "RenderOrder": 0,
+      "ID": 9190232
+    },
+    {
+      "type": "Sprite2D",
+      "Offset": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "SpriteScale": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "animated": true,
+      "depth": 0,
+      "spriteEffect": 0,
+      "origin": "0 0",
+      "Tint": "#ffffffff",
+      "spriteBox": {
+        "Left": 0,
+        "Right": 16,
+        "Top": 0,
+        "Bottom": 16,
+        "IsEmpty": false,
+        "Location": {
+          "X": 0,
+          "Y": 0
+        },
+        "Size": {
+          "X": 16,
+          "Y": 16
+        },
+        "Center": {
+          "X": 8,
+          "Y": 8
+        },
+        "X": 0,
+        "Y": 0,
+        "Width": 16,
+        "Height": 16
+      },
+      "Height": 0,
+      "texturePath": "Key",
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "frameCount": 5,
+      "frameSpeed": 4,
+      "frame": 0,
+      "Active": true,
+      "RenderOrder": 0,
+      "ID": 7142575
+    },
+    {
+      "type": "Collider2D",
+      "Size": "16 16",
+      "Offset": "0 0",
+      "IsTrigger": false,
+      "Triggered": false,
+      "Tags": {
+        "$id": "1",
+        "$values": []
+      },
+      "Tilemap": null,
+      "Active": true,
+      "RenderOrder": 0,
+      "ID": 6992547
+    }
+  ]
+}

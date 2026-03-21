@@ -95,13 +95,15 @@ namespace EarthEngineEditor
 
             // Load default project for test
             runtime.InitializeSystems();
-            _windowManager.OpenProject(_windowManager.GetLastProject());
 
             // Override game options
             EditorSettings.Load();
 
             // Load XAML documentation
             Comments.Initialize();
+
+            // Load homepage
+            homePage.Initialize();
 
             // Test console output
             Console.WriteLine("Earth Engine Editor initialized successfully!");

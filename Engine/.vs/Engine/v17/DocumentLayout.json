@@ -1,12 +1,54 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\urisv\\Desktop\\Earth-Engine\\Engine\\",
-  "Documents": [],
+  "WorkspaceRootPath": "C:\\Users\\calle\\Desktop\\Earth-Engine\\Engine\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{366ABD1D-2D99-D6BD-669C-4EFCF1164949}|Engine.Core\\Engine.Core.csproj|c:\\users\\calle\\desktop\\earth-engine\\engine\\engine.core\\game\\components\\sprite2d.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{366ABD1D-2D99-D6BD-669C-4EFCF1164949}|Engine.Core\\Engine.Core.csproj|solutionrelative:engine.core\\game\\components\\sprite2d.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{366ABD1D-2D99-D6BD-669C-4EFCF1164949}|Engine.Core\\Engine.Core.csproj|c:\\users\\calle\\desktop\\earth-engine\\engine\\engine.core\\graphics\\texturelibrary.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{366ABD1D-2D99-D6BD-669C-4EFCF1164949}|Engine.Core\\Engine.Core.csproj|solutionrelative:engine.core\\graphics\\texturelibrary.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Sprite2D.cs",
+              "DocumentMoniker": "C:\\Users\\calle\\Desktop\\Earth-Engine\\Engine\\Engine.Core\\Game\\Components\\Sprite2D.cs",
+              "RelativeDocumentMoniker": "Engine.Core\\Game\\Components\\Sprite2D.cs",
+              "ToolTip": "C:\\Users\\calle\\Desktop\\Earth-Engine\\Engine\\Engine.Core\\Game\\Components\\Sprite2D.cs",
+              "RelativeToolTip": "Engine.Core\\Game\\Components\\Sprite2D.cs",
+              "ViewState": "AgIAABgAAAAAAAAAAAAYwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-21T02:04:44.282Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "TextureLibrary.cs",
+              "DocumentMoniker": "C:\\Users\\calle\\Desktop\\Earth-Engine\\Engine\\Engine.Core\\Graphics\\TextureLibrary.cs",
+              "RelativeDocumentMoniker": "Engine.Core\\Graphics\\TextureLibrary.cs",
+              "ToolTip": "C:\\Users\\calle\\Desktop\\Earth-Engine\\Engine\\Engine.Core\\Graphics\\TextureLibrary.cs",
+              "RelativeToolTip": "Engine.Core\\Graphics\\TextureLibrary.cs",
+              "ViewState": "AgIAABQAAAAAAAAAAAAcwBUAAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-21T01:58:24.924Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
     }
   ]
 }

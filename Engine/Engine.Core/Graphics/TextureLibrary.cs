@@ -66,6 +66,17 @@ namespace Engine.Core.Graphics
         }
 
         /// <summary>
+        /// Load a texture from anywhere
+        /// </summary>
+        public void LoadTexture(string path)
+        {
+            using var fs = File.OpenRead(path);
+            var tex = Texture2D.FromStream(graphicsDevice, fs);
+            tex.Name = Path.GetFileNameWithoutExtension(path);
+            textures[tex.Name] = tex;
+        }
+
+        /// <summary>
         /// Retrieve a previously loaded texture by name (file name without extension).
         /// </summary>
         public Texture2D Get(string name)

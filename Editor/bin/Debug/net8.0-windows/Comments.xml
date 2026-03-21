@@ -2416,6 +2416,11 @@
             <param name="searchPattern"></param>
             <exception cref="T:System.IO.DirectoryNotFoundException"></exception>
         </member>
+        <member name="M:Engine.Core.Graphics.TextureLibrary.LoadTexture(System.String)">
+            <summary>
+            Load a texture from anywhere
+            </summary>
+        </member>
         <member name="M:Engine.Core.Graphics.TextureLibrary.Get(System.String)">
             <summary>
             Retrieve a previously loaded texture by name (file name without extension).

@@ -1,0 +1,96 @@
+{
+  "$id": "1",
+  "Name": "NewPrefab",
+  "components": [
+    {
+      "type": "Transform",
+      "Position": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "OldPosition": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "Rotation": 0,
+      "Scale": {
+        "X": 1,
+        "Y": 1,
+        "Z": 0
+      },
+      "Active": true,
+      "RenderOrder": 0,
+      "ID": 8489723
+    },
+    {
+      "type": "PointLight",
+      "lightRadius": 255.952,
+      "finalRadius": 1,
+      "lightIntensity": 1,
+      "finalIntensity": 1,
+      "lightColor": "#ffb000ff",
+      "Offset": {
+        "X": -8,
+        "Y": -2,
+        "Z": 0
+      },
+      "FlickerIntensity": 0,
+      "Active": true,
+      "RenderOrder": 0,
+      "ID": 8669691
+    },
+    {
+      "type": "Sprite2D",
+      "Offset": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "SpriteScale": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "animated": false,
+      "depth": 0,
+      "spriteEffect": 0,
+      "origin": "0 0",
+      "Tint": "#ffffffff",
+      "spriteBox": {
+        "Left": 0,
+        "Right": 32,
+        "Top": 0,
+        "Bottom": 64,
+        "IsEmpty": false,
+        "Location": {
+          "X": 0,
+          "Y": 0
+        },
+        "Size": {
+          "X": 32,
+          "Y": 64
+        },
+        "Center": {
+          "X": 16,
+          "Y": 32
+        },
+        "X": 0,
+        "Y": 0,
+        "Width": 32,
+        "Height": 64
+      },
+      "Height": 0,
+      "texturePath": "Lamp",
+      "frameWidth": 32,
+      "frameHeight": 64,
+      "frameCount": 1,
+      "frameSpeed": 1,
+      "frame": 0,
+      "Active": true,
+      "RenderOrder": 0,
+      "ID": 3450579
+    }
+  ]
+}

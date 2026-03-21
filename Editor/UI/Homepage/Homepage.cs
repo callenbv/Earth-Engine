@@ -7,8 +7,17 @@
 /// -----------------------------------------------------------------------------
 
 using EarthEngineEditor;
+using Editor.AssetManagement;
+using Editor.UI.Homepage;
 using Editor.Windows.ImGuiWrappers;
+using Engine.Core;
+using Engine.Core.Data;
+using Engine.Core.Game;
+using Engine.Core.Graphics;
 using ImGuiNET;
+using System.IO;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace Editor.Windows.Homepage
 {
@@ -17,15 +26,17 @@ namespace Editor.Windows.Homepage
     /// </summary>
     public class Homepage
     {
-        public bool Active = false;
+        public bool Active = true;
         public EButton OpenProjectButton;
         public EButton NewProjectButton;
         public EButton Help;
         public EDropdown<string> RecentProjects;
         public List<EWidget> MainContainer = new List<EWidget>();
+        public List<EWidget> DemoProjects = new List<EWidget>();
 
         float containerWidth = 400f;
         float containerHeight = 48f;
+        private string DemoProjectDirectory = "DemoProjects";
 
         /// <summary>
         /// Initialize homepage buttons
@@ -43,7 +54,57 @@ namespace Editor.Windows.Homepage
             // Add to the main container
             MainContainer.Add(OpenProjectButton);
             MainContainer.Add(NewProjectButton);
-            MainContainer.Add(RecentProjects);
+            // MainContainer.Add(RecentProjects);
+        }
+
+        public void Initialize()
+        {
+            // Load demo projects
+            string DemoProjectDirectory = "../../../../DemoProjects";
+            string EditorAssets = "../../../Content/Assets/Textures";
+
+            DemoProjectDirectory = Path.GetFullPath(DemoProjectDirectory);
+
+            if (Directory.Exists(DemoProjectDirectory))
+            {
+                var files = Directory.EnumerateFiles(DemoProjectDirectory, "*.earthproj", SearchOption.AllDirectories);
+
+                // Recursively check for projects
+                foreach (var f in files)
+                {
+                    // Find game options to get the project settings
+                    string json = File.ReadAllText(f);
+
+                    var projectData = JsonSerializer.Deserialize<EarthProject>(
+                        json,
+                        new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true
+                        }
+                    );
+
+                    // Create the demo project
+                    if (projectData != null)
+                    {
+                        DemoProject project = new DemoProject();
+                        project.ProjectPath = f;
+                        project.ProjectName = projectData.Name;
+                        DemoProjects.Add(project);
+                    }
+                }
+            }
+
+            // Load editor assets
+            if (Directory.Exists(EditorAssets))
+            {
+                var files = Directory.EnumerateFiles(EditorAssets, "*.png", SearchOption.AllDirectories);
+
+                // Recursively check for projects
+                foreach (var f in files)
+                {
+                    TextureLibrary.Instance.LoadTexture(f);
+                }
+            }
         }
 
         /// <summary>
@@ -65,13 +126,22 @@ namespace Editor.Windows.Homepage
                 return;
 
             ImGui.Begin("Homepage",ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse);
-            ImGui.SetCursorPosY(ImGui.GetWindowHeight()/4);
+            ImGui.SetCursorPosY(ImGui.GetWindowHeight()/8);
             RecentProjects.Items = EditorApp.Instance._windowManager.recentProjects;
 
             foreach (var widget in MainContainer)
             {
                 ImGuiRenderer.CenterDrawing(containerWidth);
                 widget.Draw();
+            }
+
+            ImGui.NewLine();
+            ImGui.Text("DEMO PROJECTS");
+            ImGui.Separator();
+
+            foreach (var project in DemoProjects)
+            {
+                project.Draw();
             }
 
             ImGui.End();

@@ -91,6 +91,8 @@ namespace GameRuntime
             EngineContext.Current.GraphicsDevice = _graphicsDevice;
             Grid3D.Instance.Initialize(_graphicsDevice);
             graphicsManager.HardwareModeSwitch = false;
+            textureLibrary = new TextureLibrary();
+            textureLibrary.graphicsDevice = _graphicsDevice;
         }
 
         /// <summary>
@@ -100,8 +102,6 @@ namespace GameRuntime
         {
             FontLibrary.Main.Initialize(_graphicsDevice, contentManager);
             FontLibrary.Main.LoadFonts();
-            TextureLibrary textureLibrary = new TextureLibrary();
-            textureLibrary.graphicsDevice = _graphicsDevice;
             textureLibrary.LoadTextures();
             MeshLibrary.LoadAll();
             audioManager.Initialize();

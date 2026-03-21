@@ -1,0 +1,79 @@
+{
+  "$id": "1",
+  "Name": "NewPrefab",
+  "components": [
+    {
+      "type": "Transform",
+      "Position": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "OldPosition": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "Rotation": 0,
+      "Scale": {
+        "X": 1,
+        "Y": 1,
+        "Z": 0
+      },
+      "Active": true,
+      "RenderOrder": 0,
+      "ID": 2564469
+    },
+    {
+      "type": "Sprite2D",
+      "Offset": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "SpriteScale": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "animated": false,
+      "depth": 0,
+      "spriteEffect": 0,
+      "origin": "0 0",
+      "Tint": "#ffffffff",
+      "spriteBox": {
+        "Left": 0,
+        "Right": 34,
+        "Top": 0,
+        "Bottom": 32,
+        "IsEmpty": false,
+        "Location": {
+          "X": 0,
+          "Y": 0
+        },
+        "Size": {
+          "X": 34,
+          "Y": 32
+        },
+        "Center": {
+          "X": 17,
+          "Y": 16
+        },
+        "X": 0,
+        "Y": 0,
+        "Width": 34,
+        "Height": 32
+      },
+      "Height": 0,
+      "texturePath": "Door",
+      "frameWidth": 34,
+      "frameHeight": 32,
+      "frameCount": 1,
+      "frameSpeed": 1,
+      "frame": 0,
+      "Active": true,
+      "RenderOrder": 0,
+      "ID": 9387013
+    }
+  ]
+}

@@ -7,6 +7,17 @@ The engine is used as the foundation for several of my game projects and serves 
 
 ---
 
+## Demo
+
+To successfully run the demo, follow these instructions:
+
+1. Download the "Demo" folder
+2. Open "Earth-Engine.exe" to launch the engine
+3. Open the demo project from the homepage
+4. Explore!
+
+---
+
 ## Features
 
 - Entity Component System (ECS) architecture

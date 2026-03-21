@@ -1,0 +1,221 @@
+{
+  "DefaultFrameIndex": 0,
+  "Rules": [
+    {
+      "SelectedFrameIndex": 1,
+      "Conditions": {
+        "TopLeft": 0,
+        "Top": 1,
+        "TopRight": 0,
+        "Left": 1,
+        "Center": 0,
+        "Right": 1,
+        "BottomLeft": 0,
+        "Bottom": 1,
+        "BottomRight": 0
+      }
+    },
+    {
+      "SelectedFrameIndex": 0,
+      "Conditions": {
+        "TopLeft": 0,
+        "Top": 2,
+        "TopRight": 0,
+        "Left": 2,
+        "Center": 0,
+        "Right": 1,
+        "BottomLeft": 0,
+        "Bottom": 1,
+        "BottomRight": 0
+      }
+    },
+    {
+      "SelectedFrameIndex": 2,
+      "Conditions": {
+        "TopLeft": 0,
+        "Top": 2,
+        "TopRight": 0,
+        "Left": 1,
+        "Center": 0,
+        "Right": 2,
+        "BottomLeft": 0,
+        "Bottom": 1,
+        "BottomRight": 0
+      }
+    },
+    {
+      "SelectedFrameIndex": 6,
+      "Conditions": {
+        "TopLeft": 0,
+        "Top": 1,
+        "TopRight": 0,
+        "Left": 2,
+        "Center": 0,
+        "Right": 1,
+        "BottomLeft": 0,
+        "Bottom": 2,
+        "BottomRight": 0
+      }
+    },
+    {
+      "SelectedFrameIndex": 8,
+      "Conditions": {
+        "TopLeft": 0,
+        "Top": 1,
+        "TopRight": 0,
+        "Left": 1,
+        "Center": 0,
+        "Right": 2,
+        "BottomLeft": 0,
+        "Bottom": 2,
+        "BottomRight": 0
+      }
+    },
+    {
+      "SelectedFrameIndex": 1,
+      "Conditions": {
+        "TopLeft": 0,
+        "Top": 1,
+        "TopRight": 0,
+        "Left": 1,
+        "Center": 0,
+        "Right": 2,
+        "BottomLeft": 0,
+        "Bottom": 1,
+        "BottomRight": 0
+      }
+    },
+    {
+      "SelectedFrameIndex": 1,
+      "Conditions": {
+        "TopLeft": 0,
+        "Top": 1,
+        "TopRight": 0,
+        "Left": 2,
+        "Center": 0,
+        "Right": 1,
+        "BottomLeft": 0,
+        "Bottom": 1,
+        "BottomRight": 0
+      }
+    },
+    {
+      "SelectedFrameIndex": 1,
+      "Conditions": {
+        "TopLeft": 0,
+        "Top": 2,
+        "TopRight": 0,
+        "Left": 1,
+        "Center": 0,
+        "Right": 1,
+        "BottomLeft": 0,
+        "Bottom": 1,
+        "BottomRight": 0
+      }
+    },
+    {
+      "SelectedFrameIndex": 1,
+      "Conditions": {
+        "TopLeft": 0,
+        "Top": 1,
+        "TopRight": 0,
+        "Left": 1,
+        "Center": 0,
+        "Right": 1,
+        "BottomLeft": 0,
+        "Bottom": 2,
+        "BottomRight": 0
+      }
+    }
+  ],
+  "TileIndex": 0,
+  "IsCollidable": false,
+  "Height": 0,
+  "CellSize": 16,
+  "Texture": {
+    "frameHeight": 48,
+    "frameWidth": 48,
+    "textureWidth": 48,
+    "textureHeight": 48,
+    "animated": false,
+    "frameCount": 1,
+    "spriteBox": {
+      "Left": 0,
+      "Right": 48,
+      "Top": 0,
+      "Bottom": 48,
+      "IsEmpty": false,
+      "Location": {
+        "X": 0,
+        "Y": 0
+      },
+      "Size": {
+        "X": 48,
+        "Y": 48
+      },
+      "Center": {
+        "X": 24,
+        "Y": 24
+      },
+      "X": 0,
+      "Y": 0,
+      "Width": 48,
+      "Height": 48
+    },
+    "Color": {
+      "B": 255,
+      "G": 255,
+      "R": 255,
+      "A": 255,
+      "PackedValue": 4294967295
+    },
+    "Textures": [],
+    "texturePath": "Grass"
+  },
+  "Frame": {
+    "Left": 0,
+    "Right": 0,
+    "Top": 0,
+    "Bottom": 0,
+    "IsEmpty": true,
+    "Location": {
+      "X": 0,
+      "Y": 0
+    },
+    "Size": {
+      "X": 0,
+      "Y": 0
+    },
+    "Center": {
+      "X": 0,
+      "Y": 0
+    },
+    "X": 0,
+    "Y": 0,
+    "Width": 0,
+    "Height": 0
+  },
+  "Destination": {
+    "Left": 0,
+    "Right": 0,
+    "Top": 0,
+    "Bottom": 0,
+    "IsEmpty": true,
+    "Location": {
+      "X": 0,
+      "Y": 0
+    },
+    "Size": {
+      "X": 0,
+      "Y": 0
+    },
+    "Center": {
+      "X": 0,
+      "Y": 0
+    },
+    "X": 0,
+    "Y": 0,
+    "Width": 0,
+    "Height": 0
+  }
+}

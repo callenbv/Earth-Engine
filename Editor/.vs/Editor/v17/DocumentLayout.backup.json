@@ -1,0 +1,156 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\calle\\Desktop\\Earth-Engine\\Editor\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{3DB9CC06-73BC-664C-AB04-67F5FEFB37CB}|Editor.csproj|c:\\users\\calle\\desktop\\earth-engine\\editor\\ui\\homepage\\demoproject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3DB9CC06-73BC-664C-AB04-67F5FEFB37CB}|Editor.csproj|solutionrelative:ui\\homepage\\demoproject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3DB9CC06-73BC-664C-AB04-67F5FEFB37CB}|Editor.csproj|c:\\users\\calle\\desktop\\earth-engine\\editor\\assetmanagement\\materialhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3DB9CC06-73BC-664C-AB04-67F5FEFB37CB}|Editor.csproj|solutionrelative:assetmanagement\\materialhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3DB9CC06-73BC-664C-AB04-67F5FEFB37CB}|Editor.csproj|c:\\users\\calle\\desktop\\earth-engine\\editor\\ui\\homepage\\homepage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3DB9CC06-73BC-664C-AB04-67F5FEFB37CB}|Editor.csproj|solutionrelative:ui\\homepage\\homepage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3DB9CC06-73BC-664C-AB04-67F5FEFB37CB}|Editor.csproj|c:\\users\\calle\\desktop\\earth-engine\\editor\\ui\\uielements\\ebutton.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3DB9CC06-73BC-664C-AB04-67F5FEFB37CB}|Editor.csproj|solutionrelative:ui\\uielements\\ebutton.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3DB9CC06-73BC-664C-AB04-67F5FEFB37CB}|Editor.csproj|c:\\users\\calle\\desktop\\earth-engine\\editor\\editorapp.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3DB9CC06-73BC-664C-AB04-67F5FEFB37CB}|Editor.csproj|solutionrelative:editorapp.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3DB9CC06-73BC-664C-AB04-67F5FEFB37CB}|Editor.csproj|c:\\users\\calle\\desktop\\earth-engine\\editor\\assetmanagement\\projectitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3DB9CC06-73BC-664C-AB04-67F5FEFB37CB}|Editor.csproj|solutionrelative:assetmanagement\\projectitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3DB9CC06-73BC-664C-AB04-67F5FEFB37CB}|Editor.csproj|c:\\users\\calle\\desktop\\earth-engine\\editor\\imguirenderer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3DB9CC06-73BC-664C-AB04-67F5FEFB37CB}|Editor.csproj|solutionrelative:imguirenderer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3DB9CC06-73BC-664C-AB04-67F5FEFB37CB}|Editor.csproj|c:\\users\\calle\\desktop\\earth-engine\\editor\\editor.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{3DB9CC06-73BC-664C-AB04-67F5FEFB37CB}|Editor.csproj|solutionrelative:editor.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 6,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "MaterialHandler.cs",
+              "DocumentMoniker": "C:\\Users\\calle\\Desktop\\Earth-Engine\\Editor\\AssetManagement\\MaterialHandler.cs",
+              "RelativeDocumentMoniker": "AssetManagement\\MaterialHandler.cs",
+              "ToolTip": "C:\\Users\\calle\\Desktop\\Earth-Engine\\Editor\\AssetManagement\\MaterialHandler.cs",
+              "RelativeToolTip": "AssetManagement\\MaterialHandler.cs",
+              "ViewState": "AgIAAAYBAAAAAAAAAAAEwBYBAABRAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-21T02:17:57.011Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "EButton.cs",
+              "DocumentMoniker": "C:\\Users\\calle\\Desktop\\Earth-Engine\\Editor\\UI\\UIElements\\EButton.cs",
+              "RelativeDocumentMoniker": "UI\\UIElements\\EButton.cs",
+              "ToolTip": "C:\\Users\\calle\\Desktop\\Earth-Engine\\Editor\\UI\\UIElements\\EButton.cs",
+              "RelativeToolTip": "UI\\UIElements\\EButton.cs",
+              "ViewState": "AgIAACUAAAAAAAAAAAAwwDkAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-21T02:03:56.75Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "ProjectItem.cs",
+              "DocumentMoniker": "C:\\Users\\calle\\Desktop\\Earth-Engine\\Editor\\AssetManagement\\ProjectItem.cs",
+              "RelativeDocumentMoniker": "AssetManagement\\ProjectItem.cs",
+              "ToolTip": "C:\\Users\\calle\\Desktop\\Earth-Engine\\Editor\\AssetManagement\\ProjectItem.cs",
+              "RelativeToolTip": "AssetManagement\\ProjectItem.cs",
+              "ViewState": "AgIAABcAAAAAAAAAAAAmwCgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-21T01:42:24.493Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "ImGuiRenderer.cs",
+              "DocumentMoniker": "C:\\Users\\calle\\Desktop\\Earth-Engine\\Editor\\ImGuiRenderer.cs",
+              "RelativeDocumentMoniker": "ImGuiRenderer.cs",
+              "ToolTip": "C:\\Users\\calle\\Desktop\\Earth-Engine\\Editor\\ImGuiRenderer.cs",
+              "RelativeToolTip": "ImGuiRenderer.cs",
+              "ViewState": "AgIAAGsAAAAAAAAAAADgv58AAABFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-21T01:36:48.062Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Editor",
+              "DocumentMoniker": "C:\\Users\\calle\\Desktop\\Earth-Engine\\Editor\\Editor.csproj",
+              "RelativeDocumentMoniker": "Editor.csproj",
+              "ToolTip": "C:\\Users\\calle\\Desktop\\Earth-Engine\\Editor\\Editor.csproj",
+              "RelativeToolTip": "Editor.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-03-21T00:23:48.991Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "EditorApp.cs",
+              "DocumentMoniker": "C:\\Users\\calle\\Desktop\\Earth-Engine\\Editor\\EditorApp.cs",
+              "RelativeDocumentMoniker": "EditorApp.cs",
+              "ToolTip": "C:\\Users\\calle\\Desktop\\Earth-Engine\\Editor\\EditorApp.cs",
+              "RelativeToolTip": "EditorApp.cs",
+              "ViewState": "AgIAACkAAAAAAAAAAAA2wEcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-21T00:13:55.89Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "DemoProject.cs",
+              "DocumentMoniker": "C:\\Users\\calle\\Desktop\\Earth-Engine\\Editor\\UI\\Homepage\\DemoProject.cs",
+              "RelativeDocumentMoniker": "UI\\Homepage\\DemoProject.cs",
+              "ToolTip": "C:\\Users\\calle\\Desktop\\Earth-Engine\\Editor\\UI\\Homepage\\DemoProject.cs*",
+              "RelativeToolTip": "UI\\Homepage\\DemoProject.cs*",
+              "ViewState": "AgIAAB4AAAAAAAAAAAAYwCoAAAAwAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-20T23:46:21.824Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Homepage.cs",
+              "DocumentMoniker": "C:\\Users\\calle\\Desktop\\Earth-Engine\\Editor\\UI\\Homepage\\Homepage.cs",
+              "RelativeDocumentMoniker": "UI\\Homepage\\Homepage.cs",
+              "ToolTip": "C:\\Users\\calle\\Desktop\\Earth-Engine\\Editor\\UI\\Homepage\\Homepage.cs",
+              "RelativeToolTip": "UI\\Homepage\\Homepage.cs",
+              "ViewState": "AgIAAGkAAAAAAAAAAAAYwHgAAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-20T23:43:56.688Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
