@@ -1,0 +1,28 @@
+{
+  "$id": "1",
+  "Name": "NewPrefab",
+  "components": [
+    {
+      "type": "Transform",
+      "Position": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "OldPosition": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "Rotation": 0,
+      "Scale": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "Active": true,
+      "RenderOrder": 0,
+      "ID": 2699352
+    }
+  ]
+}

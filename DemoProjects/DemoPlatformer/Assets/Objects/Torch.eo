@@ -1,0 +1,127 @@
+{
+  "$id": "1",
+  "Name": "NewPrefab",
+  "components": [
+    {
+      "type": "Transform",
+      "Position": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "OldPosition": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "Rotation": 0,
+      "Scale": {
+        "X": 1,
+        "Y": 1,
+        "Z": 0
+      },
+      "Active": true,
+      "RenderOrder": 0,
+      "ID": 608921
+    },
+    {
+      "type": "Sprite2D",
+      "Offset": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "SpriteScale": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "animated": true,
+      "depth": 0,
+      "spriteEffect": 0,
+      "origin": "0 0",
+      "Tint": "#ffffffff",
+      "spriteBox": {
+        "Left": 0,
+        "Right": 16,
+        "Top": 0,
+        "Bottom": 16,
+        "IsEmpty": false,
+        "Location": {
+          "X": 0,
+          "Y": 0
+        },
+        "Size": {
+          "X": 16,
+          "Y": 16
+        },
+        "Center": {
+          "X": 8,
+          "Y": 8
+        },
+        "X": 0,
+        "Y": 0,
+        "Width": 16,
+        "Height": 16
+      },
+      "Height": 0,
+      "texturePath": "Torch",
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "frameCount": 4,
+      "frameSpeed": 9,
+      "frame": 3,
+      "Active": true,
+      "RenderOrder": 0,
+      "ID": 4504182
+    },
+    {
+      "type": "PointLight",
+      "lightRadius": 188.492,
+      "finalRadius": 1,
+      "lightIntensity": 1,
+      "finalIntensity": 1,
+      "lightColor": "#ff8d28ff",
+      "Offset": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "FlickerIntensity": 1.468,
+      "Active": true,
+      "RenderOrder": 0,
+      "ID": 3242967
+    },
+    {
+      "type": "ParticleEmitter",
+      "Burst": false,
+      "BurstCount": 10,
+      "SpawnRate": 8.929,
+      "Lifetime": 60,
+      "Speed": 19.643,
+      "Direction": 269.286,
+      "DirectionWiggle": 3.929,
+      "Shape": 1,
+      "TexturePath": "",
+      "Color": "#474747ff",
+      "Offset": {
+        "X": 0,
+        "Y": -2,
+        "Z": 0
+      },
+      "ParticleSize": 2.73,
+      "Enabled": true,
+      "Visible": true,
+      "Height": 0,
+      "ShowBounds": true,
+      "EmitterSize": {
+        "X": 6,
+        "Y": -6,
+        "Z": 0
+      },
+      "Active": true,
+      "RenderOrder": 0,
+      "ID": 1969638
+    }
+  ]
+}

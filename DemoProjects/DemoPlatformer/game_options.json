@@ -1,0 +1,14 @@
+{
+  "StartScene": "Scenes/SceneBase.room",
+  "Title": "2D RPG Demo",
+  "WindowWidth": 1280,
+  "WindowHeight": 720,
+  "TargetResolutionWidth": 1280,
+  "TargetResolutionHeight": 720,
+  "TargetFPS": 60,
+  "Fullscreen": false,
+  "VerticalSync": false,
+  "FixedTimestep": true,
+  "CanResizeWindow": false,
+  "UnitsPerPixel": 1
+}

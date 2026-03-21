@@ -1,0 +1,79 @@
+{
+  "$id": "1",
+  "Name": "NewPrefab",
+  "components": [
+    {
+      "type": "Transform",
+      "Position": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "OldPosition": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "Rotation": 0,
+      "Scale": {
+        "X": 1,
+        "Y": 1,
+        "Z": 0
+      },
+      "Active": true,
+      "RenderOrder": 0,
+      "ID": 146192
+    },
+    {
+      "type": "Sprite2D",
+      "Offset": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "SpriteScale": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "animated": false,
+      "depth": 0,
+      "spriteEffect": 0,
+      "origin": "0 0",
+      "Tint": "#ffffffff",
+      "spriteBox": {
+        "Left": 0,
+        "Right": 35,
+        "Top": 0,
+        "Bottom": 36,
+        "IsEmpty": false,
+        "Location": {
+          "X": 0,
+          "Y": 0
+        },
+        "Size": {
+          "X": 35,
+          "Y": 36
+        },
+        "Center": {
+          "X": 17,
+          "Y": 18
+        },
+        "X": 0,
+        "Y": 0,
+        "Width": 35,
+        "Height": 36
+      },
+      "Height": 0,
+      "texturePath": "Castle",
+      "frameWidth": 35,
+      "frameHeight": 36,
+      "frameCount": 1,
+      "frameSpeed": 1,
+      "frame": 0,
+      "Active": true,
+      "RenderOrder": 0,
+      "ID": 9241728
+    }
+  ]
+}

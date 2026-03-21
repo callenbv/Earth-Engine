@@ -1,0 +1,114 @@
+{
+  "$id": "1",
+  "Name": "NewPrefab",
+  "components": [
+    {
+      "type": "Transform",
+      "Position": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "OldPosition": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "Rotation": 0,
+      "Scale": {
+        "X": 1,
+        "Y": 1,
+        "Z": 0
+      },
+      "Active": true,
+      "RenderOrder": 0,
+      "ID": 5610459
+    },
+    {
+      "type": "Sprite2D",
+      "Offset": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "SpriteScale": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "animated": false,
+      "depth": 0,
+      "spriteEffect": 0,
+      "origin": "0 0",
+      "Tint": "#ffffffff",
+      "spriteBox": {
+        "Left": 0,
+        "Right": 32,
+        "Top": 0,
+        "Bottom": 32,
+        "IsEmpty": false,
+        "Location": {
+          "X": 0,
+          "Y": 0
+        },
+        "Size": {
+          "X": 32,
+          "Y": 32
+        },
+        "Center": {
+          "X": 16,
+          "Y": 16
+        },
+        "X": 0,
+        "Y": 0,
+        "Width": 32,
+        "Height": 32
+      },
+      "Height": 0,
+      "texturePath": "PlayerIdleDown",
+      "frameWidth": 32,
+      "frameHeight": 32,
+      "frameCount": 1,
+      "frameSpeed": 0,
+      "frame": 0,
+      "Active": true,
+      "RenderOrder": 0,
+      "ID": 731738
+    },
+    {
+      "type": "PlayerMovement",
+      "Speed": 100,
+      "AnimationSpeed": 6,
+      "PlayerName": "",
+      "Active": true,
+      "RenderOrder": 0,
+      "ID": 211131
+    },
+    {
+      "type": "TextRenderer",
+      "Effects": 0,
+      "Offset": "0 0",
+      "Origin": "0 0",
+      "Text": "",
+      "Color": "#ffffffff",
+      "TextScale": 1,
+      "FontSize": 16,
+      "TextRotation": 0,
+      "Depth": 1,
+      "Visible": true,
+      "Centered": false,
+      "LineWidth": 3840,
+      "Active": true,
+      "RenderOrder": 0,
+      "ID": 5587831
+    },
+    {
+      "type": "Health",
+      "MaxHealth": 100,
+      "CurrentHealth": 100,
+      "Active": true,
+      "RenderOrder": 0,
+      "ID": 6572628
+    }
+  ]
+}

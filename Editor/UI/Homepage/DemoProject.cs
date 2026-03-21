@@ -15,7 +15,7 @@ namespace Editor.UI.Homepage
         public string ProjectPath = "";
         public string ProjectName = "";
         public EButton Project;
-        Vector2 Size = new Vector2(128, 128);
+        Vector2 Size = new Vector2(160, 128);
 
         public DemoProject()
         {
@@ -59,6 +59,7 @@ namespace Editor.UI.Homepage
 
             ImGui.SetCursorPos(textPos);
             ImGui.Text(ProjectName);
+            ImGui.SetCursorPos(prev+new Vector2(Size.X*1.25f,0));
         }
     }
 }
