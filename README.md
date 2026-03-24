@@ -11,10 +11,10 @@ The engine is used as the foundation for several of my game projects and serves 
 
 To successfully run the demo, follow these instructions:
 
-1. Download the "Demo" folder
-2. Open "Earth-Engine.exe" to launch the engine
-3. Open the demo project from the homepage
-4. Explore!
+1. Download ZIP folder
+2. Extract and open "GameEngine.sln" in Visual Studio to launch the game engine
+3. Select the demo project from the homepage
+4. Explore the editor capabilites, interact with objects, and play the demo!
 
 ---
 
