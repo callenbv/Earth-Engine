@@ -7,6 +7,7 @@
 /// -----------------------------------------------------------------------------
 
 using Editor.Windows.Inspector;
+using Editor.AssetManagement;
 using Engine.Core;
 using Engine.Core.Data;
 using Engine.Core.Game;
@@ -14,6 +15,7 @@ using Engine.Core.Game.Components;
 using Engine.Core.Rooms;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace EarthEngineEditor.Windows
@@ -44,6 +46,9 @@ namespace EarthEngineEditor.Windows
         }
 
         private GameObject? _selectedObject;
+        private GameObject? _selectedHierarchyObject;
+        private GameObject? _draggedHierarchyObject;
+        private GameObject? _copiedHierarchyObject;
         private GameObject? previousSelection;
         private IInspectable? _nodeBeingRenamed;
         public static int gridSize = 16;
@@ -79,7 +84,6 @@ namespace EarthEngineEditor.Windows
                 EngineContext.UIOnly = UIMode;
 
                 // Render the hierarchy
-                SyncUnfolderedObjects();
                 RenderHierarchy();
             }
 
@@ -101,6 +105,15 @@ namespace EarthEngineEditor.Windows
             ImGui.Text($"{scene.Name}");
             ImGui.Separator();
 
+            if (!_isRenaming && _selectedHierarchyObject != null && Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.F2))
+            {
+                _isRenaming = true;
+                _renameBuffer = _selectedHierarchyObject.Name;
+                _nodeBeingRenamed = _selectedHierarchyObject;
+            }
+
+            HandleCopyPasteShortcuts();
+
             // Get the mouse world coords and select the object
             if (EditorApp.Instance.gameFocused && EditorApp.Instance.selectionMode == EditorSelectionMode.Object)
             {
@@ -120,6 +133,7 @@ namespace EarthEngineEditor.Windows
                                 _selectedObject = obj;
                             }
                             previousSelection = obj;
+                            _selectedHierarchyObject = obj;
                             InspectorWindow.Instance.Inspect(new InspectableGameObject(obj));
                             break;
                         }
@@ -159,173 +173,7 @@ namespace EarthEngineEditor.Windows
             }
 
             // Draw the actual nodes in the tree
-            // We also draw a folder view here for better organization
-            DrawFolderNode(rootFolder);
-        }
-
-        /// <summary>
-        /// Draw the root node
-        /// </summary>
-        /// <param name="folder"></param>
-        /// <returns></returns>
-        private bool DrawFolderNode(SceneFolder folder)
-        {
-            bool open = ImGui.TreeNodeEx($"{folder.Name}");
-
-            if (ImGui.BeginPopupContextItem($"FolderContext_{folder.Name}"))
-            {
-                if (ImGui.MenuItem("Create Folder"))
-                {
-                    folder.SubFolders.Add(new SceneFolder($"Group{rootFolder.SubFolders.Count}"));
-                }
-                if (ImGui.MenuItem("Create Empty GameObject"))
-                {
-                    var newObj = new GameObject($"Empty{scene.objects.Count}");
-                    newObj.AddComponent<Transform>();
-                    scene.objects.Add(newObj);
-                    folder.GameObjects.Add(newObj);
-                }
-                if (ImGui.MenuItem("Create 2D Lighting"))
-                {
-                    var newObj = new GameObject($"Lighting{scene.objects.Count}");
-                    newObj.AddComponent<Transform>();
-                    newObj.AddComponent<Lighting2D>();
-                    scene.objects.Add(newObj);
-                    folder.GameObjects.Add(newObj);
-                }
-                if (ImGui.MenuItem("Rename"))
-                {
-                    _isRenaming = true;
-                    _renameBuffer = folder.Name;
-                    _nodeBeingRenamed = folder;
-                }
-                if (ImGui.MenuItem("Delete"))
-                {
-                    rootFolder.SubFolders.Remove(folder);
-                    ImGui.EndPopup();
-
-                    return false;
-                }
-                ImGui.EndPopup();
-            }
-
-            // Drop target for GameObjects
-            if (ImGui.BeginDragDropTarget())
-            {
-                unsafe
-                {
-                    if (ImGui.AcceptDragDropPayload("GAMEOBJECT").NativePtr != null)
-                    {
-                        var dragged = _selectedObject;
-                        if (dragged != null && !folder.GameObjects.Contains(dragged))
-                        {
-                            RemoveFromAllFolders(dragged, rootFolder); // Remove from all folders
-                            folder.GameObjects.Add(dragged);
-                        }
-                    }
-                    ImGui.EndDragDropTarget();
-                }
-            }
-
-            // If currently renaming THIS node, draw InputText instead of label
-            if (_isRenaming && _nodeBeingRenamed == folder)
-            {
-                ImGui.PushItemWidth(200); // prevent layout shifting
-                if (ImGui.InputText("##renameNode", ref _renameBuffer, 256, ImGuiInputTextFlags.EnterReturnsTrue | ImGuiInputTextFlags.AutoSelectAll))
-                {
-                    folder.Name = _renameBuffer.Trim();
-                    _isRenaming = false;
-                    _nodeBeingRenamed = null;
-                }
-
-                // Cancel rename on ESC or click away
-                if (!ImGui.IsItemActive() && (ImGui.IsMouseClicked(0) || ImGui.IsKeyPressed(ImGuiKey.Escape)))
-                {
-                    _isRenaming = false;
-                    _nodeBeingRenamed = null;
-                }
-                ImGui.PopItemWidth();
-            }
-
-            if (open)
-            {
-                foreach (var sub in folder.SubFolders)
-                {
-                    bool success = DrawFolderNode(sub);
-
-                    if (!success)
-                        break;
-                }
-
-                foreach (var obj in folder.GameObjects)
-                {
-                    bool sucess = DrawGameObjectNode(obj);
-
-                    if (!sucess)
-                        break;
-                }
-
-                ImGui.TreePop();
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Synchronize unfoldered objects to the root folder
-        /// </summary>
-        private void SyncUnfolderedObjects()
-        {
-            // Remove objects that are no longer in the scene
-            rootFolder.GameObjects.RemoveAll(obj => !scene.objects.Contains(obj));
-            
-            foreach (var obj in scene.objects)
-            {
-                if (!IsGroupedInAnyFolder(obj))
-                {
-                    // Only add if not already in the root folder
-                    if (!rootFolder.GameObjects.Contains(obj))
-                    {
-                        rootFolder.GameObjects.Add(obj);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Check if a game object is grouped in any folder in the hierarchy
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        private bool IsGroupedInAnyFolder(GameObject obj)
-        {
-            bool Check(SceneFolder folder)
-            {
-                if (folder.GameObjects.Contains(obj))
-                    return true;
-
-                foreach (var sub in folder.SubFolders)
-                    if (Check(sub)) return true;
-
-                return false;
-            }
-
-            return Check(rootFolder);
-        }
-
-        /// <summary>
-        /// Remove a game object from all folders in the hierarchy
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <param name="folder"></param>
-        private void RemoveFromAllFolders(GameObject obj, SceneFolder folder)
-        {
-            folder.GameObjects.Remove(obj);
-
-            foreach (var sub in folder.SubFolders)
-            {
-                RemoveFromAllFolders(obj, sub);
-            }
+            DrawRootDropTarget();
         }
 
         /// <summary>
@@ -340,15 +188,22 @@ namespace EarthEngineEditor.Windows
 
             bool hasChildren = (obj.children != null && obj.children.Count > 0);
             bool open = false;
+            ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.SpanAvailWidth;
+
+            if (_selectedHierarchyObject == obj)
+                flags |= ImGuiTreeNodeFlags.Selected;
 
             if (hasChildren)
-                open = ImGui.TreeNodeEx(obj.Name);
+                open = ImGui.TreeNodeEx(obj.Name, flags);
             else
-                open = ImGui.TreeNodeEx(obj.Name, ImGuiTreeNodeFlags.Leaf | ImGuiTreeNodeFlags.NoTreePushOnOpen);
+                open = ImGui.TreeNodeEx(obj.Name, flags | ImGuiTreeNodeFlags.Leaf | ImGuiTreeNodeFlags.NoTreePushOnOpen);
 
-            // Inspect an item in the scene
-            if (ImGui.IsItemHovered() && ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+            // Select only on a plain click, not when beginning a drag operation.
+            if (ImGui.IsItemHovered() &&
+                ImGui.IsMouseReleased(ImGuiMouseButton.Left) &&
+                !ImGui.IsMouseDragging(ImGuiMouseButton.Left))
             {
+                _selectedHierarchyObject = obj;
                 InspectorWindow.Instance.Inspect(new InspectableGameObject(obj));
             }
 
@@ -379,6 +234,23 @@ namespace EarthEngineEditor.Windows
                 // Context menu for Rename and Delete
                 if (ImGui.BeginPopupContextItem($"ObjectContext_{nodeId}"))
                 {
+                    if (ImGui.MenuItem("Create Empty GameObject"))
+                    {
+                        var newObj = new GameObject($"Empty{scene.objects.Count}");
+                        newObj.AddComponent<Transform>();
+                        newObj.SetParent(obj);
+                        scene.objects.Add(newObj);
+                    }
+
+                    if (ImGui.MenuItem("Create 2D Lighting"))
+                    {
+                        var newObj = new GameObject($"Lighting{scene.objects.Count}");
+                        newObj.AddComponent<Transform>();
+                        newObj.AddComponent<Lighting2D>();
+                        newObj.SetParent(obj);
+                        scene.objects.Add(newObj);
+                    }
+
                     if (ImGui.MenuItem("Rename"))
                     {
                         _isRenaming = true;
@@ -394,20 +266,31 @@ namespace EarthEngineEditor.Windows
                 }
             }
 
-            // Quick rename F2
-            if (Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.F2))
-            {
-                _isRenaming = true;
-                _renameBuffer = obj.Name;
-                _nodeBeingRenamed = obj;
-            }
-
             if (ImGui.BeginDragDropSource())
             {
-                ImGui.SetDragDropPayload("GAMEOBJECT", IntPtr.Zero, 0); // No payload data needed, use context
+                ImGui.SetDragDropPayload("GAMEOBJECT", IntPtr.Zero, 0);
                 ImGui.Text(obj.Name);
-                _selectedObject = obj; // Store reference in your editor context
+                _draggedHierarchyObject = obj;
+                PrefabHandler.SetDraggedGameObject(obj);
                 ImGui.EndDragDropSource();
+            }
+
+            if (ImGui.BeginDragDropTarget())
+            {
+                unsafe
+                {
+                    var payload = ImGui.AcceptDragDropPayload("GAMEOBJECT");
+                    if (payload.NativePtr != null && _draggedHierarchyObject != null)
+                    {
+                        var dragged = _draggedHierarchyObject;
+                        if (dragged != obj && !obj.IsDescendantOf(dragged))
+                        {
+                            dragged.SetParent(obj);
+                        }
+                    }
+                }
+
+                ImGui.EndDragDropTarget();
             }
 
             if (open && hasChildren && obj.children != null)
@@ -424,14 +307,128 @@ namespace EarthEngineEditor.Windows
 
             if (obj.IsDestroyed)
             {
-                RemoveFromAllFolders(obj, rootFolder); // Remove from all folders
                 drawNode = false;
             }
 
             return drawNode;
         }
 
+        private void DrawRootDropTarget()
+        {
+            bool open = ImGui.TreeNodeEx(
+                "Scene Root",
+                ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.SpanAvailWidth | ImGuiTreeNodeFlags.DefaultOpen);
+
+            if (ImGui.BeginPopupContextItem("SceneRootContext"))
+            {
+                if (ImGui.MenuItem("Create Empty GameObject"))
+                {
+                    var newObj = new GameObject($"Empty{scene.objects.Count}");
+                    newObj.AddComponent<Transform>();
+                    scene.objects.Add(newObj);
+                }
+
+                if (ImGui.MenuItem("Create 2D Lighting"))
+                {
+                    var newObj = new GameObject($"Lighting{scene.objects.Count}");
+                    newObj.AddComponent<Transform>();
+                    newObj.AddComponent<Lighting2D>();
+                    scene.objects.Add(newObj);
+                }
+
+                ImGui.EndPopup();
+            }
+
+            if (ImGui.BeginDragDropTarget())
+            {
+                unsafe
+                {
+                    var payload = ImGui.AcceptDragDropPayload("GAMEOBJECT");
+                    if (payload.NativePtr != null && _draggedHierarchyObject != null)
+                    {
+                        _draggedHierarchyObject.SetParent(null);
+                    }
+                }
+
+                ImGui.EndDragDropTarget();
+            }
+
+            if (!open)
+                return;
+
+            foreach (var obj in scene.objects.Where(o => o.Parent == null).ToList())
+            {
+                DrawGameObjectNode(obj);
+            }
+
+            ImGui.TreePop();
+        }
+
         public bool IsVisible => _showSceneView;
         public void SetVisible(bool visible) => _showSceneView = visible;
+
+        private void HandleCopyPasteShortcuts()
+        {
+            bool ctrlDown =
+                Input.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.LeftControl) ||
+                Input.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.RightControl);
+
+            if (!ctrlDown || scene == null || _isRenaming)
+                return;
+
+            if (Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.C) && _selectedHierarchyObject != null)
+            {
+                _copiedHierarchyObject = _selectedHierarchyObject;
+            }
+
+            if (Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.V) && _copiedHierarchyObject != null)
+            {
+                PasteCopiedHierarchy();
+            }
+        }
+
+        private void PasteCopiedHierarchy()
+        {
+            if (scene == null || _copiedHierarchyObject == null)
+                return;
+
+            var clones = Room.DuplicateHierarchy(_copiedHierarchyObject);
+            if (clones.Count == 0)
+                return;
+
+            var cloneRoot = clones.FirstOrDefault(obj => obj.Parent == null);
+            if (cloneRoot == null)
+                return;
+
+            foreach (var clone in clones)
+            {
+                scene.objects.Add(clone);
+            }
+
+            cloneRoot.SetParent(_copiedHierarchyObject.Parent);
+            cloneRoot.Position += new Vector3(gridSize, 0f, 0f);
+            cloneRoot.Name = GetDuplicateName(_copiedHierarchyObject.Name);
+
+            _selectedHierarchyObject = cloneRoot;
+            InspectorWindow.Instance.Inspect(new InspectableGameObject(cloneRoot));
+        }
+
+        private string GetDuplicateName(string sourceName)
+        {
+            if (scene == null)
+                return sourceName;
+
+            string baseName = $"{sourceName} Copy";
+            string candidate = baseName;
+            int index = 2;
+
+            while (scene.objects.Any(obj => obj.Name == candidate))
+            {
+                candidate = $"{baseName} {index}";
+                index++;
+            }
+
+            return candidate;
+        }
     }
 } 

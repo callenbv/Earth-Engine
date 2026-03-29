@@ -8,6 +8,7 @@
 
 using EarthEngineEditor.Windows;
 using Engine.Core.Data;
+using Microsoft.Xna.Framework.Graphics;
 using System.IO;
 using System.Reflection.Metadata;
 using System.Text.Json;
@@ -49,8 +50,29 @@ namespace Editor.AssetManagement
         {
             string absPath = System.IO.Path.Combine(ProjectSettings.AssetsDirectory, Path);
             absPath = System.IO.Path.GetFullPath(absPath);
-            EnsureLoaded();
-            _handler?.Save(absPath);
+
+            if (Type == AssetType.Scene)
+            {
+                string? currentScenePath = SceneManager.CurrentSceneData?.FilePath;
+                if (string.IsNullOrWhiteSpace(currentScenePath))
+                    return;
+
+                string normalizedAssetPath = ProjectSettings.NormalizePath(Path);
+                string normalizedScenePath = ProjectSettings.NormalizePath(currentScenePath);
+                if (!string.Equals(normalizedAssetPath, normalizedScenePath, StringComparison.OrdinalIgnoreCase))
+                    return;
+
+                _handler ??= new SceneHandler();
+                _handler.Save(absPath);
+                return;
+            }
+
+            // Avoid loading unopened assets just because the user saved the project.
+            // Loading a scene asset has side effects, and unopened assets do not need to be reserialized.
+            if (_handler == null)
+                return;
+
+            _handler.Save(absPath);
         }
 
         /// <summary>
@@ -271,6 +293,14 @@ namespace Editor.AssetManagement
         {
             _handler?.Render();
         }
+
+        /// <summary>
+        /// Draw this asset's editor UI inside the inspector.
+        /// </summary>
+        public void DrawEditor(SpriteBatch spriteBatch)
+        {
+            EnsureLoaded();
+            _handler?.Render();
+        }
     }
 }
-

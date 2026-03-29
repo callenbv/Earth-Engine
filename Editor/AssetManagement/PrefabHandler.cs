@@ -40,6 +40,21 @@ namespace Editor.AssetManagement
         private static string meshSearch = string.Empty;
         private static string materialSearch = string.Empty;
         private static string textBuffer = string.Empty;
+        private static GameObject? _draggedGameObject;
+        private static ObjectComponent? _draggedComponent;
+        private static IAssignable? _draggedAssignable;
+
+        public static void SetDraggedGameObject(GameObject? gameObject)
+        {
+            _draggedGameObject = gameObject;
+            _draggedComponent = null;
+        }
+
+        public static void SetDraggedComponent(ObjectComponent? component)
+        {
+            _draggedComponent = component;
+            _draggedGameObject = component?.Owner;
+        }
 
         /// <summary>
         /// Loads a prefab from a JSON file.
@@ -483,15 +498,15 @@ namespace Editor.AssetManagement
             }
             else if (expectedType == typeof(GameObject))
             {
-                GameObject obj = (GameObject)value;
+                GameObject? obj = value as GameObject;
                 string label = obj != null ? obj.Name : "None";
 
                 if (ImGui.Button(label))
                 {
-                    ImGui.OpenPopup("SelectGameObject");
+                    ImGui.OpenPopup($"SelectGameObject_{name}");
                 }
 
-                if (ImGui.BeginPopup("SelectGameObject"))
+                if (ImGui.BeginPopup($"SelectGameObject_{name}"))
                 {
                     foreach (var sceneObj in SceneViewWindow.Instance.scene.objects)
                     {
@@ -505,44 +520,52 @@ namespace Editor.AssetManagement
                     ImGui.EndPopup();
                 }
 
-                if (ImGui.BeginDragDropSource())
+                if (obj != null && ImGui.BeginDragDropSource())
                 {
-                    unsafe
-                    {
-                        GCHandle handle = GCHandle.Alloc(obj);
-                        ImGui.SetDragDropPayload("GAMEOBJECT_REF", (IntPtr)handle, sizeof(uint));
-                        ImGui.Text(obj.Name);
-                        ImGui.EndDragDropSource();
-                    }
+                    SetDraggedGameObject(obj);
+                    ImGui.SetDragDropPayload("GAMEOBJECT_REF", IntPtr.Zero, 0);
+                    ImGui.Text(obj.Name);
+                    ImGui.EndDragDropSource();
                 }
 
                 if (ImGui.BeginDragDropTarget())
                 {
                     unsafe
                     {
-                        var payload = ImGui.AcceptDragDropPayload("GAMEOBJECT_REF");
-                        if (payload.NativePtr != null)
+                        var objectPayload = ImGui.AcceptDragDropPayload("GAMEOBJECT_REF");
+                        if (objectPayload.NativePtr != null && TryGetDraggedGameObject(null, out var droppedObject))
                         {
-                            var handle = GCHandle.FromIntPtr(payload.Data);
-                            value = (GameObject)handle.Target;
-                            handle.Free();
+                            setValue(droppedObject);
                         }
+
+                        var hierarchyPayload = ImGui.AcceptDragDropPayload("GAMEOBJECT");
+                        if (hierarchyPayload.NativePtr != null && TryGetDraggedGameObject(null, out droppedObject))
+                        {
+                            setValue(droppedObject);
+                        }
+
+                        var componentPayload = ImGui.AcceptDragDropPayload("COMP_REF");
+                        if (componentPayload.NativePtr != null && TryGetDraggedGameObject(null, out droppedObject))
+                        {
+                            setValue(droppedObject);
+                        }
+
                         ImGui.EndDragDropTarget();
                     }
                 }
             }
             else if (typeof(ObjectComponent).IsAssignableFrom(expectedType))
             {
-                ObjectComponent comp = (ObjectComponent)value;
+                ObjectComponent? comp = value as ObjectComponent;
                 string label = comp != null ? comp.Name : "None";
 
                 if (ImGui.Button(label))
                 {
-                    ImGui.OpenPopup("SelectedComponent");
+                    ImGui.OpenPopup($"SelectedComponent_{name}");
                 }
 
                 // Assign a reference
-                if (ImGui.BeginPopup("SelectedComponent"))
+                if (ImGui.BeginPopup($"SelectedComponent_{name}"))
                 {
                     foreach (var sceneObj in SceneViewWindow.Instance.scene.objects)
                     {
@@ -567,28 +590,36 @@ namespace Editor.AssetManagement
                     ImGui.EndPopup();
                 }
 
-                if (ImGui.BeginDragDropSource())
+                if (comp != null && ImGui.BeginDragDropSource())
                 {
-                    unsafe
-                    {
-                        GCHandle handle = GCHandle.Alloc(comp);
-                        ImGui.SetDragDropPayload("COMP_REF", (IntPtr)handle, sizeof(uint));
-                        ImGui.Text(comp.Name);
-                        ImGui.EndDragDropSource();
-                    }
+                    SetDraggedComponent(comp);
+                    ImGui.SetDragDropPayload("COMP_REF", IntPtr.Zero, 0);
+                    ImGui.Text(comp.Name);
+                    ImGui.EndDragDropSource();
                 }
 
                 if (ImGui.BeginDragDropTarget())
                 {
                     unsafe
                     {
-                        var payload = ImGui.AcceptDragDropPayload("COMP_REF");
-                        if (payload.NativePtr != null)
+                        var componentPayload = ImGui.AcceptDragDropPayload("COMP_REF");
+                        if (componentPayload.NativePtr != null && TryGetDraggedComponent(expectedType, out var droppedComponent))
                         {
-                            var handle = GCHandle.FromIntPtr(payload.Data);
-                            value = (ObjectComponent)handle.Target;
-                            handle.Free();
+                            setValue(droppedComponent);
                         }
+
+                        var objectPayload = ImGui.AcceptDragDropPayload("GAMEOBJECT");
+                        if (objectPayload.NativePtr != null && TryGetDraggedComponent(expectedType, out droppedComponent))
+                        {
+                            setValue(droppedComponent);
+                        }
+
+                        var objectRefPayload = ImGui.AcceptDragDropPayload("GAMEOBJECT_REF");
+                        if (objectRefPayload.NativePtr != null && TryGetDraggedComponent(expectedType, out droppedComponent))
+                        {
+                            setValue(droppedComponent);
+                        }
+
                         ImGui.EndDragDropTarget();
                     }
                 }
@@ -743,13 +774,10 @@ namespace Editor.AssetManagement
 
                 if (assignable != null && ImGui.BeginDragDropSource())
                 {
-                    unsafe
-                    {
-                        GCHandle handle = GCHandle.Alloc(assignable);
-                        ImGui.SetDragDropPayload("ASSIGNABLE_REF", (IntPtr)handle, sizeof(uint));
-                        ImGui.Text(label);
-                        ImGui.EndDragDropSource();
-                    }
+                    _draggedAssignable = assignable;
+                    ImGui.SetDragDropPayload("ASSIGNABLE_REF", IntPtr.Zero, 0);
+                    ImGui.Text(label);
+                    ImGui.EndDragDropSource();
                 }
 
                 if (ImGui.BeginDragDropTarget())
@@ -759,13 +787,11 @@ namespace Editor.AssetManagement
                         var payload = ImGui.AcceptDragDropPayload("ASSIGNABLE_REF");
                         if (payload.NativePtr != null)
                         {
-                            var handle = GCHandle.FromIntPtr(payload.Data);
-                            IAssignable? droppedAssignable = handle.Target as IAssignable;
+                            IAssignable? droppedAssignable = _draggedAssignable;
                             if (droppedAssignable != null && expectedType.IsAssignableFrom(droppedAssignable.GetType()))
                             {
                                 setValue(droppedAssignable);
                             }
-                            handle.Free();
                         }
                         ImGui.EndDragDropTarget();
                     }
@@ -859,6 +885,36 @@ namespace Editor.AssetManagement
             ImGui.NextColumn(); // Move to next row
             ImGui.Columns(1);
         }
+
+        private static bool TryGetDraggedGameObject(GameObject? fallback, out GameObject? gameObject)
+        {
+            gameObject = _draggedGameObject ?? fallback;
+            if (gameObject == null && _draggedComponent?.Owner != null)
+            {
+                gameObject = _draggedComponent.Owner;
+            }
+
+            return gameObject != null;
+        }
+
+        private static bool TryGetDraggedComponent(Type expectedType, out ObjectComponent? component)
+        {
+            component = null;
+
+            if (_draggedComponent != null && expectedType.IsAssignableFrom(_draggedComponent.GetType()))
+            {
+                component = _draggedComponent;
+                return true;
+            }
+
+            if (TryGetDraggedGameObject(null, out var draggedObject) && draggedObject != null)
+            {
+                component = draggedObject.components
+                    .OfType<ObjectComponent>()
+                    .FirstOrDefault(c => expectedType.IsAssignableFrom(c.GetType()));
+            }
+
+            return component != null;
+        }
     }
 }
-

@@ -220,7 +220,6 @@ namespace EarthEngineEditor.Windows
             DrawBreadcrumb();
 
             float itemWidth = 100f;
-            float itemHeight = 20f;
             float padding = 4f;
             float textWidth = 100f;
 

@@ -57,14 +57,21 @@ namespace Engine.Core.Game
         {
             get
             {
-                var pos = GetComponent<Transform>()?.Position ?? Vector3.Zero;
-                return pos;
+                var transform = GetComponent<Transform>();
+                if (transform == null)
+                    return Parent?.Position ?? Vector3.Zero;
+
+                var localPosition = transform.Position;
+                if (Parent == null)
+                    return localPosition;
+
+                return Parent.TransformPoint(localPosition);
             }
             set
             {
                 var transform = GetComponent<Transform>();
                 if (transform != null)
-                    transform.Position = value;
+                    transform.Position = Parent == null ? value : Parent.InverseTransformPoint(value);
             }
         }
         /// <summary>
@@ -74,14 +81,21 @@ namespace Engine.Core.Game
         {
             get
             {
-                var pos = GetComponent<Transform>()?.OldPosition ?? Vector3.Zero;
-                return pos;
+                var transform = GetComponent<Transform>();
+                if (transform == null)
+                    return Parent?.OldPosition ?? Vector3.Zero;
+
+                var localOldPosition = transform.OldPosition;
+                if (Parent == null)
+                    return localOldPosition;
+
+                return Parent.TransformPoint(localOldPosition);
             }
             set
             {
                 var transform = GetComponent<Transform>();
                 if (transform != null)
-                    transform.OldPosition = value;
+                    transform.OldPosition = Parent == null ? value : Parent.InverseTransformPoint(value);
             }
         }
 
@@ -102,12 +116,16 @@ namespace Engine.Core.Game
         /// </summary>
         public float Rotation
         {
-            get => GetComponent<Transform>()?.Rotation ?? 0f;
+            get
+            {
+                float localRotation = GetComponent<Transform>()?.Rotation ?? 0f;
+                return Parent == null ? localRotation : Parent.Rotation + localRotation;
+            }
             set
             {
                 var transform = GetComponent<Transform>();
                 if (transform != null)
-                    transform.Rotation = value;
+                    transform.Rotation = Parent == null ? value : value - Parent.Rotation;
             }
         }
 
@@ -118,14 +136,22 @@ namespace Engine.Core.Game
         {
             get
             {
-                var scale = GetComponent<Transform>()?.Scale ?? Vector3.One;
-                return scale;
+                Vector3 localScale = GetComponent<Transform>()?.Scale ?? Vector3.One;
+                if (Parent == null)
+                    return localScale;
+
+                Vector3 parentScale = Parent.Scale;
+                return new Vector3(
+                    parentScale.X * localScale.X,
+                    parentScale.Y * localScale.Y,
+                    parentScale.Z * localScale.Z
+                );
             }
             set
             {
                 var transform = GetComponent<Transform>();
                 if (transform != null)
-                    transform.Scale = value;
+                    transform.Scale = Parent == null ? value : DivideByScale(value, Parent.Scale);
             }
         }
 
@@ -137,6 +163,7 @@ namespace Engine.Core.Game
         /// <summary>
         /// List of child GameObjects that are part of this GameObject's hierarchy.
         /// </summary>
+        [JsonIgnore]
         public List<GameObject> children = new List<GameObject>();
 
         /// <summary>
@@ -147,7 +174,13 @@ namespace Engine.Core.Game
         /// <summary>
         /// Parent GameObject, if this GameObject is part of a hierarchy.
         /// </summary>
-        public GameObject? Parent { get; set; } = null!; // Parent GameObject, if any. Initialized to null.
+        [JsonIgnore]
+        public GameObject? Parent { get; private set; } = null!; // Parent GameObject, if any. Initialized to null.
+
+        /// <summary>
+        /// Serialized parent identifier used to rebuild hierarchy after a scene loads.
+        /// </summary>
+        public Guid? ParentID { get; set; } = null;
 
         /// <summary>
         /// List of components attached to this GameObject.
@@ -286,6 +319,13 @@ namespace Engine.Core.Game
         {
             if (IsDestroyed) return;
 
+            SetParent(null);
+
+            foreach (var child in children.ToList())
+            {
+                child.SetParent(null);
+            }
+
             foreach (var component in components)
             {
                 component.Destroy();
@@ -359,11 +399,6 @@ namespace Engine.Core.Game
                 }
             }
 
-            // Update any children as well
-            foreach (var obj in children)
-            {
-                obj.Update(gameTime);
-            }
         }
 
         /// <summary>
@@ -387,10 +422,6 @@ namespace Engine.Core.Game
                 }
             }
 
-            foreach (var obj in children)
-            {
-                obj.Draw(spriteBatch);
-            }
         }
 
         /// <summary>
@@ -467,6 +498,100 @@ namespace Engine.Core.Game
                     Console.Error.WriteLine($"Error drawing UI script for {Name}: {ex.Message}");
                 }
             }
+        }
+
+        /// <summary>
+        /// Sets the parent of this GameObject and updates both sides of the hierarchy.
+        /// </summary>
+        /// <param name="newParent"></param>
+        public void SetParent(GameObject? newParent)
+        {
+            if (ReferenceEquals(Parent, newParent))
+            {
+                ParentID = newParent?.ID;
+                return;
+            }
+
+            if (newParent == this)
+                return;
+
+            if (newParent != null && newParent.IsDescendantOf(this))
+                return;
+
+            Parent?.children.Remove(this);
+
+            Parent = newParent;
+            ParentID = newParent?.ID;
+
+            if (newParent != null && !newParent.children.Contains(this))
+            {
+                newParent.children.Add(this);
+            }
+        }
+
+        public Vector3 TransformPoint(Vector3 localPoint)
+        {
+            Vector3 scaled = new Vector3(
+                localPoint.X * Scale.X,
+                localPoint.Y * Scale.Y,
+                localPoint.Z * Scale.Z
+            );
+
+            Vector3 rotated = Vector3.Transform(scaled, Matrix.CreateRotationZ(Rotation));
+            return Position + rotated;
+        }
+
+        public Vector3 InverseTransformPoint(Vector3 worldPoint)
+        {
+            Vector3 translated = worldPoint - Position;
+            Vector3 unrotated = Vector3.Transform(translated, Matrix.CreateRotationZ(-Rotation));
+            return DivideByScale(unrotated, Scale);
+        }
+
+        /// <summary>
+        /// Returns the first component of type T on this GameObject or any of its children.
+        /// </summary>
+        public T? GetComponentInChildren<T>() where T : ObjectComponent
+        {
+            var component = GetComponent<T>();
+            if (component != null)
+                return component;
+
+            foreach (var child in children)
+            {
+                component = child.GetComponentInChildren<T>();
+                if (component != null)
+                    return component;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Returns the first component of type T on this GameObject or any of its parents.
+        /// </summary>
+        public T? GetComponentInParent<T>() where T : ObjectComponent
+        {
+            var current = Parent;
+            while (current != null)
+            {
+                var component = current.GetComponent<T>();
+                if (component != null)
+                    return component;
+
+                current = current.Parent;
+            }
+
+            return null;
+        }
+
+        private static Vector3 DivideByScale(Vector3 value, Vector3 scale)
+        {
+            return new Vector3(
+                scale.X == 0f ? value.X : value.X / scale.X,
+                scale.Y == 0f ? value.Y : value.Y / scale.Y,
+                scale.Z == 0f ? value.Z : value.Z / scale.Z
+            );
         }
 
         /// <summary>

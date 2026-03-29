@@ -175,7 +175,11 @@ namespace Engine.Core.Game.Components
             float feetY = Math.Abs(Position.Y) + frameHeight / 2;
 
             // Incorporate height into depth sorting
-            float depth = ((Owner.Height+Height) * 10000f + feetY) / 100000f; // Adjust divisor to fit your world
+            float depth = ((Owner.Height + Height) * 10000f + feetY) / 100000f;
+
+            // Higher render orders should draw later / on top, which means a smaller layer depth.
+            int combinedRenderOrder = (Owner?.RenderOrder ?? 0) + RenderOrder;
+            depth -= combinedRenderOrder * 0.001f;
 
             return Math.Clamp(depth, 0f, 1f);
         }

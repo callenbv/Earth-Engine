@@ -7,6 +7,7 @@
 /// -----------------------------------------------------------------------------
 
 using Editor.AssetManagement;
+using Engine.Core.CustomMath;
 using Engine.Core.Data;
 using Engine.Core.Game;
 using Engine.Core.Game.Components;
@@ -51,10 +52,13 @@ namespace Engine.Core.Rooms
             {
                 foreach (var obj in objects)
                 {
+                    if (obj.Parent != null)
+                        continue;
+
                     if (!obj.Active)
                         continue;
 
-                    obj.Draw(spriteBatch);
+                    DrawHierarchy(obj, spriteBatch);
                 }
             }
             catch (Exception ex)
@@ -82,11 +86,14 @@ namespace Engine.Core.Rooms
             {
                 foreach (var obj in objects)
                 {
+                    if (obj.Parent != null)
+                        continue;
+
                     // Ignore deactive objects
                     if (!obj.Active)
                         continue;
 
-                    obj.DrawUI(spriteBatch);
+                    DrawUIHierarchy(obj, spriteBatch);
                 }
             }
             catch (Exception ex)
@@ -114,11 +121,14 @@ namespace Engine.Core.Rooms
                     if (obj.IsDestroyed)
                         destroyedObjects.Add(obj);
 
+                    if (obj.Parent != null)
+                        continue;
+
                     // Ignore deactive objects
                     if (!obj.Active)
                         continue;
 
-                    obj.Update(gameTime);
+                    UpdateHierarchy(obj, gameTime, destroyedObjects);
                 }
 
                 CollisionSystem.Update(gameTime);
@@ -126,6 +136,7 @@ namespace Engine.Core.Rooms
                 // Remove destroyed objects
                 foreach (GameObject obj in destroyedObjects)
                 {
+                    obj.SetParent(null);
                     objects.Remove(obj);
                 }
             }
@@ -151,50 +162,12 @@ namespace Engine.Core.Rooms
             try
             {
                 string json = File.ReadAllText(fullPath);
-
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    IncludeFields = true,
-                    Converters =
-            {
-                new ComponentListJsonConverter(),
-                new Vector2JsonConverter(),
-                new Vector3JsonConverter(),
-                new ColorJsonConverter()
-            }
-                };
-
-                var sceneData = JsonSerializer.Deserialize<Room>(json, options);
+                var sceneData = DeserializeRoomJson(json);
 
                 if (sceneData != null)
                 {
                     scene = sceneData;
                     scene.Name = name;
-
-                    Console.WriteLine($"[Room.Load] Setting up {scene.objects.Count} objects");
-                    foreach (var obj in scene.objects)
-                    {
-                        foreach (var component in obj.components)
-                        {
-                            try
-                            {
-                                if (component is ObjectComponent comp)
-                                {
-                                    comp.Owner = obj;
-                                    comp.Initialize();
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.Error.WriteLine($"[Room.Load] Error setting up component {component.GetType().Name} on {obj.Name}: {ex.Message}");
-                                Console.Error.WriteLine($"[Room.Load] Stack trace: {ex.StackTrace}");
-                            }
-                        }
-                    }
-
-                    GameReferenceResolver.Resolve(scene.objects);
-                    ComponentReferenceResolver.Resolve(scene.objects);
                 }
             }
             catch (Exception ex)
@@ -235,6 +208,187 @@ namespace Engine.Core.Rooms
         public GameObject? FindByName(string name)
         {
             return objects.FirstOrDefault(obj => !obj.IsDestroyed && obj.Name == name);
+        }
+
+        public static List<GameObject> DuplicateHierarchy(GameObject root)
+        {
+            var sourceObjects = GetHierarchyObjects(root);
+            var tempRoom = new Room
+            {
+                Name = "Clipboard",
+                objects = sourceObjects
+            };
+
+            string json = JsonSerializer.Serialize(tempRoom, CreateRoomSerializationOptions(writeIndented: false));
+            Room? cloneRoom = DeserializeRoomJson(json);
+
+            if (cloneRoom == null)
+                return new List<GameObject>();
+
+            RefreshObjectIds(cloneRoom.objects);
+            InitializeComponents(cloneRoom.objects, createComponents: true);
+
+            return cloneRoom.objects;
+        }
+
+        private static List<GameObject> GetHierarchyObjects(GameObject root)
+        {
+            List<GameObject> objects = new();
+
+            void Collect(GameObject current)
+            {
+                objects.Add(current);
+                foreach (var child in current.children)
+                {
+                    Collect(child);
+                }
+            }
+
+            Collect(root);
+            return objects;
+        }
+
+        private static JsonSerializerOptions CreateRoomSerializationOptions(bool writeIndented)
+        {
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                IncludeFields = true,
+                WriteIndented = writeIndented,
+                Converters =
+                {
+                    new ComponentListJsonConverter(),
+                    new Vector2JsonConverter(),
+                    new Vector3JsonConverter(),
+                    new ColorJsonConverter()
+                }
+            };
+
+            return options;
+        }
+
+        private static Room? DeserializeRoomJson(string json)
+        {
+            var scene = JsonSerializer.Deserialize<Room>(json, CreateRoomSerializationOptions(writeIndented: false));
+            if (scene == null)
+                return null;
+
+            InitializeComponents(scene.objects, createComponents: false);
+            GameReferenceResolver.Resolve(scene.objects);
+            ComponentReferenceResolver.Resolve(scene.objects);
+            RebuildHierarchy(scene.objects);
+            return scene;
+        }
+
+        private static void InitializeComponents(List<GameObject> objects, bool createComponents)
+        {
+            Console.WriteLine($"[Room] Setting up {objects.Count} objects");
+            foreach (var obj in objects)
+            {
+                foreach (var component in obj.components)
+                {
+                    try
+                    {
+                        if (component is ObjectComponent comp)
+                        {
+                            comp.Owner = obj;
+                            comp.Initialize();
+
+                            if (createComponents)
+                                comp.Create();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.Error.WriteLine($"[Room] Error setting up component {component.GetType().Name} on {obj.Name}: {ex.Message}");
+                        Console.Error.WriteLine($"[Room] Stack trace: {ex.StackTrace}");
+                    }
+                }
+            }
+        }
+
+        private static void RefreshObjectIds(List<GameObject> objects)
+        {
+            foreach (var obj in objects)
+            {
+                obj.ID = Guid.NewGuid();
+            }
+
+            foreach (var obj in objects)
+            {
+                obj.ParentID = obj.Parent?.ID;
+
+                foreach (var component in obj.components)
+                {
+                    if (component is ObjectComponent objectComponent)
+                    {
+                        objectComponent.ID = ERandom.Range(0, 9999999);
+                    }
+                }
+            }
+        }
+
+        private static void RebuildHierarchy(List<GameObject> objects)
+        {
+            var parentLookup = objects.ToDictionary(obj => obj, obj => obj.ParentID);
+
+            foreach (var obj in objects)
+            {
+                obj.children.Clear();
+                obj.SetParent(null);
+            }
+
+            var byId = objects.ToDictionary(o => o.ID, o => o);
+            foreach (var obj in objects)
+            {
+                var parentId = parentLookup[obj];
+                if (parentId.HasValue && byId.TryGetValue(parentId.Value, out var parent))
+                {
+                    obj.SetParent(parent);
+                }
+            }
+        }
+
+        private static void UpdateHierarchy(GameObject obj, GameTime gameTime, List<GameObject> destroyedObjects)
+        {
+            obj.Update(gameTime);
+
+            foreach (var child in obj.children)
+            {
+                if (child.IsDestroyed)
+                    destroyedObjects.Add(child);
+
+                if (!child.Active)
+                    continue;
+
+                UpdateHierarchy(child, gameTime, destroyedObjects);
+            }
+        }
+
+        private static void DrawHierarchy(GameObject obj, SpriteBatch spriteBatch)
+        {
+            obj.Draw(spriteBatch);
+
+            foreach (var child in obj.children)
+            {
+                if (!child.Active)
+                    continue;
+
+                DrawHierarchy(child, spriteBatch);
+            }
+        }
+
+        private static void DrawUIHierarchy(GameObject obj, SpriteBatch spriteBatch)
+        {
+            obj.DrawUI(spriteBatch);
+
+            foreach (var child in obj.children)
+            {
+                if (!child.Active)
+                    continue;
+
+                DrawUIHierarchy(child, spriteBatch);
+            }
         }
     }
 }

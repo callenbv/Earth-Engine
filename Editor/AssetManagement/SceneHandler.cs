@@ -88,37 +88,8 @@ namespace Editor.AssetManagement
             SceneManager.EnterScene(sc);
             scene = RuntimeManager.Instance.scene;
 
-            // Clear the old folder structure completely - create a fresh root
-            SceneFolder root = new SceneFolder("Root");
-            
-            string fullAssetPath = Path.Combine(ProjectSettings.AssetsDirectory, path);
-            string relativePath = Path.GetRelativePath(ProjectSettings.AssetsDirectory, fullAssetPath);
-            string metaPath = Path.Combine(ProjectSettings.AssetsDirectory, relativePath + ".meta");
-
-            if (File.Exists(metaPath))
-            {
-                string metaJson = File.ReadAllText(metaPath);
-
-                var options = new JsonSerializerOptions
-                {
-                    IncludeFields = true
-                };
-                var metadata = JsonSerializer.Deserialize<SceneMetadata>(metaJson, options);
-
-                if (metadata != null)
-                {
-                    foreach (var sFolder in metadata.Folders)
-                    {
-                        var folder = FromSerializable(sFolder);
-                        // Clean up any invalid references
-                        CleanupFolderGameObjects(folder, scene.objects);
-                        root.SubFolders.Add(folder);
-                    }
-                }
-            }
-            
-            // Set the new root folder (this replaces the old one completely)
-            SceneViewWindow.Instance.rootFolder = root;
+            // The hierarchy now comes from GameObject parenting directly.
+            SceneViewWindow.Instance.rootFolder = new SceneFolder("Root");
         }
 
         /// <summary>
@@ -173,4 +144,3 @@ namespace Editor.AssetManagement
         }
     }
 }
-

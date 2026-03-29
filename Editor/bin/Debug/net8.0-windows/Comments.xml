@@ -1513,6 +1513,11 @@
             Parent GameObject, if this GameObject is part of a hierarchy.
             </summary>
         </member>
+        <member name="P:Engine.Core.Game.GameObject.ParentID">
+            <summary>
+            Serialized parent identifier used to rebuild hierarchy after a scene loads.
+            </summary>
+        </member>
         <member name="P:Engine.Core.Game.GameObject.components">
             <summary>
             List of components attached to this GameObject.
@@ -1609,6 +1614,22 @@
             Draw the object and its attached scripts
             </summary>
             <param name="spriteBatch"></param>
+        </member>
+        <member name="M:Engine.Core.Game.GameObject.SetParent(Engine.Core.Game.GameObject)">
+            <summary>
+            Sets the parent of this GameObject and updates both sides of the hierarchy.
+            </summary>
+            <param name="newParent"></param>
+        </member>
+        <member name="M:Engine.Core.Game.GameObject.GetComponentInChildren``1">
+            <summary>
+            Returns the first component of type T on this GameObject or any of its children.
+            </summary>
+        </member>
+        <member name="M:Engine.Core.Game.GameObject.GetComponentInParent``1">
+            <summary>
+            Returns the first component of type T on this GameObject or any of its parents.
+            </summary>
         </member>
         <member name="M:Engine.Core.Game.GameObject.OnClick">
             <summary>

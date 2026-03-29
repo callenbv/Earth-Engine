@@ -306,9 +306,9 @@ namespace Engine.Core.Game.Components
 
             // Get Transform component for position, rotation, scale
             var transform = Owner?.GetComponent<Transform>();
-            Vector3 position = transform?.Position ?? new Vector3(Position.X, Position.Y, 0f);
-            float rotation2D = transform?.Rotation ?? 0f;
-            Vector3 scale3D = transform?.Scale ?? Vector3.One;
+            Vector3 position = Owner?.Position ?? new Vector3(Position.X, Position.Y, 0f);
+            float rotation2D = Owner?.Rotation ?? 0f;
+            Vector3 scale3D = Owner?.Scale ?? Vector3.One;
 
             // World from Transform properties (pixels -> world units) + rotation + scale
             Vector3 pos = new Vector3(position.X / EngineContext.UnitsPerPixel, -position.Y / EngineContext.UnitsPerPixel, position.Z / EngineContext.UnitsPerPixel);

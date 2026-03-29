@@ -25,7 +25,7 @@
       },
       "Persistent": false,
       "ID": "e296a93b-ccab-46a4-93a1-007fcd52177d",
-      "Parent": null,
+      "ParentID": null,
       "components": [
         {
           "type": "Transform",
@@ -448662,24 +448662,23 @@
         }
       ],
       "IsDestroyed": false,
-      "Height": 1,
-      "children": []
+      "Height": 1
     },
     {
       "Active": true,
       "RenderOrder": 0,
       "Name": "Tree2",
       "Position": {
-        "X": 144,
-        "Y": 128,
+        "X": 496,
+        "Y": 352,
         "Z": 0
       },
       "OldPosition": {
-        "X": 144,
-        "Y": 128,
+        "X": 496,
+        "Y": 352,
         "Z": 0
       },
-      "Depth": 0.10176,
+      "Depth": 0.104,
       "Rotation": 0,
       "Scale": {
         "X": 1,
@@ -448688,18 +448687,18 @@
       },
       "Persistent": false,
       "ID": "e95a881f-1a04-4ed1-8a0c-9a15a76dee46",
-      "Parent": null,
+      "ParentID": null,
       "components": [
         {
           "type": "Transform",
           "Position": {
-            "X": 144,
-            "Y": 128,
+            "X": 496,
+            "Y": 352,
             "Z": 0
           },
           "OldPosition": {
-            "X": 144,
-            "Y": 128,
+            "X": 496,
+            "Y": 352,
             "Z": 0
           },
           "Rotation": 0,
@@ -448725,7 +448724,7 @@
             "Z": 0
           },
           "animated": false,
-          "depth": 0.10176,
+          "depth": 0.104,
           "spriteEffect": 0,
           "origin": "0 0",
           "Tint": "#ffffffff",
@@ -448796,24 +448795,23 @@
         }
       ],
       "IsDestroyed": false,
-      "Height": 1,
-      "children": []
+      "Height": 1
     },
     {
       "Active": true,
       "RenderOrder": 0,
       "Name": "Player2",
       "Position": {
-        "X": 288,
-        "Y": 272,
+        "X": 438.13232,
+        "Y": 443.79868,
         "Z": 0
       },
       "OldPosition": {
-        "X": 288,
-        "Y": 272,
+        "X": 438.13232,
+        "Y": 443.79868,
         "Z": 0
       },
-      "Depth": 0.10288,
+      "Depth": 0.104597986,
       "Rotation": 0,
       "Scale": {
         "X": 1,
@@ -448822,18 +448820,18 @@
       },
       "Persistent": false,
       "ID": "92748bab-818b-4474-872e-125964b3fa7f",
-      "Parent": null,
+      "ParentID": null,
       "components": [
         {
           "type": "Transform",
           "Position": {
-            "X": 288,
-            "Y": 272,
+            "X": 438.13232,
+            "Y": 443.79868,
             "Z": 0
           },
           "OldPosition": {
-            "X": 288,
-            "Y": 272,
+            "X": 438.13232,
+            "Y": 443.79868,
             "Z": 0
           },
           "Rotation": 0,
@@ -448859,7 +448857,7 @@
             "Z": 0
           },
           "animated": false,
-          "depth": 0.10288,
+          "depth": 0.104597986,
           "spriteEffect": 0,
           "origin": "16 16",
           "Tint": "#ffffffff",
@@ -448887,7 +448885,7 @@
             "Height": 32
           },
           "Height": 0,
-          "texturePath": "PlayerIdleDown",
+          "texturePath": "PlayerIdleLeft",
           "frameWidth": 32,
           "frameHeight": 32,
           "frameCount": 1,
@@ -448916,7 +448914,7 @@
           "TextScale": 1,
           "FontSize": 16,
           "TextRotation": 0,
-          "Depth": 0.1028801,
+          "Depth": 0.10459808,
           "Visible": true,
           "Centered": false,
           "LineWidth": 3840,
@@ -448932,136 +448930,33 @@
           "ID": 9679717
         },
         {
-          "type": "Sprite2D",
-          "Offset": {
-            "X": -16,
-            "Y": 0,
-            "Z": 0
-          },
-          "SpriteScale": {
-            "X": -0.76,
-            "Y": 0,
-            "Z": 0
-          },
-          "animated": false,
-          "depth": 0.10276,
-          "spriteEffect": 0,
-          "origin": "0 24",
-          "Tint": "#ffffffff",
-          "spriteBox": {
-            "Left": 0,
-            "Right": 32,
-            "Top": 0,
-            "Bottom": 8,
-            "IsEmpty": false,
-            "Location": {
-              "X": 0,
-              "Y": 0
-            },
-            "Size": {
-              "X": 32,
-              "Y": 8
-            },
-            "Center": {
-              "X": 16,
-              "Y": 4
-            },
-            "X": 0,
-            "Y": 0,
-            "Width": 32,
-            "Height": 8
-          },
-          "Height": 0,
-          "texturePath": "Healthbar",
-          "frameWidth": 32,
-          "frameHeight": 8,
-          "frameCount": 1,
-          "frameSpeed": 1,
-          "frame": 0,
-          "Active": true,
-          "RenderOrder": 0,
-          "ID": 7462780
-        },
-        {
-          "type": "Sprite2D",
-          "Offset": {
-            "X": -16,
-            "Y": 0,
-            "Z": 0
-          },
-          "SpriteScale": {
-            "X": 0,
-            "Y": 0,
-            "Z": 0
-          },
-          "animated": false,
-          "depth": 0.00276,
-          "spriteEffect": 0,
-          "origin": "0 24",
-          "Tint": "#b71744ff",
-          "spriteBox": {
-            "Left": 0,
-            "Right": 32,
-            "Top": 0,
-            "Bottom": 8,
-            "IsEmpty": false,
-            "Location": {
-              "X": 0,
-              "Y": 0
-            },
-            "Size": {
-              "X": 32,
-              "Y": 8
-            },
-            "Center": {
-              "X": 16,
-              "Y": 4
-            },
-            "X": 0,
-            "Y": 0,
-            "Width": 32,
-            "Height": 8
-          },
-          "Height": -1,
-          "texturePath": "Healthbar",
-          "frameWidth": 32,
-          "frameHeight": 8,
-          "frameCount": 1,
-          "frameSpeed": 1,
-          "frame": 0,
-          "Active": true,
-          "RenderOrder": 0,
-          "ID": 6082161
-        },
-        {
           "type": "Health",
           "MaxHealth": 100,
-          "CurrentHealth": 24,
-          "HealthbarSprite": 7462780,
+          "CurrentHealth": 0,
+          "HealthbarSprite": 4059687,
           "Active": true,
           "RenderOrder": 0,
           "ID": 3546423
         }
       ],
       "IsDestroyed": false,
-      "Height": 1,
-      "children": []
+      "Height": 1
     },
     {
       "Active": true,
       "RenderOrder": 0,
       "Name": "Lamp3",
       "Position": {
-        "X": 336,
-        "Y": 192,
+        "X": 512,
+        "Y": 480,
         "Z": 0
       },
       "OldPosition": {
-        "X": 336,
-        "Y": 192,
+        "X": 512,
+        "Y": 480,
         "Z": 0
       },
-      "Depth": 0.10224,
+      "Depth": 0.10512,
       "Rotation": 0,
       "Scale": {
         "X": 1,
@@ -449070,18 +448965,18 @@
       },
       "Persistent": false,
       "ID": "066d8ceb-83b8-4dd2-a2c6-91bcf47d4ee2",
-      "Parent": null,
+      "ParentID": null,
       "components": [
         {
           "type": "Transform",
           "Position": {
-            "X": 336,
-            "Y": 192,
+            "X": 512,
+            "Y": 480,
             "Z": 0
           },
           "OldPosition": {
-            "X": 336,
-            "Y": 192,
+            "X": 512,
+            "Y": 480,
             "Z": 0
           },
           "Rotation": 0,
@@ -449124,7 +449019,7 @@
             "Z": 0
           },
           "animated": false,
-          "depth": 0.10224,
+          "depth": 0.10512,
           "spriteEffect": 0,
           "origin": "0 0",
           "Tint": "#ffffffff",
@@ -449164,24 +449059,23 @@
         }
       ],
       "IsDestroyed": false,
-      "Height": 1,
-      "children": []
+      "Height": 1
     },
     {
       "Active": true,
       "RenderOrder": 0,
       "Name": "Torch4",
       "Position": {
-        "X": 108.00752,
-        "Y": 257.23233,
+        "X": 592,
+        "Y": 544,
         "Z": 0
       },
       "OldPosition": {
-        "X": 108.00752,
-        "Y": 257.23233,
+        "X": 592,
+        "Y": 544,
         "Z": 0
       },
-      "Depth": 0.102652326,
+      "Depth": 0.10552,
       "Rotation": 0,
       "Scale": {
         "X": 1,
@@ -449190,18 +449084,18 @@
       },
       "Persistent": false,
       "ID": "91bc2153-70aa-4233-bd41-b6458a50098e",
-      "Parent": null,
+      "ParentID": null,
       "components": [
         {
           "type": "Transform",
           "Position": {
-            "X": 108.00752,
-            "Y": 257.23233,
+            "X": 592,
+            "Y": 544,
             "Z": 0
           },
           "OldPosition": {
-            "X": 108.00752,
-            "Y": 257.23233,
+            "X": 592,
+            "Y": 544,
             "Z": 0
           },
           "Rotation": 0,
@@ -449227,7 +449121,7 @@
             "Z": 0
           },
           "animated": true,
-          "depth": 0.102652326,
+          "depth": 0.10552,
           "spriteEffect": 0,
           "origin": "8 8",
           "Tint": "#ffffffff",
@@ -449268,7 +449162,7 @@
         {
           "type": "PointLight",
           "lightRadius": 188.492,
-          "finalRadius": 187.77043,
+          "finalRadius": 186.79555,
           "lightIntensity": 1,
           "finalIntensity": 1,
           "lightColor": "#ff8d28ff",
@@ -449315,8 +449209,7 @@
         }
       ],
       "IsDestroyed": false,
-      "Height": 1,
-      "children": []
+      "Height": 1
     },
     {
       "Active": true,
@@ -449341,7 +449234,7 @@
       },
       "Persistent": false,
       "ID": "1c68230c-2939-4e81-a767-ca9450b7e4ac",
-      "Parent": null,
+      "ParentID": null,
       "components": [
         {
           "type": "Transform",
@@ -449377,8 +449270,708 @@
         }
       ],
       "IsDestroyed": false,
-      "Height": 1,
-      "children": []
+      "Height": 1
+    },
+    {
+      "Active": true,
+      "RenderOrder": 0,
+      "Name": "HealthbarFill",
+      "Position": {
+        "X": 422.93243,
+        "Y": 419.39868,
+        "Z": 0
+      },
+      "OldPosition": {
+        "X": 422.93243,
+        "Y": 419.39868,
+        "Z": 0
+      },
+      "Depth": 0.10523399,
+      "Rotation": 0,
+      "Scale": {
+        "X": 1,
+        "Y": 1,
+        "Z": 0
+      },
+      "Persistent": false,
+      "ID": "e5b9a11b-2ffa-42ce-a2d5-526be7bf57a1",
+      "ParentID": "92748bab-818b-4474-872e-125964b3fa7f",
+      "components": [
+        {
+          "type": "Transform",
+          "Position": {
+            "X": -15.19989,
+            "Y": -24.4,
+            "Z": 0
+          },
+          "OldPosition": {
+            "X": -15.19989,
+            "Y": -24.399994,
+            "Z": 0
+          },
+          "Rotation": 0,
+          "Scale": {
+            "X": 1,
+            "Y": 1,
+            "Z": 1
+          },
+          "Active": false,
+          "RenderOrder": 1,
+          "ID": 3263427
+        },
+        {
+          "type": "Sprite2D",
+          "Offset": {
+            "X": 0,
+            "Y": 0,
+            "Z": 0
+          },
+          "SpriteScale": {
+            "X": -1,
+            "Y": 0,
+            "Z": 0
+          },
+          "animated": false,
+          "depth": 0.10523399,
+          "spriteEffect": 0,
+          "origin": "0 0",
+          "Tint": "#ffffffff",
+          "spriteBox": {
+            "Left": 0,
+            "Right": 32,
+            "Top": 0,
+            "Bottom": 8,
+            "IsEmpty": false,
+            "Location": {
+              "X": 0,
+              "Y": 0
+            },
+            "Size": {
+              "X": 32,
+              "Y": 8
+            },
+            "Center": {
+              "X": 16,
+              "Y": 4
+            },
+            "X": 0,
+            "Y": 0,
+            "Width": 32,
+            "Height": 8
+          },
+          "Height": 0,
+          "texturePath": "Healthbar",
+          "frameWidth": 32,
+          "frameHeight": 8,
+          "frameCount": 1,
+          "frameSpeed": 1,
+          "frame": 0,
+          "Active": true,
+          "RenderOrder": -1,
+          "ID": 4059687
+        }
+      ],
+      "IsDestroyed": false,
+      "Height": 1
+    },
+    {
+      "Active": true,
+      "RenderOrder": 0,
+      "Name": "HealthbarBack",
+      "Position": {
+        "X": 422.9323,
+        "Y": 419.39868,
+        "Z": 0
+      },
+      "OldPosition": {
+        "X": 422.9323,
+        "Y": 419.39868,
+        "Z": 0
+      },
+      "Depth": 0.10423399,
+      "Rotation": 0,
+      "Scale": {
+        "X": 1,
+        "Y": 1,
+        "Z": 0
+      },
+      "Persistent": false,
+      "ID": "1ba31f2a-6e25-4b08-b0e0-494461ead9f9",
+      "ParentID": "92748bab-818b-4474-872e-125964b3fa7f",
+      "components": [
+        {
+          "type": "Transform",
+          "Position": {
+            "X": -15.2,
+            "Y": -24.4,
+            "Z": 0
+          },
+          "OldPosition": {
+            "X": -15.200012,
+            "Y": -24.399994,
+            "Z": 0
+          },
+          "Rotation": 0,
+          "Scale": {
+            "X": 1,
+            "Y": 1,
+            "Z": 1
+          },
+          "Active": true,
+          "RenderOrder": 0,
+          "ID": 14218
+        },
+        {
+          "type": "Sprite2D",
+          "Offset": {
+            "X": 0,
+            "Y": 0,
+            "Z": 0
+          },
+          "SpriteScale": {
+            "X": 0,
+            "Y": 0,
+            "Z": 0
+          },
+          "animated": false,
+          "depth": 0.10423399,
+          "spriteEffect": 0,
+          "origin": "0 0",
+          "Tint": "#7a1822ff",
+          "spriteBox": {
+            "Left": 0,
+            "Right": 32,
+            "Top": 0,
+            "Bottom": 8,
+            "IsEmpty": false,
+            "Location": {
+              "X": 0,
+              "Y": 0
+            },
+            "Size": {
+              "X": 32,
+              "Y": 8
+            },
+            "Center": {
+              "X": 16,
+              "Y": 4
+            },
+            "X": 0,
+            "Y": 0,
+            "Width": 32,
+            "Height": 8
+          },
+          "Height": 0,
+          "texturePath": "Healthbar",
+          "frameWidth": 32,
+          "frameHeight": 8,
+          "frameCount": 1,
+          "frameSpeed": 1,
+          "frame": 0,
+          "Active": true,
+          "RenderOrder": 0,
+          "ID": 4425014
+        }
+      ],
+      "IsDestroyed": false,
+      "Height": 1
+    },
+    {
+      "Active": true,
+      "RenderOrder": 0,
+      "Name": "Hornet8",
+      "Position": {
+        "X": 671.84607,
+        "Y": 434.83926,
+        "Z": 0
+      },
+      "OldPosition": {
+        "X": 671.84607,
+        "Y": 434.83926,
+        "Z": 0
+      },
+      "Depth": 0.10446839,
+      "Rotation": 0,
+      "Scale": {
+        "X": 1,
+        "Y": 1,
+        "Z": 0
+      },
+      "Persistent": false,
+      "ID": "556842a7-1fb0-4c47-8bb0-28ccbd851a58",
+      "ParentID": null,
+      "components": [
+        {
+          "type": "Transform",
+          "Position": {
+            "X": 671.84607,
+            "Y": 434.83926,
+            "Z": 0
+          },
+          "OldPosition": {
+            "X": 671.84607,
+            "Y": 434.83926,
+            "Z": 0
+          },
+          "Rotation": 0,
+          "Scale": {
+            "X": 1,
+            "Y": 1,
+            "Z": 0
+          },
+          "Active": true,
+          "RenderOrder": 0,
+          "ID": 913340
+        },
+        {
+          "type": "Sprite2D",
+          "Offset": {
+            "X": 0,
+            "Y": 0,
+            "Z": 0
+          },
+          "SpriteScale": {
+            "X": 0,
+            "Y": 0,
+            "Z": 0
+          },
+          "animated": true,
+          "depth": 0.10446839,
+          "spriteEffect": 0,
+          "origin": "12 12",
+          "Tint": "#ffffffff",
+          "spriteBox": {
+            "Left": 72,
+            "Right": 96,
+            "Top": 0,
+            "Bottom": 24,
+            "IsEmpty": false,
+            "Location": {
+              "X": 72,
+              "Y": 0
+            },
+            "Size": {
+              "X": 24,
+              "Y": 24
+            },
+            "Center": {
+              "X": 84,
+              "Y": 12
+            },
+            "X": 72,
+            "Y": 0,
+            "Width": 24,
+            "Height": 24
+          },
+          "Height": 0,
+          "texturePath": "HornetIdle",
+          "frameWidth": 24,
+          "frameHeight": 24,
+          "frameCount": 5,
+          "frameSpeed": 7,
+          "frame": 4,
+          "Active": true,
+          "RenderOrder": 0,
+          "ID": 5463842
+        },
+        {
+          "type": "Collider2D",
+          "Size": "32 32",
+          "Offset": "0 0",
+          "IsTrigger": false,
+          "Triggered": false,
+          "Tags": [],
+          "Tilemap": null,
+          "Active": true,
+          "RenderOrder": 0,
+          "ID": 3255010
+        }
+      ],
+      "IsDestroyed": false,
+      "Height": 1
+    },
+    {
+      "Active": true,
+      "RenderOrder": 0,
+      "Name": "Key9",
+      "Position": {
+        "X": 410.1151,
+        "Y": 514.2176,
+        "Z": 0
+      },
+      "OldPosition": {
+        "X": 410.1151,
+        "Y": 514.2176,
+        "Z": 0
+      },
+      "Depth": 0.10522218,
+      "Rotation": 0,
+      "Scale": {
+        "X": 1,
+        "Y": 1,
+        "Z": 0
+      },
+      "Persistent": false,
+      "ID": "203aded0-2e84-4585-8e0c-f058af4e6612",
+      "ParentID": null,
+      "components": [
+        {
+          "type": "Transform",
+          "Position": {
+            "X": 410.1151,
+            "Y": 514.2176,
+            "Z": 0
+          },
+          "OldPosition": {
+            "X": 410.1151,
+            "Y": 514.2176,
+            "Z": 0
+          },
+          "Rotation": 0,
+          "Scale": {
+            "X": 1,
+            "Y": 1,
+            "Z": 0
+          },
+          "Active": true,
+          "RenderOrder": 0,
+          "ID": 9190232
+        },
+        {
+          "type": "Sprite2D",
+          "Offset": {
+            "X": 0,
+            "Y": 0,
+            "Z": 0
+          },
+          "SpriteScale": {
+            "X": 0,
+            "Y": 0,
+            "Z": 0
+          },
+          "animated": true,
+          "depth": 0.10522218,
+          "spriteEffect": 0,
+          "origin": "8 8",
+          "Tint": "#ffffffff",
+          "spriteBox": {
+            "Left": 64,
+            "Right": 80,
+            "Top": 0,
+            "Bottom": 16,
+            "IsEmpty": false,
+            "Location": {
+              "X": 64,
+              "Y": 0
+            },
+            "Size": {
+              "X": 16,
+              "Y": 16
+            },
+            "Center": {
+              "X": 72,
+              "Y": 8
+            },
+            "X": 64,
+            "Y": 0,
+            "Width": 16,
+            "Height": 16
+          },
+          "Height": 0,
+          "texturePath": "Key",
+          "frameWidth": 16,
+          "frameHeight": 16,
+          "frameCount": 5,
+          "frameSpeed": 4,
+          "frame": 4,
+          "Active": true,
+          "RenderOrder": 0,
+          "ID": 7142575
+        },
+        {
+          "type": "Collider2D",
+          "Size": "16 16",
+          "Offset": "0 0",
+          "IsTrigger": false,
+          "Triggered": false,
+          "Tags": [],
+          "Tilemap": null,
+          "Active": true,
+          "RenderOrder": 0,
+          "ID": 6992547
+        }
+      ],
+      "IsDestroyed": false,
+      "Height": 1
+    },
+    {
+      "Active": true,
+      "RenderOrder": 0,
+      "Name": "Lamp10",
+      "Position": {
+        "X": 410.00427,
+        "Y": 336.01218,
+        "Z": 0
+      },
+      "OldPosition": {
+        "X": 410.00427,
+        "Y": 336.01218,
+        "Z": 0
+      },
+      "Depth": 0.10368012,
+      "Rotation": 0,
+      "Scale": {
+        "X": 1,
+        "Y": 1,
+        "Z": 0
+      },
+      "Persistent": false,
+      "ID": "ff8e3d11-6246-4d0a-a1c7-681e853a65ff",
+      "ParentID": null,
+      "components": [
+        {
+          "type": "Transform",
+          "Position": {
+            "X": 410.00427,
+            "Y": 336.01218,
+            "Z": 0
+          },
+          "OldPosition": {
+            "X": 410.00427,
+            "Y": 336.01218,
+            "Z": 0
+          },
+          "Rotation": 0,
+          "Scale": {
+            "X": 1,
+            "Y": 1,
+            "Z": 0
+          },
+          "Active": true,
+          "RenderOrder": 0,
+          "ID": 8489723
+        },
+        {
+          "type": "PointLight",
+          "lightRadius": 255.952,
+          "finalRadius": 255.952,
+          "lightIntensity": 1,
+          "finalIntensity": 1,
+          "lightColor": "#ffb000ff",
+          "Offset": {
+            "X": -8,
+            "Y": -2,
+            "Z": 0
+          },
+          "FlickerIntensity": 0,
+          "Active": true,
+          "RenderOrder": 0,
+          "ID": 8669691
+        },
+        {
+          "type": "Sprite2D",
+          "Offset": {
+            "X": 0,
+            "Y": 0,
+            "Z": 0
+          },
+          "SpriteScale": {
+            "X": 0,
+            "Y": 0,
+            "Z": 0
+          },
+          "animated": false,
+          "depth": 0.10368012,
+          "spriteEffect": 0,
+          "origin": "0 0",
+          "Tint": "#ffffffff",
+          "spriteBox": {
+            "Left": 0,
+            "Right": 32,
+            "Top": 0,
+            "Bottom": 64,
+            "IsEmpty": false,
+            "Location": {
+              "X": 0,
+              "Y": 0
+            },
+            "Size": {
+              "X": 32,
+              "Y": 64
+            },
+            "Center": {
+              "X": 16,
+              "Y": 32
+            },
+            "X": 0,
+            "Y": 0,
+            "Width": 32,
+            "Height": 64
+          },
+          "Height": 0,
+          "texturePath": "Lamp",
+          "frameWidth": 32,
+          "frameHeight": 64,
+          "frameCount": 1,
+          "frameSpeed": 1,
+          "frame": 0,
+          "Active": true,
+          "RenderOrder": 0,
+          "ID": 3450579
+        }
+      ],
+      "IsDestroyed": false,
+      "Height": 1
+    },
+    {
+      "Active": true,
+      "RenderOrder": 0,
+      "Name": "Torch11",
+      "Position": {
+        "X": 692.3163,
+        "Y": 517.53186,
+        "Z": 0
+      },
+      "OldPosition": {
+        "X": 692.3163,
+        "Y": 517.53186,
+        "Z": 0
+      },
+      "Depth": 0.10525532,
+      "Rotation": 0,
+      "Scale": {
+        "X": 1,
+        "Y": 1,
+        "Z": 0
+      },
+      "Persistent": false,
+      "ID": "a07c807e-0aa6-4aa5-a8ef-665e2f75ba8e",
+      "ParentID": null,
+      "components": [
+        {
+          "type": "Transform",
+          "Position": {
+            "X": 692.3163,
+            "Y": 517.53186,
+            "Z": 0
+          },
+          "OldPosition": {
+            "X": 692.3163,
+            "Y": 517.53186,
+            "Z": 0
+          },
+          "Rotation": 0,
+          "Scale": {
+            "X": 1,
+            "Y": 1,
+            "Z": 0
+          },
+          "Active": true,
+          "RenderOrder": 0,
+          "ID": 608921
+        },
+        {
+          "type": "Sprite2D",
+          "Offset": {
+            "X": 0,
+            "Y": 0,
+            "Z": 0
+          },
+          "SpriteScale": {
+            "X": 0,
+            "Y": 0,
+            "Z": 0
+          },
+          "animated": true,
+          "depth": 0.10525532,
+          "spriteEffect": 0,
+          "origin": "8 8",
+          "Tint": "#ffffffff",
+          "spriteBox": {
+            "Left": 16,
+            "Right": 32,
+            "Top": 0,
+            "Bottom": 16,
+            "IsEmpty": false,
+            "Location": {
+              "X": 16,
+              "Y": 0
+            },
+            "Size": {
+              "X": 16,
+              "Y": 16
+            },
+            "Center": {
+              "X": 24,
+              "Y": 8
+            },
+            "X": 16,
+            "Y": 0,
+            "Width": 16,
+            "Height": 16
+          },
+          "Height": 0,
+          "texturePath": "Torch",
+          "frameWidth": 16,
+          "frameHeight": 16,
+          "frameCount": 4,
+          "frameSpeed": 9,
+          "frame": 1,
+          "Active": true,
+          "RenderOrder": 0,
+          "ID": 4504182
+        },
+        {
+          "type": "PointLight",
+          "lightRadius": 188.492,
+          "finalRadius": 186.79555,
+          "lightIntensity": 1,
+          "finalIntensity": 1,
+          "lightColor": "#ff8d28ff",
+          "Offset": {
+            "X": 0,
+            "Y": 0,
+            "Z": 0
+          },
+          "FlickerIntensity": 1.468,
+          "Active": true,
+          "RenderOrder": 0,
+          "ID": 3242967
+        },
+        {
+          "type": "ParticleEmitter",
+          "Burst": false,
+          "BurstCount": 10,
+          "SpawnRate": 8.929,
+          "Lifetime": 60,
+          "Speed": 19.643,
+          "Direction": 269.286,
+          "DirectionWiggle": 3.929,
+          "Shape": 1,
+          "TexturePath": "",
+          "Color": "#474747ff",
+          "Offset": {
+            "X": 0,
+            "Y": -2,
+            "Z": 0
+          },
+          "ParticleSize": 2.73,
+          "Enabled": true,
+          "Visible": true,
+          "Height": 0,
+          "ShowBounds": true,
+          "EmitterSize": {
+            "X": 6,
+            "Y": -6,
+            "Z": 0
+          },
+          "Active": true,
+          "RenderOrder": 0,
+          "ID": 1969638
+        }
+      ],
+      "IsDestroyed": false,
+      "Height": 1
     }
   ]
 }

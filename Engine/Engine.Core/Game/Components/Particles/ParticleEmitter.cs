@@ -265,7 +265,7 @@ namespace Engine.Core.Game.Components
 
             // Get Transform component for 3D positioning
             var transform = Owner.GetComponent<Transform>();
-            Vector3 emitterPos = transform?.Position ?? new Vector3(Position.X, Position.Y, Position.Z);
+            Vector3 emitterPos = Owner?.Position ?? new Vector3(Position.X, Position.Y, Position.Z);
 
             // Calculate the center of the emitter box and randomize within the box
             Vector3 boxCenter = emitterPos + Offset;
@@ -384,7 +384,7 @@ namespace Engine.Core.Game.Components
             var transform = Owner.GetComponent<Transform>();
             if (transform == null) return;
 
-            Vector3 emitterPos = transform.Position;
+            Vector3 emitterPos = Owner?.Position ?? transform.Position;
             Vector3 worldPos = new Vector3(
                 emitterPos.X / EngineContext.UnitsPerPixel,
                 -emitterPos.Y / EngineContext.UnitsPerPixel,

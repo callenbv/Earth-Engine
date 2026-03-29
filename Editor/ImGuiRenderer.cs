@@ -207,12 +207,12 @@ namespace EarthEngineEditor
             string robotoFontPath = Path.GetFullPath("Roboto-VariableFont_wdth.ttf");
 
             // Load Roboto font from memory
-            byte[] robotoData = File.ReadAllBytes(robotoFontPath);
-            GCHandle robotoHandle = GCHandle.Alloc(robotoData, GCHandleType.Pinned);
-            IntPtr robotoPtr = robotoHandle.AddrOfPinnedObject();
+            _robotoFontData = File.ReadAllBytes(robotoFontPath);
+            _robotoFontHandle = GCHandle.Alloc(_robotoFontData, GCHandleType.Pinned);
+            IntPtr robotoPtr = _robotoFontHandle.AddrOfPinnedObject();
 
             // Add Roboto as base font
-            _robotoFont = fontAtlas.AddFontFromMemoryTTF(robotoPtr, robotoData.Length, 16.0f);
+            _robotoFont = fontAtlas.AddFontFromMemoryTTF(robotoPtr, _robotoFontData.Length, 16.0f);
 
             // Load Font Awesome font from memory
             byte[] iconData = File.ReadAllBytes(iconFontPath);
@@ -248,7 +248,6 @@ namespace EarthEngineEditor
             fontAtlas.SetTexID(_fontTextureId);
 
             // Free memory
-            robotoHandle.Free();
             iconHandle.Free();
 
             Console.WriteLine("Font atlas built with Roboto and Font Awesome.");

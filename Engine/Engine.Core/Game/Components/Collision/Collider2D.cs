@@ -108,8 +108,22 @@ namespace Engine.Core.Game.Components
         {
             get
             {
-                var pos = new Vector2(Owner.Position.X, Owner.Position.Y) + Offset;
-                return new RectangleF(pos.X, pos.Y, Size.X, Size.Y);
+                Vector3 ownerScale = Owner.Scale;
+                Vector2 scaledOffset = new Vector2(Offset.X * ownerScale.X, Offset.Y * ownerScale.Y);
+                Vector2 scaledSize = new Vector2(MathF.Abs(Size.X * ownerScale.X), MathF.Abs(Size.Y * ownerScale.Y));
+                Vector2 position = new Vector2(Owner.Position.X, Owner.Position.Y) + scaledOffset;
+
+                if (ownerScale.X < 0f)
+                {
+                    position.X -= scaledSize.X;
+                }
+
+                if (ownerScale.Y < 0f)
+                {
+                    position.Y -= scaledSize.Y;
+                }
+
+                return new RectangleF(position.X, position.Y, scaledSize.X, scaledSize.Y);
             }
         }
 
@@ -233,9 +247,23 @@ namespace Engine.Core.Game.Components
             if (!EngineContext.Debug)
                 return;
 
-            //var bounds = Bounds;
-            //var rect = new Rectangle((int)bounds.X, (int)bounds.Y, (int)bounds.Width, (int)bounds.Height);
-            //spriteBatch.Draw(GraphicsLibrary.PixelTexture, rect, IsTrigger ? Color.Green * 0.5f : Color.Red * 0.5f);
+            var bounds = Bounds;
+            var rect = new Rectangle((int)bounds.X, (int)bounds.Y, (int)bounds.Width, (int)bounds.Height);
+            DrawOutline(spriteBatch, rect, IsTrigger ? Color.LimeGreen : Color.Red);
+        }
+
+        private static void DrawOutline(SpriteBatch spriteBatch, Rectangle rect, Color color, int thickness = 1)
+        {
+            if (rect.Width <= 0 || rect.Height <= 0)
+                return;
+
+            thickness = Math.Max(1, thickness);
+            Texture2D pixel = GraphicsLibrary.PixelTexture;
+
+            spriteBatch.Draw(pixel, new Rectangle(rect.X, rect.Y, rect.Width, thickness), color);
+            spriteBatch.Draw(pixel, new Rectangle(rect.X, rect.Bottom - thickness, rect.Width, thickness), color);
+            spriteBatch.Draw(pixel, new Rectangle(rect.X, rect.Y, thickness, rect.Height), color);
+            spriteBatch.Draw(pixel, new Rectangle(rect.Right - thickness, rect.Y, thickness, rect.Height), color);
         }
 
         /// <summary>

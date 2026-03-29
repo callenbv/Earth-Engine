@@ -36,8 +36,6 @@ namespace Editor.Windows.Homepage
 
         float containerWidth = 400f;
         float containerHeight = 48f;
-        private string DemoProjectDirectory = "DemoProjects";
-
         /// <summary>
         /// Initialize homepage buttons
         /// </summary>
@@ -60,14 +58,14 @@ namespace Editor.Windows.Homepage
         public void Initialize()
         {
             // Load demo projects
-            string DemoProjectDirectory = "../../../../DemoProjects";
+            string demoProjectDirectory = "../../../../DemoProjects";
             string EditorAssets = "../../../Content/Assets/Textures";
 
-            DemoProjectDirectory = Path.GetFullPath(DemoProjectDirectory);
+            demoProjectDirectory = Path.GetFullPath(demoProjectDirectory);
 
-            if (Directory.Exists(DemoProjectDirectory))
+            if (Directory.Exists(demoProjectDirectory))
             {
-                var files = Directory.EnumerateFiles(DemoProjectDirectory, "*.earthproj", SearchOption.AllDirectories);
+                var files = Directory.EnumerateFiles(demoProjectDirectory, "*.earthproj", SearchOption.AllDirectories);
 
                 // Recursively check for projects
                 foreach (var f in files)

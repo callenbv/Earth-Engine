@@ -88,16 +88,11 @@ namespace Engine.Core.Game.Components
         [HideInInspector]
         public Vector3 Position
         {
-            get
-            {
-                var pos = Owner?.GetComponent<Transform>()?.Position ?? Vector3.Zero;
-                return pos;
-            }
+            get => Owner?.Position ?? Vector3.Zero;
             set
             {
-                var transform = Owner?.GetComponent<Transform>();
-                if (transform != null)
-                    transform.Position = value;
+                if (Owner != null)
+                    Owner.Position = value;
             }
         }
 
@@ -108,16 +103,11 @@ namespace Engine.Core.Game.Components
         [HideInInspector]
         public Vector3 OldPosition
         {
-            get
-            {
-                var pos = Owner?.GetComponent<Transform>()?.OldPosition ?? Vector3.Zero;
-                return pos;
-            }
+            get => Owner?.OldPosition ?? Vector3.Zero;
             set
             {
-                var transform = Owner?.GetComponent<Transform>();
-                if (transform != null)
-                    transform.OldPosition = value;
+                if (Owner != null)
+                    Owner.OldPosition = value;
             }
         }
 
@@ -128,12 +118,11 @@ namespace Engine.Core.Game.Components
         [HideInInspector]
         public float Rotation
         {
-            get => Owner?.GetComponent<Transform>()?.Rotation ?? 0f;
+            get => Owner?.Rotation ?? 0f;
             set
             {
-                var transform = Owner?.GetComponent<Transform>();
-                if (transform != null)
-                    transform.Rotation = value;
+                if (Owner != null)
+                    Owner.Rotation = value;
             }
         }
 
@@ -144,16 +133,11 @@ namespace Engine.Core.Game.Components
         [HideInInspector]
         public Vector3 Scale
         {
-            get
-            {
-                var scale = Owner?.GetComponent<Transform>()?.Scale ?? Vector3.One;
-                return scale;
-            }
+            get => Owner?.Scale ?? Vector3.One;
             set
             {
-                var transform = Owner?.GetComponent<Transform>();
-                if (transform != null)
-                    transform.Scale = value;
+                if (Owner != null)
+                    Owner.Scale = value;
             }
         }
 

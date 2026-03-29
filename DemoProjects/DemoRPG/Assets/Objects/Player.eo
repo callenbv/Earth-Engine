@@ -106,6 +106,7 @@
       "type": "Health",
       "MaxHealth": 100,
       "CurrentHealth": 100,
+      "HealthbarSprite": null,
       "Active": true,
       "RenderOrder": 0,
       "ID": 6572628

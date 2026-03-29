@@ -56,15 +56,23 @@ namespace Editor.Windows.Inspector
             {
                 bool open = ImGui.TreeNodeEx($"{comp.Name}##{comp.GetID()}");
 
+                if (comp is ObjectComponent objectComponent && ImGui.BeginDragDropSource())
+                {
+                    PrefabHandler.SetDraggedComponent(objectComponent);
+                    ImGui.SetDragDropPayload("COMP_REF", IntPtr.Zero, 0);
+                    ImGui.Text(comp.Name);
+                    ImGui.EndDragDropSource();
+                }
+
                 if (open)
                 {
                     DrawComponent(comp);
                     ImGui.TreePop();
                     if (ImGuiRenderer.IconButton("Remove", "\uf1f8", Microsoft.Xna.Framework.Color.Red))
                     {
-                        if (comp is ObjectComponent objectComponent)
+                        if (comp is ObjectComponent removableComponent)
                         {
-                            objectComponent.Owner?.components.Remove(objectComponent);
+                            removableComponent.Owner?.components.Remove(removableComponent);
                             break;
                         }
                     }

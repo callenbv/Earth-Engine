@@ -91,7 +91,7 @@ namespace Engine.Core.Game.Components
             Vector3 up = Vector3.Up;
 
             // Just follow the player exactly - convert position to camera space
-            Vector3 playerPos = transform.Position;
+            Vector3 playerPos = Owner?.Position ?? transform.Position;
             Vector3 cameraPosition = new Vector3(
                 playerPos.X / Engine.Core.EngineContext.UnitsPerPixel,
                 -playerPos.Y / Engine.Core.EngineContext.UnitsPerPixel, 
